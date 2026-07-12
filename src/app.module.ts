@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import configuration from './common/config/configuration';
 import { validateEnv } from './common/config/env.validation';
+import { DatabaseModule } from './common/database/database.module';
+import { SchedulingModule } from './modules/scheduling/scheduling.module';
 
 @Module({
   imports: [
@@ -12,9 +15,10 @@ import { validateEnv } from './common/config/env.validation';
       load: [configuration],
       validate: validateEnv,
     }),
-    // Foundational & feature modules are wired in subsequent phases:
-    // DatabaseModule, SchedulingModule, SourcesModule, ListingsModule,
-    // ValuationModule, ProfilesModule, NotificationsModule, FxModule.
+    ScheduleModule.forRoot(),
+    DatabaseModule,
+    SchedulingModule,
+    // US1 feature modules wired next: Sources, Listings, Valuation, Notifications.
   ],
 })
 export class AppModule {}

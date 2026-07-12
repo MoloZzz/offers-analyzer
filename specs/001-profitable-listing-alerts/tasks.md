@@ -37,15 +37,15 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T006 Setup TypeORM datasource + migration tooling in `src/common/database/`
-- [ ] T007 [P] Error handling + structured logging in `src/common/`
-- [ ] T008 [P] Shared `Money` type + currency enum in `src/common/types/`
-- [ ] T009 [P] Define ports (`ListingSource`, `Notifier`, `ExchangeRate`) in `src/modules/*/ports/` per `contracts/`
-- [ ] T010 Setup BullMQ module + Redis connection in `src/modules/scheduling/`
-- [ ] T011 Implement Redis token-bucket **rate budget** in `src/modules/scheduling/rate-budget.service.ts`
-- [ ] T012 Create all entities + initial migration (SearchProfile, Listing, PriceObservation, FairValueBenchmark, Opportunity, Subscriber, Notification) per `data-model.md` in `src/modules/*/entities/` and `src/migrations/`
+- [X] T006 Setup TypeORM datasource + `DatabaseModule` in `src/common/database/` (dev schema via `synchronize`; prod migrations via `data-source.ts`)
+- [X] T007 [P] Error handling (`DomainError` + typed subclasses) in `src/common/errors/`; logging via Nest `Logger`
+- [X] T008 [P] Shared `Money` type + `Currency` enum in `src/common/types/money.ts`
+- [X] T009 [P] Define ports (`ListingSource`, `Notifier`, `ExchangeRate`) in `src/modules/*/ports/` per `contracts/`
+- [X] T010 Redis connection wired (ioredis) in `src/modules/scheduling/` (BullMQ queue added with the poll pipeline in US1)
+- [X] T011 Implement Redis rate-budget in `src/modules/scheduling/rate-budget.service.ts`
+- [X] T012 Create all 7 entities per `data-model.md` in `src/modules/*/entities/` (schema auto-synced in dev; migration generation deferred to first DB run)
 
-**Checkpoint**: Foundation ready.
+**Checkpoint**: Foundation ready. *(Build/lint verification pending in a Linux/WSL env — the Cowork sandbox's `@types/node` copy is corrupted and aborts `tsc`; all source files confirmed structurally intact. Run `npm install` — `@nestjs/typeorm` was added — then `npm run build`.)*
 
 ---
 

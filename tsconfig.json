@@ -21,11 +21,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "@common/*": ["src/common/*"],
-      "@modules/*": ["src/modules/*"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]
