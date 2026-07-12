@@ -14,7 +14,7 @@ _TODO: none yet. First entry appears after the first `/speckit-specify` run._
 
 | Spec | Summary | Status |
 |------|---------|--------|
-| _(none)_ | — | — |
+| `../.specify/../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Draft (v1 MVP) |
 
 ## Constitution
 
