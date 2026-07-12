@@ -30,6 +30,19 @@ Updating the vault is part of "done." A change is not complete until the knowled
 - **New tool / env / runbook step** → update [[environment-setup]].
 - **New spec** (Spec Kit) → link it from [[specs/README]].
 
+## Context zone (`context/`) — decoupled inbox
+
+There are **two layers**. Keep them distinct:
+
+- **Curated vault** (all folders except `context/`) — the source of truth, governed by the read/write protocol above and navigated via `[[links]]` from [[00-INDEX]].
+- **Context zone** (`context/`) — a decoupled inbox for goals, session logs, and drafts. Intentionally **not** woven into the navigation graph (curated notes don't link out to it), so the graph stays high-signal. Full rules: `context/README.md`.
+
+How the two interact **without breaking the vault**:
+
+- **Read:** at session start, skim `context/goals.md` and the latest `context/log/*` for background — *then* navigate the curated vault as usual.
+- **Capture:** jot session notes/decisions into today's `context/log/YYYY-MM-DD-*.md` freely.
+- **Promote, don't accumulate:** when a context note matures into a durable fact/decision, move it into the curated vault (ADR / [[glossary]] / [[overview]] / [[coding-standards]] / `research/`). The log stays as a historical record. The curated notes remain the only source of truth.
+
 ## Note conventions
 
 - One concept per note. Prefer many small linked notes over few large ones.

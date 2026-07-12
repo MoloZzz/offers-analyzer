@@ -13,13 +13,23 @@ The Obsidian vault at `knowledge-offers-analyzer/` is the **primary navigation
 layer** for this project. It is not optional documentation; it is how you find
 your way around.
 
+The vault has **two layers**: the **curated** notes (source of truth, navigated
+via `[[links]]`) and a **decoupled context zone** (`context/`) for goals, session
+logs, and drafts — deliberately kept out of the navigation graph so it never
+dilutes it. Rules: `context/README.md`.
+
 **Read protocol — before touching code, every task:**
-1. Open `knowledge-offers-analyzer/00-INDEX.md` **first**.
-2. Follow its Maps of Content into the area you're working on.
+1. Skim `knowledge-offers-analyzer/context/goals.md` and the latest
+   `context/log/*` for background.
+2. Open `knowledge-offers-analyzer/00-INDEX.md` and follow its Maps of Content
+   into the area you're working on.
 3. Let the notes point you to the right files. Do **not** default to broad
    grepping the codebase — navigate via the vault's `[[links]]`.
 
 **Write protocol — a task is NOT done until the vault reflects the change:**
+- Capture running context/decisions in today's `context/log/YYYY-MM-DD-*.md`.
+- **Promote** anything durable out of `context/` into the curated notes below
+  (the context zone is an inbox, not a destination).
 - New module/feature → update `architecture/overview.md`.
 - New domain concept or rule → update `domain/glossary.md`.
 - Non-trivial decision → add an ADR (`decisions/`, copy `adr-template.md`).

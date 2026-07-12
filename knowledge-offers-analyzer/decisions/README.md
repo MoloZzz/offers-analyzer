@@ -11,6 +11,8 @@ updated: 2026-07-12
 ## Index
 
 - [[0001-adopt-sdd-vault-rtk|ADR-0001]] — Adopt Spec-Driven Development, a knowledge vault, and RTK (Accepted)
+- [[0002-monitoring-via-official-api|ADR-0002]] — Monitor AUTO.RIA via the official API, narrow niche on free tier (Accepted)
+- [[0003-decoupled-context-zone|ADR-0003]] — Decoupled context zone instead of a second knowledge base (Accepted)
 
 ## How to add one
 

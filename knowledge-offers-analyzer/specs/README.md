@@ -16,6 +16,11 @@ _TODO: none yet. First entry appears after the first `/speckit-specify` run._
 |------|---------|--------|
 | _(none)_ | — | — |
 
+## Constitution
+
+Project principles are ratified in `../.specify/memory/constitution.md` (v1.0.0, 2026-07-12) —
+the non-negotiable rules every spec must satisfy. Amendments require an ADR + version bump.
+
 ## How this connects
 
 - Author specs with the SDD workflow — see [[environment-setup]].
