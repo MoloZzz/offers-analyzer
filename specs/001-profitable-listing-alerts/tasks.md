@@ -22,11 +22,14 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Initialize NestJS project (package.json, strict tsconfig, `src/main.ts`, `src/app.module.ts`) at repo root
-- [ ] T002 [P] Configure ESLint (typescript-eslint strict) + Prettier in `.eslintrc.cjs`, `.prettierrc`
-- [ ] T003 [P] Add dependencies (TypeORM, pg, bullmq, ioredis, @nestjs/schedule, nestjs-telegraf, @nestjs/config, class-validator/transformer, undici, jest, nock) in `package.json`
-- [ ] T004 [P] Add `docker-compose.yml` for local PostgreSQL + Redis
-- [ ] T005 Configure `@nestjs/config` + `.env` schema and validation in `src/common/config/`
+- [X] T001 Initialize NestJS project (package.json, strict tsconfig, `src/main.ts`, `src/app.module.ts`) at repo root
+- [X] T002 [P] Configure ESLint (typescript-eslint strict) + Prettier in `.eslintrc.cjs`, `.prettierrc`
+- [X] T003 [P] Add dependencies (TypeORM, pg, bullmq, ioredis, @nestjs/schedule, nestjs-telegraf, @nestjs/config, class-validator/transformer, undici, jest, nock) in `package.json`
+- [X] T004 [P] Add `docker-compose.yml` for local PostgreSQL + Redis
+- [X] T005 Configure `@nestjs/config` + `.env` schema and validation in `src/common/config/`
+
+> Phase 1 files written. `npm install` + `npm run build` must be run in a Linux/WSL env
+> (the Cowork sandbox can't finish the heavy install within its per-command time limit).
 
 ---
 

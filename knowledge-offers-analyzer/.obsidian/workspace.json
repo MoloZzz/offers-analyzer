@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "61dc980c45ef3205",
+        "id": "fb88b53ad9ecb636",
         "type": "tabs",
         "children": [
           {
-            "id": "94effdfb1a59f30b",
+            "id": "3125873069acc5fe",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "specs/README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "specs/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for README"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "specs/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from README"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "specs/README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of README"
             }
           }
         ]
@@ -176,12 +183,14 @@
       "bases:Create new base": false
     }
   },
-  "active": "94effdfb1a59f30b",
+  "active": "3125873069acc5fe",
   "lastOpenFiles": [
+    "research/profitability-definition.md",
+    "context/goals.md",
     "context/log/2026-07-12-session-01.md",
+    "decisions/adr-template.md",
     "specs/README.md",
     "domain/glossary.md",
-    "context/goals.md",
     "decisions/0003-decoupled-context-zone.md",
     "context/goals.md.tmp.18108.c98ccfe8c542",
     "context/README.md",
@@ -190,7 +199,6 @@
     "00-INDEX.md.tmp.28696.fbad2ec41a9a",
     "decisions/0002-monitoring-via-official-api.md",
     "decisions/0002-monitoring-via-official-api.md.tmp.28696.f5320c081a53",
-    "research/profitability-definition.md",
     "research/profitability-definition.md.tmp.28696.2e2717922fb1",
     "research/monitoring-approaches.md",
     "research",
@@ -201,7 +209,6 @@
     "operations/environment-setup.md",
     "operations/environment-setup.md.tmp.27932.10257b014653",
     "decisions/0001-adopt-sdd-vault-rtk.md",
-    "decisions/adr-template.md",
     "decisions/README.md",
     "conventions/coding-standards.md",
     "architecture/overview.md",

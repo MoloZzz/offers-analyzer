@@ -28,7 +28,7 @@ A user has told the system which kind of cars to watch (a niche). When a listing
 
 ### User Story 2 - Control what I watch and how strict it is (Priority: P2)
 
-A user manages one or more watch niches and tunes how the system decides what counts as "profitable" — the region, makes/models, price band, discount threshold, how dealers are treated, and the comparison currency — and can pause a niche.
+The operator manages one or more watch niches and tunes how the system decides what counts as "profitable" — the region, makes/models, price band, discount threshold, how dealers are treated, and the comparison currency — and can pause a niche. In v1 this configuration is operator-side (config/admin); end users interact only via subscribe/mute (US1, FR-015).
 
 **Why this priority**: Without user control the alerts are either too noisy or miss the target. This turns the fixed P1 flow into something each user can shape. It also removes any need to commit to a single niche up front.
 
@@ -80,7 +80,7 @@ Each alert explains *why* the listing was flagged — asking price vs fair marke
 - **FR-007**: System MUST notify subscribers of each new Opportunity via **Telegram**, including the reason (asking price, fair value, discount %, confidence, red-flags checked) and a link back to the original listing.
 - **FR-008**: System MUST NOT alert about the same listing more than once as new, and MUST recognize relisted/duplicate listings.
 - **FR-009**: System MUST detect significant **price drops** on already-seen listings and MAY notify them as a distinct, configurable event.
-- **FR-010**: Users MUST be able to configure, **per niche**: discount threshold, dealer policy (`label` / `exclude` / `ignore`), comparison currency (switchable), and enabled/disabled state.
+- **FR-010**: The **operator** MUST be able to configure, **per niche** (via configuration in v1): discount threshold, dealer policy (`label` / `exclude` / `ignore`), comparison currency (switchable), and enabled/disabled state. (End-user-facing profile management UI is out of v1 scope.)
 - **FR-011**: System MUST store listings and their observed prices **over time** (history), from first observation.
 - **FR-012**: System MUST operate within the source's **usage limits and Terms** (request budget, required backlink), degrade gracefully, and alert the operator when the budget is exhausted or the source is unavailable.
 - **FR-013**: System MUST **rank** surfaced Opportunities (v1: by discount × confidence).
