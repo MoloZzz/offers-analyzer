@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "fb88b53ad9ecb636",
+        "id": "80c572db27eb0fa1",
         "type": "tabs",
         "children": [
           {
-            "id": "3125873069acc5fe",
+            "id": "b9c0b6a35053acb4",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -176,21 +176,25 @@
       "bases:Create new base": false
     }
   },
-  "active": "3125873069acc5fe",
+  "active": "b9c0b6a35053acb4",
   "lastOpenFiles": [
+    "decisions/0004-drop-redis-bullmq.md",
+    "decisions/0004-drop-redis-bullmq.md.tmp.18704.749a9a2f548a",
+    "context/backlog.md",
+    "decisions/0003-decoupled-context-zone.md",
+    "decisions/README.md",
+    "decisions/0002-monitoring-via-official-api.md",
     "specs/README.md",
     "research/profitability-definition.md",
     "context/goals.md",
     "context/log/2026-07-12-session-01.md",
     "decisions/adr-template.md",
     "domain/glossary.md",
-    "decisions/0003-decoupled-context-zone.md",
     "context/goals.md.tmp.18108.c98ccfe8c542",
     "context/README.md",
     "context/log",
     "context",
     "00-INDEX.md.tmp.28696.fbad2ec41a9a",
-    "decisions/0002-monitoring-via-official-api.md",
     "decisions/0002-monitoring-via-official-api.md.tmp.28696.f5320c081a53",
     "research/profitability-definition.md.tmp.28696.2e2717922fb1",
     "research/monitoring-approaches.md",
@@ -200,9 +204,7 @@
     "Welcome.md.tmp.27932.4f4a81408861",
     "specs/README.md.tmp.27932.05faa98182e7",
     "operations/environment-setup.md",
-    "operations/environment-setup.md.tmp.27932.10257b014653",
     "decisions/0001-adopt-sdd-vault-rtk.md",
-    "decisions/README.md",
     "conventions/coding-standards.md",
     "architecture/overview.md",
     "_meta/note-template.md",

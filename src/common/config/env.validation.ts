@@ -2,7 +2,7 @@
  * Fail fast on missing/invalid required configuration at startup.
  * Secrets are only *required* outside test/development bootstrap.
  */
-const REQUIRED_ALWAYS = ['DATABASE_URL', 'REDIS_URL'] as const;
+const REQUIRED_ALWAYS = ['DATABASE_URL'] as const;
 const REQUIRED_IN_PROD = ['AUTO_RIA_API_KEY', 'TELEGRAM_BOT_TOKEN'] as const;
 
 export function validateEnv(config: Record<string, unknown>): Record<string, unknown> {

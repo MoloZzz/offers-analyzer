@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { RateBudgetService } from './rate-budget.service';
 
-/** Owns the rate budget now; the cron + BullMQ poll pipeline is added in US1. */
+/** Owns the in-memory rate budget. The poll pipeline lives in PollingModule (no queue in v1). */
 @Module({
   providers: [RateBudgetService],
   exports: [RateBudgetService],

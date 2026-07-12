@@ -5,7 +5,6 @@ export interface AppConfig {
   nodeEnv: string;
   port: number;
   databaseUrl: string;
-  redisUrl: string;
   autoRiaApiKey: string;
   telegramBotToken: string;
   nbuRateUrl: string;
@@ -18,7 +17,6 @@ export default (): AppConfig => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number(process.env.PORT ?? 3000),
   databaseUrl: process.env.DATABASE_URL ?? '',
-  redisUrl: process.env.REDIS_URL ?? '',
   autoRiaApiKey: process.env.AUTO_RIA_API_KEY ?? '',
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
   nbuRateUrl:

@@ -17,12 +17,12 @@ Telegram bot as the interface. See [research.md](./research.md) for decisions.
 
 **Language/Version**: TypeScript 5.x on Node.js 20 LTS
 
-**Primary Dependencies**: NestJS 10, TypeORM, `pg`, BullMQ + Redis (`ioredis`), `@nestjs/schedule`
+**Primary Dependencies**: NestJS 10, TypeORM + `@nestjs/typeorm`, `pg`, `@nestjs/schedule`
 (cron), `nestjs-telegraf` (Telegram), `@nestjs/config`, `class-validator`/`class-transformer`,
-`undici`/`axios` (HTTP)
+`undici` (HTTP). No Redis/BullMQ in v1 — see ADR-0004.
 
-**Storage**: PostgreSQL (listings, price history, profiles, subscribers, opportunities); Redis
-(queues + rate-budget token bucket + short-lived caches)
+**Storage**: PostgreSQL (listings, price history, profiles, subscribers, opportunities). Rate
+budget is in-memory (no Redis — ADR-0004)
 
 **Testing**: Jest (unit + integration), `nock`/recorded fixtures for AUTO.RIA contract tests,
 Supertest for bot/HTTP surface

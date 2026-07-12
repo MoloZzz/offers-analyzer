@@ -12,7 +12,7 @@ updated: 2026-07-12
 
 - **Runtime/Framework:** Node.js + NestJS.
 - **DB / ORM:** PostgreSQL + TypeORM.
-- **Queue/scheduling:** Redis + BullMQ (rate-limited polling under the API budget).
+- **Scheduling:** `@nestjs/schedule` cron with an in-memory rate budget (no Redis — see [[0004-drop-redis-bullmq|ADR-0004]]).
 - **Notifications:** Telegram bot.
 - **Repository:** `MoloZzz/offers-analyzer` (GitHub).
 
@@ -27,7 +27,8 @@ Planned in [[specs/README|spec 001]] `plan.md` (not yet implemented). One NestJS
 | `valuation` | fair value, discount, confidence, red-flags, opportunity scoring | see [[profitability-definition]] |
 | `profiles` | SearchProfile config (niche + tuning) | user-controlled params |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting | `Notifier` port |
-| `scheduling` | cron + BullMQ queues + rate budget (token bucket) | enforces ~30 req/hr |
+| `scheduling` | in-memory rate budget (fixed window) | enforces ~30 req/hr |
+| `polling` | cron pipeline: search → new → value → alert | no queue in v1 |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
@@ -51,7 +52,6 @@ _Draft — refine during `/speckit-plan`:_
 
 - **AUTO.RIA official API** behind a `ListingSource` port (first adapter). See [[monitoring-approaches]] and [[0002-monitoring-via-official-api|ADR-0002]].
 - **Telegram Bot API** for push notifications.
-- **Redis** for the queue/rate-limited scheduler.
 - Future: additional listing sources implement the same port.
 
 ## Related
