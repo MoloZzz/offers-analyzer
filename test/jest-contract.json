@@ -1,0 +1,7 @@
+{
+  "rootDir": "..",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "testRegex": "test/contract/.*\\.spec\\.ts$",
+  "transform": { "^.+\\.ts$": ["ts-jest", { "isolatedModules": true }] },
+  "testEnvironment": "node"
+}

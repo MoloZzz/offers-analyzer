@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import configuration from './common/config/configuration';
 import { validateEnv } from './common/config/env.validation';
 import { DatabaseModule } from './common/database/database.module';
+import { PollingModule } from './modules/polling/polling.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 
 @Module({
@@ -18,7 +19,8 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
     ScheduleModule.forRoot(),
     DatabaseModule,
     SchedulingModule,
-    // US1 feature modules wired next: Sources, Listings, Valuation, Notifications.
+    // PollingModule brings the US1 pipeline: Sources, Listings, Valuation, Notifications, Profiles.
+    PollingModule,
   ],
 })
 export class AppModule {}

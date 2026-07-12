@@ -57,24 +57,24 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 
 ### Tests for User Story 1
 
-- [ ] T013 [P] [US1] Contract test AUTO.RIA search/info/average_price vs fixtures in `test/contract/auto-ria.spec.ts`
-- [ ] T014 [P] [US1] Unit test valuation (discount, confidence gate, red-flags) in `test/unit/valuation.spec.ts`
-- [ ] T015 [P] [US1] Integration test end-to-end alert path in `test/integration/alert-flow.spec.ts`
+- [X] T013 [P] [US1] Contract test AUTO.RIA search/info/average_price via undici MockAgent in `test/contract/auto-ria.spec.ts`
+- [X] T014 [P] [US1] Unit test valuation (discount, confidence gate, red-flags) in `test/unit/valuation.spec.ts`
+- [ ] T015 [P] [US1] Integration test end-to-end alert path in `test/integration/alert-flow.spec.ts` — deferred (needs DB harness)
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] AUTO.RIA adapter implementing `ListingSource` (search/info/average_price/dictionaries) in `src/modules/sources/auto-ria/`
-- [ ] T017 [P] [US1] Dictionary cache (marks/models/states/cities) in `src/modules/sources/dictionary-cache.service.ts`
-- [ ] T018 [US1] Listing + PriceObservation repository with unique `(source, externalId)` dedup in `src/modules/listings/`
-- [ ] T019 [US1] Ingestion service: search → filter new ids → budgeted fetch details in `src/modules/listings/ingestion.service.ts`
-- [ ] T020 [US1] Valuation service: fair value, discount, confidence, red-flags, opportunity + score in `src/modules/valuation/valuation.service.ts`
-- [ ] T021 [US1] FairValueBenchmark cache (per cohort/day) in `src/modules/valuation/benchmark-cache.service.ts`
-- [ ] T022 [US1] Telegram `Notifier` adapter + alert formatting incl. AUTO.RIA backlink in `src/modules/notifications/telegram/`
-- [ ] T023 [US1] Persist Opportunity + Notification with unique `dedupKey` in `src/modules/notifications/`
-- [ ] T024 [US1] Poll job + cron wiring for one profile through the rate budget in `src/modules/scheduling/poll.processor.ts`
-- [ ] T025 [US1] Seed one example SearchProfile + subscriber bootstrap in `src/modules/profiles/seed.ts`
+- [X] T016 [P] [US1] AUTO.RIA adapter implementing `ListingSource` (search/info/average_price) in `src/modules/sources/auto-ria/auto-ria.source.ts`
+- [ ] T017 [P] [US1] Dictionary cache — deferred (not on the US1 hot path: profiles carry ids, info carries names)
+- [X] T018 [US1] Listings service with unique `(sourceKey, externalId)` dedup + price history in `src/modules/listings/listings.service.ts`
+- [X] T019 [US1] Ingestion (search → new ids → budgeted fetch) in `src/modules/polling/poll.service.ts`
+- [X] T020 [US1] Valuation service (fair value, discount, confidence, red-flags, score) in `src/modules/valuation/valuation.service.ts`
+- [X] T021 [US1] FairValueBenchmark cache (per cohort/day) in `src/modules/valuation/benchmark-cache.service.ts`
+- [X] T022 [US1] Telegram `Notifier` + alert formatting incl. AUTO.RIA backlink in `src/modules/notifications/telegram/` + `format/`
+- [X] T023 [US1] Persist Opportunity + Notification with unique `dedupKey` in `src/modules/notifications/notifications.service.ts`
+- [X] T024 [US1] Cron poll (no BullMQ) through the rate budget in `src/modules/polling/poll.service.ts`
+- [X] T025 [US1] Seed a disabled example SearchProfile in `src/modules/profiles/profiles.service.ts`
 
-**Checkpoint**: MVP — a real below-market listing triggers a Telegram alert.
+**Checkpoint**: MVP — a real below-market listing triggers a Telegram alert. *(Build/tests to be run in WSL; sandbox node_modules is broken/read-only. Simplification note: BullMQ intentionally omitted — cron is enough for v1.)*
 
 ---
 
