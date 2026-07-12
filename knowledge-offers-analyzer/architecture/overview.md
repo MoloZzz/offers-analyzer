@@ -18,15 +18,25 @@ updated: 2026-07-12
 
 ## Module map
 
-_TODO: fill as modules land. One row per module._
+Planned in [[specs/README|spec 001]] `plan.md` (not yet implemented). One NestJS module per concern:
 
-| Module | Responsibility | Key files | Notes |
-|--------|----------------|-----------|-------|
-| _(none yet)_ | — | — | Bootstrap stage |
+| Module | Responsibility | Notes |
+|--------|----------------|-------|
+| `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
+| `listings` | Listing & PriceObservation entities, dedup/relist | history from day one |
+| `valuation` | fair value, discount, confidence, red-flags, opportunity scoring | see [[profitability-definition]] |
+| `profiles` | SearchProfile config (niche + tuning) | user-controlled params |
+| `notifications` | Telegram bot, Subscriber, Notification, formatting | `Notifier` port |
+| `scheduling` | cron + BullMQ queues + rate budget (token bucket) | enforces ~30 req/hr |
+| `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
 
-_TODO: describe how an offer enters the system, is analyzed, and is stored/returned. Add a diagram when the first end-to-end path exists._
+Planned end-to-end path (v1): `scheduling` cron enqueues a poll per active `profile` →
+`sources` search (ids) → `listings` filters to new ids → `sources` fetch details (budgeted) →
+`valuation` gets `sources` average price, computes discount/confidence/red-flags → an
+**Opportunity** is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
+Full design: `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
 
 ## Entities / data model
 

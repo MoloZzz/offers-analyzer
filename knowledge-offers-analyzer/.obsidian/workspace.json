@@ -11,10 +11,14 @@
             "id": "94effdfb1a59f30b",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "context/log/2026-07-12-session-01.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "2026-07-12-session-01"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "context/log/2026-07-12-session-01.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for 2026-07-12-session-01"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "context/log/2026-07-12-session-01.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from 2026-07-12-session-01"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "context/log/2026-07-12-session-01.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of 2026-07-12-session-01"
             }
           }
         ]
@@ -178,6 +185,7 @@
   },
   "active": "94effdfb1a59f30b",
   "lastOpenFiles": [
+    "specs/README.md",
     "domain/glossary.md",
     "context/goals.md",
     "decisions/0003-decoupled-context-zone.md",
@@ -196,7 +204,6 @@
     "Welcome.md",
     "00-INDEX.md",
     "Welcome.md.tmp.27932.4f4a81408861",
-    "specs/README.md",
     "specs/README.md.tmp.27932.05faa98182e7",
     "operations/environment-setup.md",
     "operations/environment-setup.md.tmp.27932.10257b014653",
