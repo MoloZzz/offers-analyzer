@@ -10,10 +10,10 @@ export class FairValueBenchmark {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ default: 'auto-ria' })
+  @Column({ type: 'varchar', default: 'auto-ria' })
   sourceKey!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   cohortKey!: string;
 
   @Column('numeric', { transformer: numericTransformer })

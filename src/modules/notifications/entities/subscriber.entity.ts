@@ -8,7 +8,7 @@ export class Subscriber {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   telegramChatId!: string;
 
   @Column({ type: 'varchar', default: 'active' })

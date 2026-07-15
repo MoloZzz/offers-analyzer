@@ -37,7 +37,7 @@ export class Opportunity {
   @Column('jsonb', { default: {} })
   redFlags!: Record<string, boolean>;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   notified!: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })

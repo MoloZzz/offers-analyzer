@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
@@ -20,10 +21,7 @@ export const ENTITIES = [
   Notification,
 ];
 
-export function buildDataSourceOptions(
-  url: string,
-  synchronize: boolean,
-): DataSourceOptions {
+export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {
   return {
     type: 'postgres',
     url,
@@ -35,8 +33,6 @@ export function buildDataSourceOptions(
 }
 
 /** Standalone datasource used by the TypeORM CLI (migrations). App wiring uses TypeOrmModule. */
-const AppDataSource = new DataSource(
-  buildDataSourceOptions(process.env.DATABASE_URL ?? '', false),
-);
+const AppDataSource = new DataSource(buildDataSourceOptions(process.env.DATABASE_URL ?? '', false));
 
 export default AppDataSource;

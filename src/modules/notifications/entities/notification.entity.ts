@@ -17,7 +17,7 @@ export class Notification {
   @Column({ type: 'varchar' })
   type!: NotificationType;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   dedupKey!: string;
 
   @CreateDateColumn({ type: 'timestamptz' })

@@ -25,10 +25,10 @@ export class SearchProfile {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ default: 'auto-ria' })
+  @Column({ type: 'varchar', default: 'auto-ria' })
   sourceKey!: string;
 
   @Column('int')
@@ -61,7 +61,7 @@ export class SearchProfile {
   @Column({ type: 'varchar', default: 'label' })
   dealerPolicy!: DealerPolicy;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   enabled!: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })

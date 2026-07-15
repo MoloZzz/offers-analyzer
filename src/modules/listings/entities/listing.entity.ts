@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 import { numericTransformer } from '../../../common/database/numeric.transformer';
 import { Currency } from '../../../common/types/money';
@@ -21,16 +14,16 @@ export class Listing {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ default: 'auto-ria' })
+  @Column({ type: 'varchar', default: 'auto-ria' })
   sourceKey!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   externalId!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   make!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   model!: string;
 
   @Column('int', { nullable: true })
@@ -54,10 +47,10 @@ export class Listing {
   @Column({ type: 'varchar', default: 'unknown' })
   sellerType!: SellerType;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   vin?: string | null;
 
-  @Column()
+  @Column({ type: 'varchar' })
   url!: string;
 
   @Column('numeric', { transformer: numericTransformer })
