@@ -95,6 +95,8 @@ export class PollService {
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
     });
+
+    await this.listings.recordEvaluation(listing, result.score, result.discountPct);
     if (!result.isOpportunity) return;
 
     const opportunity = await this.opportunities.save(

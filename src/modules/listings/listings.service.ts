@@ -80,4 +80,12 @@ export class ListingsService {
 
     return { listing: saved, isNew, priceChanged };
   }
+
+  /** Record the latest valuation on the listing — for every evaluated listing, not just opportunities. */
+  async recordEvaluation(listing: Listing, score: number, discountPct: number): Promise<void> {
+    listing.lastScore = score;
+    listing.lastDiscountPct = discountPct;
+    listing.lastEvaluatedAt = new Date();
+    await this.listings.save(listing);
+  }
 }

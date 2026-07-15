@@ -115,10 +115,13 @@ export class AutoRiaSource implements ListingSource {
     const d = await this.get<AutoRiaAverage>('/average_price', params);
     // Prefer a robust central measure over the plain mean, which is skewed by outliers
     // (a live sample had arithmeticMean 12815 vs interQuartileMean 10584). See research note.
-    const amount = d.interQuartileMean ?? d.percentiles?.['50.0'] ?? d.arithmeticMean ?? 0;
+    const central = d.interQuartileMean ?? d.percentiles?.['50.0'] ?? d.arithmeticMean;
+    // Guard: only a finite number may become a benchmark (Postgres numeric would store NaN otherwise).
+    const amount = isFiniteNumber(central) ? central : 0;
+    const sampleSize = isFiniteNumber(d.total) ? d.total : (d.prices?.length ?? 0);
     return {
       value: { amount, currency: Currency.USD },
-      sampleSize: d.total ?? d.prices?.length ?? 0,
+      sampleSize,
     };
   }
 
@@ -135,6 +138,11 @@ export class AutoRiaSource implements ListingSource {
     const url = `${BASE_URL}${path}?${params.toString()}`;
     try {
       const { statusCode, body } = await request(url);
+      if (statusCode === 429) {
+        // The source's own rate limit is authoritative — stop spending until the window rolls over.
+        this.budget.markExhausted(this.key);
+        throw new RateBudgetExhaustedError(`AUTO.RIA ${path} rate limited (HTTP 429)`);
+      }
       if (statusCode >= 400) {
         throw new SourceUnavailableError(`AUTO.RIA ${path} returned HTTP ${statusCode}`);
       }
@@ -146,7 +154,9 @@ export class AutoRiaSource implements ListingSource {
       }
       return json;
     } catch (err) {
-      if (err instanceof SourceUnavailableError) throw err;
+      if (err instanceof SourceUnavailableError || err instanceof RateBudgetExhaustedError) {
+        throw err;
+      }
       this.logger.error(`AUTO.RIA ${path} request failed`, err as Error);
       throw new SourceUnavailableError(`AUTO.RIA ${path} request failed`);
     }
@@ -157,6 +167,10 @@ export class AutoRiaSource implements ListingSource {
 function mapSellerType(dealer?: { id?: number }): SellerType {
   if (!dealer) return 'unknown';
   return (dealer.id ?? 0) > 0 ? 'dealer' : 'private';
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
 }
 
 /** Real AUTO.RIA JSON shapes we read (verified against live responses). */

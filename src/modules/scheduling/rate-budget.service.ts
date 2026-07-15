@@ -38,6 +38,15 @@ export class RateBudgetService {
     return Math.max(0, this.capacity - used);
   }
 
+  /**
+   * Force the current hour window to "exhausted" — used when the source itself returns HTTP 429.
+   * The source's 429 is authoritative (our in-memory count drifts across restarts), so we stop
+   * spending until the window rolls over.
+   */
+  markExhausted(sourceKey = 'auto-ria'): void {
+    this.windows.set(this.windowKey(sourceKey), this.capacity);
+  }
+
   private windowKey(sourceKey: string): string {
     const now = new Date();
     const stamp =

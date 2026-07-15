@@ -44,8 +44,9 @@ const DEAL_SCORE_SCALE_PCT = 30;
 @Injectable()
 export class ValuationService {
   evaluate(input: ValuationInput): ValuationResult {
+    const fairValue = Number.isFinite(input.fairValue) ? input.fairValue : 0;
     const discountPct =
-      input.fairValue > 0 ? ((input.fairValue - input.asking) / input.fairValue) * 100 : 0;
+      fairValue > 0 ? ((fairValue - input.asking) / fairValue) * 100 : 0;
 
     const raw = clamp(discountPct / DEAL_SCORE_SCALE_PCT, -1, 1);
     const confidence =

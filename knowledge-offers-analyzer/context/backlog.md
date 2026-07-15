@@ -38,7 +38,8 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 
 ## 🟡 Next — US3 (trust & bot)
 
-- [ ] **B8 — Telegram bot commands:** `/start /subscribe /unsubscribe /mute /profiles /help`. FR-015.
+- [~] **B8 — Telegram bot commands.** Minimal `/start` (subscribe) + `/stop` (unsubscribe) done
+  (`TelegramBotUpdate` + `SubscribersService`). Remaining: `/mute`, `/profiles`, `/help`. FR-015.
 - [ ] **B9 — Richer alert:** show the deal score + all reasoning fields + seller; label (not
   celebrate) suspicious discounts. Spec 001 US3 / FR-007.
 

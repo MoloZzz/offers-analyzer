@@ -8,19 +8,19 @@ import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { Notification } from './entities/notification.entity';
 import { formatOpportunity } from './format/opportunity-message';
 import { Notifier, NOTIFIER } from './ports/notifier.port';
-import { Subscriber } from './entities/subscriber.entity';
+import { SubscribersService } from './subscribers.service';
 
 /** Sends opportunity alerts to active subscribers, idempotently (unique dedupKey — FR-008). */
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectRepository(Subscriber) private readonly subscribers: Repository<Subscriber>,
+    private readonly subscribers: SubscribersService,
     @InjectRepository(Notification) private readonly notifications: Repository<Notification>,
     @Inject(NOTIFIER) private readonly notifier: Notifier,
   ) {}
 
   async notifyOpportunity(opportunity: Opportunity, listing: Listing): Promise<void> {
-    const recipients = await this.subscribers.find({ where: { state: 'active' } });
+    const recipients = await this.subscribers.listActive();
     if (recipients.length === 0) return;
 
     const text = formatOpportunity(opportunity, listing);

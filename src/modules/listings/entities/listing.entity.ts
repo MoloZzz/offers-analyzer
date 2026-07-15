@@ -67,4 +67,14 @@ export class Listing {
 
   @Column({ type: 'timestamptz' })
   lastSeenAt!: Date;
+
+  // Last valuation result for this listing (recorded for every evaluated listing, not only opportunities).
+  @Column('numeric', { nullable: true, transformer: numericTransformer })
+  lastScore?: number | null;
+
+  @Column('numeric', { nullable: true, transformer: numericTransformer })
+  lastDiscountPct?: number | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  lastEvaluatedAt?: Date | null;
 }

@@ -9,6 +9,8 @@ import { Notification } from './entities/notification.entity';
 import { Subscriber } from './entities/subscriber.entity';
 import { NotificationsService } from './notifications.service';
 import { NOTIFIER } from './ports/notifier.port';
+import { SubscribersService } from './subscribers.service';
+import { TelegramBotUpdate } from './telegram/telegram-bot.update';
 import { TelegramNotifier } from './telegram/telegram.notifier';
 
 @Module({
@@ -23,6 +25,8 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
   ],
   providers: [
     NotificationsService,
+    SubscribersService,
+    TelegramBotUpdate,
     TelegramNotifier,
     { provide: NOTIFIER, useExisting: TelegramNotifier },
   ],
