@@ -5,48 +5,58 @@ export interface RedFlagInput {
   discountPct: number;
   sellerType: SellerType;
   hasVinReport: boolean;
+  damaged?: boolean;
+  salvage?: boolean;
+  unclearCustoms?: boolean;
+  confiscated?: boolean;
+  underCredit?: boolean;
+  abroad?: boolean;
 }
 
-export interface RedFlagRule {
+interface RedFlagRule {
   code: string;
-  /** A disqualifying flag suppresses the opportunity entirely; otherwise it only annotates. */
+  /** A disqualifying flag suppresses the opportunity entirely; a soft one only penalizes the score. */
   disqualifying: boolean;
   fired: (input: RedFlagInput) => boolean;
 }
 
 /**
  * v1 red-flags. "Cheaper than average" is often a scam/damaged car — see
- * knowledge-offers-analyzer/research/profitability-definition.md. Thresholds are conservative
- * and can move to config later.
+ * knowledge-offers-analyzer/research/profitability-definition.md. Damage/salvage/customs signals
+ * come straight from AUTO.RIA `autoInfoBar`.
  */
-export const RED_FLAG_RULES: RedFlagRule[] = [
-  {
-    code: 'suspicious_discount',
-    disqualifying: true,
-    // Too good to be true — likely scam or hidden damage.
-    fired: (i) => i.discountPct > 45,
-  },
-  {
-    code: 'no_vin_report',
-    disqualifying: false,
-    fired: (i) => !i.hasVinReport,
-  },
+const RED_FLAG_RULES: RedFlagRule[] = [
+  { code: 'suspicious_discount', disqualifying: true, fired: (i) => i.discountPct > 45 },
+  { code: 'damaged', disqualifying: true, fired: (i) => i.damaged === true },
+  { code: 'salvage', disqualifying: true, fired: (i) => i.salvage === true },
+  { code: 'confiscated', disqualifying: true, fired: (i) => i.confiscated === true },
+  { code: 'under_credit', disqualifying: true, fired: (i) => i.underCredit === true },
+  { code: 'unclear_customs', disqualifying: false, fired: (i) => i.unclearCustoms === true },
+  { code: 'abroad', disqualifying: false, fired: (i) => i.abroad === true },
+  { code: 'no_vin_report', disqualifying: false, fired: (i) => !i.hasVinReport },
 ];
+
+/** Multiplier applied per soft (non-disqualifying) red-flag that fires. */
+const SOFT_FLAG_PENALTY = 0.8;
 
 export interface RedFlagOutcome {
   flags: Record<string, boolean>;
   disqualified: boolean;
+  /** Score multiplier from soft flags (1 = none fired). */
+  penalty: number;
 }
 
 export function evaluateRedFlags(input: RedFlagInput): RedFlagOutcome {
   const flags: Record<string, boolean> = {};
   let disqualified = false;
+  let softFired = 0;
   for (const rule of RED_FLAG_RULES) {
     const fired = rule.fired(input);
     flags[rule.code] = fired;
-    if (fired && rule.disqualifying) {
-      disqualified = true;
+    if (fired) {
+      if (rule.disqualifying) disqualified = true;
+      else softFired += 1;
     }
   }
-  return { flags, disqualified };
+  return { flags, disqualified, penalty: Math.pow(SOFT_FLAG_PENALTY, softFired) };
 }

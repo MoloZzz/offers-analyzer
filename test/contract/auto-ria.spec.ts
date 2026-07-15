@@ -52,25 +52,62 @@ describe('AutoRiaSource (contract)', () => {
     expect(result.sampleSize).toBe(42);
   });
 
-  it('maps listing detail from info', async () => {
+  it('maps listing detail from info (real AUTO.RIA shape)', async () => {
     agent
       .get('https://developers.ria.com')
       .intercept({ path: (p) => p.startsWith('/auto/info'), method: 'GET' })
       .reply(200, {
         USD: 13000,
+        markId: 9,
+        modelId: 96,
         markName: 'Volkswagen',
         modelName: 'Passat',
-        marka_id: 9,
-        model_id: 96,
-        autoData: { year: 2017, race: 150 },
-        dealer: false,
-        linkToView: 'https://auto.ria.com/uk/auto_passat_19050985.html',
+        VIN: 'WVWZZZ3CZLE000000',
+        haveInfotechReport: true,
+        linkToView: '/auto_vw_passat_19050985.html',
+        dealer: { id: 0 },
+        stateData: { stateId: 5, cityId: 5 },
+        autoData: { year: 2017, raceInt: 150 },
+        autoInfoBar: {
+          damage: false,
+          custom: false,
+          abroad: false,
+          confiscatedCar: false,
+          onRepairParts: false,
+          underCredit: false,
+        },
       });
 
     const detail = await makeSource().fetch('19050985');
     expect(detail.make).toBe('Volkswagen');
+    expect(detail.markId).toBe(9);
     expect(detail.year).toBe(2017);
+    expect(detail.mileage).toBe(150);
     expect(detail.price.amount).toBe(13000);
     expect(detail.sellerType).toBe('private');
+    expect(detail.hasVinReport).toBe(true);
+    expect(detail.risk.damaged).toBe(false);
+    expect(detail.url).toBe('https://auto.ria.com/auto_vw_passat_19050985.html');
+  });
+
+  it('reads the damage red-flag from autoInfoBar', async () => {
+    agent
+      .get('https://developers.ria.com')
+      .intercept({ path: (p) => p.startsWith('/auto/info'), method: 'GET' })
+      .reply(200, {
+        USD: 16500,
+        markId: 9,
+        modelId: 3219,
+        markName: 'BMW',
+        modelName: '3 Series',
+        haveInfotechReport: true,
+        linkToView: '/auto_bmw_3_series_38561317.html',
+        dealer: { id: 0 },
+        autoData: { year: 2017, raceInt: 127 },
+        autoInfoBar: { damage: true },
+      });
+
+    const detail = await makeSource().fetch('38561317');
+    expect(detail.risk.damaged).toBe(true);
   });
 });

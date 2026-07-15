@@ -59,47 +59,62 @@ export class PollService {
 
     for (const externalId of ids) {
       if (await this.listings.isKnown(externalId)) continue; // dedup: only new listings
-
-      const detail = await this.source.fetch(externalId);
-      if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') continue;
-
-      const { listing } = await this.listings.recordSeen(detail);
-
-      const cohort = toCohort(detail);
-      const benchmark = await this.benchmarks.getOrLoad('auto-ria', cohort, () =>
-        this.source.averagePrice(cohort),
-      );
-
-      const result = this.valuation.evaluate({
-        asking: detail.price.amount,
-        fairValue: benchmark.value.amount,
-        sampleSize: benchmark.sampleSize,
-        minScore: profile.minDealScore,
-        minSamples: profile.confidenceMinSamples,
-        sellerType: detail.sellerType,
-        hasVinReport: detail.vinReportUrl != null,
-      });
-      if (!result.isOpportunity) continue;
-
-      const opportunity = await this.opportunities.save(
-        this.opportunities.create({
-          listingId: listing.id,
-          profileId: profile.id,
-          fairValue: benchmark.value.amount,
-          currency: profile.currency,
-          askingValue: detail.price.amount,
-          discountPct: result.discountPct,
-          confidence: result.confidence,
-          score: result.score,
-          redFlags: result.redFlags,
-          notified: false,
-        }),
-      );
-
-      await this.notifications.notifyOpportunity(opportunity, listing);
-      opportunity.notified = true;
-      await this.opportunities.save(opportunity);
+      try {
+        await this.evaluateListing(profile, externalId);
+      } catch (err) {
+        if (err instanceof RateBudgetExhaustedError) throw err; // stop the whole cycle
+        // One bad listing (e.g. thin cohort → average_price 400) must not abort the profile.
+        this.logger.warn(`Skipping listing ${externalId}: ${(err as Error).message}`);
+      }
     }
+  }
+
+  private async evaluateListing(profile: SearchProfile, externalId: string): Promise<void> {
+    const detail = await this.source.fetch(externalId);
+    if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
+
+    const { listing } = await this.listings.recordSeen(detail);
+
+    const cohort = toCohort(detail);
+    const benchmark = await this.benchmarks.getOrLoad('auto-ria', cohort, () =>
+      this.source.averagePrice(cohort),
+    );
+
+    const result = this.valuation.evaluate({
+      asking: detail.price.amount,
+      fairValue: benchmark.value.amount,
+      sampleSize: benchmark.sampleSize,
+      minScore: profile.minDealScore,
+      minSamples: profile.confidenceMinSamples,
+      sellerType: detail.sellerType,
+      hasVinReport: detail.hasVinReport,
+      damaged: detail.risk.damaged,
+      salvage: detail.risk.salvage,
+      unclearCustoms: detail.risk.unclearCustoms,
+      confiscated: detail.risk.confiscated,
+      underCredit: detail.risk.underCredit,
+      abroad: detail.risk.abroad,
+    });
+    if (!result.isOpportunity) return;
+
+    const opportunity = await this.opportunities.save(
+      this.opportunities.create({
+        listingId: listing.id,
+        profileId: profile.id,
+        fairValue: benchmark.value.amount,
+        currency: profile.currency,
+        askingValue: detail.price.amount,
+        discountPct: result.discountPct,
+        confidence: result.confidence,
+        score: result.score,
+        redFlags: result.redFlags,
+        notified: false,
+      }),
+    );
+
+    await this.notifications.notifyOpportunity(opportunity, listing);
+    opportunity.notified = true;
+    await this.opportunities.save(opportunity);
   }
 }
 

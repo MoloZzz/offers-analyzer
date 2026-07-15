@@ -69,24 +69,33 @@ export class AutoRiaSource implements ListingSource {
   async fetch(externalId: string): Promise<ListingDetail> {
     const params = new URLSearchParams({ api_key: this.apiKey, auto_id: externalId });
     const d = await this.get<AutoRiaInfo>('/info', params);
+    const bar = d.autoInfoBar ?? {};
 
-    const currency = Currency.USD;
-    const amount = d.USD ?? d.price ?? 0;
     return {
       externalId,
       make: d.markName ?? '',
       model: d.modelName ?? '',
-      markId: d.marka_id ?? 0,
-      modelId: d.model_id ?? 0,
-      year: d.autoData?.year ?? d.year ?? 0,
-      mileage: parseMileage(d.autoData?.race),
-      stateId: d.stateId ?? undefined,
-      cityId: d.cityId ?? undefined,
+      markId: d.markId ?? 0,
+      modelId: d.modelId ?? 0,
+      year: d.autoData?.year ?? 0,
+      mileage: d.autoData?.raceInt ?? undefined,
+      stateId: d.stateData?.stateId ?? undefined,
+      cityId: d.stateData?.cityId ?? undefined,
       sellerType: mapSellerType(d.dealer),
       vin: d.VIN ?? undefined,
-      vinReportUrl: d.linkToReport ?? undefined,
-      url: d.linkToView ?? `https://auto.ria.com/uk/auto_${externalId}.html`,
-      price: { amount, currency },
+      hasVinReport: d.haveInfotechReport === true,
+      url: d.linkToView
+        ? `https://auto.ria.com${d.linkToView}`
+        : `https://auto.ria.com/uk/auto_${externalId}.html`,
+      price: { amount: d.USD ?? 0, currency: Currency.USD },
+      risk: {
+        damaged: bar.damage === true,
+        salvage: bar.onRepairParts === true,
+        unclearCustoms: bar.custom === true,
+        confiscated: bar.confiscatedCar === true,
+        underCredit: bar.underCredit === true,
+        abroad: bar.abroad === true,
+      },
     };
   }
 
@@ -140,50 +149,33 @@ export class AutoRiaSource implements ListingSource {
   }
 }
 
-function mapSellerType(dealer: unknown): SellerType {
-  if (dealer === true || dealer === 1) return 'dealer';
-  if (dealer === false || dealer === 0) return 'private';
-  return 'unknown';
+/** AUTO.RIA `/info` returns a `dealer` object; a private seller has `dealer.id === 0`. */
+function mapSellerType(dealer?: { id?: number }): SellerType {
+  if (!dealer) return 'unknown';
+  return (dealer.id ?? 0) > 0 ? 'dealer' : 'private';
 }
 
-function parseMileage(value: unknown): number | undefined {
-  if (value == null) return undefined;
-  if (typeof value === 'number' && Number.isFinite(value)) return Math.round(value);
-
-  if (typeof value === 'string') {
-    const normalized = value.toLowerCase().replace(/\s+/g, ' ').trim();
-    const match = normalized.match(/([\d,.]+)/);
-    if (!match) return undefined;
-
-    let num = Number(match[1].replace(',', '.'));
-    if (Number.isNaN(num)) return undefined;
-
-    if (normalized.includes('тис')) {
-      num *= 1000;
-    }
-
-    return Math.round(num);
-  }
-
-  return undefined;
-}
-
-/** Loose shapes for the AUTO.RIA JSON we read; validated against fixtures in contract tests. */
+/** Real AUTO.RIA JSON shapes we read (verified against live responses). */
 interface AutoRiaInfo {
   USD?: number;
-  price?: number;
+  markId?: number;
+  modelId?: number;
   markName?: string;
   modelName?: string;
-  marka_id?: number;
-  model_id?: number;
-  year?: number;
-  stateId?: number;
-  cityId?: number;
-  dealer?: boolean | number;
   VIN?: string;
-  linkToReport?: string;
+  haveInfotechReport?: boolean;
   linkToView?: string;
-  autoData?: { year?: number; race?: number };
+  dealer?: { id?: number };
+  stateData?: { stateId?: number; cityId?: number };
+  autoData?: { year?: number; raceInt?: number };
+  autoInfoBar?: {
+    abroad?: boolean;
+    confiscatedCar?: boolean;
+    custom?: boolean;
+    damage?: boolean;
+    onRepairParts?: boolean;
+    underCredit?: boolean;
+  };
 }
 
 interface AutoRiaAverage {

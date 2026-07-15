@@ -24,6 +24,16 @@ export interface SourceSearchResult {
   nextPage?: string;
 }
 
+/** Risk signals read from the source (AUTO.RIA `autoInfoBar`). Drive red-flags. */
+export interface ListingRisk {
+  damaged: boolean;
+  salvage: boolean;
+  unclearCustoms: boolean;
+  confiscated: boolean;
+  underCredit: boolean;
+  abroad: boolean;
+}
+
 export interface ListingDetail {
   externalId: string;
   make: string;
@@ -31,14 +41,16 @@ export interface ListingDetail {
   markId: number;
   modelId: number;
   year: number;
+  /** Mileage in thousand km (AUTO.RIA `raceInt`). */
   mileage?: number;
   stateId?: number;
   cityId?: number;
   sellerType: SellerType;
   vin?: string;
-  vinReportUrl?: string;
+  hasVinReport: boolean;
   url: string;
   price: Money;
+  risk: ListingRisk;
 }
 
 export interface CohortQuery {

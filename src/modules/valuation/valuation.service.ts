@@ -13,6 +13,12 @@ export interface ValuationInput {
   minScore: number;
   sellerType: SellerType;
   hasVinReport: boolean;
+  damaged?: boolean;
+  salvage?: boolean;
+  unclearCustoms?: boolean;
+  confiscated?: boolean;
+  underCredit?: boolean;
+  abroad?: boolean;
 }
 
 export interface ValuationResult {
@@ -29,8 +35,6 @@ export interface ValuationResult {
 
 /** A discount of this percent (below fair value) saturates the raw score to ~1.0. */
 const DEAL_SCORE_SCALE_PCT = 30;
-/** Multiplier applied when a soft (non-disqualifying) red-flag fires. */
-const SOFT_FLAG_PENALTY = 0.8;
 
 /**
  * The heart of the product: score how good/bad a listing's price is as a deal.
@@ -47,14 +51,19 @@ export class ValuationService {
     const confidence =
       input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
-    const { flags, disqualified } = evaluateRedFlags({
+    const { flags, disqualified, penalty } = evaluateRedFlags({
       discountPct,
       sellerType: input.sellerType,
       hasVinReport: input.hasVinReport,
+      damaged: input.damaged,
+      salvage: input.salvage,
+      unclearCustoms: input.unclearCustoms,
+      confiscated: input.confiscated,
+      underCredit: input.underCredit,
+      abroad: input.abroad,
     });
-    const softPenalty = flags.no_vin_report ? SOFT_FLAG_PENALTY : 1;
 
-    let score = raw * confidence * softPenalty;
+    let score = raw * confidence * penalty;
     if (disqualified) score = Math.min(score, 0); // a scam/damaged bargain is not a deal
 
     const hasEnoughData = input.sampleSize >= input.minSamples;

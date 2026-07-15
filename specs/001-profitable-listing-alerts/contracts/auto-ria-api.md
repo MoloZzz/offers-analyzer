@@ -23,9 +23,23 @@ through the shared rate budget. ToS: display a backlink to AUTO.RIA (carried int
 - `average_price.sample.json` — cohort average + any sample-count field.
 - `dictionaries/*.json` — marks, models, states, cities.
 
-## Adapter mapping notes
+## Verified field mappings (from live responses, 2026-07-13)
 
-- Cohort → average_price params: `marka_id`←make, `model_id`←model, `city_id`←region, `raceInt`←
-  mileage band (array = range). Validate exact params against live samples during implementation.
-- Confidence: prefer a sample-count from the average-price payload; else fall back to our stored
-  comparable count (documented in [research.md](../research.md) R3/open items).
+**`/search`** → `result.search_result.ids` (clean id list). `result.search_result_common.data` also
+lists `OfferOfTheDay` ads — do NOT use it. `result.search_result.count` = total matches.
+`marka_id[]` / `model_id[]` **must be numeric ids** (names are silently ignored → all-cars search).
+Returns **ids only, no prices** → confirms N+1 (one `/info` per listing).
+
+**`/info`** (top-level unless noted):
+- price: `USD` (number); also `UAH`, `EUR`.
+- ids: `markId`, `modelId` (NOT `marka_id`/`model_id`); names `markName`, `modelName`, `title`.
+- `year` = `autoData.year`; mileage = `autoData.raceInt` (**thousand km**).
+- region: `stateData.stateId`, `stateData.cityId`.
+- seller: `dealer` is an **object** — `dealer.id === 0` ⇒ private, else dealer.
+- VIN report: `haveInfotechReport` (bool); VIN in `VIN`.
+- link: `linkToView` is **relative** → prefix `https://auto.ria.com`.
+- risk (→ red-flags): `autoInfoBar.{damage, onRepairParts, custom, confiscatedCar, underCredit, abroad}`.
+
+**`/average_price`**: `marka_id`/`model_id` must be numeric; returns HTTP **400
+`{message:"Not Enough Data"}`** for thin cohorts (treat as "no benchmark", not an error). Response
+fields (`arithmeticMean` / `total`) still to be confirmed on a valid sample.

@@ -17,13 +17,14 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 - [ ] **B1 — Regenerate the DB migration.** The committed initial migration still has the old
   `discountThresholdPct`. Existing dev data is disposable. Delete `src/common/database/migrations/*.ts`,
   `npm run migration:generate`, `migration:run`. (Migrations-only now — see [[coding-standards]].)
-- [~] **B2 — Validate AUTO.RIA field mappings** against 3 real responses (`search`, `info`,
-  `average_price`) and fix the adapter (`arithmeticMean`/`total`/`USD` are guesses). Tooling added:
-  gated request/response logging (`LOG_SOURCE_REQUESTS=true`) + standalone `scripts/dump-auto-ria.ts`.
-  Awaiting the raw responses from the user, then fix mappings. See `contracts/auto-ria-api.md`.
-- [ ] **B3 — Decide the search strategy** once B2 is known: if `search`/list returns prices →
-  "score-from-list, `info` only for winners"; else → "N+1, newest-first". Then implement
-  budget-cursor polling (newest-first, stop at budget, round-robin across profiles) + `countpage=100`.
+- [~] **B2 — Validate AUTO.RIA field mappings.** `search` + `info` **fixed** from live responses
+  (real fields: `markId`/`modelId`, `autoData.raceInt`, `stateData`, `dealer` object,
+  `haveInfotechReport`, relative `linkToView`); **red-flags enriched** from `autoInfoBar`
+  (damage/salvage/customs/confiscated/credit/abroad). Remaining: a **valid `/average_price`** sample
+  (needs numeric ids — e.g. `9 3219`), then confirm `arithmeticMean`/`total`. See `contracts/auto-ria-api.md`.
+- [x] **B3 — Search strategy decided: N+1** (`search` returns **ids only, no prices**). Newest-first
+  N+1, `info` only for new ids. Implementation TODO: budget-cursor (stop at budget, round-robin across
+  profiles), newest-first ordering, `countpage=100`.
 - [ ] **B4 — Make the pipeline actually run:** a real **enabled** `SearchProfile` with real ids
   (today only a disabled placeholder is seeded). Folds into B5.
 
