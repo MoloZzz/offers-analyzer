@@ -68,7 +68,7 @@ export class AutoRiaSource implements ListingSource {
       markId: d.marka_id ?? 0,
       modelId: d.model_id ?? 0,
       year: d.autoData?.year ?? d.year ?? 0,
-      mileage: d.autoData?.race ?? undefined,
+      mileage: parseMileage(d.autoData?.race),
       stateId: d.stateId ?? undefined,
       cityId: d.cityId ?? undefined,
       sellerType: mapSellerType(d.dealer),
@@ -127,6 +127,28 @@ function mapSellerType(dealer: unknown): SellerType {
   if (dealer === true || dealer === 1) return 'dealer';
   if (dealer === false || dealer === 0) return 'private';
   return 'unknown';
+}
+
+function parseMileage(value: unknown): number | undefined {
+  if (value == null) return undefined;
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.round(value);
+
+  if (typeof value === 'string') {
+    const normalized = value.toLowerCase().replace(/\s+/g, ' ').trim();
+    const match = normalized.match(/([\d,.]+)/);
+    if (!match) return undefined;
+
+    let num = Number(match[1].replace(',', '.'));
+    if (Number.isNaN(num)) return undefined;
+
+    if (normalized.includes('тис')) {
+      num *= 1000;
+    }
+
+    return Math.round(num);
+  }
+
+  return undefined;
 }
 
 /** Loose shapes for the AUTO.RIA JSON we read; validated against fixtures in contract tests. */
