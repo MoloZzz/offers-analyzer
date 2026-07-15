@@ -26,7 +26,7 @@ export function buildDataSourceOptions(url: string, synchronize: boolean): DataS
     type: 'postgres',
     url,
     entities: ENTITIES,
-    migrations: [__dirname + '/../../migrations/*.{ts,js}'],
+    migrations: [__dirname + '/migrations/*.{ts,js}'],
     synchronize,
     logging: false,
   };

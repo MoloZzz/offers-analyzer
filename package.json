@@ -16,7 +16,7 @@
     "test:cov": "jest --coverage",
     "test:contract": "jest --config ./test/jest-contract.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/common/database/data-source.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate src/common/database/migrations/migration -d src/common/database/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/common/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/common/database/data-source.ts"
   },
