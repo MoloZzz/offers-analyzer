@@ -22,3 +22,6 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# operator's real watch niches (commit only the example)
+config/search-profiles.json

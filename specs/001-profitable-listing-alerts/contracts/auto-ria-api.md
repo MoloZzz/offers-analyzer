@@ -41,5 +41,8 @@ Returns **ids only, no prices** → confirms N+1 (one `/info` per listing).
 - risk (→ red-flags): `autoInfoBar.{damage, onRepairParts, custom, confiscatedCar, underCredit, abroad}`.
 
 **`/average_price`**: `marka_id`/`model_id` must be numeric; returns HTTP **400
-`{message:"Not Enough Data"}`** for thin cohorts (treat as "no benchmark", not an error). Response
-fields (`arithmeticMean` / `total`) still to be confirmed on a valid sample.
+`{message:"Not Enough Data"}`** for thin cohorts (treat as "no benchmark", not an error).
+Verified fields: `arithmeticMean` (skewed by outliers), **`interQuartileMean`** (robust — we use
+this as fair value), `percentiles` (`"1.0"`…`"99.0"`, incl. `"50.0"` median), `total` (sample size),
+plus `prices[]` / `classifieds[]` (ignored). **Narrow the cohort** (year + `raceInt` band + city) or
+the average mixes all years/mileages (a live all-years BMW 3-Series sample ranged 800…70000).

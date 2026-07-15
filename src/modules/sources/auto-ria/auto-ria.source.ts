@@ -46,6 +46,7 @@ export class AutoRiaSource implements ListingSource {
     const params = new URLSearchParams({
       api_key: this.apiKey,
       category_id: String(query.categoryId),
+      countpage: '100', // max ids per request (default is small); we still dedup + budget info calls
     });
     if (query.stateId != null) params.set('state_id', String(query.stateId));
     if (query.cityId != null) params.set('city_id', String(query.cityId));
@@ -112,8 +113,11 @@ export class AutoRiaSource implements ListingSource {
     if (cohort.mileageTo != null) params.append('raceInt', String(cohort.mileageTo));
 
     const d = await this.get<AutoRiaAverage>('/average_price', params);
+    // Prefer a robust central measure over the plain mean, which is skewed by outliers
+    // (a live sample had arithmeticMean 12815 vs interQuartileMean 10584). See research note.
+    const amount = d.interQuartileMean ?? d.percentiles?.['50.0'] ?? d.arithmeticMean ?? 0;
     return {
-      value: { amount: d.arithmeticMean ?? 0, currency: Currency.USD },
+      value: { amount, currency: Currency.USD },
       sampleSize: d.total ?? d.prices?.length ?? 0,
     };
   }
@@ -180,6 +184,8 @@ interface AutoRiaInfo {
 
 interface AutoRiaAverage {
   arithmeticMean?: number;
+  interQuartileMean?: number;
+  percentiles?: Record<string, number>;
   total?: number;
   prices?: number[];
 }

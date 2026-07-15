@@ -17,20 +17,20 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 - [ ] **B1 — Regenerate the DB migration.** The committed initial migration still has the old
   `discountThresholdPct`. Existing dev data is disposable. Delete `src/common/database/migrations/*.ts`,
   `npm run migration:generate`, `migration:run`. (Migrations-only now — see [[coding-standards]].)
-- [~] **B2 — Validate AUTO.RIA field mappings.** `search` + `info` **fixed** from live responses
-  (real fields: `markId`/`modelId`, `autoData.raceInt`, `stateData`, `dealer` object,
-  `haveInfotechReport`, relative `linkToView`); **red-flags enriched** from `autoInfoBar`
-  (damage/salvage/customs/confiscated/credit/abroad). Remaining: a **valid `/average_price`** sample
-  (needs numeric ids — e.g. `9 3219`), then confirm `arithmeticMean`/`total`. See `contracts/auto-ria-api.md`.
-- [x] **B3 — Search strategy decided: N+1** (`search` returns **ids only, no prices**). Newest-first
-  N+1, `info` only for new ids. Implementation TODO: budget-cursor (stop at budget, round-robin across
-  profiles), newest-first ordering, `countpage=100`.
-- [ ] **B4 — Make the pipeline actually run:** a real **enabled** `SearchProfile` with real ids
-  (today only a disabled placeholder is seeded). Folds into B5.
+- [x] **B2 — AUTO.RIA field mappings validated** against live responses. `search`/`info` fixed;
+  red-flags enriched from `autoInfoBar`; `/average_price` confirmed → fair value now uses the robust
+  **`interQuartileMean`** (not the outlier-skewed `arithmeticMean`), `total` = sample size. Full map in
+  `contracts/auto-ria-api.md`.
+- [~] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Remaining
+  (low priority for a narrow niche): budget-cursor (round-robin across profiles), newest-first ordering
+  (needs the `order_by` value verified).
+- [~] **B4 — Make the pipeline run:** now driven by `config/search-profiles.json` (copy the example,
+  set numeric ids + `enabled: true`, restart). **User action** to go live.
 
 ## 🟡 Next — US2 (operator config + currency)
 
-- [ ] **B5 — SearchProfile config** (create/edit/enable) operator-side. Spec 001 US2 / FR-010.
+- [~] **B5 — SearchProfile config (operator).** Declarative `config/search-profiles.json`, upserted by
+  `name` on boot, implemented. Remaining (optional, later): richer editing via bot command / API.
 - [ ] **B6 — FX / currency:** `ExchangeRate` NBU adapter + normalization; per-profile currency
   switch in valuation and alert. FR-014. (`fx/` today is port-only.)
 - [ ] **B7 — Apply all per-profile config** end-to-end (threshold=minDealScore ✅, dealer policy ✅,
@@ -45,8 +45,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 ## 🟢 Later — deferred (promote when picked up)
 
 - [ ] **B10 — Re-observe known listings** → price-drop detection (FR-009). Competes for the budget.
-- [ ] **B11 — Own-statistics valuation:** median/percentiles from our stored listings instead of only
-  the RIA average. See [[profitability-definition]].
+- [ ] **B11 — Own-statistics valuation** — mostly **obviated**: RIA `/average_price` already returns
+  `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
+  need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].
 - [ ] **B12 — Relist/duplicate heuristic** (VIN / phone-hash). FR-008.
 - [ ] **B13 — Durable rate budget** (Postgres-backed) if we run multiple instances or restart often.
   See [[0004-drop-redis-bullmq|ADR-0004]].

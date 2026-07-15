@@ -41,15 +41,20 @@ describe('AutoRiaSource (contract)', () => {
     expect(result.ids).toEqual(['19050985', '19050986']);
   });
 
-  it('maps average price and sample size', async () => {
+  it('uses the robust interquartile mean, not the skewed arithmetic mean', async () => {
     agent
       .get('https://developers.ria.com')
       .intercept({ path: (p) => p.startsWith('/auto/average_price'), method: 'GET' })
-      .reply(200, { arithmeticMean: 16000, total: 42 });
+      .reply(200, {
+        arithmeticMean: 12815,
+        interQuartileMean: 10584,
+        percentiles: { '50.0': 10998 },
+        total: 3845,
+      });
 
-    const result = await makeSource().averagePrice({ markId: 9, modelId: 96 });
-    expect(result.value.amount).toBe(16000);
-    expect(result.sampleSize).toBe(42);
+    const result = await makeSource().averagePrice({ markId: 9, modelId: 3219 });
+    expect(result.value.amount).toBe(10584);
+    expect(result.sampleSize).toBe(3845);
   });
 
   it('maps listing detail from info (real AUTO.RIA shape)', async () => {

@@ -1,12 +1,35 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Currency } from '../../common/types/money';
 
-import { SearchProfile } from './entities/search-profile.entity';
+import { DealerPolicy, ProfileFilters, SearchProfile } from './entities/search-profile.entity';
 
-/** Manages watch niches (operator-controlled in v1) and seeds one disabled example on first boot. */
+/** Declarative operator config for a watch niche (v1: a JSON file, no UI). */
+interface SearchProfileConfig {
+  name: string;
+  categoryId: number;
+  stateId?: number | null;
+  cityId?: number | null;
+  filters: ProfileFilters;
+  priceFrom?: number | null;
+  priceTo?: number | null;
+  currency: Currency;
+  minDealScore: number;
+  confidenceMinSamples: number;
+  dealerPolicy: DealerPolicy;
+  enabled: boolean;
+}
+
+/**
+ * Manages watch niches. In v1 the operator defines them declaratively in
+ * `config/search-profiles.json` (path overridable via `SEARCH_PROFILES_FILE`); they are
+ * upserted by `name` on every boot, so editing the file + restart syncs them. FR-010.
+ */
 @Injectable()
 export class ProfilesService implements OnApplicationBootstrap {
   private readonly logger = new Logger(ProfilesService.name);
@@ -20,24 +43,32 @@ export class ProfilesService implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    const count = await this.profiles.count();
-    if (count > 0) return;
+    const file =
+      process.env.SEARCH_PROFILES_FILE ?? join(process.cwd(), 'config', 'search-profiles.json');
+    if (!existsSync(file)) {
+      this.logger.warn(`No profiles config at ${file} — nothing to monitor. See config/search-profiles.example.json`);
+      return;
+    }
 
-    // Seed a DISABLED example so nothing runs with placeholder ids. The operator fills real
-    // AUTO.RIA marka_id/model_id and enables it. Category 1 = passenger cars.
-    await this.profiles.save(
-      this.profiles.create({
-        name: 'Example niche (edit ids & enable)',
-        sourceKey: 'auto-ria',
-        categoryId: 1,
-        filters: { makeModelPairs: [{ markId: 0, modelId: 0 }], yearFrom: 2015 },
-        currency: Currency.USD,
-        minDealScore: 0.3,
-        confidenceMinSamples: 10,
-        dealerPolicy: 'label',
-        enabled: false,
-      }),
-    );
-    this.logger.log('Seeded a disabled example SearchProfile — set real ids and enable it.');
+    const configs = JSON.parse(readFileSync(file, 'utf8')) as SearchProfileConfig[];
+    for (const cfg of configs) {
+      const existing = await this.profiles.findOne({ where: { name: cfg.name } });
+      const entity = existing ?? this.profiles.create();
+      entity.name = cfg.name;
+      entity.sourceKey = 'auto-ria';
+      entity.categoryId = cfg.categoryId;
+      entity.stateId = cfg.stateId ?? null;
+      entity.cityId = cfg.cityId ?? null;
+      entity.filters = cfg.filters;
+      entity.priceFrom = cfg.priceFrom ?? null;
+      entity.priceTo = cfg.priceTo ?? null;
+      entity.currency = cfg.currency;
+      entity.minDealScore = cfg.minDealScore;
+      entity.confidenceMinSamples = cfg.confidenceMinSamples;
+      entity.dealerPolicy = cfg.dealerPolicy;
+      entity.enabled = cfg.enabled;
+      await this.profiles.save(entity);
+    }
+    this.logger.log(`Synced ${configs.length} search profile(s) from ${file}`);
   }
 }

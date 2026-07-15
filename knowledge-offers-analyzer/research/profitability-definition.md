@@ -23,8 +23,9 @@ A listing is worth surfacing when its **asking price is meaningfully below the f
 ## Fair value & the opportunity score
 
 ```
-fair_value(FV)  = RIA average price for the listing's cohort
-                  (optionally adjusted for mileage/options/condition vs the cohort)
+fair_value(FV)  = RIA robust cohort average — interQuartileMean (fallback: median),
+                  NOT the plain arithmetic mean, which outliers skew. Cohort must be
+                  narrowed by year + mileage band + region.
 discount        = (FV − asking_price) / FV
 ```
 
