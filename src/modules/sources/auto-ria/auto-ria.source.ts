@@ -32,12 +32,14 @@ export class AutoRiaSource implements ListingSource {
   readonly key = 'auto-ria';
   private readonly logger = new Logger(AutoRiaSource.name);
   private readonly apiKey: string;
+  private readonly logResponses: boolean;
 
   constructor(
     config: ConfigService<AppConfig, true>,
     private readonly budget: RateBudgetService,
   ) {
     this.apiKey = config.get('autoRiaApiKey', { infer: true });
+    this.logResponses = config.get('logSourceRequests', { infer: true });
   }
 
   async search(query: SourceSearchQuery): Promise<SourceSearchResult> {
@@ -123,7 +125,13 @@ export class AutoRiaSource implements ListingSource {
       if (statusCode >= 400) {
         throw new SourceUnavailableError(`AUTO.RIA ${path} returned HTTP ${statusCode}`);
       }
-      return (await body.json()) as T;
+      const json = (await body.json()) as T;
+      if (this.logResponses) {
+        const safe = new URLSearchParams(params);
+        safe.set('api_key', '***');
+        this.logger.log(`GET ${path}?${safe.toString()} → ${JSON.stringify(json)}`);
+      }
+      return json;
     } catch (err) {
       if (err instanceof SourceUnavailableError) throw err;
       this.logger.error(`AUTO.RIA ${path} request failed`, err as Error);

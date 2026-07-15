@@ -11,6 +11,8 @@ export interface AppConfig {
   rateBudgetPerHour: number;
   defaultMinDealScore: number;
   defaultConfidenceMinSamples: number;
+  /** When true, log every outbound request + raw response to external sources (api_key redacted). */
+  logSourceRequests: boolean;
 }
 
 export default (): AppConfig => ({
@@ -25,4 +27,5 @@ export default (): AppConfig => ({
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
   defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.3),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
+  logSourceRequests: process.env.LOG_SOURCE_REQUESTS === 'true',
 });

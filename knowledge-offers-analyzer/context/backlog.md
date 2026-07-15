@@ -15,11 +15,12 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 ## 🔴 Now — correctness / unblock the running pipeline
 
 - [ ] **B1 — Regenerate the DB migration.** The committed initial migration still has the old
-  `discountThresholdPct`. Delete `src/common/database/migrations/*.ts`, `npm run migration:generate`,
-  `migration:run`. (We are migrations-only now — see [[coding-standards]].)
-- [ ] **B2 — Validate AUTO.RIA field mappings** against 3 real responses (`search`, `info`,
-  `average_price`) and fix the adapter (`arithmeticMean`/`total`/`USD` are guesses). Blocks correct
-  scoring. See `specs/001-.../contracts/auto-ria-api.md`, [[monitoring-approaches]].
+  `discountThresholdPct`. Existing dev data is disposable. Delete `src/common/database/migrations/*.ts`,
+  `npm run migration:generate`, `migration:run`. (Migrations-only now — see [[coding-standards]].)
+- [~] **B2 — Validate AUTO.RIA field mappings** against 3 real responses (`search`, `info`,
+  `average_price`) and fix the adapter (`arithmeticMean`/`total`/`USD` are guesses). Tooling added:
+  gated request/response logging (`LOG_SOURCE_REQUESTS=true`) + standalone `scripts/dump-auto-ria.ts`.
+  Awaiting the raw responses from the user, then fix mappings. See `contracts/auto-ria-api.md`.
 - [ ] **B3 — Decide the search strategy** once B2 is known: if `search`/list returns prices →
   "score-from-list, `info` only for winners"; else → "N+1, newest-first". Then implement
   budget-cursor polling (newest-first, stop at budget, round-robin across profiles) + `countpage=100`.
