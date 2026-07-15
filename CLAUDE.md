@@ -37,6 +37,17 @@ dilutes it. Rules: `context/README.md`.
 - New tool/env/runbook step → update `operations/environment-setup.md`.
 - New spec → link it from `specs/README.md`.
 
+**Supersession sweep (REQUIRED whenever a decision changes).** A new ADR — or any
+edit that supersedes, reverses, or narrows a prior decision — is NOT done until
+**every note that repeated the old fact is updated in the same task**. Before
+closing such a task you MUST `rtk grep` the vault for the superseded fact (e.g. a
+dropped library, renamed concept, changed default) and fix each hit. The usual
+offenders are the notes that *duplicate* decisions rather than own them —
+`context/goals.md` (the "Stack"/north-star), `architecture/overview.md`, and
+`domain/glossary.md`. A vault where one note contradicts an ADR is a defect, not a
+stale doc. (Concrete example: ADR-0004 dropped Redis/BullMQ; goals.md kept listing
+them — exactly the drift this rule exists to prevent.)
+
 Full rules: `knowledge-offers-analyzer/_meta/vault-protocol.md`. If a note is
 missing or contradicts the code, fixing it is part of your task. This is a
 **second-brain** approach, deliberately chosen over vector RAG (inefficient and
@@ -74,5 +85,7 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
 
 1. Code/spec change complete.
 2. Commands were run via RTK.
-3. The **vault is updated** to reflect the change (§1 write protocol).
+3. The **vault is updated** to reflect the change (§1 write protocol), **and the
+   supersession sweep has been run** if any decision changed — no note may
+   contradict an ADR (§1).
 4. For features: the SDD artifacts under `.specify/` are consistent with the code.

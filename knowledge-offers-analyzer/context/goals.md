@@ -1,7 +1,7 @@
 ---
 title: Project goals & scope (living)
 type: context
-updated: 2026-07-12
+updated: 2026-07-13
 ---
 
 # Project goals & scope
@@ -18,7 +18,7 @@ Build a system that **monitors car listings on auto.ria.com** (with room for oth
 - **Coverage:** a **narrow niche** (a few search profiles) on the free API tier (~30 req/hour).
 - **Profitability:** "below fair value + threshold + risk red-flags", anchored on RIA average price — see [[profitability-definition]] *(still Proposed)*.
 - **Delivery:** Telegram bot notifications.
-- **Stack:** NestJS · PostgreSQL · TypeORM · Redis + BullMQ · Telegram bot.
+- **Stack:** NestJS · PostgreSQL · TypeORM · `@nestjs/schedule` cron + in-memory rate budget · Telegram bot. (No Redis/BullMQ in v1 — see [[0004-drop-redis-bullmq|ADR-0004]].)
 - **Method:** strict Spec-Driven Development; clean code per [[coding-standards]].
 
 ## Explicitly later (not v1)

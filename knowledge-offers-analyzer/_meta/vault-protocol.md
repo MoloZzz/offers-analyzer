@@ -1,7 +1,7 @@
 ---
 title: Vault Protocol — how agents use and maintain the knowledge base
 type: meta
-updated: 2026-07-12
+updated: 2026-07-13
 ---
 
 # Vault Protocol (read + maintain)
@@ -29,6 +29,14 @@ Updating the vault is part of "done." A change is not complete until the knowled
 - **New convention or pattern** → record it in [[coding-standards]].
 - **New tool / env / runbook step** → update [[environment-setup]].
 - **New spec** (Spec Kit) → link it from [[specs/README]].
+
+**Supersession sweep — REQUIRED whenever a decision changes.** Writing a new ADR (or
+editing anything that supersedes, reverses, or narrows an earlier decision) is not
+finished until **every note that repeated the old fact is fixed in the same task**.
+Grep the vault for the superseded fact and update each hit. Watch the notes that
+*duplicate* decisions instead of owning them — `context/goals.md`, [[overview]], and
+[[glossary]] are the usual drift points. A note that contradicts an ADR is a **defect**
+(see the "missing or contradicts" rule above), not merely stale.
 
 ## Context zone (`context/`) — decoupled inbox
 

@@ -222,5 +222,7 @@ Report final status with summary of completed work.
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
 - [ ] Implementation validated against specification, plan, and test coverage
+- [ ] **Knowledge vault synced per `CLAUDE.md` §1 write protocol** — `architecture/overview.md`, `domain/glossary.md`, `conventions/coding-standards.md`, `operations/environment-setup.md`, and `specs/README.md` reflect what was built; durable context promoted out of `context/`.
+- [ ] **Supersession sweep run** — if this work changed, dropped, or narrowed any prior decision, every note that repeated the old fact (esp. `context/goals.md`, `overview.md`, `glossary.md`) was updated in this task; no note contradicts an ADR (`CLAUDE.md` §1).
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with summary of completed work

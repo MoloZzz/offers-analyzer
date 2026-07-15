@@ -2,7 +2,7 @@
 title: Research — how to monitor AUTO.RIA (API vs scraping)
 type: research
 status: Decided
-updated: 2026-07-12
+updated: 2026-07-13
 ---
 
 # Research — monitoring approach for AUTO.RIA
@@ -62,7 +62,7 @@ Reasons: it's the only legal, stable path; it hands us the **average-price bench
 1. **Source-adapter port.** Define a `ListingSource` interface (search → ids, fetch → detail, averagePrice → benchmark). AUTO.RIA API is the first adapter; future sites/scrapers implement the same port. ("Maybe other sites later" is designed-in now.)
 2. **Request budgeting.** Cache dictionaries; spend the 30/hr on `search` (cheap, paged) + `info` for **new** candidates only + `average_price` per cohort (cache per cohort/day).
 3. **Dedup & state.** Persist seen `auto_id`s; only pull `info` for unseen/changed listings; track price changes and relists.
-4. **Scheduling.** A queue/cron (e.g. BullMQ + Redis) that respects the hourly cap with backoff and a dead-man's-switch alert when the budget is exhausted.
+4. **Scheduling.** A cron that respects the hourly cap with backoff and a dead-man's-switch alert when the budget is exhausted. *(Originally proposed BullMQ + Redis; v1 uses a `@nestjs/schedule` cron + in-memory rate budget instead — superseded by [[0004-drop-redis-bullmq|ADR-0004]].)*
 5. **History.** Store listings + observed prices over time (own statistics + price-drop detection). See [[overview]].
 
 ## Sources
@@ -73,4 +73,4 @@ Reasons: it's the only legal, stable path; it hands us the **average-price bench
 
 ## Related
 
-- [[00-INDEX]] · [[profitability-definition]] · [[overview]] · [[decisions/README]]
+- [[00-INDEX]] · [[profitability-definition]] · [[overview]] · [[decisions/README]] · [[alternative-sources]]

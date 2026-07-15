@@ -29,4 +29,4 @@ We must ingest auto.ria listings to detect profitable ones. Options were officia
 
 ## Related
 
-- [[decisions/README]] · [[monitoring-approaches]] · [[profitability-definition]] · [[overview]]
+- [[decisions/README]] · [[monitoring-approaches]] · [[profitability-definition]] · [[overview]] · [[alternative-sources]]
