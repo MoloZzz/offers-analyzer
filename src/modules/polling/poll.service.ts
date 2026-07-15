@@ -74,7 +74,7 @@ export class PollService {
         asking: detail.price.amount,
         fairValue: benchmark.value.amount,
         sampleSize: benchmark.sampleSize,
-        thresholdPct: profile.discountThresholdPct,
+        minScore: profile.minDealScore,
         minSamples: profile.confidenceMinSamples,
         sellerType: detail.sellerType,
         hasVinReport: detail.vinReportUrl != null,
@@ -118,12 +118,20 @@ function toQuery(p: SearchProfile): SourceSearchQuery {
   };
 }
 
+/** ± thousand km around the listing's mileage — compare within a fair mileage band. */
+const MILEAGE_BAND = 20;
+
 function toCohort(d: ListingDetail): CohortQuery {
-  return {
+  const cohort: CohortQuery = {
     markId: d.markId,
     modelId: d.modelId,
     cityId: d.cityId ?? undefined,
     yearFrom: d.year,
     yearTo: d.year,
   };
+  if (d.mileage != null) {
+    cohort.mileageFrom = Math.max(0, d.mileage - MILEAGE_BAND);
+    cohort.mileageTo = d.mileage + MILEAGE_BAND;
+  }
+  return cohort;
 }

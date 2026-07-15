@@ -8,24 +8,32 @@ export interface ValuationInput {
   asking: number;
   fairValue: number;
   sampleSize: number;
-  thresholdPct: number;
   minSamples: number;
+  /** Minimum deal score (−1..1) for a listing to count as an Opportunity (profile config). */
+  minScore: number;
   sellerType: SellerType;
   hasVinReport: boolean;
 }
 
 export interface ValuationResult {
   isOpportunity: boolean;
+  /** Informational: how far below fair value, in percent. */
   discountPct: number;
+  /** 0..1 — how much comparable data backs the fair value. */
   confidence: number;
+  /** Signed deal score in [−1, 1]: −1 overpriced/trap, 0 at market/unknown, +1 clearly below market. */
   score: number;
   redFlags: Record<string, boolean>;
-  /** Human-readable reason the listing was or wasn't flagged (used in alerts/logs). */
   reason: string;
 }
 
+/** A discount of this percent (below fair value) saturates the raw score to ~1.0. */
+const DEAL_SCORE_SCALE_PCT = 30;
+/** Multiplier applied when a soft (non-disqualifying) red-flag fires. */
+const SOFT_FLAG_PENALTY = 0.8;
+
 /**
- * The heart of the product: decide whether a listing is a below-market opportunity.
+ * The heart of the product: score how good/bad a listing's price is as a deal.
  * Pure and deterministic (no IO) so it is fully unit-testable — constitution §VI.
  * Methodology: knowledge-offers-analyzer/research/profitability-definition.md.
  */
@@ -35,6 +43,7 @@ export class ValuationService {
     const discountPct =
       input.fairValue > 0 ? ((input.fairValue - input.asking) / input.fairValue) * 100 : 0;
 
+    const raw = clamp(discountPct / DEAL_SCORE_SCALE_PCT, -1, 1);
     const confidence =
       input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
@@ -43,12 +52,13 @@ export class ValuationService {
       sellerType: input.sellerType,
       hasVinReport: input.hasVinReport,
     });
+    const softPenalty = flags.no_vin_report ? SOFT_FLAG_PENALTY : 1;
 
-    const meetsDiscount = discountPct >= input.thresholdPct;
-    const meetsConfidence = input.sampleSize >= input.minSamples;
-    const isOpportunity = meetsDiscount && meetsConfidence && !disqualified;
+    let score = raw * confidence * softPenalty;
+    if (disqualified) score = Math.min(score, 0); // a scam/damaged bargain is not a deal
 
-    const score = isOpportunity ? (discountPct / 100) * confidence : 0;
+    const hasEnoughData = input.sampleSize >= input.minSamples;
+    const isOpportunity = score >= input.minScore && hasEnoughData && !disqualified;
 
     return {
       isOpportunity,
@@ -56,22 +66,26 @@ export class ValuationService {
       confidence: round(confidence),
       score: round(score),
       redFlags: flags,
-      reason: reasonFor({ meetsDiscount, meetsConfidence, disqualified, isOpportunity }),
+      reason: reasonFor({ isOpportunity, disqualified, hasEnoughData, score, minScore: input.minScore }),
     };
   }
 }
 
 function reasonFor(p: {
-  meetsDiscount: boolean;
-  meetsConfidence: boolean;
-  disqualified: boolean;
   isOpportunity: boolean;
+  disqualified: boolean;
+  hasEnoughData: boolean;
+  score: number;
+  minScore: number;
 }): string {
-  if (p.isOpportunity) return 'below fair value with sufficient data and no disqualifying flags';
-  if (!p.meetsDiscount) return 'discount below threshold';
-  if (!p.meetsConfidence) return 'insufficient comparable data (low confidence)';
+  if (p.isOpportunity) return `deal score ${round(p.score)} ≥ threshold ${p.minScore}`;
   if (p.disqualified) return 'disqualified by a risk red-flag';
-  return 'not an opportunity';
+  if (!p.hasEnoughData) return 'insufficient comparable data (low confidence)';
+  return `deal score ${round(p.score)} below threshold ${p.minScore}`;
+}
+
+function clamp(n: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, n));
 }
 
 function round(n: number): number {

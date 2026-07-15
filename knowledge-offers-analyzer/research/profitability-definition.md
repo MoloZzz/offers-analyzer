@@ -35,6 +35,22 @@ Flag as a **candidate** when **all** hold:
 
 Score/rank candidates by `discount × confidence` (and later: minus expected costs).
 
+## Deal score ∈ [−1, 1] (v1 signal)
+
+Instead of a bare boolean, express each listing as a single signed **deal score**: −1 = clearly overpriced / a trap, 0 = at market or unknown, +1 = clearly below market.
+
+```
+delta       = (fair_value − asking) / fair_value      # >0 below market (good), <0 above
+raw         = clamp(delta / SCALE, −1, 1)             # SCALE ≈ 0.30 → a 30% discount saturates to ~1
+confidence  = min(1, sampleSize / (minSamples × 2))   # 0..1; low data shrinks the score toward 0
+score       = raw × confidence × flagPenalty          # flagPenalty ≈ 0.8 for soft flags (e.g. no VIN)
+if a disqualifying red-flag fires: score = min(score, 0)   # a scam/damaged bargain is not a deal
+```
+
+Flag as an **Opportunity** when `score ≥ profile.minDealScore` (default ≈ 0.3) and `sampleSize ≥ minSamples`. Rank by `score`. This unifies discount, confidence, and risk into one explainable number and degrades gracefully (unsure → near 0). `SCALE` and `minDealScore` are config; `SCALE` is a constant in v1.
+
+**Cohort must include mileage.** Compare a listing against the average for its *mileage band*, not the whole model — otherwise `delta` is unfair (a 250k-km car vs the model average).
+
 ## Worked example (what the system actually does)
 
 1. It sees an ad: **VW Passat B8, 2017, 150 000 km, Kyiv — asking $13 000**.

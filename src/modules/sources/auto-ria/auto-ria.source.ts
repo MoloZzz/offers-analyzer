@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { request } from 'undici';
 
 import { AppConfig } from '../../../common/config/configuration';
-import { RateBudgetExhaustedError, SourceUnavailableError } from '../../../common/errors/domain-error';
+import {
+  RateBudgetExhaustedError,
+  SourceUnavailableError,
+} from '../../../common/errors/domain-error';
 import { Currency } from '../../../common/types/money';
 import { RateBudgetService } from '../../scheduling/rate-budget.service';
 import {
@@ -38,7 +41,10 @@ export class AutoRiaSource implements ListingSource {
   }
 
   async search(query: SourceSearchQuery): Promise<SourceSearchResult> {
-    const params = new URLSearchParams({ api_key: this.apiKey, category_id: String(query.categoryId) });
+    const params = new URLSearchParams({
+      api_key: this.apiKey,
+      category_id: String(query.categoryId),
+    });
     if (query.stateId != null) params.set('state_id', String(query.stateId));
     if (query.cityId != null) params.set('city_id', String(query.cityId));
     if (query.priceFrom != null) params.set('price_ot', String(query.priceFrom));
@@ -51,7 +57,10 @@ export class AutoRiaSource implements ListingSource {
       params.append('model_id[]', String(modelId));
     }
 
-    const data = await this.get<{ result?: { search_result?: { ids?: string[] } } }>('/search', params);
+    const data = await this.get<{ result?: { search_result?: { ids?: string[] } } }>(
+      '/search',
+      params,
+    );
     return { ids: data.result?.search_result?.ids ?? [] };
   }
 

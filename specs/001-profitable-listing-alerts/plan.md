@@ -80,13 +80,14 @@ src/
 ├── app.module.ts
 ├── common/                  # config, logging, errors, shared types
 ├── modules/
-│   ├── sources/             # ListingSource port + auto-ria adapter + dictionary cache
-│   ├── listings/            # Listing & PriceObservation entities, repo, dedup/relist
-│   ├── valuation/           # fair value, discount, confidence, red-flags, opportunity scoring
-│   ├── profiles/            # SearchProfile config + management
-│   ├── notifications/       # Telegram bot, Subscriber, Notification, message formatting
-│   ├── scheduling/          # cron + BullMQ queues + rate-budget (token bucket)
-│   └── fx/                  # ExchangeRate port + NBU adapter
+│   ├── sources/             # ListingSource port + AUTO.RIA adapter
+│   ├── listings/            # Listing & PriceObservation entities, dedup + price history
+│   ├── valuation/           # deal score (−1..1), confidence, red-flags + benchmark cache
+│   ├── profiles/            # SearchProfile config + seed
+│   ├── notifications/       # Telegram notifier, Subscriber, Notification, formatting
+│   ├── scheduling/          # in-memory rate budget (fixed window)
+│   ├── polling/             # cron pipeline: search → new → value → alert
+│   └── fx/                  # ExchangeRate port (NBU adapter lands in US2)
 test/
 ├── unit/                    # valuation, dedup, budget logic
 ├── integration/             # module wiring, DB, queue

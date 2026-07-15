@@ -32,7 +32,7 @@ export class ProfilesService implements OnApplicationBootstrap {
         categoryId: 1,
         filters: { makeModelPairs: [{ markId: 0, modelId: 0 }], yearFrom: 2015 },
         currency: Currency.USD,
-        discountThresholdPct: 15,
+        minDealScore: 0.3,
         confidenceMinSamples: 10,
         dealerPolicy: 'label',
         enabled: false,

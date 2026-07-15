@@ -75,15 +75,15 @@ Each alert explains *why* the listing was flagged — asking price vs fair marke
 - **FR-002**: System MUST periodically discover new and updated listings matching each active niche from the configured source (AUTO.RIA for v1).
 - **FR-003**: System MUST estimate a **fair market value** for each candidate listing from the prices of comparable listings (same make/model/year/region/mileage cohort).
 - **FR-004**: System MUST compute a **discount** = (fair value − asking price) / fair value for each candidate.
-- **FR-005**: System MUST flag a listing as an **Opportunity** only when **all** hold: discount ≥ the niche's configured threshold; comparable data is sufficient (**confidence** gate); and it passes the risk red-flag checks.
+- **FR-005**: System MUST compute a **deal score** in the range **[−1, 1]** for each candidate (−1 = clearly overpriced/trap, 0 = at market or unknown, +1 = clearly below market) from the discount vs fair value, weighted by **confidence** (comparable-data sufficiency) and adjusted by risk red-flags. It MUST flag a listing as an **Opportunity** only when the deal score ≥ the niche's configured minimum **and** comparable data is sufficient **and** no disqualifying red-flag fired.
 - **FR-006**: System MUST apply **configurable risk red-flags** that suppress or down-rank a listing (e.g. damaged/after-accident, unclear customs status, missing/failed VIN report, implausibly large discount).
 - **FR-007**: System MUST notify subscribers of each new Opportunity via **Telegram**, including the reason (asking price, fair value, discount %, confidence, red-flags checked) and a link back to the original listing.
 - **FR-008**: System MUST NOT alert about the same listing more than once as new, and MUST recognize relisted/duplicate listings.
 - **FR-009**: System MUST detect significant **price drops** on already-seen listings and MAY notify them as a distinct, configurable event.
-- **FR-010**: The **operator** MUST be able to configure, **per niche** (via configuration in v1): discount threshold, dealer policy (`label` / `exclude` / `ignore`), comparison currency (switchable), and enabled/disabled state. (End-user-facing profile management UI is out of v1 scope.)
+- **FR-010**: The **operator** MUST be able to configure, **per niche** (via configuration in v1): minimum deal score, dealer policy (`label` / `exclude` / `ignore`), comparison currency (switchable), and enabled/disabled state. (End-user-facing profile management UI is out of v1 scope.)
 - **FR-011**: System MUST store listings and their observed prices **over time** (history), from first observation.
 - **FR-012**: System MUST operate within the source's **usage limits and Terms** (request budget, required backlink), degrade gracefully, and alert the operator when the budget is exhausted or the source is unavailable.
-- **FR-013**: System MUST **rank** surfaced Opportunities (v1: by discount × confidence).
+- **FR-013**: System MUST **rank** surfaced Opportunities by their deal score (higher = better deal).
 - **FR-014**: System MUST **normalize prices across currencies** using a maintained exchange rate.
 - **FR-015**: Users MUST be able to **subscribe, unsubscribe, and mute** notifications via the Telegram bot.
 

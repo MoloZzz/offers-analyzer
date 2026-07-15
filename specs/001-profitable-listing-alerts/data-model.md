@@ -19,13 +19,13 @@ The configured niche and its tuning. Source of the "user-controlled" parameters.
 | filters | jsonb | make/model pairs, year range, mileage range |
 | priceFrom / priceTo | int? | price band |
 | currency | enum(`USD`,`UAH`) | display/compare currency (switchable) |
-| discountThresholdPct | numeric | e.g. 15.0 |
+| minDealScore | numeric | min deal score to alert, e.g. 0.3 (range −1..1) |
 | confidenceMinSamples | int | minimum comparables to trust fair value |
 | dealerPolicy | enum(`label`,`exclude`,`ignore`) | |
 | enabled | bool | pause switch |
 | createdAt / updatedAt | timestamptz | |
 
-Validation: `priceFrom ≤ priceTo`; `discountThresholdPct` in (0,100); at least one make/model.
+Validation: `priceFrom ≤ priceTo`; `minDealScore` in [−1, 1]; at least one make/model.
 
 ## Listing
 
@@ -92,7 +92,7 @@ A listing flagged as a candidate deal.
 | askingValue | money | at flag time |
 | discountPct | numeric | |
 | confidence | numeric | 0..1 or sample-based |
-| score | numeric | discount × confidence |
+| score | numeric | signed deal score in [−1, 1] |
 | redFlags | jsonb | which checks fired |
 | createdAt | timestamptz | |
 | notified | bool | |

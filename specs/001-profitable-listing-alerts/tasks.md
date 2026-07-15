@@ -37,13 +37,13 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [X] T006 Setup TypeORM datasource + `DatabaseModule` in `src/common/database/` (dev schema via `synchronize`; prod migrations via `data-source.ts`)
+- [X] T006 Setup TypeORM datasource + `DatabaseModule` in `src/common/database/` (migrations only — no `synchronize`; run `npm run migration:run`)
 - [X] T007 [P] Error handling (`DomainError` + typed subclasses) in `src/common/errors/`; logging via Nest `Logger`
 - [X] T008 [P] Shared `Money` type + `Currency` enum in `src/common/types/money.ts`
 - [X] T009 [P] Define ports (`ListingSource`, `Notifier`, `ExchangeRate`) in `src/modules/*/ports/` per `contracts/`
 - [X] T010 Redis connection wired (ioredis) in `src/modules/scheduling/` (BullMQ queue added with the poll pipeline in US1)
 - [X] T011 Implement Redis rate-budget in `src/modules/scheduling/rate-budget.service.ts`
-- [X] T012 Create all 7 entities per `data-model.md` in `src/modules/*/entities/` (schema auto-synced in dev; migration generation deferred to first DB run)
+- [X] T012 Create all 7 entities per `data-model.md` in `src/modules/*/entities/` (schema via generated migration in `src/common/database/migrations/`)
 
 **Checkpoint**: Foundation ready. *(Build/lint verification pending in a Linux/WSL env — the Cowork sandbox's `@types/node` copy is corrupted and aborts `tsc`; all source files confirmed structurally intact. Run `npm install` — `@nestjs/typeorm` was added — then `npm run build`.)*
 

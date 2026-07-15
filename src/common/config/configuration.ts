@@ -9,7 +9,7 @@ export interface AppConfig {
   telegramBotToken: string;
   nbuRateUrl: string;
   rateBudgetPerHour: number;
-  defaultDiscountThresholdPct: number;
+  defaultMinDealScore: number;
   defaultConfidenceMinSamples: number;
 }
 
@@ -23,6 +23,6 @@ export default (): AppConfig => ({
     process.env.NBU_RATE_URL ??
     'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
-  defaultDiscountThresholdPct: Number(process.env.DEFAULT_DISCOUNT_THRESHOLD_PCT ?? 15),
+  defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.3),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
 });

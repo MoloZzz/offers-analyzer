@@ -22,6 +22,7 @@ updated: 2026-07-12
 - Feature modules (e.g. `listings`, `sources`, `valuation`, `notifications`) — each with its own controller/service/dto/entities.
 - DTOs with `class-validator` + `ValidationPipe`; never trust external input (API responses, bot commands).
 - Config via `@nestjs/config`; **no secrets in code** (API key, bot token → `.env`, already gitignored).
+- **Schema changes go through migrations, never `synchronize`** — dev and prod evolve identically and reproducibly. After an entity change, regenerate (`npm run migration:generate`) and commit the migration.
 - Async work (polling, notifications) via a queue (BullMQ + Redis), not inline in request handlers.
 
 ## Testing
