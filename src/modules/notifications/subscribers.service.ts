@@ -23,9 +23,17 @@ export class SubscribersService {
   }
 
   async unsubscribe(telegramChatId: string): Promise<void> {
+    await this.setState(telegramChatId, 'unsubscribed');
+  }
+
+  async mute(telegramChatId: string): Promise<void> {
+    await this.setState(telegramChatId, 'muted');
+  }
+
+  private async setState(telegramChatId: string, state: Subscriber['state']): Promise<void> {
     const existing = await this.subscribers.findOne({ where: { telegramChatId } });
     if (!existing) return;
-    existing.state = 'unsubscribed';
+    existing.state = state;
     await this.subscribers.save(existing);
   }
 }

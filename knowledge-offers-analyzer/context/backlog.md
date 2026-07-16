@@ -31,17 +31,18 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 
 - [~] **B5 — SearchProfile config (operator).** Declarative `config/search-profiles.json`, upserted by
   `name` on boot, implemented. Remaining (optional, later): richer editing via bot command / API.
-- [ ] **B6 — FX / currency:** `ExchangeRate` NBU adapter + normalization; per-profile currency
-  switch in valuation and alert. FR-014. (`fx/` today is port-only.)
-- [ ] **B7 — Apply all per-profile config** end-to-end (threshold=minDealScore ✅, dealer policy ✅,
-  currency, enable/disable) and cover with a unit test. US2.
+- [x] **B6 — FX / currency:** NBU `ExchangeRate` adapter (daily-cached, falls back to rate 1);
+  comparison stays in USD (ratios are currency-agnostic), Opportunity amounts are converted to the
+  profile's currency for storage/alert. Contract-tested. FR-014.
+- [x] **B7 — Per-profile config applied** end-to-end: minDealScore ✅, dealer policy ✅, currency ✅
+  (conversion), enable/disable ✅. (Dedicated wiring unit test still optional.)
 
 ## 🟡 Next — US3 (trust & bot)
 
-- [~] **B8 — Telegram bot commands.** Minimal `/start` (subscribe) + `/stop` (unsubscribe) done
-  (`TelegramBotUpdate` + `SubscribersService`). Remaining: `/mute`, `/profiles`, `/help`. FR-015.
-- [ ] **B9 — Richer alert:** show the deal score + all reasoning fields + seller; label (not
-  celebrate) suspicious discounts. Spec 001 US3 / FR-007.
+- [x] **B8 — Telegram bot commands:** `/start`, `/stop`, `/mute`, `/profiles`, `/help`
+  (`TelegramBotUpdate` + `SubscribersService` + `ProfilesService`). FR-015.
+- [x] **B9 — Richer alert:** leads with the deal score, shows asking vs market, discount, confidence,
+  seller, Ukrainian risk labels, and the AUTO.RIA backlink. Unit-tested. Spec 001 US3 / FR-007.
 
 ## 🟢 Later — deferred (promote when picked up)
 

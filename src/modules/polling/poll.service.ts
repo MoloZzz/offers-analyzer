@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
+import { Currency } from '../../common/types/money';
+import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { ListingsService } from '../listings/listings.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SearchProfile } from '../profiles/entities/search-profile.entity';
@@ -36,6 +38,7 @@ export class PollService {
     private readonly benchmarks: BenchmarkCacheService,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     private readonly notifications: NotificationsService,
+    @Inject(EXCHANGE_RATE) private readonly fx: ExchangeRate,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -99,13 +102,15 @@ export class PollService {
     await this.listings.recordEvaluation(listing, result.score, result.discountPct);
     if (!result.isOpportunity) return;
 
+    // Comparison ran in USD (ratios are currency-agnostic); store amounts in the profile's currency.
+    const rate = await this.fx.rate(Currency.USD, profile.currency);
     const opportunity = await this.opportunities.save(
       this.opportunities.create({
         listingId: listing.id,
         profileId: profile.id,
-        fairValue: benchmark.value.amount,
+        fairValue: Math.round(benchmark.value.amount * rate),
         currency: profile.currency,
-        askingValue: detail.price.amount,
+        askingValue: Math.round(detail.price.amount * rate),
         discountPct: result.discountPct,
         confidence: result.confidence,
         score: result.score,

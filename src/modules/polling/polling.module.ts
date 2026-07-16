@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { FxModule } from '../fx/fx.module';
 import { ListingsModule } from '../listings/listings.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ProfilesModule } from '../profiles/profiles.module';
@@ -16,6 +17,7 @@ import { PollService } from './poll.service';
     ListingsModule,
     ValuationModule,
     NotificationsModule,
+    FxModule,
   ],
   providers: [PollService],
 })
