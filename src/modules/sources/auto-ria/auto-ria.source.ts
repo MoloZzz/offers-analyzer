@@ -140,7 +140,7 @@ export class AutoRiaSource implements ListingSource {
       const { statusCode, body } = await request(url);
       if (statusCode === 429) {
         // The source's own rate limit is authoritative — stop spending until the window rolls over.
-        this.budget.markExhausted(this.key);
+        await this.budget.markExhausted(this.key);
         throw new RateBudgetExhaustedError(`AUTO.RIA ${path} rate limited (HTTP 429)`);
       }
       if (statusCode >= 400) {

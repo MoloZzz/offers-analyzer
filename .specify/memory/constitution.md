@@ -72,7 +72,7 @@ output before it reaches agent context. Rationale: preserve context budget for r
 ## Technology & External Constraints
 
 - Stack: NestJS · PostgreSQL · TypeORM · Telegram bot. Scheduling is a `@nestjs/schedule` cron
-  with an in-memory rate budget — no Redis/queue in v1 (see ADR-0004).
+  with a Postgres-backed rate budget — no Redis/queue in v1 (see ADR-0004).
 - Data source (v1): AUTO.RIA official REST API (`developers.ria.com`) — search, listing info,
   average price. Reference dictionaries are cached; the hourly budget is spent on search,
   info for new candidates, and average price per cohort.
@@ -101,6 +101,7 @@ MAJOR for incompatible principle removals/redefinitions, MINOR for a new princip
 materially expanded guidance, PATCH for clarifications. All work — human or agent — is
 expected to comply; `CLAUDE.md` is the runtime enforcement of these rules.
 
-**Version**: 1.0.1 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-07-13
+**Version**: 1.0.2 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-07-16
 <!-- 1.0.1: PATCH — Technology stack refined to drop Redis/BullMQ from v1 (ADR-0004). -->
+<!-- 1.0.2: PATCH — Rate budget is now Postgres-backed (durable) instead of in-memory (ADR-0004, B13). -->
 

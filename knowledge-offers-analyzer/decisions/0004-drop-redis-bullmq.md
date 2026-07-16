@@ -27,7 +27,7 @@ The only remaining infrastructure is **PostgreSQL**, which is genuinely needed (
 
 **Positive:** simpler stack, fewer moving parts, faster to run and reason about.
 
-**Negative / trade-off:** the in-memory counter **resets on process restart**, so a restart mid-hour could allow up to a second budget in that hour — acceptable for a single instance. A durable (Postgres-backed) counter is in the [[backlog]] for when restarts are frequent or we run multiple instances.
+**Negative / trade-off:** the counter was initially in-memory (reset on restart). **Update (B13):** it is now a **durable Postgres-backed** counter (`rate_budget_windows`, atomic upsert per hour window), so the budget survives restarts and matches the source's real usage — Redis is still not needed.
 
 Supersedes the Redis/BullMQ elements of [[0002-monitoring-via-official-api|ADR-0002]] and `plan` research R2.
 

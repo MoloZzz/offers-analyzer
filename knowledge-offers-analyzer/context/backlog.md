@@ -54,8 +54,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
   need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].
 - [ ] **B12 — Relist/duplicate heuristic** (VIN / phone-hash). FR-008.
-- [ ] **B13 — Durable rate budget** (Postgres-backed) if we run multiple instances or restart often.
-  See [[0004-drop-redis-bullmq|ADR-0004]].
+- [x] **B13 — Durable rate budget:** Postgres-backed `rate_budget_windows` (atomic upsert per hour
+  window, prunes old windows). Survives restarts + safe across instances; 429 still authoritative. Redis
+  not needed. See [[0004-drop-redis-bullmq|ADR-0004]].
 - [ ] **B14 — Dictionary cache** (id↔name) if a flow needs name→id resolution. (T017)
 - [ ] **B15 — Integration test** end-to-end alert path with a DB harness. (T015)
 - [ ] **B16 — Operator alerting** on budget exhaustion / source down (dead-man's-switch). (FR-012 / T038)

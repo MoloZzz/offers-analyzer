@@ -9,6 +9,7 @@ import { Subscriber } from '../../modules/notifications/entities/subscriber.enti
 import { SearchProfile } from '../../modules/profiles/entities/search-profile.entity';
 import { FairValueBenchmark } from '../../modules/valuation/entities/fair-value-benchmark.entity';
 import { Opportunity } from '../../modules/valuation/entities/opportunity.entity';
+import { RateBudgetWindow } from '../../modules/scheduling/entities/rate-budget-window.entity';
 
 /** All persistent entities — single source of truth for the datasource and TypeOrmModule. */
 export const ENTITIES = [
@@ -19,6 +20,7 @@ export const ENTITIES = [
   Opportunity,
   Subscriber,
   Notification,
+  RateBudgetWindow,
 ];
 
 export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {

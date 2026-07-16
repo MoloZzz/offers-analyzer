@@ -27,7 +27,7 @@ Planned in [[specs/README|spec 001]] `plan.md` (not yet implemented). One NestJS
 | `valuation` | fair value, discount, confidence, red-flags, opportunity scoring | see [[profitability-definition]] |
 | `profiles` | SearchProfile config (niche + tuning) | user-controlled params |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting | `Notifier` port |
-| `scheduling` | in-memory rate budget (fixed window) | enforces ~30 req/hr |
+| `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
 | `polling` | cron pipeline: search → new → value → alert | no queue in v1 |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 

@@ -22,7 +22,11 @@ updated: 2026-07-12
 - Feature modules (e.g. `listings`, `sources`, `valuation`, `notifications`) — each with its own controller/service/dto/entities.
 - DTOs with `class-validator` + `ValidationPipe`; never trust external input (API responses, bot commands).
 - Config via `@nestjs/config`; **no secrets in code** (API key, bot token → `.env`, already gitignored).
-- **Schema changes go through migrations, never `synchronize`** — dev and prod evolve identically and reproducibly. After an entity change, regenerate (`npm run migration:generate`) and commit the migration.
+- **Schema changes go through migrations, never `synchronize`.** Migrations are **append-only
+  history**: for each entity change generate a **new incremental** migration
+  (`npm run migration:generate -- src/common/database/migrations/<Name>`), review it, and commit it.
+  **Never delete existing migrations and regenerate** — that throws away history and breaks anyone
+  who already ran them. (The only exception was the one-time initial baseline before the first real DB.)
 - Async work (polling, notifications) via a queue (BullMQ + Redis), not inline in request handlers.
 
 ## Testing

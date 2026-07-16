@@ -1,30 +1,49 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 
+import { RateBudgetWindow } from './entities/rate-budget-window.entity';
+
 /**
  * Hard cap on source API calls (AUTO.RIA free tier ~30/hour) — constitution §V, FR-012.
- * In-memory fixed-window counter: simplest thing that works for a single-instance v1 (no Redis).
- * Trade-off: the count resets on process restart (see backlog — durable counter if needed).
+ * Durable fixed-window counter in Postgres: the count survives restarts (unlike the earlier
+ * in-memory version), so we don't over-spend and hit HTTP 429 after a restart. See ADR-0004 (B13).
  */
 @Injectable()
 export class RateBudgetService {
   private readonly logger = new Logger(RateBudgetService.name);
   private readonly capacity: number;
-  private readonly windows = new Map<string, number>();
 
-  constructor(config: ConfigService<AppConfig, true>) {
+  constructor(
+    config: ConfigService<AppConfig, true>,
+    @InjectRepository(RateBudgetWindow) private readonly repo: Repository<RateBudgetWindow>,
+  ) {
     this.capacity = config.get('rateBudgetPerHour', { infer: true });
   }
 
   /** Try to consume `cost` from the current hour's budget. Returns false if it would exceed the cap. */
-  // eslint-disable-next-line @typescript-eslint/require-await
   async tryConsume(sourceKey = 'auto-ria', cost = 1): Promise<boolean> {
-    const key = this.windowKey(sourceKey);
-    this.pruneExcept(key);
-    const used = (this.windows.get(key) ?? 0) + cost;
-    this.windows.set(key, used);
+    const windowKey = RateBudgetService.windowKey();
+    const rows = (await this.repo.query(
+      `INSERT INTO rate_budget_windows ("sourceKey", "windowKey", "used")
+       VALUES ($1, $2, $3)
+       ON CONFLICT ("sourceKey", "windowKey")
+       DO UPDATE SET "used" = rate_budget_windows."used" + $3
+       RETURNING "used"`,
+      [sourceKey, windowKey, cost],
+    )) as Array<{ used: string | number }>;
+    const used = Number(rows[0]?.used ?? cost);
+
+    if (used === cost) {
+      // First consume of this window — prune older windows so the table stays tiny.
+      await this.repo.query(
+        `DELETE FROM rate_budget_windows WHERE "sourceKey" = $1 AND "windowKey" <> $2`,
+        [sourceKey, windowKey],
+      );
+    }
     if (used > this.capacity) {
       this.logger.warn(`Rate budget exhausted for ${sourceKey} (used=${used}/${this.capacity})`);
       return false;
@@ -33,33 +52,31 @@ export class RateBudgetService {
   }
 
   /** Remaining calls in the current hour window. */
-  remaining(sourceKey = 'auto-ria'): number {
-    const used = this.windows.get(this.windowKey(sourceKey)) ?? 0;
-    return Math.max(0, this.capacity - used);
+  async remaining(sourceKey = 'auto-ria'): Promise<number> {
+    const row = await this.repo.findOne({
+      where: { sourceKey, windowKey: RateBudgetService.windowKey() },
+    });
+    return Math.max(0, this.capacity - (row?.used ?? 0));
   }
 
-  /**
-   * Force the current hour window to "exhausted" — used when the source itself returns HTTP 429.
-   * The source's 429 is authoritative (our in-memory count drifts across restarts), so we stop
-   * spending until the window rolls over.
-   */
-  markExhausted(sourceKey = 'auto-ria'): void {
-    this.windows.set(this.windowKey(sourceKey), this.capacity);
+  /** Force the current window to exhausted (e.g. the source returned HTTP 429). */
+  async markExhausted(sourceKey = 'auto-ria'): Promise<void> {
+    const windowKey = RateBudgetService.windowKey();
+    await this.repo.query(
+      `INSERT INTO rate_budget_windows ("sourceKey", "windowKey", "used")
+       VALUES ($1, $2, $3)
+       ON CONFLICT ("sourceKey", "windowKey")
+       DO UPDATE SET "used" = GREATEST(rate_budget_windows."used", $3)`,
+      [sourceKey, windowKey, this.capacity],
+    );
   }
 
-  private windowKey(sourceKey: string): string {
+  private static windowKey(): string {
     const now = new Date();
-    const stamp =
+    return (
       `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}` +
-      `${pad(now.getUTCHours())}`;
-    return `${sourceKey}:${stamp}`;
-  }
-
-  /** Drop stale windows so the map doesn't grow unbounded. */
-  private pruneExcept(currentKey: string): void {
-    for (const key of this.windows.keys()) {
-      if (key !== currentKey) this.windows.delete(key);
-    }
+      `${pad(now.getUTCHours())}`
+    );
   }
 }
 
