@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-12
+updated: 2026-07-16
 ---
 
 # Architecture overview
@@ -18,26 +18,32 @@ updated: 2026-07-12
 
 ## Module map
 
-Planned in [[specs/README|spec 001]] `plan.md` (not yet implemented). One NestJS module per concern:
+Implemented (spec 001). One NestJS module per concern:
 
 | Module | Responsibility | Notes |
 |--------|----------------|-------|
 | `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
-| `listings` | Listing & PriceObservation entities, dedup/relist | history from day one |
-| `valuation` | fair value, discount, confidence, red-flags, opportunity scoring | see [[profitability-definition]] |
-| `profiles` | SearchProfile config (niche + tuning) | user-controlled params |
+| `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore` | history from day one |
+| `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry | see [[profitability-definition]], [[why-no-opportunities]] |
+| `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
+| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`) | powers `/check`, `/top`, `/best` |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting | `Notifier` port |
 | `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
-| `polling` | cron pipeline: search → new → value → alert | no queue in v1 |
+| `polling` | cron pipeline: search → new → value → alert + re-observe price drops | no queue in v1 |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
 
-Planned end-to-end path (v1): `scheduling` cron enqueues a poll per active `profile` →
-`sources` search (ids) → `listings` filters to new ids → `sources` fetch details (budgeted) →
-`valuation` gets `sources` average price, computes discount/confidence/red-flags → an
-**Opportunity** is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
-Full design: `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
+End-to-end path (v1): `scheduling` cron runs a poll per active `profile` → `sources` search (ids;
+market-wide profiles set `top` submission-period for "newest by market") → `listings` filters to new
+ids → `sources` fetch details (budgeted) → `valuation` resolves a benchmark via **`cohort.ts`
+widen-and-retry** (make+model+year±1 → make+model until `sampleSize ≥ 10`), computes
+discount/confidence/red-flags → every evaluated listing records its score; an **Opportunity**
+(score ≥ threshold) is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
+The poll also re-observes a few known listings each cycle for price drops. On demand, the `query`
+module lets the bot check any listing (`/check`), list stored opportunities (`/top`), or list the
+best-scoring candidates even below the alert bar (`/best`). Full design:
+`specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
 
 ## Entities / data model
 

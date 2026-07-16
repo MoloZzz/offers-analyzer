@@ -11,9 +11,27 @@
     "priceFrom": null,
     "priceTo": null,
     "currency": "USD",
-    "minDealScore": 0.3,
+    "minDealScore": 0.15,
     "confidenceMinSamples": 10,
     "dealerPolicy": "label",
     "enabled": true
+  },
+  {
+    "name": "Найновіші по ринку — Львівщина, до $15000",
+    "categoryId": 1,
+    "stateId": 5,
+    "cityId": null,
+    "filters": {
+      "makeModelPairs": [],
+      "yearFrom": 2010,
+      "submittedWithin": 2
+    },
+    "priceFrom": null,
+    "priceTo": 15000,
+    "currency": "USD",
+    "minDealScore": 0.15,
+    "confidenceMinSamples": 10,
+    "dealerPolicy": "label",
+    "enabled": false
   }
 ]

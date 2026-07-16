@@ -1,7 +1,7 @@
 ---
 title: Domain glossary
 type: domain
-updated: 2026-07-12
+updated: 2026-07-16
 ---
 
 # Domain glossary (ubiquitous language)
@@ -11,7 +11,8 @@ updated: 2026-07-12
 | Term | Definition | Notes / synonyms to avoid |
 |------|------------|---------------------------|
 | **Listing** | A single car advertisement on a source (auto.ria `auto_id` + details). | Prefer over "offer" for a raw ad. |
-| **Cohort** | The set of comparable cars used to value a listing (make, model, year, region, mileage band, options). | — |
+| **Cohort** | The set of comparable cars used to value a listing. Shipped default: **make+model+year±1 nationwide**, widening to make+model until the sample is usable (city & mileage dropped — they starve the sample). See [[why-no-opportunities]]. | — |
+| **Newest by market** | An ingestion mode: a search profile with **empty make/model** + region + price cap that pulls the freshest listings market-wide, using AUTO.RIA's `top` **submission-period** filter (1=last hour, 2=today, 8=last 3h…). Each is still valued against its own cohort. | Not an `order_by` sort — RIA has no "newest" sort. |
 | **Fair value (FV)** | Estimated market price for a listing's cohort; v1 anchored on RIA average price. | See [[profitability-definition]]. |
 | **Discount** | `(FV − asking) / FV` — how far below market a listing is priced. | — |
 | **Opportunity** | A listing flagged as a candidate deal: sufficient discount + confidence, passes red-flags. | Not a guarantee of profit. |

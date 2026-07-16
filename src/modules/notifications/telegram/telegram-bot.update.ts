@@ -8,7 +8,8 @@ import { SubscribersService } from '../subscribers.service';
 
 const HELP =
   '/check <id або посилання> — оцінити конкретне авто\n' +
-  '/top — найкращі знайдені пропозиції\n' +
+  '/top — знайдені вигідні пропозиції\n' +
+  '/best — найкращі оцінені авто (навіть нижче порогу)\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
@@ -86,6 +87,20 @@ export class TelegramBotUpdate {
       return `• ${name} — бал ${opportunity.score}, ${opportunity.askingValue} ${opportunity.currency}${link}`;
     });
     await ctx.reply(`Топ вигідних пропозицій:\n${lines.join('\n')}`);
+  }
+
+  @Command('best')
+  async onBest(@Ctx() ctx: Context): Promise<void> {
+    const listings = await this.query.topCandidates(5);
+    if (listings.length === 0) {
+      await ctx.reply('Ще нічого не оцінено. Дай боту попрацювати або спробуй /check <id>.');
+      return;
+    }
+    const lines = listings.map((l) => {
+      const score = l.lastScore ?? 0;
+      return `• ${l.make} ${l.model}, ${l.year} — бал ${score}, ${l.currentAmount} ${l.currentCurrency}\n  ${l.url}`;
+    });
+    await ctx.reply(`Найкращі оцінені (навіть нижче порогу):\n${lines.join('\n')}`);
   }
 
   @Help()

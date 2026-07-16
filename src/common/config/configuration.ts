@@ -25,7 +25,7 @@ export default (): AppConfig => ({
     process.env.NBU_RATE_URL ??
     'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
-  defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.3),
+  defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.15),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
   logSourceRequests: process.env.LOG_SOURCE_REQUESTS === 'true',
 });

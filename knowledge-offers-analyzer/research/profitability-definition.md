@@ -48,9 +48,9 @@ score       = raw × confidence × flagPenalty          # flagPenalty ≈ 0.8 fo
 if a disqualifying red-flag fires: score = min(score, 0)   # a scam/damaged bargain is not a deal
 ```
 
-Flag as an **Opportunity** when `score ≥ profile.minDealScore` (default ≈ 0.3) and `sampleSize ≥ minSamples`. Rank by `score`. This unifies discount, confidence, and risk into one explainable number and degrades gracefully (unsure → near 0). `SCALE` and `minDealScore` are config; `SCALE` is a constant in v1.
+Flag as an **Opportunity** when `score ≥ profile.minDealScore` (default **0.15** — lowered from 0.3 on 2026-07-16 so real candidates surface; see [[why-no-opportunities]]) and `sampleSize ≥ minSamples`. Rank by `score`. This unifies discount, confidence, and risk into one explainable number and degrades gracefully (unsure → near 0). `SCALE` and `minDealScore` are config; `SCALE` is a constant in v1.
 
-**Cohort must include mileage.** Compare a listing against the average for its *mileage band*, not the whole model — otherwise `delta` is unfair (a 250k-km car vs the model average).
+**Cohort width is a sample-vs-precision trade-off.** Ideally the cohort matches the listing's *mileage band* so `delta` is fair. In practice, make+model+city+exact-year+mileage collapses the RIA sample to ~1 and the confidence gate rejects everything (the "0 opportunities" bug). So the shipped default cohort is **make+model+year±1 nationwide** (drop city & mileage), widening to make+model only — `resolveBenchmark` walks these until `sampleSize ≥ 10`. Mileage-adjusted valuation is a deliberate later refinement. Details: [[why-no-opportunities]].
 
 ## Worked example (what the system actually does)
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 
 import { Currency } from '../../common/types/money';
 import { ListingDetail } from '../sources/ports/listing-source.port';
@@ -41,6 +41,15 @@ export class ListingsService {
   findByIds(ids: string[]): Promise<Listing[]> {
     if (ids.length === 0) return Promise.resolve([]);
     return this.listings.find({ where: { id: In(ids) } });
+  }
+
+  /** Best-scoring evaluated listings (even below the alert threshold) — the "best available now". */
+  topByScore(limit = 5): Promise<Listing[]> {
+    return this.listings.find({
+      where: { lastScore: Not(IsNull()) },
+      order: { lastScore: 'DESC' },
+      take: limit,
+    });
   }
 
   async recordSeen(detail: ListingDetail): Promise<RecordResult> {

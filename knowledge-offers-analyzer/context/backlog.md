@@ -21,9 +21,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   red-flags enriched from `autoInfoBar`; `/average_price` confirmed → fair value now uses the robust
   **`interQuartileMean`** (not the outlier-skewed `arithmeticMean`), `total` = sample size. Full map in
   `contracts/auto-ria-api.md`.
-- [~] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Remaining
-  (low priority for a narrow niche): budget-cursor (round-robin across profiles), newest-first ordering
-  (needs the `order_by` value verified).
+- [~] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Freshness
+  **done** via the `top` submission-period filter (see B19) — note: AUTO.RIA `order_by` has **no**
+  "newest" value (only 0/1/2), so newest-first is `top`, not `order_by`. Remaining (low priority):
+  budget-cursor (round-robin across profiles).
 - [~] **B4 — Make the pipeline run:** now driven by `config/search-profiles.json` (copy the example,
   set numeric ids + `enabled: true`, restart). **User action** to go live.
 
@@ -47,6 +48,20 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   (fetch → value → reply with the deal score), `/top` lists the best-scoring saved opportunities.
   `QueryService` + `QueryModule` (reuses source + valuation + listings). Lets the operator check any
   car instantly instead of waiting for the poll.
+
+## 🔵 Business-value push (2026-07-16) — reach non-zero opportunities
+
+Root cause + plan in [[why-no-opportunities]].
+
+- [x] **B18 — Widen the cohort + surface candidates.** `valuation/cohort.ts`
+  (`cohortCandidates` → make+model+year±1, then make+model; `resolveBenchmark` widens until
+  `sampleSize ≥ 10`), used by poll + `/check`. Default `minDealScore` lowered **0.3 → 0.15**. New bot
+  command **`/best`** lists best-scoring evaluated listings even below the alert bar
+  (`QueryService.topCandidates` → `ListingsService.topByScore`). No schema change.
+- [x] **B19 — Newest by market.** `submittedWithin` query knob → AUTO.RIA `top` submission-period
+  filter; a profile with **empty `makeModelPairs`** + region + `priceTo` + `submittedWithin` ingests the
+  freshest listings market-wide, each valued against its own widened cohort. Example profile shipped
+  **disabled** (budget-heavier — operator opts in). No schema change (`filters` is jsonb).
 
 ## 🟢 Later — deferred (promote when picked up)
 

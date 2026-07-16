@@ -12,11 +12,14 @@ import { Currency } from '../../../common/types/money';
 export type DealerPolicy = 'label' | 'exclude' | 'ignore';
 
 export interface ProfileFilters {
+  /** Empty = market-wide (no make/model constraint) — used for the "newest by market" profile. */
   makeModelPairs: Array<{ markId: number; modelId: number }>;
   yearFrom?: number;
   yearTo?: number;
   mileageFrom?: number;
   mileageTo?: number;
+  /** AUTO.RIA submission-period code (`top`): only listings posted within this window. */
+  submittedWithin?: number;
 }
 
 /** A configured niche to monitor and how strictly to evaluate it (operator-controlled in v1). */

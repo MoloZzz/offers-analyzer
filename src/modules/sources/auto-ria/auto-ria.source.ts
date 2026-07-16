@@ -54,6 +54,8 @@ export class AutoRiaSource implements ListingSource {
     if (query.priceTo != null) params.set('price_do', String(query.priceTo));
     if (query.yearFrom != null) params.set('s_yers', String(query.yearFrom));
     if (query.yearTo != null) params.set('po_yers', String(query.yearTo));
+    // "Newest by market": restrict to recently-submitted listings (AUTO.RIA `top` period code).
+    if (query.submittedWithin != null) params.set('top', String(query.submittedWithin));
     if (query.page != null) params.set('page', String(query.page));
     for (const { markId, modelId } of query.makeModelPairs) {
       params.append('marka_id[]', String(markId));

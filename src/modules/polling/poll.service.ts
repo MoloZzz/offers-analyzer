@@ -12,18 +12,16 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { SearchProfile } from '../profiles/entities/search-profile.entity';
 import { ProfilesService } from '../profiles/profiles.service';
 import {
-  CohortQuery,
   ListingDetail,
   ListingSource,
   LISTING_SOURCE,
   SourceSearchQuery,
 } from '../sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
+import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { ValuationService } from '../valuation/valuation.service';
 
-/** ± thousand km around the listing's mileage — compare within a fair mileage band. */
-const MILEAGE_BAND = 20;
 /** How many already-seen listings to re-check per cycle for price drops (budget permitting). */
 const REOBSERVE_PER_CYCLE = 5;
 
@@ -117,15 +115,14 @@ export class PollService {
     type: 'opportunity' | 'price_drop',
     previousAmount: number | null,
   ): Promise<void> {
-    const cohort = toCohort(detail);
-    const benchmark = await this.benchmarks.getOrLoad('auto-ria', cohort, () =>
-      this.source.averagePrice(cohort),
-    );
+    const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
+    const fairValue = benchmark?.value.amount ?? 0;
+    const sampleSize = benchmark?.sampleSize ?? 0;
 
     const result = this.valuation.evaluate({
       asking: detail.price.amount,
-      fairValue: benchmark.value.amount,
-      sampleSize: benchmark.sampleSize,
+      fairValue,
+      sampleSize,
       minScore: profile.minDealScore,
       minSamples: profile.confidenceMinSamples,
       sellerType: detail.sellerType,
@@ -147,7 +144,7 @@ export class PollService {
       this.opportunities.create({
         listingId: listing.id,
         profileId: profile.id,
-        fairValue: Math.round(benchmark.value.amount * rate),
+        fairValue: Math.round(fairValue * rate),
         currency: profile.currency,
         askingValue: Math.round(detail.price.amount * rate),
         discountPct: result.discountPct,
@@ -180,20 +177,6 @@ function toQuery(p: SearchProfile): SourceSearchQuery {
     priceTo: p.priceTo ?? undefined,
     mileageFrom: p.filters.mileageFrom,
     mileageTo: p.filters.mileageTo,
+    submittedWithin: p.filters.submittedWithin,
   };
-}
-
-function toCohort(d: ListingDetail): CohortQuery {
-  const cohort: CohortQuery = {
-    markId: d.markId,
-    modelId: d.modelId,
-    cityId: d.cityId ?? undefined,
-    yearFrom: d.year,
-    yearTo: d.year,
-  };
-  if (d.mileage != null) {
-    cohort.mileageFrom = Math.max(0, d.mileage - MILEAGE_BAND);
-    cohort.mileageTo = d.mileage + MILEAGE_BAND;
-  }
-  return cohort;
 }

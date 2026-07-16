@@ -7,17 +7,11 @@ import { AppConfig } from '../../common/config/configuration';
 import { Currency } from '../../common/types/money';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
-import {
-  CohortQuery,
-  ListingDetail,
-  ListingSource,
-  LISTING_SOURCE,
-} from '../sources/ports/listing-source.port';
+import { ListingDetail, ListingSource, LISTING_SOURCE } from '../sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
+import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
-
-const MILEAGE_BAND = 20;
 
 export interface Assessment {
   detail: ListingDetail;
@@ -31,7 +25,7 @@ export interface RankedOpportunity {
   listing?: Listing;
 }
 
-/** Read-mostly queries exposed to the Telegram bot (on-demand check, top deals). */
+/** Read-mostly queries exposed to the Telegram bot (on-demand check, top deals, best candidates). */
 @Injectable()
 export class QueryService {
   private readonly minScore: number;
@@ -52,14 +46,14 @@ export class QueryService {
   /** Fetch + evaluate a single listing on demand (spends budget). */
   async assessById(externalId: string): Promise<Assessment> {
     const detail = await this.source.fetch(externalId);
-    const cohort = cohortFromDetail(detail);
-    const benchmark = await this.benchmarks.getOrLoad('auto-ria', cohort, () =>
-      this.source.averagePrice(cohort),
-    );
+    const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
+    const fairValue = benchmark?.value.amount ?? 0;
+    const currency = benchmark?.value.currency ?? Currency.USD;
+
     const result = this.valuation.evaluate({
       asking: detail.price.amount,
-      fairValue: benchmark.value.amount,
-      sampleSize: benchmark.sampleSize,
+      fairValue,
+      sampleSize: benchmark?.sampleSize ?? 0,
       minScore: this.minScore,
       minSamples: this.minSamples,
       sellerType: detail.sellerType,
@@ -71,7 +65,7 @@ export class QueryService {
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
     });
-    return { detail, result, fairValue: benchmark.value.amount, currency: benchmark.value.currency };
+    return { detail, result, fairValue, currency };
   }
 
   /** The highest-scoring opportunities recorded so far. */
@@ -81,19 +75,9 @@ export class QueryService {
     const byId = new Map(listings.map((l) => [l.id, l]));
     return ops.map((opportunity) => ({ opportunity, listing: byId.get(opportunity.listingId) }));
   }
-}
 
-function cohortFromDetail(d: ListingDetail): CohortQuery {
-  const cohort: CohortQuery = {
-    markId: d.markId,
-    modelId: d.modelId,
-    cityId: d.cityId ?? undefined,
-    yearFrom: d.year,
-    yearTo: d.year,
-  };
-  if (d.mileage != null) {
-    cohort.mileageFrom = Math.max(0, d.mileage - MILEAGE_BAND);
-    cohort.mileageTo = d.mileage + MILEAGE_BAND;
+  /** Best-scoring evaluated listings, even below the alert threshold — the "best available now". */
+  topCandidates(limit = 5): Promise<Listing[]> {
+    return this.listings.topByScore(limit);
   }
-  return cohort;
 }

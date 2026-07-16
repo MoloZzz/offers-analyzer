@@ -17,6 +17,11 @@ export interface SourceSearchQuery {
   mileageFrom?: number;
   mileageTo?: number;
   page?: number;
+  /**
+   * Restrict to listings submitted within a recent window ("newest by market"). AUTO.RIA `top`
+   * (period): 1=last hour, 2=today, 3=3 days, 4=week, 5=month, 8=last 3h, 9=last 6h. Undefined = all.
+   */
+  submittedWithin?: number;
 }
 
 export interface SourceSearchResult {
