@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+
+import { ListingsModule } from '../listings/listings.module';
+import { SourcesModule } from '../sources/sources.module';
+import { ValuationModule } from '../valuation/valuation.module';
+
+import { QueryService } from './query.service';
+
+/** On-demand queries for the Telegram bot. Read-mostly; reuses the source + valuation + listings. */
+@Module({
+  imports: [SourcesModule, ValuationModule, ListingsModule],
+  providers: [QueryService],
+  exports: [QueryService],
+})
+export class QueryModule {}

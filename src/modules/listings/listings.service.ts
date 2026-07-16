@@ -37,6 +37,12 @@ export class ListingsService {
     });
   }
 
+  /** Return listings by internal id (for joining opportunities to their listing). */
+  findByIds(ids: string[]): Promise<Listing[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return this.listings.find({ where: { id: In(ids) } });
+  }
+
   async recordSeen(detail: ListingDetail): Promise<RecordResult> {
     const now = new Date();
     let listing = await this.listings.findOne({

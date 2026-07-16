@@ -43,6 +43,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   (`TelegramBotUpdate` + `SubscribersService` + `ProfilesService`). FR-015.
 - [x] **B9 — Richer alert:** leads with the deal score, shows asking vs market, discount, confidence,
   seller, Ukrainian risk labels, and the AUTO.RIA backlink. Unit-tested. Spec 001 US3 / FR-007.
+- [x] **B-bot-query — On-demand bot queries:** `/check <id|url>` evaluates a specific listing live
+  (fetch → value → reply with the deal score), `/top` lists the best-scoring saved opportunities.
+  `QueryService` + `QueryModule` (reuses source + valuation + listings). Lets the operator check any
+  car instantly instead of waiting for the poll.
 
 ## 🟢 Later — deferred (promote when picked up)
 
