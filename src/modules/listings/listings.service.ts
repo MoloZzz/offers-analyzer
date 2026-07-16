@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Currency } from '../../common/types/money';
 import { ListingDetail } from '../sources/ports/listing-source.port';
@@ -27,6 +27,14 @@ export class ListingsService {
   async isKnown(externalId: string): Promise<boolean> {
     const count = await this.listings.count({ where: { sourceKey: this.sourceKey, externalId } });
     return count > 0;
+  }
+
+  /** Return the already-known listings among the given external ids (for dedup + re-observation). */
+  findByExternalIds(externalIds: string[]): Promise<Listing[]> {
+    if (externalIds.length === 0) return Promise.resolve([]);
+    return this.listings.find({
+      where: { sourceKey: this.sourceKey, externalId: In(externalIds) },
+    });
   }
 
   async recordSeen(detail: ListingDetail): Promise<RecordResult> {

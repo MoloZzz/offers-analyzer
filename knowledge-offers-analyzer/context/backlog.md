@@ -46,7 +46,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 
 ## 🟢 Later — deferred (promote when picked up)
 
-- [ ] **B10 — Re-observe known listings** → price-drop detection (FR-009). Competes for the budget.
+- [x] **B10 — Price-drop detection (FR-009):** after new ids, the poll re-observes up to
+  `REOBSERVE_PER_CYCLE` known listings (oldest `lastSeenAt` first), budget-permitting; on a price drop
+  that re-qualifies as an opportunity it sends a distinct `📉 Ціна знижена` alert (idempotent
+  `price_drop` dedupKey). `ListingsService.findByExternalIds` + `NotificationsService.notifyPriceDrop`.
 - [ ] **B11 — Own-statistics valuation** — mostly **obviated**: RIA `/average_price` already returns
   `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
   need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].

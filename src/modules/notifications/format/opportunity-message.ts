@@ -44,6 +44,17 @@ export function formatOpportunity(op: Opportunity, listing: Listing): string {
   ].join('\n');
 }
 
+/** Price-drop alert: a previously-seen listing got cheaper and is now a good deal (FR-009). */
+export function formatPriceDrop(op: Opportunity, listing: Listing, oldAmount: number): string {
+  const dropPct = oldAmount > 0 ? Math.round(((oldAmount - op.askingValue) / oldAmount) * 100) : 0;
+  return [
+    `📉 Ціна знижена: ${listing.make} ${listing.model}, ${listing.year}`,
+    `Було ${fmt(oldAmount)} → стало ${fmt(op.askingValue)} ${op.currency} (−${dropPct}%)`,
+    `💰 Вигідність: ${signed(op.score)}  ·  від ринку −${op.discountPct}%`,
+    `🔗 ${listing.url}`,
+  ].join('\n');
+}
+
 function signed(n: number): string {
   return n > 0 ? `+${n}` : `${n}`;
 }

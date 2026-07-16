@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
 import { Currency } from '../../common/types/money';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
+import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SearchProfile } from '../profiles/entities/search-profile.entity';
@@ -21,10 +22,16 @@ import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { ValuationService } from '../valuation/valuation.service';
 
+/** ± thousand km around the listing's mileage — compare within a fair mileage band. */
+const MILEAGE_BAND = 20;
+/** How many already-seen listings to re-check per cycle for price drops (budget permitting). */
+const REOBSERVE_PER_CYCLE = 5;
+
 /**
  * The MVP pipeline (US1): for each enabled niche — search → new ids → fetch → value → alert.
- * Runs on a cron (no queue in v1). Every source call is budgeted; when the budget is exhausted
- * the cycle stops cleanly and resumes next tick (FR-012).
+ * Also re-observes a few known listings each cycle to catch price drops (FR-009). Runs on a cron
+ * (no queue in v1). Every source call is budgeted; when the budget is exhausted (or the source
+ * returns HTTP 429) the cycle stops cleanly and resumes next tick (FR-012).
  */
 @Injectable()
 export class PollService {
@@ -59,25 +66,57 @@ export class PollService {
 
   private async pollProfile(profile: SearchProfile): Promise<void> {
     const { ids } = await this.source.search(toQuery(profile));
+    const known = await this.listings.findByExternalIds(ids);
+    const knownIds = new Set(known.map((l) => l.externalId));
 
+    // 1) New listings first (priority).
     for (const externalId of ids) {
-      if (await this.listings.isKnown(externalId)) continue; // dedup: only new listings
-      try {
-        await this.evaluateListing(profile, externalId);
-      } catch (err) {
-        if (err instanceof RateBudgetExhaustedError) throw err; // stop the whole cycle
-        // One bad listing (e.g. thin cohort → average_price 400) must not abort the profile.
-        this.logger.warn(`Skipping listing ${externalId}: ${(err as Error).message}`);
-      }
+      if (knownIds.has(externalId)) continue;
+      await this.guarded(externalId, () => this.processNew(profile, externalId));
+    }
+
+    // 2) Re-observe a few already-seen listings (oldest first) to catch price drops.
+    const stale = [...known]
+      .sort((a, b) => a.lastSeenAt.getTime() - b.lastSeenAt.getTime())
+      .slice(0, REOBSERVE_PER_CYCLE);
+    for (const listing of stale) {
+      await this.guarded(listing.externalId, () => this.reobserve(profile, listing));
     }
   }
 
-  private async evaluateListing(profile: SearchProfile, externalId: string): Promise<void> {
+  /** A budget-exhausted error stops the whole cycle; any other per-listing error just skips it. */
+  private async guarded(externalId: string, fn: () => Promise<void>): Promise<void> {
+    try {
+      await fn();
+    } catch (err) {
+      if (err instanceof RateBudgetExhaustedError) throw err;
+      this.logger.warn(`Skipping listing ${externalId}: ${(err as Error).message}`);
+    }
+  }
+
+  private async processNew(profile: SearchProfile, externalId: string): Promise<void> {
     const detail = await this.source.fetch(externalId);
     if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
-
     const { listing } = await this.listings.recordSeen(detail);
+    await this.evaluateAndNotify(profile, detail, listing, 'opportunity', null);
+  }
 
+  private async reobserve(profile: SearchProfile, existing: Listing): Promise<void> {
+    const previousAmount = existing.currentAmount;
+    const detail = await this.source.fetch(existing.externalId);
+    const { listing } = await this.listings.recordSeen(detail);
+    // Only a price drop is interesting here; the observation is recorded either way.
+    if (detail.price.amount >= previousAmount) return;
+    await this.evaluateAndNotify(profile, detail, listing, 'price_drop', previousAmount);
+  }
+
+  private async evaluateAndNotify(
+    profile: SearchProfile,
+    detail: ListingDetail,
+    listing: Listing,
+    type: 'opportunity' | 'price_drop',
+    previousAmount: number | null,
+  ): Promise<void> {
     const cohort = toCohort(detail);
     const benchmark = await this.benchmarks.getOrLoad('auto-ria', cohort, () =>
       this.source.averagePrice(cohort),
@@ -119,7 +158,11 @@ export class PollService {
       }),
     );
 
-    await this.notifications.notifyOpportunity(opportunity, listing);
+    if (type === 'price_drop' && previousAmount != null) {
+      await this.notifications.notifyPriceDrop(opportunity, listing, Math.round(previousAmount * rate));
+    } else {
+      await this.notifications.notifyOpportunity(opportunity, listing);
+    }
     opportunity.notified = true;
     await this.opportunities.save(opportunity);
   }
@@ -139,9 +182,6 @@ function toQuery(p: SearchProfile): SourceSearchQuery {
     mileageTo: p.filters.mileageTo,
   };
 }
-
-/** ± thousand km around the listing's mileage — compare within a fair mileage band. */
-const MILEAGE_BAND = 20;
 
 function toCohort(d: ListingDetail): CohortQuery {
   const cohort: CohortQuery = {

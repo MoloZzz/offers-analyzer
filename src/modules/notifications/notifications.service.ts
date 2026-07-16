@@ -6,7 +6,7 @@ import { Listing } from '../listings/entities/listing.entity';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 
 import { Notification } from './entities/notification.entity';
-import { formatOpportunity } from './format/opportunity-message';
+import { formatOpportunity, formatPriceDrop } from './format/opportunity-message';
 import { Notifier, NOTIFIER } from './ports/notifier.port';
 import { SubscribersService } from './subscribers.service';
 
@@ -36,6 +36,33 @@ export class NotificationsService {
           subscriberId: sub.id,
           opportunityId: opportunity.id,
           type: 'opportunity',
+          dedupKey,
+        }),
+      );
+    }
+  }
+
+  async notifyPriceDrop(
+    opportunity: Opportunity,
+    listing: Listing,
+    oldAmount: number,
+  ): Promise<void> {
+    const recipients = await this.subscribers.listActive();
+    if (recipients.length === 0) return;
+
+    const text = formatPriceDrop(opportunity, listing, oldAmount);
+
+    for (const sub of recipients) {
+      const dedupKey = `${sub.id}:price_drop:${opportunity.id}`;
+      const already = await this.notifications.count({ where: { dedupKey } });
+      if (already > 0) continue;
+
+      await this.notifier.send({ chatId: sub.telegramChatId, text });
+      await this.notifications.save(
+        this.notifications.create({
+          subscriberId: sub.id,
+          opportunityId: opportunity.id,
+          type: 'price_drop',
           dedupKey,
         }),
       );
