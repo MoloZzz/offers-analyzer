@@ -6,18 +6,38 @@ import { BenchmarkCacheService, BenchmarkValue } from './benchmark-cache.service
 /** A cohort's average is only trustworthy with at least this many comparable listings. */
 const MIN_USEFUL_SAMPLES = 10;
 
+/** Half-width of the mileage band (thousand km) around the listing's own mileage — see M1 (banded). */
+export const MILEAGE_BAND_K = 25;
+
 /**
- * Cohorts to try, from a reasonable segment to the widest — widest-DATA fallback.
- * We deliberately drop city and mileage from the default: narrow cohorts (make+model+city+exact
- * year+mileage) collapse the sample to ~1, which the confidence gate then rejects (see
- * research/why-no-opportunities). Year±1 nationwide usually has hundreds of comparables.
- * (Mileage-adjusted valuation is a later refinement.)
+ * Cohorts to try, from the most specific (mileage-matched) to the widest — widest-DATA fallback.
+ * `resolveBenchmark` walks these until one has enough samples.
+ *
+ * - **Mileage-banded** (make+model+year±1+mileage±25k km) — a true like-for-like average, so a
+ *   high-mileage car isn't judged against low-mileage comparables. Only kept when we know mileage.
+ * - **Year±1 nationwide** (drop mileage) — the unblocker: narrow cohorts (make+model+city+exact
+ *   year+mileage) collapse the sample to ~1 and the confidence gate rejects everything (see
+ *   research/why-no-opportunities). This usually has hundreds of comparables.
+ * - **Make+model only** — last resort so we still produce *some* benchmark.
+ *
+ * City is deliberately never used (it starves the sample). When we fall back off the banded cohort,
+ * an analytic mileage correction compensates (M2).
  */
 export function cohortCandidates(d: ListingDetail): CohortQuery[] {
-  return [
-    { markId: d.markId, modelId: d.modelId, yearFrom: d.year - 1, yearTo: d.year + 1 },
-    { markId: d.markId, modelId: d.modelId },
-  ];
+  const base = { markId: d.markId, modelId: d.modelId };
+  const candidates: CohortQuery[] = [];
+  if (d.mileage != null && d.mileage > 0) {
+    candidates.push({
+      ...base,
+      yearFrom: d.year - 1,
+      yearTo: d.year + 1,
+      mileageFrom: Math.max(0, d.mileage - MILEAGE_BAND_K),
+      mileageTo: d.mileage + MILEAGE_BAND_K,
+    });
+  }
+  candidates.push({ ...base, yearFrom: d.year - 1, yearTo: d.year + 1 });
+  candidates.push(base);
+  return candidates;
 }
 
 /**

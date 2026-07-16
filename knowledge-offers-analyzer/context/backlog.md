@@ -1,7 +1,7 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-13
+updated: 2026-07-17
 ---
 
 # Backlog
@@ -62,6 +62,30 @@ Root cause + plan in [[why-no-opportunities]].
   filter; a profile with **empty `makeModelPairs`** + region + `priceTo` + `submittedWithin` ingests the
   freshest listings market-wide, each valued against its own widened cohort. Example profile shipped
   **disabled** (budget-heavier — operator opts in). No schema change (`filters` is jsonb).
+
+## 🔵 Valuation refinements (2026-07-17) — accuracy: mileage + condition
+
+Broken into steps per the operator's ask ("обидва підходи, покроково"). Mileage (M), condition (C),
+self-tuning reports (R).
+
+- [x] **M1 — Mileage-banded cohort.** `cohort.ts`: `cohortCandidates` now tries
+  **make+model+year±1+mileage±25k km** first (a like-for-like average), then year±1, then make+model;
+  `resolveBenchmark` widens as before. Cache keys already include mileage. Unit-tested
+  (`test/unit/cohort.spec.ts`). No schema change.
+- [ ] **M2 — Analytic mileage correction.** When we fall back off the banded cohort (mileage-agnostic
+  average), adjust `fairValue` by expected-mileage-for-age × per-1000km factor. Needs `resolveBenchmark`
+  to report whether the matched cohort was mileage-aware; add config (annual-km, price-per-1000km) with
+  a cap. Guard confidence.
+- [ ] **M3 — Show mileage context** in the alert/`/check` (e.g. "пробіг 120к vs очікувано 90к → −$800").
+- [ ] **C1 — Read description.** Add `description?: string` to `ListingDetail` from `/info`
+  `autoData.description` (confirmed present; free text, ru/uk).
+- [ ] **C2 — Condition red-flags.** Keyword scan of the description (uk+ru) → new flags: after-accident,
+  needs-repair, engine/gearbox issue, non-runner (disqualifying/soft). Negatives penalise; positive
+  phrases ("ідеальний стан", "не бита не фарбована") do **not** inflate score (anti-gaming).
+- [ ] **C3 — Wire condition** into `ValuationInput`/`evaluate` + Ukrainian labels in the alert.
+- [ ] **R1 — Self-tuning report (scheduled).** Weekly digest from stored evaluations +
+  `average_price_snapshots`: #evaluated, score distribution, near-misses just below threshold, suggested
+  `minDealScore`. Turns practice into recommendations. Deferred until some data accumulates.
 
 ## 🟢 Later — deferred (promote when picked up)
 
