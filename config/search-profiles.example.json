@@ -1,25 +1,8 @@
 [
   {
-    "name": "BMW 3 Series — Lviv region, 2015+",
+    "name": "Найновіші по ринку — Київщина, до $15000",
     "categoryId": 1,
-    "stateId": 5,
-    "cityId": null,
-    "filters": {
-      "makeModelPairs": [{ "markId": 9, "modelId": 3219 }],
-      "yearFrom": 2015
-    },
-    "priceFrom": null,
-    "priceTo": null,
-    "currency": "USD",
-    "minDealScore": 0.15,
-    "confidenceMinSamples": 10,
-    "dealerPolicy": "label",
-    "enabled": true
-  },
-  {
-    "name": "Найновіші по ринку — Львівщина, до $15000",
-    "categoryId": 1,
-    "stateId": 5,
+    "stateId": 10,
     "cityId": null,
     "filters": {
       "makeModelPairs": [],
