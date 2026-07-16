@@ -40,22 +40,28 @@ export function cohortCandidates(d: ListingDetail): CohortQuery[] {
   return candidates;
 }
 
+/** A resolved benchmark plus whether its cohort was mileage-banded (M2 skips correction if so). */
+export interface ResolvedBenchmark extends BenchmarkValue {
+  mileageAware: boolean;
+}
+
 /**
  * Resolve a usable benchmark, widening the cohort until it has enough samples. Returns null when
  * even the widest cohort has no usable data. A budget-exhausted error propagates (stops the cycle).
+ * `mileageAware` is true when the matched cohort was constrained by mileage (like-for-like).
  */
 export async function resolveBenchmark(
   source: ListingSource,
   benchmarks: BenchmarkCacheService,
   detail: ListingDetail,
-): Promise<BenchmarkValue | null> {
+): Promise<ResolvedBenchmark | null> {
   for (const cohort of cohortCandidates(detail)) {
     try {
       const benchmark = await benchmarks.getOrLoad('auto-ria', cohort, () =>
         source.averagePrice(cohort),
       );
       if (benchmark.value.amount > 0 && benchmark.sampleSize >= MIN_USEFUL_SAMPLES) {
-        return benchmark;
+        return { ...benchmark, mileageAware: cohort.mileageFrom != null };
       }
     } catch (err) {
       if (err instanceof RateBudgetExhaustedError) throw err;

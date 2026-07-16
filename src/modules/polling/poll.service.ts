@@ -20,6 +20,7 @@ import {
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
+import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationService } from '../valuation/valuation.service';
 
 /** How many already-seen listings to re-check per cycle for price drops (budget permitting). */
@@ -44,6 +45,7 @@ export class PollService {
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     private readonly notifications: NotificationsService,
     @Inject(EXCHANGE_RATE) private readonly fx: ExchangeRate,
+    private readonly mileage: MileageAdjuster,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -116,7 +118,7 @@ export class PollService {
     previousAmount: number | null,
   ): Promise<void> {
     const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
-    const fairValue = benchmark?.value.amount ?? 0;
+    const fairValue = benchmark ? this.mileage.fairValue(benchmark, detail) : 0;
     const sampleSize = benchmark?.sampleSize ?? 0;
 
     const result = this.valuation.evaluate({

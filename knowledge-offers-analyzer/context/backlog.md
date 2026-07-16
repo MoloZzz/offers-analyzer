@@ -72,10 +72,11 @@ self-tuning reports (R).
   **make+model+year±1+mileage±25k km** first (a like-for-like average), then year±1, then make+model;
   `resolveBenchmark` widens as before. Cache keys already include mileage. Unit-tested
   (`test/unit/cohort.spec.ts`). No schema change.
-- [ ] **M2 — Analytic mileage correction.** When we fall back off the banded cohort (mileage-agnostic
-  average), adjust `fairValue` by expected-mileage-for-age × per-1000km factor. Needs `resolveBenchmark`
-  to report whether the matched cohort was mileage-aware; add config (annual-km, price-per-1000km) with
-  a cap. Guard confidence.
+- [x] **M2 — Analytic mileage correction (percentage model).** `resolveBenchmark` now returns
+  `mileageAware`; when false, `MileageAdjuster` (valuation module) shifts `fairValue` by
+  `(expected − actual)/10 × MILEAGE_PER_10K_PCT` %, capped at ±`MILEAGE_MAX_ADJ_PCT`, where
+  `expected = age × MILEAGE_ANNUAL_K`. Config defaults 15 / 2% / ±20%. Pure fns unit-tested
+  (`test/unit/mileage.spec.ts`); wired into poll + `/check`. No schema change.
 - [ ] **M3 — Show mileage context** in the alert/`/check` (e.g. "пробіг 120к vs очікувано 90к → −$800").
 - [ ] **C1 — Read description.** Add `description?: string` to `ListingDetail` from `/info`
   `autoData.description` (confirmed present; free text, ru/uk).

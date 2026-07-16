@@ -11,6 +11,10 @@ export interface AppConfig {
   rateBudgetPerHour: number;
   defaultMinDealScore: number;
   defaultConfidenceMinSamples: number;
+  /** Analytic mileage correction (M2): applied only when the matched cohort was not mileage-banded. */
+  mileageAnnualK: number;
+  mileagePer10kPct: number;
+  mileageMaxAdjPct: number;
   /** When true, log every outbound request + raw response to external sources (api_key redacted). */
   logSourceRequests: boolean;
 }
@@ -27,5 +31,8 @@ export default (): AppConfig => ({
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
   defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.15),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
+  mileageAnnualK: Number(process.env.MILEAGE_ANNUAL_K ?? 15),
+  mileagePer10kPct: Number(process.env.MILEAGE_PER_10K_PCT ?? 2),
+  mileageMaxAdjPct: Number(process.env.MILEAGE_MAX_ADJ_PCT ?? 20),
   logSourceRequests: process.env.LOG_SOURCE_REQUESTS === 'true',
 });

@@ -11,6 +11,7 @@ import { ListingDetail, ListingSource, LISTING_SOURCE } from '../sources/ports/l
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
+import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
 
 export interface Assessment {
@@ -36,6 +37,7 @@ export class QueryService {
     private readonly valuation: ValuationService,
     private readonly benchmarks: BenchmarkCacheService,
     private readonly listings: ListingsService,
+    private readonly mileage: MileageAdjuster,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     config: ConfigService<AppConfig, true>,
   ) {
@@ -47,7 +49,7 @@ export class QueryService {
   async assessById(externalId: string): Promise<Assessment> {
     const detail = await this.source.fetch(externalId);
     const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
-    const fairValue = benchmark?.value.amount ?? 0;
+    const fairValue = benchmark ? this.mileage.fairValue(benchmark, detail) : 0;
     const currency = benchmark?.value.currency ?? Currency.USD;
 
     const result = this.valuation.evaluate({
