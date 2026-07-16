@@ -7,9 +7,10 @@ import { PriceObservation } from '../../modules/listings/entities/price-observat
 import { Notification } from '../../modules/notifications/entities/notification.entity';
 import { Subscriber } from '../../modules/notifications/entities/subscriber.entity';
 import { SearchProfile } from '../../modules/profiles/entities/search-profile.entity';
+import { RateBudgetWindow } from '../../modules/scheduling/entities/rate-budget-window.entity';
+import { AveragePriceSnapshot } from '../../modules/valuation/entities/average-price-snapshot.entity';
 import { FairValueBenchmark } from '../../modules/valuation/entities/fair-value-benchmark.entity';
 import { Opportunity } from '../../modules/valuation/entities/opportunity.entity';
-import { RateBudgetWindow } from '../../modules/scheduling/entities/rate-budget-window.entity';
 
 /** All persistent entities — single source of truth for the datasource and TypeOrmModule. */
 export const ENTITIES = [
@@ -17,6 +18,7 @@ export const ENTITIES = [
   Listing,
   PriceObservation,
   FairValueBenchmark,
+  AveragePriceSnapshot,
   Opportunity,
   Subscriber,
   Notification,

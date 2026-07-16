@@ -79,6 +79,22 @@ Cached cohort valuation to avoid spending budget repeatedly.
 
 Unique on `(sourceKey, cohortKey)`.
 
+## AveragePriceSnapshot
+
+Time-series of the cohort average — appended on every fresh fetch (cache miss), separate from the
+cache above (which only keeps the latest). Enables market-price trend analysis.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | uuid (PK) | |
+| sourceKey | string | |
+| cohortKey | string | same key as the benchmark cache |
+| value / currency | money | robust average at capture time |
+| sampleSize | int | |
+| capturedAt | timestamptz | |
+
+Index on `(cohortKey, capturedAt)`.
+
 ## Opportunity
 
 A listing flagged as a candidate deal.

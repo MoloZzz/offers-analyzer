@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Money } from '../../common/types/money';
 import { CohortQuery } from '../sources/ports/listing-source.port';
 
+import { AveragePriceSnapshot } from './entities/average-price-snapshot.entity';
 import { FairValueBenchmark } from './entities/fair-value-benchmark.entity';
 
 export interface BenchmarkValue {
@@ -20,6 +21,8 @@ export class BenchmarkCacheService {
   constructor(
     @InjectRepository(FairValueBenchmark)
     private readonly repo: Repository<FairValueBenchmark>,
+    @InjectRepository(AveragePriceSnapshot)
+    private readonly snapshots: Repository<AveragePriceSnapshot>,
   ) {}
 
   async getOrLoad(
@@ -38,6 +41,20 @@ export class BenchmarkCacheService {
     }
 
     const loaded = await loader();
+
+    // Append a time-series snapshot (only fresh fetches reach here; cache hits returned above).
+    if (loaded.value.amount > 0 && loaded.sampleSize > 0) {
+      await this.snapshots.save(
+        this.snapshots.create({
+          sourceKey,
+          cohortKey,
+          value: loaded.value.amount,
+          currency: loaded.value.currency,
+          sampleSize: loaded.sampleSize,
+        }),
+      );
+    }
+
     const entity = existing ?? this.repo.create({ sourceKey, cohortKey });
     entity.value = loaded.value.amount;
     entity.currency = loaded.value.currency;
