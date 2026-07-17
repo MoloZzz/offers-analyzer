@@ -14,6 +14,7 @@ updated: 2026-07-12
 - [[0002-monitoring-via-official-api|ADR-0002]] — Monitor AUTO.RIA via the official API, narrow niche on free tier (Accepted)
 - [[0003-decoupled-context-zone|ADR-0003]] — Decoupled context zone instead of a second knowledge base (Accepted)
 - [[0004-drop-redis-bullmq|ADR-0004]] — Drop Redis/BullMQ for v1; in-memory rate budget (Accepted)
+- [[0005-versioned-parameter-sets|ADR-0005]] — Versioned ParameterSets + human-in-the-loop calibration (Accepted)
 
 ## How to add one
 

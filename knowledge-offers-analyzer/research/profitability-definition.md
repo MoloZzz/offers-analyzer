@@ -52,6 +52,10 @@ Flag as an **Opportunity** when `score ≥ profile.minDealScore` (default **0.15
 
 **Cohort width is a sample-vs-precision trade-off.** Ideally the cohort matches the listing's *mileage band* so `delta` is fair. In practice, make+model+city+exact-year+mileage collapses the RIA sample to ~1 and the confidence gate rejects everything (the "0 opportunities" bug). The shipped strategy (`resolveBenchmark`) walks cohorts most-specific → widest until `sampleSize ≥ 10`: **(1) make+model+year±1+mileage±25k km** (like-for-like, M1), **(2) make+model+year±1 nationwide** (drop mileage — the unblocker), **(3) make+model only**. City is never used (it starves the sample). When we fall back off the banded cohort, an **analytic mileage correction** (M2) compensates: fair value shifts by `(expected − actual)/10 × per10kPct` % (capped ±20%), where `expected = age × annualK` (config: 15k km/yr, 2%/10k km). Details: [[why-no-opportunities]].
 
+> **Caveat — we trust the *claimed* odometer.** A rolled-back mileage makes a worn car look like a
+> bargain (our mileage math rewards low mileage). AUTO.RIA's VIN check often has the *real* figure, but
+> the API doesn't expose it directly. Open research: [[vin-real-mileage]].
+
 ## Worked example (what the system actually does)
 
 1. It sees an ad: **VW Passat B8, 2017, 150 000 km, Kyiv — asking $13 000**.

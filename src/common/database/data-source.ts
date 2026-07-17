@@ -2,6 +2,7 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
+import { ParameterSet } from '../../modules/calibration/entities/parameter-set.entity';
 import { Listing } from '../../modules/listings/entities/listing.entity';
 import { PriceObservation } from '../../modules/listings/entities/price-observation.entity';
 import { Notification } from '../../modules/notifications/entities/notification.entity';
@@ -23,6 +24,7 @@ export const ENTITIES = [
   Subscriber,
   Notification,
   RateBudgetWindow,
+  ParameterSet,
 ];
 
 export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {

@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import configuration from './common/config/configuration';
 import { validateEnv } from './common/config/env.validation';
 import { DatabaseModule } from './common/database/database.module';
+import { CalibrationModule } from './modules/calibration/calibration.module';
 import { PollingModule } from './modules/polling/polling.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 
@@ -22,6 +23,7 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
     SchedulingModule,
     // PollingModule brings the US1 pipeline: Sources, Listings, Valuation, Notifications, Profiles.
     PollingModule,
+    CalibrationModule,
   ],
 })
 export class AppModule {}
