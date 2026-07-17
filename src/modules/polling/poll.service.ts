@@ -23,14 +23,24 @@ import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationService } from '../valuation/valuation.service';
 
-/** How many already-seen listings to re-check per cycle for price drops (budget permitting). */
+/** Cap new listings processed per profile per cycle so one profile can't hog the shared budget. */
+const MAX_NEW_PER_PROFILE = 15;
+/** How many already-seen listings to re-check per profile per cycle for price drops. */
 const REOBSERVE_PER_CYCLE = 5;
 
+/** A profile's per-cycle work: fresh listings to value, and known ones to re-check for price drops. */
+interface ProfileQueue {
+  profile: SearchProfile;
+  newIds: string[];
+  stale: Listing[];
+}
+
 /**
- * The MVP pipeline (US1): for each enabled niche — search → new ids → fetch → value → alert.
- * Also re-observes a few known listings each cycle to catch price drops (FR-009). Runs on a cron
- * (no queue in v1). Every source call is budgeted; when the budget is exhausted (or the source
- * returns HTTP 429) the cycle stops cleanly and resumes next tick (FR-012).
+ * The MVP pipeline (US1): each cycle searches every enabled niche, then values fresh listings and
+ * re-checks a few known ones for price drops (FR-009). Work is drained **round-robin** across profiles
+ * so no single niche (e.g. a market-wide one) spends the whole ~30 req/hr budget before the others run.
+ * Runs on a cron (no queue in v1); when the budget is exhausted (or the source returns HTTP 429) the
+ * cycle stops cleanly and resumes next tick (FR-012).
  */
 @Injectable()
 export class PollService {
@@ -51,47 +61,74 @@ export class PollService {
   @Cron(CronExpression.EVERY_10_MINUTES)
   async poll(): Promise<void> {
     const profiles = await this.profiles.getEnabled();
+
+    // Phase 1 — one search per profile; build a per-profile work queue (dedup + per-profile cap).
+    const queues: ProfileQueue[] = [];
     for (const profile of profiles) {
       try {
-        await this.pollProfile(profile);
+        const { ids } = await this.source.search(toQuery(profile));
+        const known = await this.listings.findByExternalIds(ids);
+        const knownIds = new Set(known.map((l) => l.externalId));
+        const newIds = ids.filter((id) => !knownIds.has(id)).slice(0, MAX_NEW_PER_PROFILE);
+        // Never-scored listings first (a prior cycle likely hit the budget limit mid-evaluation),
+        // then oldest-seen — so nothing stays unscored forever.
+        const stale = [...known]
+          .sort((a, b) => {
+            const aUnscored = a.lastScore == null ? 0 : 1;
+            const bUnscored = b.lastScore == null ? 0 : 1;
+            if (aUnscored !== bUnscored) return aUnscored - bUnscored;
+            return a.lastSeenAt.getTime() - b.lastSeenAt.getTime();
+          })
+          .slice(0, REOBSERVE_PER_CYCLE);
+        queues.push({ profile, newIds, stale });
       } catch (err) {
-        if (err instanceof RateBudgetExhaustedError) {
-          this.logger.warn('Request budget exhausted — pausing this cycle');
-          return;
-        }
-        this.logger.error(`Poll failed for profile ${profile.id}`, err as Error);
+        if (err instanceof RateBudgetExhaustedError) return; // budget gone — resume next tick
+        this.logger.error(`Search failed for profile ${profile.id}`, err as Error);
       }
     }
+
+    // Phase 2 — new listings first (that's where fresh deals are), fairly across profiles.
+    const exhausted = await this.drainRoundRobin(
+      queues,
+      (q) => q.newIds,
+      (profile, externalId) => this.processNew(profile, externalId),
+    );
+    if (exhausted) return;
+
+    // Phase 3 — re-observe known listings for price drops (and score any never-scored), budget permitting.
+    await this.drainRoundRobin(
+      queues,
+      (q) => q.stale,
+      (profile, listing) => this.reobserve(profile, listing),
+    );
   }
 
-  private async pollProfile(profile: SearchProfile): Promise<void> {
-    const { ids } = await this.source.search(toQuery(profile));
-    const known = await this.listings.findByExternalIds(ids);
-    const knownIds = new Set(known.map((l) => l.externalId));
-
-    // 1) New listings first (priority).
-    for (const externalId of ids) {
-      if (knownIds.has(externalId)) continue;
-      await this.guarded(externalId, () => this.processNew(profile, externalId));
+  /**
+   * Take one item from each profile's queue in turn until all are empty. A budget-exhausted error
+   * stops the whole cycle (returns true); any other per-item error just skips that item.
+   */
+  private async drainRoundRobin<T>(
+    queues: ProfileQueue[],
+    pick: (q: ProfileQueue) => T[],
+    handle: (profile: SearchProfile, item: T) => Promise<void>,
+  ): Promise<boolean> {
+    let progressed = true;
+    while (progressed) {
+      progressed = false;
+      for (const q of queues) {
+        const items = pick(q);
+        if (items.length === 0) continue;
+        progressed = true;
+        const item = items.shift() as T;
+        try {
+          await handle(q.profile, item);
+        } catch (err) {
+          if (err instanceof RateBudgetExhaustedError) return true;
+          this.logger.warn(`Skipping item for profile ${q.profile.id}: ${(err as Error).message}`);
+        }
+      }
     }
-
-    // 2) Re-observe a few already-seen listings (oldest first) to catch price drops.
-    const stale = [...known]
-      .sort((a, b) => a.lastSeenAt.getTime() - b.lastSeenAt.getTime())
-      .slice(0, REOBSERVE_PER_CYCLE);
-    for (const listing of stale) {
-      await this.guarded(listing.externalId, () => this.reobserve(profile, listing));
-    }
-  }
-
-  /** A budget-exhausted error stops the whole cycle; any other per-listing error just skips it. */
-  private async guarded(externalId: string, fn: () => Promise<void>): Promise<void> {
-    try {
-      await fn();
-    } catch (err) {
-      if (err instanceof RateBudgetExhaustedError) throw err;
-      this.logger.warn(`Skipping listing ${externalId}: ${(err as Error).message}`);
-    }
+    return false;
   }
 
   private async processNew(profile: SearchProfile, externalId: string): Promise<void> {
@@ -105,9 +142,17 @@ export class PollService {
     const previousAmount = existing.currentAmount;
     const detail = await this.source.fetch(existing.externalId);
     const { listing } = await this.listings.recordSeen(detail);
-    // Only a price drop is interesting here; the observation is recorded either way.
-    if (detail.price.amount >= previousAmount) return;
-    await this.evaluateAndNotify(profile, detail, listing, 'price_drop', previousAmount);
+    // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of
+    // budget before scoring it). Otherwise the recorded observation is enough.
+    const dropped = detail.price.amount < previousAmount;
+    if (!dropped && existing.lastScore != null) return;
+    await this.evaluateAndNotify(
+      profile,
+      detail,
+      listing,
+      dropped ? 'price_drop' : 'opportunity',
+      dropped ? previousAmount : null,
+    );
   }
 
   private async evaluateAndNotify(

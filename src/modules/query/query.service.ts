@@ -14,6 +14,8 @@ import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
 
+import { buildDigest, ReportDigest } from './report';
+
 export interface Assessment {
   detail: ListingDetail;
   result: ValuationResult;
@@ -82,5 +84,18 @@ export class QueryService {
   /** Best-scoring evaluated listings, even below the alert threshold — the "best available now". */
   topCandidates(limit = 5): Promise<Listing[]> {
     return this.listings.topByScore(limit);
+  }
+
+  /** Self-tuning report (R1): distribution of scores, near-misses, and a suggested threshold. */
+  async report(targetCandidates = 10): Promise<ReportDigest> {
+    const scores = await this.listings.scoresForReport();
+    const opportunities = await this.opportunities.count();
+    const nm = await this.listings.nearMisses(Math.max(0, this.minScore - 0.1), this.minScore, 5);
+    const nearMisses = nm.map((l) => ({
+      label: `${l.make} ${l.model}, ${l.year}`,
+      score: l.lastScore ?? 0,
+      url: l.url,
+    }));
+    return buildDigest(scores, opportunities, nearMisses, this.minScore, targetCandidates);
   }
 }

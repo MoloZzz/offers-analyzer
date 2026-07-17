@@ -52,6 +52,26 @@ export class ListingsService {
     });
   }
 
+  /** All recorded deal scores (for the self-tuning report distribution) — R1. */
+  async scoresForReport(): Promise<number[]> {
+    const rows = await this.listings
+      .createQueryBuilder('l')
+      .select('l.lastScore', 'lastScore')
+      .where('l.lastScore IS NOT NULL')
+      .getRawMany<{ lastScore: string }>();
+    return rows.map((r) => Number(r.lastScore)).filter((n) => Number.isFinite(n));
+  }
+
+  /** Listings scored just below the alert threshold — the "almost made it" near-misses (R1). */
+  nearMisses(min: number, maxExclusive: number, limit = 5): Promise<Listing[]> {
+    return this.listings
+      .createQueryBuilder('l')
+      .where('l.lastScore >= :min AND l.lastScore < :max', { min, max: maxExclusive })
+      .orderBy('l.lastScore', 'DESC')
+      .limit(limit)
+      .getMany();
+  }
+
   async recordSeen(detail: ListingDetail): Promise<RecordResult> {
     const now = new Date();
     let listing = await this.listings.findOne({
@@ -75,6 +95,7 @@ export class ListingsService {
         sellerType: detail.sellerType,
         vin: detail.vin ?? null,
         url: detail.url,
+        description: detail.description ?? null,
         currentAmount: detail.price.amount,
         currentCurrency: detail.price.currency,
         status: 'active',
@@ -84,6 +105,7 @@ export class ListingsService {
       priceChanged = listing.currentAmount !== detail.price.amount;
       listing.currentAmount = detail.price.amount;
       listing.currentCurrency = detail.price.currency;
+      if (detail.description != null) listing.description = detail.description;
       listing.lastSeenAt = now;
     }
 

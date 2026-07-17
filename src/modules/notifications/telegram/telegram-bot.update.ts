@@ -3,6 +3,7 @@ import { Context } from 'telegraf';
 
 import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
+import { formatReport } from '../../query/report';
 import { formatAssessment } from '../format/opportunity-message';
 import { SubscribersService } from '../subscribers.service';
 
@@ -10,6 +11,7 @@ const HELP =
   '/check <id або посилання> — оцінити конкретне авто\n' +
   '/top — знайдені вигідні пропозиції\n' +
   '/best — найкращі оцінені авто (навіть нижче порогу)\n' +
+  '/report — звіт по відбору + підказка порогу\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
@@ -101,6 +103,12 @@ export class TelegramBotUpdate {
       return `• ${l.make} ${l.model}, ${l.year} — бал ${score}, ${l.currentAmount} ${l.currentCurrency}\n  ${l.url}`;
     });
     await ctx.reply(`Найкращі оцінені (навіть нижче порогу):\n${lines.join('\n')}`);
+  }
+
+  @Command('report')
+  async onReport(@Ctx() ctx: Context): Promise<void> {
+    const digest = await this.query.report();
+    await ctx.reply(formatReport(digest));
   }
 
   @Help()

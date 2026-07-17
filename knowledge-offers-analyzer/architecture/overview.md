@@ -26,10 +26,10 @@ Implemented (spec 001). One NestJS module per concern:
 | `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore` | history from day one |
 | `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry | see [[profitability-definition]], [[why-no-opportunities]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
-| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`) | powers `/check`, `/top`, `/best` |
-| `notifications` | Telegram bot, Subscriber, Notification, formatting | `Notifier` port |
+| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report` |
+| `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report scheduler | `Notifier` port |
 | `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
-| `polling` | cron pipeline: search → new → value → alert + re-observe price drops | no queue in v1 |
+| `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops | budget-fair; no queue in v1 |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
@@ -49,7 +49,7 @@ best-scoring candidates even below the alert bar (`/best`). Full design:
 
 _Draft — refine during `/speckit-plan`:_
 - **SearchProfile** — a configured niche to watch (region + make/models + price band).
-- **Listing** — a car listing (auto_id, specs, seller, current price) fetched via the source adapter.
+- **Listing** — a car listing (auto_id, specs, seller, current price, latest description snapshot) fetched via the source adapter.
 - **PriceObservation** — price of a listing at a point in time (history, drop detection).
 - **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags). See [[profitability-definition]].
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).

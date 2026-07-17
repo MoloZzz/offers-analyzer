@@ -21,10 +21,10 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   red-flags enriched from `autoInfoBar`; `/average_price` confirmed → fair value now uses the robust
   **`interQuartileMean`** (not the outlier-skewed `arithmeticMean`), `total` = sample size. Full map in
   `contracts/auto-ria-api.md`.
-- [~] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Freshness
-  **done** via the `top` submission-period filter (see B19) — note: AUTO.RIA `order_by` has **no**
-  "newest" value (only 0/1/2), so newest-first is `top`, not `order_by`. Remaining (low priority):
-  budget-cursor (round-robin across profiles).
+- [x] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Freshness **done**
+  via the `top` submission-period filter (see B19) — note: AUTO.RIA `order_by` has **no** "newest" value
+  (only 0/1/2), so newest-first is `top`, not `order_by`. **Budget-smart scanning done** (see B20):
+  round-robin across profiles + per-profile cap so one niche can't hog the ~30 req/hr budget.
 - [~] **B4 — Make the pipeline run:** now driven by `config/search-profiles.json` (copy the example,
   set numeric ids + `enabled: true`, restart). **User action** to go live.
 
@@ -87,9 +87,38 @@ self-tuning reports (R).
   (`test/unit/condition.spec.ts`).
 - [x] **C3 — Wire condition.** `evaluate` parses `input.description` centrally (poll + `/check` just
   pass `detail.description`); Ukrainian labels added to the alert/`/check` risk line. No schema change.
-- [ ] **R1 — Self-tuning report (scheduled).** Weekly digest from stored evaluations +
-  `average_price_snapshots`: #evaluated, score distribution, near-misses just below threshold, suggested
-  `minDealScore`. Turns practice into recommendations. Deferred until some data accumulates.
+- [x] **R1a — Self-tuning report on demand (`/report`).** `query/report.ts` (pure: `distribution`,
+  `suggestedThreshold`, `buildDigest`, `formatReport`) + `QueryService.report()` +
+  `ListingsService.scoresForReport`/`nearMisses`. Shows #evaluated, score distribution, near-misses just
+  below the threshold, and a suggested `minDealScore` that would yield ~10 candidates. Bot `/report`
+  command. Unit-tested (`test/unit/report.spec.ts`). No schema change.
+- [x] **B20 — Budget-smart scanning.** `poll()` now searches every profile once (phase 1), then drains
+  new listings **round-robin** across profiles (phase 2) and re-observes for price drops (phase 3), each
+  budget-guarded. Per-profile cap `MAX_NEW_PER_PROFILE=15` so a market-wide niche can't starve the
+  others. Replaces the old profile-by-profile-to-exhaustion loop. No schema change.
+- [x] **R1b — Scheduled weekly push.** `ReportSchedulerService` (`@Cron '0 9 * * 1'` — Mon 09:00) builds
+  the R1a digest and `NotificationsService.broadcast`s it to active subscribers; skips weeks with 0
+  evaluated (no empty spam). Cadence is a one-line constant. No schema change.
+
+## 🟣 Epic — Auto-calibration & learning (spec 002)
+
+Full plan in `specs/002-auto-calibration-learning/` (spec + plan + tasks). Closes the feedback loop on
+the rule-based scorer: capture outcomes → auto-calibrate the threshold → learn weights. Transparent,
+bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequenced:
+
+- [ ] **E0** — research.md + **ADR-0005** (versioned ParameterSets + calibration) + supersession sweep.
+- [ ] **E1 (foundational)** — scoring reads from a **versioned active `ParameterSet`** (seeded from
+  today's config; identical behavior) so any tuning can take effect without redeploy.
+- [ ] **E2 — US1 (P1): Outcome capture** (MVP): 👍/👎 buttons + `/outcome` + passive signals
+  (disappeared/price-drop/time-on-market) → `outcomes`; report shows realized precision.
+- [ ] **E3 — US2 (P2): Threshold auto-calibration** — weekly job proposes/auto-applies a bounded
+  per-profile `minDealScore` toward a volume corridor / precision target; `/calibrate` `/params`
+  `/revert`.
+- [ ] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks to
+  penalties/mileage/condition weights, operator-approved.
+
+Note: learning is scoped to **precision on the alerted set** (selection bias — we don't observe
+never-alerted listings). See spec §Context.
 
 ## 🟢 Later — deferred (promote when picked up)
 

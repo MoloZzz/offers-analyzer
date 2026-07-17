@@ -11,6 +11,7 @@ import { Notification } from './entities/notification.entity';
 import { Subscriber } from './entities/subscriber.entity';
 import { NotificationsService } from './notifications.service';
 import { NOTIFIER } from './ports/notifier.port';
+import { ReportSchedulerService } from './report-scheduler.service';
 import { SubscribersService } from './subscribers.service';
 import { TelegramBotUpdate } from './telegram/telegram-bot.update';
 import { TelegramNotifier } from './telegram/telegram.notifier';
@@ -30,6 +31,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
   providers: [
     NotificationsService,
     SubscribersService,
+    ReportSchedulerService,
     TelegramBotUpdate,
     TelegramNotifier,
     { provide: NOTIFIER, useExisting: TelegramNotifier },

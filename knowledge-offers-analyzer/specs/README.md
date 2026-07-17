@@ -14,7 +14,8 @@ _TODO: none yet. First entry appears after the first `/speckit-specify` run._
 
 | Spec | Summary | Status |
 |------|---------|--------|
-| `../.specify/../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Draft (v1 MVP) |
+| `../../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Implemented (v1 MVP + mileage/condition/report follow-ups) |
+| `../../specs/002-auto-calibration-learning/spec.md` | Capture outcomes → auto-calibrate the alert threshold → learn scoring weights; transparent, bounded, human-in-the-loop | Draft (planned) |
 
 ## Constitution
 

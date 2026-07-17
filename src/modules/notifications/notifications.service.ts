@@ -68,4 +68,12 @@ export class NotificationsService {
       );
     }
   }
+
+  /** Send a plain broadcast (e.g. the weekly self-tuning report) to all active subscribers. */
+  async broadcast(text: string): Promise<void> {
+    const recipients = await this.subscribers.listActive();
+    for (const sub of recipients) {
+      await this.notifier.send({ chatId: sub.telegramChatId, text });
+    }
+  }
 }

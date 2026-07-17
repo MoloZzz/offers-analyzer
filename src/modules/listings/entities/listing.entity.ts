@@ -53,6 +53,10 @@ export class Listing {
   @Column({ type: 'varchar' })
   url!: string;
 
+  /** Latest seller description snapshot — kept for re-scanning condition signals without re-fetching. */
+  @Column({ type: 'text', nullable: true })
+  description?: string | null;
+
   @Column('numeric', { transformer: numericTransformer })
   currentAmount!: number;
 

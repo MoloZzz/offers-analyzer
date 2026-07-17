@@ -12,7 +12,7 @@
     "priceFrom": null,
     "priceTo": 15000,
     "currency": "USD",
-    "minDealScore": 0.15,
+    "minDealScore": 0.63,
     "confidenceMinSamples": 10,
     "dealerPolicy": "label",
     "enabled": false

@@ -29,7 +29,7 @@ export default (): AppConfig => ({
     process.env.NBU_RATE_URL ??
     'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
-  defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.15),
+  defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.63),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
   mileageAnnualK: Number(process.env.MILEAGE_ANNUAL_K ?? 15),
   mileagePer10kPct: Number(process.env.MILEAGE_PER_10K_PCT ?? 2),
