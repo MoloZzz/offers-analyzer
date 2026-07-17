@@ -123,8 +123,11 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     `1784289182080`) + `OutcomesService` (`recordManual` idempotent per opportunity, `recordPassive`
     dedup on listingId+label, `manualLabeledSince` for precision) + fake-repo unit tests. Wired into
     `CalibrationModule` + `ENTITIES`; not consumed anywhere yet. tsc clean, jest 32/32.
-  - [ ] **E2b — bot surface**: inline 👍/👎 buttons on opportunity alerts + `/outcome <id> …` command →
-    `OutcomesService` (needs the notifier to send buttons + a callback handler).
+  - [x] **E2b — bot surface** (delegated → Sonnet): `Notifier` port gained optional inline `buttons`;
+    `TelegramNotifier` sends a keyboard; both alerts carry 👍 Вдала / 👎 Невдала (callback `oc:<label>:<opId>`
+    via pure `outcome-callback.ts`, tested). Bot `@Action(/^oc:/)` records the manual outcome (resolves
+    opportunity→listing), `/outcome <id> <label> [note]` command records by external id. `CalibrationModule`
+    imported into `NotificationsModule` (no cycle). tsc clean, jest 37/37.
   - [ ] **E2c — passive signals** in the poll: `disappeared` (known listing absent this cycle),
     `price_dropped`, time-on-market — no extra source request.
   - [ ] **E2d — realized precision** in `/report` (👍 vs 👎 over a recent window, per profile + overall).

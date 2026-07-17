@@ -98,4 +98,15 @@ export class QueryService {
     }));
     return buildDigest(scores, opportunities, nearMisses, this.minScore, targetCandidates);
   }
+
+  /** Look up a recorded opportunity by id (for the 👍/👎 outcome buttons). */
+  findOpportunity(id: string): Promise<Opportunity | null> {
+    return this.opportunities.findOne({ where: { id } });
+  }
+
+  /** Look up a listing by its source external id (for the /outcome command). */
+  async findListingByExternalId(externalId: string): Promise<Listing | null> {
+    const [listing] = await this.listings.findByExternalIds([externalId]);
+    return listing ?? null;
+  }
 }

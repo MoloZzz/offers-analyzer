@@ -1,17 +1,22 @@
-import { Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
+import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
+import { ManualLabel } from '../../calibration/entities/outcome.entity';
+import { OutcomesService } from '../../calibration/outcomes.service';
 import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
 import { formatAssessment } from '../format/opportunity-message';
 import { SubscribersService } from '../subscribers.service';
 
+import { parseOutcomeCallback } from './outcome-callback';
+
 const HELP =
   '/check <id або посилання> — оцінити конкретне авто\n' +
   '/top — знайдені вигідні пропозиції\n' +
   '/best — найкращі оцінені авто (навіть нижче порогу)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
+  '/outcome <id> <результат> — записати, що сталося з авто\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
@@ -25,6 +30,7 @@ export class TelegramBotUpdate {
     private readonly subscribers: SubscribersService,
     private readonly profiles: ProfilesService,
     private readonly query: QueryService,
+    private readonly outcomes: OutcomesService,
   ) {}
 
   @Start()
@@ -109,6 +115,44 @@ export class TelegramBotUpdate {
   async onReport(@Ctx() ctx: Context): Promise<void> {
     const digest = await this.query.report();
     await ctx.reply(formatReport(digest));
+  }
+
+  @Action(/^oc:/)
+  async onOutcomeButton(@Ctx() ctx: Context): Promise<void> {
+    const cq = ctx.callbackQuery;
+    const data = cq && 'data' in cq ? cq.data : '';
+    const parsed = parseOutcomeCallback(data);
+    if (!parsed) {
+      await ctx.answerCbQuery();
+      return;
+    }
+    const op = await this.query.findOpportunity(parsed.opportunityId);
+    if (!op) {
+      await ctx.answerCbQuery('Не знайдено');
+      return;
+    }
+    await this.outcomes.recordManual({ listingId: op.listingId, opportunityId: op.id, label: parsed.label });
+    await ctx.answerCbQuery(parsed.label === 'good' ? 'Дякую — позначено вдалою' : 'Дякую — позначено невдалою');
+  }
+
+  @Command('outcome')
+  async onOutcome(@Ctx() ctx: Context): Promise<void> {
+    const parts = commandArg(ctx).split(/\s+/).filter(Boolean);
+    const externalId = extractAutoId(parts[0] ?? '');
+    const label = parts[1] as ManualLabel;
+    const note = parts.slice(2).join(' ') || null;
+    const allowed: ManualLabel[] = ['good', 'bad', 'bought', 'skipped', 'resold'];
+    if (!externalId || !allowed.includes(label)) {
+      await ctx.reply('Формат: /outcome <id|посилання> <good|bad|bought|skipped|resold> [нотатка]');
+      return;
+    }
+    const listing = await this.query.findListingByExternalId(externalId);
+    if (!listing) {
+      await ctx.reply('Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.');
+      return;
+    }
+    await this.outcomes.recordManual({ listingId: listing.id, label, note });
+    await ctx.reply('Записав результат. Дякую!');
   }
 
   @Help()

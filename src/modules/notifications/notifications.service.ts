@@ -9,6 +9,7 @@ import { Notification } from './entities/notification.entity';
 import { formatOpportunity, formatPriceDrop } from './format/opportunity-message';
 import { Notifier, NOTIFIER } from './ports/notifier.port';
 import { SubscribersService } from './subscribers.service';
+import { buildOutcomeCallback } from './telegram/outcome-callback';
 
 /** Sends opportunity alerts to active subscribers, idempotently (unique dedupKey — FR-008). */
 @Injectable()
@@ -30,7 +31,16 @@ export class NotificationsService {
       const already = await this.notifications.count({ where: { dedupKey } });
       if (already > 0) continue;
 
-      await this.notifier.send({ chatId: sub.telegramChatId, text });
+      await this.notifier.send({
+        chatId: sub.telegramChatId,
+        text,
+        buttons: [
+          [
+            { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunity.id) },
+            { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunity.id) },
+          ],
+        ],
+      });
       await this.notifications.save(
         this.notifications.create({
           subscriberId: sub.id,
@@ -57,7 +67,16 @@ export class NotificationsService {
       const already = await this.notifications.count({ where: { dedupKey } });
       if (already > 0) continue;
 
-      await this.notifier.send({ chatId: sub.telegramChatId, text });
+      await this.notifier.send({
+        chatId: sub.telegramChatId,
+        text,
+        buttons: [
+          [
+            { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunity.id) },
+            { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunity.id) },
+          ],
+        ],
+      });
       await this.notifications.save(
         this.notifications.create({
           subscriberId: sub.id,
