@@ -118,8 +118,16 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     from it; `ValuationModule` imports `CalibrationModule`. `valuation.spec` now drives the pure fn with
     the v1 seed — all original assertions pass (SC-006 regression guard). tsc clean, jest 29/29.
     Supersession sweep done ([[profitability-definition]], [[glossary]], [[overview]]).
-- [ ] **E2 — US1 (P1): Outcome capture** (MVP): 👍/👎 buttons + `/outcome` + passive signals
-  (disappeared/price-drop/time-on-market) → `outcomes`; report shows realized precision.
+- [~] **E2 — US1 (P1): Outcome capture** (MVP of spec 002). Split into safe slices:
+  - [x] **E2a — data layer** (delegated → Sonnet): `Outcome` entity + `outcomes` migration (append-only,
+    `1784289182080`) + `OutcomesService` (`recordManual` idempotent per opportunity, `recordPassive`
+    dedup on listingId+label, `manualLabeledSince` for precision) + fake-repo unit tests. Wired into
+    `CalibrationModule` + `ENTITIES`; not consumed anywhere yet. tsc clean, jest 32/32.
+  - [ ] **E2b — bot surface**: inline 👍/👎 buttons on opportunity alerts + `/outcome <id> …` command →
+    `OutcomesService` (needs the notifier to send buttons + a callback handler).
+  - [ ] **E2c — passive signals** in the poll: `disappeared` (known listing absent this cycle),
+    `price_dropped`, time-on-market — no extra source request.
+  - [ ] **E2d — realized precision** in `/report` (👍 vs 👎 over a recent window, per profile + overall).
 - [ ] **E3 — US2 (P2): Threshold auto-calibration** — weekly job proposes/auto-applies a bounded
   per-profile `minDealScore` toward a volume corridor / precision target; `/calibrate` `/params`
   `/revert`.
