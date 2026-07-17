@@ -81,4 +81,8 @@ export class Listing {
 
   @Column({ type: 'timestamptz', nullable: true })
   lastEvaluatedAt?: Date | null;
+
+  /** The profile that most recently surfaced/evaluated this listing (for per-profile calibration). */
+  @Column({ type: 'uuid', nullable: true })
+  profileId?: string | null;
 }

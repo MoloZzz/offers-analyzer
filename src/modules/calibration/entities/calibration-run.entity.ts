@@ -16,6 +16,10 @@ export class CalibrationRun {
   @CreateDateColumn({ type: 'timestamptz' })
   ranAt!: Date;
 
+  /** Which profile this run is about; null = global. */
+  @Column({ type: 'uuid', nullable: true })
+  profileId?: string | null;
+
   @Column({ type: 'varchar', default: 'threshold' })
   capability!: string;
 

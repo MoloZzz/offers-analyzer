@@ -178,6 +178,7 @@
   },
   "active": "b9c0b6a35053acb4",
   "lastOpenFiles": [
+    "context/log/2026-07-17-session-01.md.tmp.29860.087051d82221",
     "context/backlog.md.tmp.1992.929ebf2409f4",
     "decisions/0004-drop-redis-bullmq.md",
     "decisions/0004-drop-redis-bullmq.md.tmp.18704.749a9a2f548a",
@@ -203,7 +204,6 @@
     "Welcome.md",
     "00-INDEX.md",
     "Welcome.md.tmp.27932.4f4a81408861",
-    "specs/README.md.tmp.27932.05faa98182e7",
     "operations/environment-setup.md",
     "decisions/0001-adopt-sdd-vault-rtk.md",
     "conventions/coding-standards.md",

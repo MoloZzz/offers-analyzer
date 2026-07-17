@@ -189,7 +189,7 @@ export class PollService {
       description: detail.description,
     });
 
-    await this.listings.recordEvaluation(listing, result.score, result.discountPct);
+    await this.listings.recordEvaluation(listing, result.score, result.discountPct, profile.id);
     if (!result.isOpportunity) return;
 
     // Comparison ran in USD (ratios are currency-agnostic); store amounts in the profile's currency.

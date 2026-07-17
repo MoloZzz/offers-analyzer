@@ -143,10 +143,17 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     "insignificant change → null") + `CalibrationRun` entity/migration (`1784302227453`) +
     `CalibrationService.proposeThresholdRun` (global scores + realized precision → persists a
     propose-mode run). Unit-tested (6 cases). No apply/scheduler/bot. tsc clean, jest 47/47.
-  - [ ] **E3b — apply + bot + schedule**: `/calibrate` `/params` `/revert`, weekly job, auto-apply mode.
-    **Design decision first (mine):** thresholds are per-profile (`SearchProfile.minDealScore`) but scores
-    aren't linked to a profile (a `listing`→`profile` gap) — so E3b must decide global-vs-per-profile
-    apply (likely: apply the global proposal to a chosen profile, or add a listing↔profile tag).
+  - Decision (operator): go **per-profile** ("повніше") — tag listings with their profile.
+  - [x] **E3b-1 — `listing`→`profile` link** (mine): `Listing.profileId` (nullable) set in
+    `recordEvaluation(…, profile.id)`; migration `1784303733796`; `scoresForReport(profileId?)` filters
+    per profile. tsc clean, jest 47/47.
+  - [x] **E3b-2 — per-profile proposals** (delegated → Sonnet): `CalibrationRun.profileId` (+ migration
+    `1784304020857`); `CalibrationService.proposeAllProfiles(target)` iterates enabled profiles →
+    per-profile scores + `profile.minDealScore` → `proposeThreshold` → one propose-mode run per profile;
+    `globalPrecision()` helper (shared). `ProfilesModule` wired (no cycle). Global precision for now
+    (per-profile precision deferred — needs outcome→opportunity join). tsc clean, jest 48/48.
+  - [ ] **E3b-3 — apply + bot + schedule**: `/calibrate` `/params` `/revert`, weekly job, auto-apply
+    (bounded), profile-threshold update recorded/reversible.
 - [ ] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks to
   penalties/mileage/condition weights, operator-approved.
 

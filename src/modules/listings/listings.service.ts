@@ -52,13 +52,14 @@ export class ListingsService {
     });
   }
 
-  /** All recorded deal scores (for the self-tuning report distribution) — R1. */
-  async scoresForReport(): Promise<number[]> {
-    const rows = await this.listings
+  /** All recorded deal scores (for the self-tuning report / calibration) — optionally per profile. */
+  async scoresForReport(profileId?: string): Promise<number[]> {
+    const qb = this.listings
       .createQueryBuilder('l')
       .select('l.lastScore', 'lastScore')
-      .where('l.lastScore IS NOT NULL')
-      .getRawMany<{ lastScore: string }>();
+      .where('l.lastScore IS NOT NULL');
+    if (profileId) qb.andWhere('l.profileId = :profileId', { profileId });
+    const rows = await qb.getRawMany<{ lastScore: string }>();
     return rows.map((r) => Number(r.lastScore)).filter((n) => Number.isFinite(n));
   }
 
@@ -127,10 +128,16 @@ export class ListingsService {
   }
 
   /** Record the latest valuation on the listing — for every evaluated listing, not just opportunities. */
-  async recordEvaluation(listing: Listing, score: number, discountPct: number): Promise<void> {
+  async recordEvaluation(
+    listing: Listing,
+    score: number,
+    discountPct: number,
+    profileId?: string | null,
+  ): Promise<void> {
     listing.lastScore = score;
     listing.lastDiscountPct = discountPct;
     listing.lastEvaluatedAt = new Date();
+    if (profileId != null) listing.profileId = profileId;
     await this.listings.save(listing);
   }
 }
