@@ -36,6 +36,12 @@ export interface ValuationResult {
   score: number;
   redFlags: Record<string, boolean>;
   reason: string;
+  /** Raw discount-derived score in [−1, 1], before confidence/penalty are applied. */
+  raw: number;
+  /** Multiplicative penalty in (0, 1] applied for soft red-flags. */
+  penalty: number;
+  /** Whether a hard red-flag disqualified this listing regardless of score. */
+  disqualified: boolean;
 }
 
 /**
@@ -85,6 +91,9 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
     score: round(score),
     redFlags: flags,
     reason: reasonFor({ isOpportunity, disqualified, hasEnoughData, score, minScore: input.minScore }),
+    raw: round(raw),
+    penalty: round(penalty),
+    disqualified,
   };
 }
 

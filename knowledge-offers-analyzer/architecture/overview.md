@@ -27,7 +27,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; tunables from the active `ParameterSet` | see [[profitability-definition]], [[why-no-opportunities]] |
 | `calibration` | versioned `ParameterSet` + `ParametersService`; `Outcome` + `OutcomesService` (feedback capture); foundation for spec 002 auto-calibration/learning | see [[0005-versioned-parameter-sets\|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
-| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report` |
+| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome` |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report scheduler | `Notifier` port |
 | `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
 | `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops | budget-fair; no queue in v1 |
@@ -48,12 +48,16 @@ best-scoring candidates even below the alert bar (`/best`). Full design:
 
 ## Entities / data model
 
-_Draft — refine during `/speckit-plan`:_
-- **SearchProfile** — a configured niche to watch (region + make/models + price band).
-- **Listing** — a car listing (auto_id, specs, seller, current price, latest description snapshot) fetched via the source adapter.
+- **SearchProfile** — a configured niche to watch (region + make/models + price band + `minDealScore`).
+- **Listing** — a car listing (auto_id, specs, seller, current price, latest description snapshot, `profileId` = the niche that last evaluated it) fetched via the source adapter.
 - **PriceObservation** — price of a listing at a point in time (history, drop detection).
 - **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags). See [[profitability-definition]].
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
+- **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
+- **RateBudgetWindow** — durable per-hour request-budget counter (scheduling).
+- **ParameterSet** — versioned, active scoring tunables (scale, penalty, mileage factors); v1 = seeded from config. Spec 002 / [[0005-versioned-parameter-sets|ADR-0005]].
+- **Outcome** — realized result of a listing (manual 👍/👎, bought/skipped/resold; passive price_dropped/disappeared). Feedback ground truth.
+- **CalibrationRun** — a recorded calibration pass (per-profile inputs, proposal, applied?, reason).
 
 ## Boundaries & integrations
 

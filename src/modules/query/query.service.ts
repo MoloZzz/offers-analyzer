@@ -22,6 +22,9 @@ export interface Assessment {
   result: ValuationResult;
   fairValue: number;
   currency: Currency;
+  sampleSize: number;
+  benchmarkBase: number;
+  mileageAware: boolean;
 }
 
 export interface RankedOpportunity {
@@ -72,7 +75,10 @@ export class QueryService {
       abroad: detail.risk.abroad,
       description: detail.description,
     });
-    return { detail, result, fairValue, currency };
+    const sampleSize = benchmark?.sampleSize ?? 0;
+    const benchmarkBase = benchmark?.value.amount ?? 0;
+    const mileageAware = benchmark?.mileageAware ?? false;
+    return { detail, result, fairValue, currency, sampleSize, benchmarkBase, mileageAware };
   }
 
   /** The highest-scoring opportunities recorded so far. */

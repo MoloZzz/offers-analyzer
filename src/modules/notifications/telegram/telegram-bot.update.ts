@@ -1,22 +1,32 @@
 import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
+import { CalibrationService } from '../../calibration/calibration.service';
 import { ManualLabel } from '../../calibration/entities/outcome.entity';
 import { OutcomesService } from '../../calibration/outcomes.service';
 import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
+import { formatCalibration } from '../format/calibration-message';
 import { formatAssessment } from '../format/opportunity-message';
+import { formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
 import { parseOutcomeCallback } from './outcome-callback';
 
+/** Example listing URL shown in prompts (operators paste the auto.ria link, not a numeric id). */
+const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
+
 const HELP =
-  '/check <id або посилання> — оцінити конкретне авто\n' +
+  '/check <посилання> — оцінити конкретне авто\n' +
+  '/why <посилання> — пояснити, чому такий бал\n' +
   '/top — знайдені вигідні пропозиції\n' +
   '/best — найкращі оцінені авто (навіть нижче порогу)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
-  '/outcome <id> <результат> — записати, що сталося з авто\n' +
+  '/calibrate — підібрати пороги за даними\n' +
+  '/params — поточні пороги\n' +
+  '/revert — відкотити останнє калібрування\n' +
+  '/outcome <посилання> <результат> — записати, що сталося з авто\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
@@ -31,6 +41,7 @@ export class TelegramBotUpdate {
     private readonly profiles: ProfilesService,
     private readonly query: QueryService,
     private readonly outcomes: OutcomesService,
+    private readonly calibration: CalibrationService,
   ) {}
 
   @Start()
@@ -69,7 +80,7 @@ export class TelegramBotUpdate {
   async onCheck(@Ctx() ctx: Context): Promise<void> {
     const externalId = extractAutoId(commandArg(ctx));
     if (!externalId) {
-      await ctx.reply('Вкажіть id або посилання, напр.: /check 38561317');
+      await ctx.reply(`Надішліть посилання на оголошення, напр.:\n/check ${URL_EXAMPLE}`);
       return;
     }
     try {
@@ -77,6 +88,29 @@ export class TelegramBotUpdate {
       await ctx.reply(formatAssessment(a.detail, a.result, a.fairValue, a.currency));
     } catch {
       await ctx.reply('Не вдалося перевірити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.');
+    }
+  }
+
+  @Command('why')
+  async onWhy(@Ctx() ctx: Context): Promise<void> {
+    const externalId = extractAutoId(commandArg(ctx));
+    if (!externalId) {
+      await ctx.reply(`Надішліть посилання на оголошення, напр.:\n/why ${URL_EXAMPLE}`);
+      return;
+    }
+    try {
+      const a = await this.query.assessById(externalId);
+      await ctx.reply(
+        formatWhy(a.detail, a.result, {
+          fairValue: a.fairValue,
+          currency: a.currency,
+          sampleSize: a.sampleSize,
+          benchmarkBase: a.benchmarkBase,
+          mileageAware: a.mileageAware,
+        }),
+      );
+    } catch {
+      await ctx.reply('Не вдалося пояснити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.');
     }
   }
 
@@ -101,7 +135,7 @@ export class TelegramBotUpdate {
   async onBest(@Ctx() ctx: Context): Promise<void> {
     const listings = await this.query.topCandidates(5);
     if (listings.length === 0) {
-      await ctx.reply('Ще нічого не оцінено. Дай боту попрацювати або спробуй /check <id>.');
+      await ctx.reply('Ще нічого не оцінено. Дай боту попрацювати або надішли /check <посилання>.');
       return;
     }
     const lines = listings.map((l) => {
@@ -115,6 +149,35 @@ export class TelegramBotUpdate {
   async onReport(@Ctx() ctx: Context): Promise<void> {
     const digest = await this.query.report();
     await ctx.reply(formatReport(digest));
+  }
+
+  @Command('calibrate')
+  async onCalibrate(@Ctx() ctx: Context): Promise<void> {
+    const mode = this.calibration.configuredMode();
+    const lines = await this.calibration.runAndSummarize(mode);
+    await ctx.reply(formatCalibration(lines, mode));
+  }
+
+  @Command('params')
+  async onParams(@Ctx() ctx: Context): Promise<void> {
+    const profiles = await this.profiles.getEnabled();
+    if (profiles.length === 0) {
+      await ctx.reply('Активних ніш немає.');
+      return;
+    }
+    const lines = profiles.map((p) => `• ${p.name}: поріг ${p.minDealScore}`);
+    await ctx.reply(`Поточні пороги:\n${lines.join('\n')}`);
+  }
+
+  @Command('revert')
+  async onRevert(@Ctx() ctx: Context): Promise<void> {
+    const profiles = await this.profiles.getEnabled();
+    const reverted: string[] = [];
+    for (const p of profiles) {
+      const before = await this.calibration.revert(p.id);
+      if (before != null) reverted.push(`• ${p.name}: повернено до ${before}`);
+    }
+    await ctx.reply(reverted.length ? `Відкат:\n${reverted.join('\n')}` : 'Нема що відкочувати.');
   }
 
   @Action(/^oc:/)
@@ -143,7 +206,9 @@ export class TelegramBotUpdate {
     const note = parts.slice(2).join(' ') || null;
     const allowed: ManualLabel[] = ['good', 'bad', 'bought', 'skipped', 'resold'];
     if (!externalId || !allowed.includes(label)) {
-      await ctx.reply('Формат: /outcome <id|посилання> <good|bad|bought|skipped|resold> [нотатка]');
+      await ctx.reply(
+        `Формат: /outcome <посилання> <good|bad|bought|skipped|resold> [нотатка]\nНапр.: /outcome ${URL_EXAMPLE} bought`,
+      );
       return;
     }
     const listing = await this.query.findListingByExternalId(externalId);
@@ -161,15 +226,18 @@ export class TelegramBotUpdate {
   }
 }
 
-/** Read the text after the command (e.g. "/check 12345" → "12345"). */
+/** Read the text after the command (e.g. "/check <url>" -> "<url>"). */
 function commandArg(ctx: Context): string {
   const message = ctx.message;
   const text = message && 'text' in message ? message.text : '';
   return text.replace(/^\/\w+(@\w+)?\s*/, '').trim();
 }
 
-/** Extract an AUTO.RIA auto_id from a raw id or a listing URL. */
+/**
+ * Extract an AUTO.RIA auto_id from a listing URL (or a raw id). The id is the last 6+ digit run —
+ * auto.ria URLs put it at the end, e.g. `.../auto_hyundai_sonata_40143820.html` -> `40143820`.
+ */
 function extractAutoId(input: string): string | null {
-  const match = input.match(/(\d{6,})/);
-  return match ? match[1] : null;
+  const matches = input.match(/\d{6,}/g);
+  return matches ? matches[matches.length - 1] : null;
 }

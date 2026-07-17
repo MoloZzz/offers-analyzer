@@ -8,6 +8,7 @@ import { CalibrationModule } from '../calibration/calibration.module';
 import { ProfilesModule } from '../profiles/profiles.module';
 import { QueryModule } from '../query/query.module';
 
+import { CalibrationSchedulerService } from './calibration-scheduler.service';
 import { Notification } from './entities/notification.entity';
 import { Subscriber } from './entities/subscriber.entity';
 import { NotificationsService } from './notifications.service';
@@ -34,6 +35,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     NotificationsService,
     SubscribersService,
     ReportSchedulerService,
+    CalibrationSchedulerService,
     TelegramBotUpdate,
     TelegramNotifier,
     { provide: NOTIFIER, useExisting: TelegramNotifier },

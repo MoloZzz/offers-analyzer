@@ -21,6 +21,7 @@ updated: 2026-07-17
 | **Search profile** | A configured niche to monitor within the API budget. | — |
 | **Source adapter** | Implementation of the `ListingSource` port for one site (auto.ria = first). | — |
 | **Outcome** | The realized result of a flagged listing — `manual` (operator 👍/👎, bought/skipped/resold) or `passive` (price_dropped, disappeared). The ground truth for spec-002 precision + learning. Manual is idempotent per opportunity; passive is deduped per (listing, label). | Weak passive signals ≠ confirmed profit. |
+| **CalibrationRun** | A recorded threshold-calibration pass — inputs (per-profile scores, precision), the bounded proposal, whether it was applied, and why. Propose-only in v1. See spec 002. | Audit + revert trail. |
 | **ParameterSet** | A versioned, active bundle of scoring tunables (`scale`, soft-flag penalty, mileage factors) that live scoring reads at runtime — replaces hard-coded constants; enables tuning + rollback. One active version at a time. See [[0005-versioned-parameter-sets\|ADR-0005]]. | Not the per-profile `minDealScore` (that's profile config). |
 
 ## Business rules

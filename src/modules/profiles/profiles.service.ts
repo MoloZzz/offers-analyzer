@@ -42,6 +42,11 @@ export class ProfilesService implements OnApplicationBootstrap {
     return this.profiles.find({ where: { enabled: true } });
   }
 
+  /** Set a profile's threshold directly (used by calibration apply/revert, spec 002, E3). */
+  async setThreshold(profileId: string, minDealScore: number): Promise<void> {
+    await this.profiles.update({ id: profileId }, { minDealScore });
+  }
+
   async onApplicationBootstrap(): Promise<void> {
     const file =
       process.env.SEARCH_PROFILES_FILE ?? join(process.cwd(), 'config', 'search-profiles.json');
@@ -63,7 +68,12 @@ export class ProfilesService implements OnApplicationBootstrap {
       entity.priceFrom = cfg.priceFrom ?? null;
       entity.priceTo = cfg.priceTo ?? null;
       entity.currency = cfg.currency;
-      entity.minDealScore = cfg.minDealScore;
+      // minDealScore is only seeded on first creation; once a profile exists, calibration
+      // (spec 002, E3) owns it, so re-syncing from JSON on every boot would clobber applied
+      // proposals.
+      if (!existing) {
+        entity.minDealScore = cfg.minDealScore;
+      }
       entity.confidenceMinSamples = cfg.confidenceMinSamples;
       entity.dealerPolicy = cfg.dealerPolicy;
       entity.enabled = cfg.enabled;

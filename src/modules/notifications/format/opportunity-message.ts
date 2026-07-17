@@ -5,7 +5,7 @@ import { Opportunity } from '../../valuation/entities/opportunity.entity';
 import { ValuationResult } from '../../valuation/valuation.service';
 
 /** Human-readable Ukrainian labels for red-flag codes. */
-const FLAG_LABELS: Record<string, string> = {
+export const FLAG_LABELS: Record<string, string> = {
   suspicious_discount: 'підозріло дешево',
   damaged: 'була в ДТП',
   salvage: 'на запчастини',

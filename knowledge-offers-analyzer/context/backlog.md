@@ -136,8 +136,9 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     - [ ] **E2c-later — `disappeared` / time-on-market**: reliable only once the source distinguishes
       "listing removed" (HTTP 404) from "fell out of the search/paging". Deferred (needs a source change).
   - [ ] **E2d — realized precision** in `/report` (👍 vs 👎 over a recent window, per profile + overall).
-- [~] **E3 — US2 (P2): Threshold auto-calibration** — propose (later auto-apply) a bounded `minDealScore`
-  toward a volume-corridor / precision target; bounded, frozen on thin data, recorded in `calibration_runs`.
+- [x] **E3 — US2 (P2): Threshold auto-calibration** — **complete.** Per-profile propose + bounded
+  apply/revert; weekly schedule; `propose` default, `CALIBRATION_MODE=auto` for hands-off; frozen on thin
+  data, reversible, recorded in `calibration_runs`.
   - [x] **E3a — calibration core (propose-only)** (delegated → Sonnet): pure `proposeThreshold(input,
     target)` (freeze < 20 scores; precision rule priority; volume corridor; bounded ±`MAX_STEP` 0.1;
     "insignificant change → null") + `CalibrationRun` entity/migration (`1784302227453`) +
@@ -152,8 +153,12 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     per-profile scores + `profile.minDealScore` → `proposeThreshold` → one propose-mode run per profile;
     `globalPrecision()` helper (shared). `ProfilesModule` wired (no cycle). Global precision for now
     (per-profile precision deferred — needs outcome→opportunity join). tsc clean, jest 48/48.
-  - [ ] **E3b-3 — apply + bot + schedule**: `/calibrate` `/params` `/revert`, weekly job, auto-apply
-    (bounded), profile-threshold update recorded/reversible.
+  - [x] **E3b-3 — apply + bot + schedule** (E3b-3a mine, E3b-3b delegated → Sonnet):
+    `CalibrationService.applyProposal`/`revert`/`runCalibration`/`runAndSummarize`; `ProfilesService.setThreshold`
+    + boot no-clobber of `minDealScore` (calibration owns it after first seed); config `CALIBRATION_MODE`
+    (propose|auto, default propose) + target (`CALIBRATION_MIN/MAX_VOLUME`, `MIN_PRECISION`); weekly
+    `CalibrationSchedulerService` (Mon 09:30) broadcasts proposals/applied changes; bot `/calibrate`
+    `/params` `/revert`. Bounded (±0.1/run), frozen on thin data, reversible. tsc clean, jest 58/58.
 - [ ] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks to
   penalties/mileage/condition weights, operator-approved.
 
@@ -162,14 +167,13 @@ never-alerted listings). See spec §Context.
 
 ## 🟢 Later — deferred (promote when picked up)
 
-- [ ] **B22 — Explainable "why" breakdown.** Today alerts/`/check` show the headline factors (score,
-  discount vs market, confidence, fired risk labels, one-line verdict) but not the full derivation.
-  Surface: the **cohort used + sample size** behind fair value, whether/how much the **mileage
-  correction** (M2) moved it, the **score decomposition** (`raw × confidence × penalty` with the penalty
-  value), and **which description phrase** fired each condition flag. Add a `/why <id>` (or enrich the
-  assessment). Also localize the `reason` string (currently English) to Ukrainian. Matters for trusting
-  auto-calibration (spec 002). The inputs already exist in the valuation path — this is surfacing, not
-  new logic.
+- [x] **B22 — Explainable "why" breakdown** (delegated → Sonnet): `/why <id>` shows the full derivation —
+  fair-value basis (cohort mileage-aware? + **sample size**), **mileage correction** amount, **score
+  decomposition** (`raw × confidence × penalty = score`), risks **grouped by source** (AUTO.RIA data vs
+  description), and a Ukrainian verdict. `ValuationResult` now exposes `raw`/`penalty`/`disqualified`;
+  `Assessment` exposes `sampleSize`/`benchmarkBase`/`mileageAware`; pure `formatWhy` + unit test. tsc
+  clean, jest 50/50. (Remaining niceties: show the exact description *phrase* that fired a flag, and
+  localize the `/check` `reason` string — small follow-ups.)
 
 - [ ] **B21 — Real (VIN-verified) mileage vs claimed.** Rolled-back odometers make frauds look like
   jackpots (real case: Sonata 2013, claimed 181k / real 595k → false score 1, −44.55%). API exposes only

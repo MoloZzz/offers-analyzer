@@ -17,6 +17,14 @@ export interface AppConfig {
   mileageMaxAdjPct: number;
   /** When true, log every outbound request + raw response to external sources (api_key redacted). */
   logSourceRequests: boolean;
+  /** 'propose' (default): calibration only records proposals. 'auto': bounded auto-apply. */
+  calibrationMode: 'propose' | 'auto';
+  /** Desired min # of qualifying listings (scores >= threshold) — calibration target. */
+  calibrationMinVolume: number;
+  /** Desired max # of qualifying listings (scores >= threshold) — calibration target. */
+  calibrationMaxVolume: number;
+  /** Desired floor on realized precision (0..1) — calibration target. */
+  calibrationMinPrecision: number;
 }
 
 export default (): AppConfig => ({
@@ -35,4 +43,8 @@ export default (): AppConfig => ({
   mileagePer10kPct: Number(process.env.MILEAGE_PER_10K_PCT ?? 2),
   mileageMaxAdjPct: Number(process.env.MILEAGE_MAX_ADJ_PCT ?? 20),
   logSourceRequests: process.env.LOG_SOURCE_REQUESTS === 'true',
+  calibrationMode: process.env.CALIBRATION_MODE === 'auto' ? 'auto' : 'propose',
+  calibrationMinVolume: Number(process.env.CALIBRATION_MIN_VOLUME ?? 5),
+  calibrationMaxVolume: Number(process.env.CALIBRATION_MAX_VOLUME ?? 20),
+  calibrationMinPrecision: Number(process.env.CALIBRATION_MIN_PRECISION ?? 0.7),
 });
