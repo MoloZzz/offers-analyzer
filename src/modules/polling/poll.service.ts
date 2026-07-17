@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 
 import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
 import { Currency } from '../../common/types/money';
+import { OutcomesService } from '../calibration/outcomes.service';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
@@ -56,6 +57,7 @@ export class PollService {
     private readonly notifications: NotificationsService,
     @Inject(EXCHANGE_RATE) private readonly fx: ExchangeRate,
     private readonly mileage: MileageAdjuster,
+    private readonly outcomes: OutcomesService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -145,6 +147,10 @@ export class PollService {
     // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of
     // budget before scoring it). Otherwise the recorded observation is enough.
     const dropped = detail.price.amount < previousAmount;
+    // Passive outcome (spec 002 E2c): the listing got cheaper — a weak "the market moved" signal.
+    if (dropped) {
+      await this.outcomes.recordPassive({ listingId: listing.id, label: 'price_dropped' });
+    }
     if (!dropped && existing.lastScore != null) return;
     await this.evaluateAndNotify(
       profile,

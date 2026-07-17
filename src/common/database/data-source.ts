@@ -2,6 +2,7 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
+import { CalibrationRun } from '../../modules/calibration/entities/calibration-run.entity';
 import { Outcome } from '../../modules/calibration/entities/outcome.entity';
 import { ParameterSet } from '../../modules/calibration/entities/parameter-set.entity';
 import { Listing } from '../../modules/listings/entities/listing.entity';
@@ -27,6 +28,7 @@ export const ENTITIES = [
   RateBudgetWindow,
   ParameterSet,
   Outcome,
+  CalibrationRun,
 ];
 
 export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {

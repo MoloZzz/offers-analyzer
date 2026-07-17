@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 import { Currency } from '../../common/types/money';
+import { OutcomesService } from '../calibration/outcomes.service';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
 import { ListingDetail, ListingSource, LISTING_SOURCE } from '../sources/ports/listing-source.port';
@@ -14,7 +15,7 @@ import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
 
-import { buildDigest, ReportDigest } from './report';
+import { buildDigest, realizedPrecision, ReportDigest } from './report';
 
 export interface Assessment {
   detail: ListingDetail;
@@ -40,6 +41,7 @@ export class QueryService {
     private readonly benchmarks: BenchmarkCacheService,
     private readonly listings: ListingsService,
     private readonly mileage: MileageAdjuster,
+    private readonly outcomes: OutcomesService,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     config: ConfigService<AppConfig, true>,
   ) {
@@ -96,7 +98,12 @@ export class QueryService {
       score: l.lastScore ?? 0,
       url: l.url,
     }));
-    return buildDigest(scores, opportunities, nearMisses, this.minScore, targetCandidates);
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const labeled = await this.outcomes.manualLabeledSince(since);
+    const good = labeled.filter((o) => o.label === 'good').length;
+    const bad = labeled.filter((o) => o.label === 'bad').length;
+    const precision = realizedPrecision(good, bad);
+    return buildDigest(scores, opportunities, nearMisses, this.minScore, targetCandidates, precision);
   }
 
   /** Look up a recorded opportunity by id (for the 👍/👎 outcome buttons). */

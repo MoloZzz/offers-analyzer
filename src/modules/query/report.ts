@@ -24,6 +24,20 @@ export interface ReportDigest {
   nearMisses: NearMiss[];
   /** A threshold that would yield ~targetCount candidates, or null when it ≈ current / data is thin. */
   suggestedThreshold: number | null;
+  realizedPrecision: RealizedPrecision | null;
+}
+
+export interface RealizedPrecision {
+  good: number;
+  bad: number;
+  precision: number | null;
+}
+
+/** Share of 👍 among labeled (👍/👎) outcomes. null when there are no labels yet. */
+export function realizedPrecision(good: number, bad: number): RealizedPrecision | null {
+  const total = good + bad;
+  if (total === 0) return null;
+  return { good, bad, precision: Math.round((good / total) * 100) / 100 };
 }
 
 export function distribution(scores: number[], threshold: number): ScoreDistribution {
@@ -54,6 +68,7 @@ export function buildDigest(
   nearMisses: NearMiss[],
   threshold: number,
   targetCount = 10,
+  precision: RealizedPrecision | null = null,
 ): ReportDigest {
   return {
     threshold,
@@ -62,6 +77,7 @@ export function buildDigest(
     distribution: distribution(scores, threshold),
     nearMisses,
     suggestedThreshold: suggestedThreshold(scores, threshold, targetCount),
+    realizedPrecision: precision,
   };
 }
 
@@ -71,6 +87,9 @@ export function formatReport(d: ReportDigest): string {
     '📊 Звіт по відбору',
     `Оцінено оголошень: ${d.evaluated}`,
     `Вигідних (бал ≥ ${d.threshold}): ${d.opportunities}`,
+    d.realizedPrecision != null
+      ? `Реальна точність (👍/👎, ~30 днів): 👍 ${d.realizedPrecision.good} / 👎 ${d.realizedPrecision.bad} → ${Math.round((d.realizedPrecision.precision ?? 0) * 100)}%`
+      : `Реальна точність: поки немає оцінок 👍/👎`,
     `Розподіл балів: <0 — ${d.distribution.belowZero} · 0…${d.threshold} — ${d.distribution.zeroToThreshold} · ≥${d.threshold} — ${d.distribution.atOrAbove}`,
   ];
   if (d.nearMisses.length > 0) {

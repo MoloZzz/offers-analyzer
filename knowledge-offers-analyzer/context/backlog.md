@@ -118,7 +118,9 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     from it; `ValuationModule` imports `CalibrationModule`. `valuation.spec` now drives the pure fn with
     the v1 seed — all original assertions pass (SC-006 regression guard). tsc clean, jest 29/29.
     Supersession sweep done ([[profitability-definition]], [[glossary]], [[overview]]).
-- [~] **E2 — US1 (P1): Outcome capture** (MVP of spec 002). Split into safe slices:
+- [x] **E2 — US1 (P1): Outcome capture** (MVP of spec 002) — **complete** (E2a–E2d; `disappeared`
+  deferred as E2c-later). Feedback now flows: 👍/👎 + `/outcome` + passive `price_dropped` → `outcomes`;
+  `/report` shows realized precision. Delivered in safe slices:
   - [x] **E2a — data layer** (delegated → Sonnet): `Outcome` entity + `outcomes` migration (append-only,
     `1784289182080`) + `OutcomesService` (`recordManual` idempotent per opportunity, `recordPassive`
     dedup on listingId+label, `manualLabeledSince` for precision) + fake-repo unit tests. Wired into
@@ -128,12 +130,23 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     via pure `outcome-callback.ts`, tested). Bot `@Action(/^oc:/)` records the manual outcome (resolves
     opportunity→listing), `/outcome <id> <label> [note]` command records by external id. `CalibrationModule`
     imported into `NotificationsModule` (no cycle). tsc clean, jest 37/37.
-  - [ ] **E2c — passive signals** in the poll: `disappeared` (known listing absent this cycle),
-    `price_dropped`, time-on-market — no extra source request.
+  - [x] **E2c — passive `price_dropped`** in the poll: on a re-observed price drop, `poll.service`
+    records a deduped passive `Outcome` (weak "market moved" signal); `PollingModule` imports
+    `CalibrationModule`. No extra source request. tsc clean, jest 37/37.
+    - [ ] **E2c-later — `disappeared` / time-on-market**: reliable only once the source distinguishes
+      "listing removed" (HTTP 404) from "fell out of the search/paging". Deferred (needs a source change).
   - [ ] **E2d — realized precision** in `/report` (👍 vs 👎 over a recent window, per profile + overall).
-- [ ] **E3 — US2 (P2): Threshold auto-calibration** — weekly job proposes/auto-applies a bounded
-  per-profile `minDealScore` toward a volume corridor / precision target; `/calibrate` `/params`
-  `/revert`.
+- [~] **E3 — US2 (P2): Threshold auto-calibration** — propose (later auto-apply) a bounded `minDealScore`
+  toward a volume-corridor / precision target; bounded, frozen on thin data, recorded in `calibration_runs`.
+  - [x] **E3a — calibration core (propose-only)** (delegated → Sonnet): pure `proposeThreshold(input,
+    target)` (freeze < 20 scores; precision rule priority; volume corridor; bounded ±`MAX_STEP` 0.1;
+    "insignificant change → null") + `CalibrationRun` entity/migration (`1784302227453`) +
+    `CalibrationService.proposeThresholdRun` (global scores + realized precision → persists a
+    propose-mode run). Unit-tested (6 cases). No apply/scheduler/bot. tsc clean, jest 47/47.
+  - [ ] **E3b — apply + bot + schedule**: `/calibrate` `/params` `/revert`, weekly job, auto-apply mode.
+    **Design decision first (mine):** thresholds are per-profile (`SearchProfile.minDealScore`) but scores
+    aren't linked to a profile (a `listing`→`profile` gap) — so E3b must decide global-vs-per-profile
+    apply (likely: apply the global proposal to a chosen profile, or add a listing↔profile tag).
 - [ ] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks to
   penalties/mileage/condition weights, operator-approved.
 
@@ -141,6 +154,15 @@ Note: learning is scoped to **precision on the alerted set** (selection bias —
 never-alerted listings). See spec §Context.
 
 ## 🟢 Later — deferred (promote when picked up)
+
+- [ ] **B22 — Explainable "why" breakdown.** Today alerts/`/check` show the headline factors (score,
+  discount vs market, confidence, fired risk labels, one-line verdict) but not the full derivation.
+  Surface: the **cohort used + sample size** behind fair value, whether/how much the **mileage
+  correction** (M2) moved it, the **score decomposition** (`raw × confidence × penalty` with the penalty
+  value), and **which description phrase** fired each condition flag. Add a `/why <id>` (or enrich the
+  assessment). Also localize the `reason` string (currently English) to Ukrainian. Matters for trusting
+  auto-calibration (spec 002). The inputs already exist in the valuation path — this is surfacing, not
+  new logic.
 
 - [ ] **B21 — Real (VIN-verified) mileage vs claimed.** Rolled-back odometers make frauds look like
   jackpots (real case: Sonata 2013, claimed 181k / real 595k → false score 1, −44.55%). API exposes only

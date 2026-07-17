@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { CalibrationModule } from '../calibration/calibration.module';
 import { FxModule } from '../fx/fx.module';
 import { ListingsModule } from '../listings/listings.module';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -18,6 +19,7 @@ import { PollService } from './poll.service';
     ValuationModule,
     NotificationsModule,
     FxModule,
+    CalibrationModule,
   ],
   providers: [PollService],
 })
