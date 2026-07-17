@@ -56,6 +56,8 @@ export interface ListingDetail {
   url: string;
   price: Money;
   risk: ListingRisk;
+  /** Free-text seller description (AUTO.RIA `autoData.description`) — scanned for condition signals. */
+  description?: string;
 }
 
 export interface CohortQuery {

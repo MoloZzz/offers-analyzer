@@ -66,6 +66,7 @@ export class QueryService {
       confiscated: detail.risk.confiscated,
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
+      description: detail.description,
     });
     return { detail, result, fairValue, currency };
   }

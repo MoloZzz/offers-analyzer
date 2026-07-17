@@ -14,6 +14,10 @@ const FLAG_LABELS: Record<string, string> = {
   unclear_customs: 'нерозмитнена',
   abroad: 'за кордоном',
   no_vin_report: 'немає VIN-звіту',
+  desc_after_accident: 'опис: після ДТП',
+  desc_not_running: 'опис: не на ходу / на запчастини',
+  desc_needs_repair: 'опис: потребує ремонту',
+  desc_mechanical_issue: 'опис: проблеми з двигуном/КПП',
 };
 
 function risksLabel(redFlags: Record<string, boolean>): string {

@@ -11,6 +11,11 @@ export interface RedFlagInput {
   confiscated?: boolean;
   underCredit?: boolean;
   abroad?: boolean;
+  // Condition signals parsed from the seller description (see condition.ts).
+  afterAccident?: boolean;
+  notRunning?: boolean;
+  needsRepair?: boolean;
+  mechanicalIssue?: boolean;
 }
 
 interface RedFlagRule {
@@ -34,6 +39,11 @@ const RED_FLAG_RULES: RedFlagRule[] = [
   { code: 'unclear_customs', disqualifying: false, fired: (i) => i.unclearCustoms === true },
   { code: 'abroad', disqualifying: false, fired: (i) => i.abroad === true },
   { code: 'no_vin_report', disqualifying: false, fired: (i) => !i.hasVinReport },
+  // Condition read from the description — a cheap wreck/non-runner is a trap, not a deal.
+  { code: 'desc_after_accident', disqualifying: true, fired: (i) => i.afterAccident === true },
+  { code: 'desc_not_running', disqualifying: true, fired: (i) => i.notRunning === true },
+  { code: 'desc_needs_repair', disqualifying: false, fired: (i) => i.needsRepair === true },
+  { code: 'desc_mechanical_issue', disqualifying: false, fired: (i) => i.mechanicalIssue === true },
 ];
 
 /** Multiplier applied per soft (non-disqualifying) red-flag that fires. */

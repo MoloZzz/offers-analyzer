@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { SellerType } from '../sources/ports/listing-source.port';
 
+import { assessCondition } from './condition';
 import { evaluateRedFlags } from './red-flags';
 
 export interface ValuationInput {
@@ -19,6 +20,8 @@ export interface ValuationInput {
   confiscated?: boolean;
   underCredit?: boolean;
   abroad?: boolean;
+  /** Seller description — scanned for condition red-flags (after-accident, non-runner, etc.). */
+  description?: string;
 }
 
 export interface ValuationResult {
@@ -52,6 +55,7 @@ export class ValuationService {
     const confidence =
       input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
+    const condition = assessCondition(input.description);
     const { flags, disqualified, penalty } = evaluateRedFlags({
       discountPct,
       sellerType: input.sellerType,
@@ -62,6 +66,10 @@ export class ValuationService {
       confiscated: input.confiscated,
       underCredit: input.underCredit,
       abroad: input.abroad,
+      afterAccident: condition.afterAccident,
+      notRunning: condition.notRunning,
+      needsRepair: condition.needsRepair,
+      mechanicalIssue: condition.mechanicalIssue,
     });
 
     let score = raw * confidence * penalty;

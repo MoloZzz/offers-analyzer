@@ -135,6 +135,7 @@ export class PollService {
       confiscated: detail.risk.confiscated,
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
+      description: detail.description,
     });
 
     await this.listings.recordEvaluation(listing, result.score, result.discountPct);

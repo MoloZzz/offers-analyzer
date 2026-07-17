@@ -78,12 +78,15 @@ self-tuning reports (R).
   `expected = age × MILEAGE_ANNUAL_K`. Config defaults 15 / 2% / ±20%. Pure fns unit-tested
   (`test/unit/mileage.spec.ts`); wired into poll + `/check`. No schema change.
 - [ ] **M3 — Show mileage context** in the alert/`/check` (e.g. "пробіг 120к vs очікувано 90к → −$800").
-- [ ] **C1 — Read description.** Add `description?: string` to `ListingDetail` from `/info`
-  `autoData.description` (confirmed present; free text, ru/uk).
-- [ ] **C2 — Condition red-flags.** Keyword scan of the description (uk+ru) → new flags: after-accident,
-  needs-repair, engine/gearbox issue, non-runner (disqualifying/soft). Negatives penalise; positive
-  phrases ("ідеальний стан", "не бита не фарбована") do **not** inflate score (anti-gaming).
-- [ ] **C3 — Wire condition** into `ValuationInput`/`evaluate` + Ukrainian labels in the alert.
+- [x] **C1 — Read description.** `description?: string` on `ListingDetail`, mapped from `/info`
+  `autoData.description` in `auto-ria.source`.
+- [x] **C2 — Condition red-flags.** `valuation/condition.ts` (`assessCondition`) scans the description
+  (uk+ru) → `desc_after_accident`/`desc_not_running` (disqualifying), `desc_needs_repair`/
+  `desc_mechanical_issue` (soft) in `red-flags.ts`. **Negation-aware**: «вкладень не потребує»,
+  «не бита», «після капремонту» do not fire. Positives never inflate the score. Unit-tested
+  (`test/unit/condition.spec.ts`).
+- [x] **C3 — Wire condition.** `evaluate` parses `input.description` centrally (poll + `/check` just
+  pass `detail.description`); Ukrainian labels added to the alert/`/check` risk line. No schema change.
 - [ ] **R1 — Self-tuning report (scheduled).** Weekly digest from stored evaluations +
   `average_price_snapshots`: #evaluated, score distribution, near-misses just below threshold, suggested
   `minDealScore`. Turns practice into recommendations. Deferred until some data accumulates.

@@ -99,6 +99,7 @@ export class AutoRiaSource implements ListingSource {
         underCredit: bar.underCredit === true,
         abroad: bar.abroad === true,
       },
+      description: d.autoData?.description ?? undefined,
     };
   }
 
@@ -187,7 +188,7 @@ interface AutoRiaInfo {
   linkToView?: string;
   dealer?: { id?: number };
   stateData?: { stateId?: number; cityId?: number };
-  autoData?: { year?: number; raceInt?: number };
+  autoData?: { year?: number; raceInt?: number; description?: string };
   autoInfoBar?: {
     abroad?: boolean;
     confiscatedCar?: boolean;

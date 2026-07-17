@@ -17,7 +17,7 @@ updated: 2026-07-17
 | **Discount** | `(FV − asking) / FV` — how far below market a listing is priced. | — |
 | **Opportunity** | A listing flagged as a candidate deal: sufficient discount + confidence, passes red-flags. | Not a guarantee of profit. |
 | **Opportunity score** | Ranking signal for candidates (v1: `discount × confidence`). | — |
-| **Red-flag** | A risk condition that disqualifies/penalizes a cheap listing (damaged, unclear customs, scam-cheap, etc.). | — |
+| **Red-flag** | A risk condition that disqualifies/penalizes a cheap listing (damaged, unclear customs, scam-cheap, etc.). Sources: AUTO.RIA `autoInfoBar` flags **and** condition signals parsed from the seller description (after-accident, non-runner, needs-repair — negation-aware). | — |
 | **Search profile** | A configured niche to monitor within the API budget. | — |
 | **Source adapter** | Implementation of the `ListingSource` port for one site (auto.ria = first). | — |
 
