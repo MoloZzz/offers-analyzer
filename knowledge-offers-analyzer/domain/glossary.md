@@ -20,6 +20,7 @@ updated: 2026-07-17
 | **Red-flag** | A risk condition that disqualifies/penalizes a cheap listing (damaged, unclear customs, scam-cheap, etc.). Sources: AUTO.RIA `autoInfoBar` flags **and** condition signals parsed from the seller description (after-accident, non-runner, needs-repair — negation-aware). | — |
 | **Search profile** | A configured niche to monitor within the API budget. | — |
 | **Source adapter** | Implementation of the `ListingSource` port for one site (auto.ria = first). | — |
+| **ParameterSet** | A versioned, active bundle of scoring tunables (`scale`, soft-flag penalty, mileage factors) that live scoring reads at runtime — replaces hard-coded constants; enables tuning + rollback. One active version at a time. See [[0005-versioned-parameter-sets\|ADR-0005]]. | Not the per-profile `minDealScore` (that's profile config). |
 
 ## Business rules
 

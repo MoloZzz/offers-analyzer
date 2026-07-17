@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { CalibrationModule } from '../calibration/calibration.module';
+
 import { BenchmarkCacheService } from './benchmark-cache.service';
 import { AveragePriceSnapshot } from './entities/average-price-snapshot.entity';
 import { FairValueBenchmark } from './entities/fair-value-benchmark.entity';
@@ -9,7 +11,10 @@ import { MileageAdjuster } from './mileage';
 import { ValuationService } from './valuation.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FairValueBenchmark, Opportunity, AveragePriceSnapshot])],
+  imports: [
+    TypeOrmModule.forFeature([FairValueBenchmark, Opportunity, AveragePriceSnapshot]),
+    CalibrationModule,
+  ],
   providers: [ValuationService, BenchmarkCacheService, MileageAdjuster],
   exports: [ValuationService, BenchmarkCacheService, MileageAdjuster, TypeOrmModule],
 })

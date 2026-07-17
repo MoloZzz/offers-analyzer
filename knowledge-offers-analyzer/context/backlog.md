@@ -107,16 +107,17 @@ the rule-based scorer: capture outcomes → auto-calibrate the threshold → lea
 bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequenced:
 
 - [ ] **E0** — research.md + **ADR-0005** (versioned ParameterSets + calibration) + supersession sweep.
-- [~] **E1 (foundational)** — scoring reads from a **versioned active `ParameterSet`** (seeded from
+- [x] **E1 (foundational)** — scoring reads from a **versioned active `ParameterSet`** (seeded from
   today's config; identical behavior) so any tuning can take effect without redeploy. See
   [[0005-versioned-parameter-sets|ADR-0005]].
   - [x] **E1a — scaffold** (delegated → Sonnet): `ParameterSet` entity + `parameter_sets` migration
     (append-only) + `ParametersService` (seeds v1 from config, caches active) + `CalibrationModule` +
     seed unit test. No consumer refactor; behavior unchanged. tsc clean, jest 29/29.
-  - [ ] **E1b — consumer refactor**: `ValuationService` (`scale`, `softFlagPenalty`), `MileageAdjuster`
-    (mileage factors) read from `ParametersService.params()` instead of constants/config; regression
-    test asserts identical output at v1 (SC-006). Then run the supersession sweep (weights → versioned)
-    in [[profitability-definition]] / [[glossary]].
+  - [x] **E1b — consumer refactor** (delegated → Sonnet): pure `computeValuation(input, params)` reads
+    `scale`/`softFlagPenalty` from `ParametersService.params()`; `MileageAdjuster` reads mileage factors
+    from it; `ValuationModule` imports `CalibrationModule`. `valuation.spec` now drives the pure fn with
+    the v1 seed — all original assertions pass (SC-006 regression guard). tsc clean, jest 29/29.
+    Supersession sweep done ([[profitability-definition]], [[glossary]], [[overview]]).
 - [ ] **E2 — US1 (P1): Outcome capture** (MVP): 👍/👎 buttons + `/outcome` + passive signals
   (disappeared/price-drop/time-on-market) → `outcomes`; report shows realized precision.
 - [ ] **E3 — US2 (P2): Threshold auto-calibration** — weekly job proposes/auto-applies a bounded

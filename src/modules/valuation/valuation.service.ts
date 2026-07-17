@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
+import { ScoringParams } from '../calibration/entities/parameter-set.entity';
+import { ParametersService } from '../calibration/parameters.service';
 import { SellerType } from '../sources/ports/listing-source.port';
 
 import { assessCondition } from './condition';
@@ -36,27 +38,23 @@ export interface ValuationResult {
   reason: string;
 }
 
-/** A discount of this percent (below fair value) saturates the raw score to ~1.0. */
-const DEAL_SCORE_SCALE_PCT = 30;
-
 /**
  * The heart of the product: score how good/bad a listing's price is as a deal.
  * Pure and deterministic (no IO) so it is fully unit-testable — constitution §VI.
  * Methodology: knowledge-offers-analyzer/research/profitability-definition.md.
  */
-@Injectable()
-export class ValuationService {
-  evaluate(input: ValuationInput): ValuationResult {
-    const fairValue = Number.isFinite(input.fairValue) ? input.fairValue : 0;
-    const discountPct =
-      fairValue > 0 ? ((fairValue - input.asking) / fairValue) * 100 : 0;
+export function computeValuation(input: ValuationInput, params: ScoringParams): ValuationResult {
+  const fairValue = Number.isFinite(input.fairValue) ? input.fairValue : 0;
+  const discountPct =
+    fairValue > 0 ? ((fairValue - input.asking) / fairValue) * 100 : 0;
 
-    const raw = clamp(discountPct / DEAL_SCORE_SCALE_PCT, -1, 1);
-    const confidence =
-      input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
+  const raw = clamp(discountPct / params.scale, -1, 1);
+  const confidence =
+    input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
-    const condition = assessCondition(input.description);
-    const { flags, disqualified, penalty } = evaluateRedFlags({
+  const condition = assessCondition(input.description);
+  const { flags, disqualified, penalty } = evaluateRedFlags(
+    {
       discountPct,
       sellerType: input.sellerType,
       hasVinReport: input.hasVinReport,
@@ -70,22 +68,32 @@ export class ValuationService {
       notRunning: condition.notRunning,
       needsRepair: condition.needsRepair,
       mechanicalIssue: condition.mechanicalIssue,
-    });
+    },
+    params.softFlagPenalty,
+  );
 
-    let score = raw * confidence * penalty;
-    if (disqualified) score = Math.min(score, 0); // a scam/damaged bargain is not a deal
+  let score = raw * confidence * penalty;
+  if (disqualified) score = Math.min(score, 0); // a scam/damaged bargain is not a deal
 
-    const hasEnoughData = input.sampleSize >= input.minSamples;
-    const isOpportunity = score >= input.minScore && hasEnoughData && !disqualified;
+  const hasEnoughData = input.sampleSize >= input.minSamples;
+  const isOpportunity = score >= input.minScore && hasEnoughData && !disqualified;
 
-    return {
-      isOpportunity,
-      discountPct: round(discountPct),
-      confidence: round(confidence),
-      score: round(score),
-      redFlags: flags,
-      reason: reasonFor({ isOpportunity, disqualified, hasEnoughData, score, minScore: input.minScore }),
-    };
+  return {
+    isOpportunity,
+    discountPct: round(discountPct),
+    confidence: round(confidence),
+    score: round(score),
+    redFlags: flags,
+    reason: reasonFor({ isOpportunity, disqualified, hasEnoughData, score, minScore: input.minScore }),
+  };
+}
+
+@Injectable()
+export class ValuationService {
+  constructor(private readonly parameters: ParametersService) {}
+
+  evaluate(input: ValuationInput): ValuationResult {
+    return computeValuation(input, this.parameters.params());
   }
 }
 

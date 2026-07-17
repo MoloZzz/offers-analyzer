@@ -56,7 +56,10 @@ export interface RedFlagOutcome {
   penalty: number;
 }
 
-export function evaluateRedFlags(input: RedFlagInput): RedFlagOutcome {
+export function evaluateRedFlags(
+  input: RedFlagInput,
+  softFlagPenalty: number = SOFT_FLAG_PENALTY,
+): RedFlagOutcome {
   const flags: Record<string, boolean> = {};
   let disqualified = false;
   let softFired = 0;
@@ -68,5 +71,5 @@ export function evaluateRedFlags(input: RedFlagInput): RedFlagOutcome {
       else softFired += 1;
     }
   }
-  return { flags, disqualified, penalty: Math.pow(SOFT_FLAG_PENALTY, softFired) };
+  return { flags, disqualified, penalty: Math.pow(softFlagPenalty, softFired) };
 }

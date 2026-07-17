@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
-import { AppConfig } from '../../common/config/configuration';
+import { ParametersService } from '../calibration/parameters.service';
 import { ListingDetail } from '../sources/ports/listing-source.port';
 
 import { ResolvedBenchmark } from './cohort';
@@ -68,19 +67,16 @@ function clamp(n: number, lo: number, hi: number): number {
  */
 @Injectable()
 export class MileageAdjuster {
-  private readonly opts: MileageAdjustOptions;
-
-  constructor(config: ConfigService<AppConfig, true>) {
-    this.opts = {
-      annualK: config.get('mileageAnnualK', { infer: true }),
-      per10kPct: config.get('mileagePer10kPct', { infer: true }),
-      maxAdjPct: config.get('mileageMaxAdjPct', { infer: true }),
-    };
-  }
+  constructor(private readonly parameters: ParametersService) {}
 
   /** Fair value in the benchmark's currency, corrected for mileage when appropriate. */
   fairValue(benchmark: ResolvedBenchmark, detail: ListingDetail): number {
     if (benchmark.mileageAware) return benchmark.value.amount;
-    return adjustFairForMileage(benchmark.value.amount, detail.mileage, detail.year, this.opts);
+    const p = this.parameters.params();
+    return adjustFairForMileage(benchmark.value.amount, detail.mileage, detail.year, {
+      annualK: p.mileageAnnualK,
+      per10kPct: p.mileagePer10kPct,
+      maxAdjPct: p.mileageMaxAdjPct,
+    });
   }
 }
