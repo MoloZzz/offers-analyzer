@@ -5,6 +5,7 @@ import { ParametersService } from '../calibration/parameters.service';
 import { SellerType } from '../sources/ports/listing-source.port';
 
 import { assessCondition } from './condition';
+import { assessMileageRisk } from './mileage-risk';
 import { evaluateRedFlags } from './red-flags';
 
 export interface ValuationInput {
@@ -24,6 +25,12 @@ export interface ValuationInput {
   abroad?: boolean;
   /** Seller description — scanned for condition red-flags (after-accident, non-runner, etc.). */
   description?: string;
+  /** Claimed mileage, thousand km — feeds odometer-fraud heuristics (see mileage-risk.ts). */
+  mileageK?: number;
+  /** Model year — feeds odometer-fraud heuristics (see mileage-risk.ts). */
+  year?: number;
+  /** Whether AUTO.RIA reports an independent VIN check (distinct from a full VIN report). */
+  vinChecked?: boolean;
 }
 
 export interface ValuationResult {
@@ -59,6 +66,13 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
     input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
   const condition = assessCondition(input.description);
+  const mileageRisk = assessMileageRisk({
+    mileageK: input.mileageK,
+    year: input.year,
+    discountPct,
+    hasVinReport: input.hasVinReport,
+    vinChecked: input.vinChecked,
+  });
   const { flags, disqualified, penalty } = evaluateRedFlags(
     {
       discountPct,
@@ -74,6 +88,8 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
       notRunning: condition.notRunning,
       needsRepair: condition.needsRepair,
       mechanicalIssue: condition.mechanicalIssue,
+      suspiciousLowMileage: mileageRisk.suspiciousLowMileage,
+      unverifiedBargain: mileageRisk.unverifiedBargain,
     },
     params.softFlagPenalty,
   );

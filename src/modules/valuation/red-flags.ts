@@ -16,6 +16,9 @@ export interface RedFlagInput {
   notRunning?: boolean;
   needsRepair?: boolean;
   mechanicalIssue?: boolean;
+  // Odometer-fraud / too-good-to-be-true signals (see mileage-risk.ts).
+  suspiciousLowMileage?: boolean;
+  unverifiedBargain?: boolean;
 }
 
 interface RedFlagRule {
@@ -44,6 +47,9 @@ const RED_FLAG_RULES: RedFlagRule[] = [
   { code: 'desc_not_running', disqualifying: true, fired: (i) => i.notRunning === true },
   { code: 'desc_needs_repair', disqualifying: false, fired: (i) => i.needsRepair === true },
   { code: 'desc_mechanical_issue', disqualifying: false, fired: (i) => i.mechanicalIssue === true },
+  // Odometer-fraud / too-good-to-be-true signals (B21a) — soft, since low-mileage/no-VIN can be legit.
+  { code: 'suspicious_low_mileage', disqualifying: false, fired: (i) => i.suspiciousLowMileage === true },
+  { code: 'unverified_bargain', disqualifying: false, fired: (i) => i.unverifiedBargain === true },
 ];
 
 /** Codes of the non-disqualifying (soft) red-flags — used by weight learning (spec 002, E4). */

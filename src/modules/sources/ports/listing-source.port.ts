@@ -37,6 +37,7 @@ export interface ListingRisk {
   confiscated: boolean;
   underCredit: boolean;
   abroad: boolean;
+  vinChecked: boolean;
 }
 
 export interface ListingDetail {

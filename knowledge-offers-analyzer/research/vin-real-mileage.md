@@ -1,9 +1,15 @@
 ---
 title: Research — real (VIN-verified) mileage vs claimed mileage
 type: research
-status: Open
+status: Partly implemented (Option 1)
 updated: 2026-07-17
 ---
+
+> **Update (2026-07-17):** Option 1 shipped as **B21a** — `valuation/mileage-risk.ts` adds soft red-flags
+> `unverified_bargain` (big discount + no VIN verification) and `suspicious_low_mileage` (very low km for
+> age); `risk.vinChecked` now read from `/info` `checkedVin.isChecked`. This *flags + dampens* traps
+> (score ×0.8), it does not eliminate them — the real figure (Options 2/3) is still open (B21b).
+
 
 # Real mileage (VIN check) vs the claimed odometer
 

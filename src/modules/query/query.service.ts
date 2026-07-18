@@ -74,6 +74,9 @@ export class QueryService {
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
       description: detail.description,
+      mileageK: detail.mileage,
+      year: detail.year,
+      vinChecked: detail.risk.vinChecked,
     });
     const sampleSize = benchmark?.sampleSize ?? 0;
     const benchmarkBase = benchmark?.value.amount ?? 0;

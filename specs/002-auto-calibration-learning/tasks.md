@@ -78,9 +78,9 @@ Prereq done this route: **E3b-1** — `Listing.profileId` (set at evaluation) so
 
 ## Phase 4: US3 (P3) — Weight learning (propose-only)
 
-- [ ] T018 [US3] Pure `weight-learning.ts`: per named weight, compute a separating statistic from labeled outcomes (e.g. precision lift when a flag fires) → bounded proposed adjustment + evidence; freeze on thin/no-signal.
-- [ ] T019 [US3] Extend `CalibrationService` to emit a candidate weight `ParameterSet` (propose-only) with evidence; operator approve/reject via bot → activate or archive.
-- [ ] T020 [P] [US3] Unit tests: a signal that separates outcomes yields a bounded increase; a non-separating/thin signal yields no change.
+- [X] T018 [US3] Pure `weight-learning.ts::proposeSoftFlagPenalty` — 👎-rate of listings with ≥1 soft flag vs none → bounded ±0.05 penalty tweak (clamped [0.5,1]) + evidence; freeze < 8/group, "no signal" → null. E4a. **Scope: the global soft-flag penalty only** (per-flag / mileage / condition weights are a later refinement).
+- [X] T019 [US3] `CalibrationService.proposeWeights` (labeled outcomes → opportunities' redFlags → `SOFT_FLAG_CODES` counts) emits a candidate `ParameterSet` (`ParametersService.createCandidate`); `applyLatestWeightCandidate` → `activate`. Bot `/weights` + `/weights_apply`. E4b.
+- [X] T020 [P] [US3] Unit tests: freeze/strengthen/weaken/no-signal/clamp (E4a); `formatWeights` (E4b).
 
 **Checkpoint**: the system recommends explainable weight tweaks with evidence; nothing changes without approval.
 

@@ -187,6 +187,9 @@ export class PollService {
       underCredit: detail.risk.underCredit,
       abroad: detail.risk.abroad,
       description: detail.description,
+      mileageK: detail.mileage,
+      year: detail.year,
+      vinChecked: detail.risk.vinChecked,
     });
 
     await this.listings.recordEvaluation(listing, result.score, result.discountPct, profile.id);

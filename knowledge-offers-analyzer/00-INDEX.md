@@ -25,7 +25,8 @@ The code is the *how*. This vault is the *what* and *why*: architecture, domain 
 - **Conventions** → [[coding-standards|Coding standards]] — NestJS patterns, testing, style.
 - **Operations** → [[environment-setup|Environment setup]] — tooling (RTK, Spec Kit), env, runbooks.
 - **Specs (SDD)** → [[specs/README|Feature specs index]] — links to Spec Kit artifacts under `.specify/`.
-- **Research** → [[monitoring-approaches|Monitoring approach]] · [[profitability-definition|Defining "profitable"]] · [[alternative-sources|Alternative listing sources]] — investigations behind the decisions.
+- **Business (plain language)** → [[how-it-works|How it works & how we score]] — for non-technical stakeholders: data collection + profitability scoring, in simple words.
+- **Research** → [[monitoring-approaches|Monitoring approach]] · [[profitability-definition|Defining "profitable"]] · [[why-no-opportunities|Reaching non-zero opportunities]] · [[vin-real-mileage|Real vs claimed mileage]] · [[explainability-gaps|Explainability gaps]] · [[alternative-sources|Alternative listing sources]] — investigations behind the decisions.
 
 ## 🗃️ Context zone (decoupled — read for background, not part of this graph)
 

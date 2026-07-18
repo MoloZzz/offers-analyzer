@@ -22,6 +22,7 @@ function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {
       confiscated: false,
       underCredit: false,
       abroad: false,
+      vinChecked: false,
     },
     ...overrides,
   };

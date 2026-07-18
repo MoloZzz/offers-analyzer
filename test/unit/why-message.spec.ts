@@ -22,6 +22,7 @@ const detail: ListingDetail = {
     confiscated: false,
     underCredit: false,
     abroad: false,
+    vinChecked: false,
   },
   description: 'потребує ремонту двигуна',
 };

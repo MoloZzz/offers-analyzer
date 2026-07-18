@@ -98,6 +98,7 @@ export class AutoRiaSource implements ListingSource {
         confiscated: bar.confiscatedCar === true,
         underCredit: bar.underCredit === true,
         abroad: bar.abroad === true,
+        vinChecked: d.checkedVin?.isChecked === true,
       },
       description: d.autoData?.description ?? undefined,
     };
@@ -185,6 +186,7 @@ interface AutoRiaInfo {
   modelName?: string;
   VIN?: string;
   haveInfotechReport?: boolean;
+  checkedVin?: { isChecked?: boolean };
   linkToView?: string;
   dealer?: { id?: number };
   stateData?: { stateId?: number; cityId?: number };

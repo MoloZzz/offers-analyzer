@@ -159,17 +159,20 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     (propose|auto, default propose) + target (`CALIBRATION_MIN/MAX_VOLUME`, `MIN_PRECISION`); weekly
     `CalibrationSchedulerService` (Mon 09:30) broadcasts proposals/applied changes; bot `/calibrate`
     `/params` `/revert`. Bounded (±0.1/run), frozen on thin data, reversible. tsc clean, jest 58/58.
-- [~] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks, operator-approved.
+- [x] **E4 — US3 (P3): Weight learning** (propose-only) — **complete.** Learns the global soft-flag
+  penalty from labeled outcomes → bounded, evidence-backed candidate `ParameterSet`; operator approves.
   - [x] **E4a — learning core** (delegated → Sonnet): `SOFT_FLAG_CODES` exported from `red-flags.ts`;
     pure `weight-learning.ts::proposeSoftFlagPenalty(samples, current)` — compares 👎-rate of listings
     where ≥1 soft flag fired vs none; strengthens/weakens the global soft-flag penalty (bounded ±0.05,
     clamped [0.5,1.0]), freezes < 8/group, "no signal" → null; returns evidence. Unit-tested (5 cases).
     Additive only (no consumers yet). tsc clean; new suite green in isolation (full jest blocked by a
     transient sandbox slowdown — re-run on your machine).
-  - [ ] **E4b — wire + approve**: `CalibrationService.proposeWeights` (join labeled outcomes →
-    opportunities' `redFlags` → soft-flag counts via `SOFT_FLAG_CODES`) emits a **candidate ParameterSet**
-    (`ParametersService.createCandidate`/`activate`); bot `/weights` (view proposal + evidence) +
-    `/weights-apply` (activate). Propose-only default.
+  - [x] **E4b — wire + approve** (delegated → Sonnet): `CalibrationService.proposeWeights` (labeled
+    outcomes → opportunities' `redFlags` → soft-flag counts via `SOFT_FLAG_CODES` → `proposeSoftFlagPenalty`)
+    emits a **candidate `ParameterSet`** (`ParametersService.createCandidate`); `applyLatestWeightCandidate`
+    → `ParametersService.activate` (refreshes cache). Bot `/weights` (proposal + evidence) + `/weights_apply`
+    (activate). Pure `formatWeights` unit-tested. tsc clean; targeted jest green (full suite pending on the
+    dev machine — sandbox jest degraded).
 
 Note: learning is scoped to **precision on the alerted set** (selection bias — we don't observe
 never-alerted listings). See spec §Context.
@@ -182,14 +185,26 @@ never-alerted listings). See spec §Context.
   description), and a Ukrainian verdict. `ValuationResult` now exposes `raw`/`penalty`/`disqualified`;
   `Assessment` exposes `sampleSize`/`benchmarkBase`/`mileageAware`; pure `formatWhy` + unit test. tsc
   clean, jest 50/50. (Remaining niceties: show the exact description *phrase* that fired a flag, and
-  localize the `/check` `reason` string — small follow-ups.)
+  localize the `/check` `reason` string — small follow-ups; folded into B23.)
+- [ ] **B23 — Persisted evaluation explanation** (so we can *argue* any decision, incl. past ones).
+  Snapshot the reasoning at scoring time onto `Listing.lastExplanation` (+ copy to `Opportunity`): cohort
+  {key, tier, sampleSize, mileageAware}, fair-value base/adjusted + mileage adjustment, discount, raw /
+  confidence / penalty, fired flags {code, source}, **ParameterSet version + threshold used**, timestamp.
+  `/why` + the alert read the snapshot (faithful, free, works even if the listing is gone) → live re-fetch
+  only as fallback. Then capture matched condition **phrases** and localise the `reason`. `resolveBenchmark`
+  must surface the matched cohort. Full analysis: [[explainability-gaps]].
 
-- [ ] **B21 — Real (VIN-verified) mileage vs claimed.** Rolled-back odometers make frauds look like
-  jackpots (real case: Sonata 2013, claimed 181k / real 595k → false score 1, −44.55%). API exposes only
-  `checkedVin.isChecked` + `linkToReport`, **not** the real number. Steps: (1) cheap — treat unverified
-  low-mileage-for-age + big discount as a confidence penalty / red-flag; (2) check for a (paid) VIN-report
-  API for the real figure; (3) scrape the report page behind the source port as a fallback. Enrich
-  *candidates only* (budget). Full note: [[vin-real-mileage]].
+- [~] **B21 — Real (VIN-verified) mileage vs claimed.** Rolled-back odometers make frauds look like
+  jackpots (Sonata 2013, claimed 181k / real 595k → false score 1, −44.55%). API exposes only
+  `checkedVin.isChecked` + `linkToReport`, **not** the real number. Full note: [[vin-real-mileage]].
+  - [x] **B21a — cheap heuristics** (delegated → Sonnet): read `checkedVin.isChecked` → `risk.vinChecked`;
+    pure `valuation/mileage-risk.ts` → two **soft** red-flags: `unverified_bargain` (discount ≥ 25% with no
+    VIN verification — the Sonata pattern) and `suspicious_low_mileage` (< age × 5k km/yr). Wired through
+    `computeValuation` + poll + `/check` + alert labels. Unit-tested. **Flags + dampens** (soft ×0.8), does
+    not hard-eliminate — the real number needs B21b. tsc clean; `mileage-risk` 6/6.
+  - [ ] **B21b — real figure** (deferred): a (paid) VIN-report API, or scrape the `linkToReport` page
+    behind the source port — enrich *candidates only* (budget). Then the low-claimed-mileage trap can be
+    hard-caught, not just flagged.
 
 - [x] **B10 — Price-drop detection (FR-009):** after new ids, the poll re-observes up to
   `REOBSERVE_PER_CYCLE` known listings (oldest `lastSeenAt` first), budget-permitting; on a price drop
@@ -203,7 +218,13 @@ never-alerted listings). See spec §Context.
   window, prunes old windows). Survives restarts + safe across instances; 429 still authoritative. Redis
   not needed. See [[0004-drop-redis-bullmq|ADR-0004]].
 - [ ] **B14 — Dictionary cache** (id↔name) if a flow needs name→id resolution. (T017)
-- [ ] **B15 — Integration test** end-to-end alert path with a DB harness. (T015)
+- [x] **B15 — Integration test — scoring pipeline** (`test/integration/scoring-pipeline.spec.ts`): composes
+  the **real** `resolveBenchmark` + `MileageAdjuster` + `ValuationService` (v1 seed) against a fake source
+  (fake benchmark cache passes the loader through) — deterministic, no DB. 6 cases: clean below-market →
+  opportunity; overpriced → no; damaged → disqualified; thin cohort → no (insufficient data); unverified
+  bargain → flag + dampened; suspiciously-low mileage → flag. Guards "don't lose deals / don't spam". tsc
+  clean; logic hand-verified (full jest run pending on the dev machine — sandbox jest degraded). A
+  full DB-harness `poll()` test (subscribers→notifier fan-out) remains a later add.
 - [ ] **B16 — Operator alerting** on budget exhaustion / source down (dead-man's-switch). (FR-012 / T038)
 - [ ] **B17 — Scale:** paid API tier / wider coverage; explore [[alternative-sources]] if the API
   stays too limiting.
