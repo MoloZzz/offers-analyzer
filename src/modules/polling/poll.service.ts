@@ -7,9 +7,12 @@ import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
 import { Currency } from '../../common/types/money';
 import { OutcomesService } from '../calibration/outcomes.service';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
+import { HealthService } from '../health/health.service';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
+import { AlertedCarsService } from '../notifications/alerted-cars.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { normalizeVin } from '../notifications/vin';
 import { SearchProfile } from '../profiles/entities/search-profile.entity';
 import { ProfilesService } from '../profiles/profiles.service';
 import {
@@ -58,10 +61,22 @@ export class PollService {
     @Inject(EXCHANGE_RATE) private readonly fx: ExchangeRate,
     private readonly mileage: MileageAdjuster,
     private readonly outcomes: OutcomesService,
+    private readonly health: HealthService,
+    private readonly alertedCars: AlertedCarsService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   async poll(): Promise<void> {
+    try {
+      await this.runCycle();
+      this.health.markPollSuccess();
+    } catch (err) {
+      this.health.markPollFailure();
+      this.logger.error('Poll cycle failed', err as Error);
+    }
+  }
+
+  private async runCycle(): Promise<void> {
     const profiles = await this.profiles.getEnabled();
 
     // Phase 1 — one search per profile; build a per-profile work queue (dedup + per-profile cap).
@@ -194,6 +209,14 @@ export class PollService {
 
     await this.listings.recordEvaluation(listing, result.score, result.discountPct, profile.id);
     if (!result.isOpportunity) return;
+
+    // Relist de-dup (B12): don't re-alert the same car (by VIN) unless it's now cheaper than the
+    // lowest we ever alerted. No VIN → no cross-listing de-dup (behaves as before).
+    const carKey = normalizeVin(detail.vin);
+    if (carKey) {
+      const decision = await this.alertedCars.decideAndRecord(carKey, detail.price.amount, listing.id);
+      if (decision === 'suppress') return;
+    }
 
     // Comparison ran in USD (ratios are currency-agnostic); store amounts in the profile's currency.
     const rate = await this.fx.rate(Currency.USD, profile.currency);

@@ -7,6 +7,7 @@ import { Outcome } from '../../modules/calibration/entities/outcome.entity';
 import { ParameterSet } from '../../modules/calibration/entities/parameter-set.entity';
 import { Listing } from '../../modules/listings/entities/listing.entity';
 import { PriceObservation } from '../../modules/listings/entities/price-observation.entity';
+import { AlertedCar } from '../../modules/notifications/entities/alerted-car.entity';
 import { Notification } from '../../modules/notifications/entities/notification.entity';
 import { Subscriber } from '../../modules/notifications/entities/subscriber.entity';
 import { SearchProfile } from '../../modules/profiles/entities/search-profile.entity';
@@ -25,6 +26,7 @@ export const ENTITIES = [
   Opportunity,
   Subscriber,
   Notification,
+  AlertedCar,
   RateBudgetWindow,
   ParameterSet,
   Outcome,

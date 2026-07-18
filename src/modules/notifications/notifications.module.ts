@@ -5,12 +5,16 @@ import { TelegrafModule } from 'nestjs-telegraf';
 
 import { AppConfig } from '../../common/config/configuration';
 import { CalibrationModule } from '../calibration/calibration.module';
+import { HealthModule } from '../health/health.module';
 import { ProfilesModule } from '../profiles/profiles.module';
 import { QueryModule } from '../query/query.module';
 
+import { AlertedCarsService } from './alerted-cars.service';
 import { CalibrationSchedulerService } from './calibration-scheduler.service';
+import { AlertedCar } from './entities/alerted-car.entity';
 import { Notification } from './entities/notification.entity';
 import { Subscriber } from './entities/subscriber.entity';
+import { HealthMonitorService } from './health-monitor.service';
 import { NotificationsService } from './notifications.service';
 import { NOTIFIER } from './ports/notifier.port';
 import { ReportSchedulerService } from './report-scheduler.service';
@@ -23,7 +27,8 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     ProfilesModule,
     QueryModule,
     CalibrationModule,
-    TypeOrmModule.forFeature([Subscriber, Notification]),
+    HealthModule,
+    TypeOrmModule.forFeature([Subscriber, Notification, AlertedCar]),
     TelegrafModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<AppConfig, true>) => ({
@@ -36,10 +41,12 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     SubscribersService,
     ReportSchedulerService,
     CalibrationSchedulerService,
+    HealthMonitorService,
     TelegramBotUpdate,
     TelegramNotifier,
+    AlertedCarsService,
     { provide: NOTIFIER, useExisting: TelegramNotifier },
   ],
-  exports: [NotificationsService],
+  exports: [NotificationsService, AlertedCarsService],
 })
 export class NotificationsModule {}

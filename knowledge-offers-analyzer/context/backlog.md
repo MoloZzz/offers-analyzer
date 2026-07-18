@@ -213,7 +213,12 @@ never-alerted listings). See spec §Context.
 - [ ] **B11 — Own-statistics valuation** — mostly **obviated**: RIA `/average_price` already returns
   `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
   need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].
-- [ ] **B12 — Relist/duplicate heuristic** (VIN / phone-hash). FR-008.
+- [x] **B12 — Relist de-dup** (delegated → Sonnet) — definition in [[when-to-alert]]. Alert only when it's
+  a deal **and** new info about that car: identity = **VIN** (`normalizeVin`), track `alerted_cars`
+  {carKey → lowest alerted USD}; pure `decideRelistAlert(lowest, asking)` → `first` | `cheaper` |
+  `suppress`; poll gate in `evaluateAndNotify` (after `isOpportunity`) suppresses a re-listed car unless
+  it's now **cheaper than the lowest we ever alerted** (USD compare). No VIN → behaves as before. New
+  entity + migration `1784402208608`. Unit-tested. tsc clean; `relist-dedup` 7/7.
 - [x] **B13 — Durable rate budget:** Postgres-backed `rate_budget_windows` (atomic upsert per hour
   window, prunes old windows). Survives restarts + safe across instances; 429 still authoritative. Redis
   not needed. See [[0004-drop-redis-bullmq|ADR-0004]].
@@ -225,7 +230,12 @@ never-alerted listings). See spec §Context.
   bargain → flag + dampened; suspiciously-low mileage → flag. Guards "don't lose deals / don't spam". tsc
   clean; logic hand-verified (full jest run pending on the dev machine — sandbox jest degraded). A
   full DB-harness `poll()` test (subscribers→notifier fan-out) remains a later add.
-- [ ] **B16 — Operator alerting** on budget exhaustion / source down (dead-man's-switch). (FR-012 / T038)
+- [x] **B16 — Operator alerting (dead-man's-switch)** (delegated → Sonnet): new `HealthModule`/`HealthService`
+  (shared singleton) tracks the last successful poll cycle; `PollService.poll` wraps `runCycle` and marks
+  **success/failure** (budget exhaustion is normal → still success; an unexpected throw = failure).
+  `HealthMonitorService` (`@Cron */15`) uses pure `decideHealthAlert` (edge-triggered: alert once when
+  stale > 45 min, once on recovery) and `NotificationsService.broadcast`s to the operator. Unit-tested
+  (`health-alert.spec`). Directly serves "don't sit blind if polling silently broke". tsc clean.
 - [ ] **B17 — Scale:** paid API tier / wider coverage; explore [[alternative-sources]] if the API
   stays too limiting.
 

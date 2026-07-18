@@ -28,7 +28,8 @@ Implemented (spec 001). One NestJS module per concern:
 | `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts` | spec 002; [[0005-versioned-parameter-sets\|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome` |
-| `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report scheduler | `Notifier` port |
+| `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch) | `Notifier` port |
+| `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
 | `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
 | `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops | budget-fair; no queue in v1 |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
@@ -58,6 +59,7 @@ best-scoring candidates even below the alert bar (`/best`). Full design:
 - **ParameterSet** — versioned, active scoring tunables (scale, penalty, mileage factors); v1 = seeded from config. Spec 002 / [[0005-versioned-parameter-sets|ADR-0005]].
 - **Outcome** — realized result of a listing (manual 👍/👎, bought/skipped/resold; passive price_dropped/disappeared). Feedback ground truth.
 - **CalibrationRun** — a recorded calibration pass (per-profile inputs, proposal, applied?, reason).
+- **AlertedCar** — per-car (VIN) record of the lowest price we've alerted, so a relist is only re-alerted when cheaper (B12; [[when-to-alert]]).
 
 ## Boundaries & integrations
 

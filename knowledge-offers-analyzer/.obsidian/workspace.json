@@ -11,14 +11,10 @@
             "id": "b9c0b6a35053acb4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "business/how-it-works.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "how-it-works"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -182,6 +178,10 @@
   },
   "active": "b9c0b6a35053acb4",
   "lastOpenFiles": [
+    "00-INDEX.md.tmp.33464.1e69dd6ea948",
+    "research/when-to-alert.md",
+    "research/when-to-alert.md.tmp.33464.9871870f10fc",
+    "business/how-it-works.md",
     "context/log/2026-07-17-session-01.md.tmp.29860.087051d82221",
     "context/backlog.md.tmp.1992.929ebf2409f4",
     "decisions/0004-drop-redis-bullmq.md",
@@ -204,10 +204,8 @@
     "decisions/0002-monitoring-via-official-api.md.tmp.28696.f5320c081a53",
     "research/profitability-definition.md.tmp.28696.2e2717922fb1",
     "research/monitoring-approaches.md",
-    "research",
     "Welcome.md",
     "00-INDEX.md",
-    "Welcome.md.tmp.27932.4f4a81408861",
     "operations/environment-setup.md",
     "decisions/0001-adopt-sdd-vault-rtk.md",
     "conventions/coding-standards.md",

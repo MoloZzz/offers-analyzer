@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { CalibrationModule } from '../calibration/calibration.module';
 import { FxModule } from '../fx/fx.module';
+import { HealthModule } from '../health/health.module';
 import { ListingsModule } from '../listings/listings.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ProfilesModule } from '../profiles/profiles.module';
@@ -20,6 +21,7 @@ import { PollService } from './poll.service';
     NotificationsModule,
     FxModule,
     CalibrationModule,
+    HealthModule,
   ],
   providers: [PollService],
 })
