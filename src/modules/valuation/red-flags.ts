@@ -46,6 +46,11 @@ const RED_FLAG_RULES: RedFlagRule[] = [
   { code: 'desc_mechanical_issue', disqualifying: false, fired: (i) => i.mechanicalIssue === true },
 ];
 
+/** Codes of the non-disqualifying (soft) red-flags — used by weight learning (spec 002, E4). */
+export const SOFT_FLAG_CODES: Set<string> = new Set(
+  RED_FLAG_RULES.filter((r) => !r.disqualifying).map((r) => r.code),
+);
+
 /** Multiplier applied per soft (non-disqualifying) red-flag that fires. */
 const SOFT_FLAG_PENALTY = 0.8;
 

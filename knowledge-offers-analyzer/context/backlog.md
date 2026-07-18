@@ -159,8 +159,17 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
     (propose|auto, default propose) + target (`CALIBRATION_MIN/MAX_VOLUME`, `MIN_PRECISION`); weekly
     `CalibrationSchedulerService` (Mon 09:30) broadcasts proposals/applied changes; bot `/calibrate`
     `/params` `/revert`. Bounded (±0.1/run), frozen on thin data, reversible. tsc clean, jest 58/58.
-- [ ] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks to
-  penalties/mileage/condition weights, operator-approved.
+- [~] **E4 — US3 (P3): Weight learning** (propose-only) — bounded, evidence-backed tweaks, operator-approved.
+  - [x] **E4a — learning core** (delegated → Sonnet): `SOFT_FLAG_CODES` exported from `red-flags.ts`;
+    pure `weight-learning.ts::proposeSoftFlagPenalty(samples, current)` — compares 👎-rate of listings
+    where ≥1 soft flag fired vs none; strengthens/weakens the global soft-flag penalty (bounded ±0.05,
+    clamped [0.5,1.0]), freezes < 8/group, "no signal" → null; returns evidence. Unit-tested (5 cases).
+    Additive only (no consumers yet). tsc clean; new suite green in isolation (full jest blocked by a
+    transient sandbox slowdown — re-run on your machine).
+  - [ ] **E4b — wire + approve**: `CalibrationService.proposeWeights` (join labeled outcomes →
+    opportunities' `redFlags` → soft-flag counts via `SOFT_FLAG_CODES`) emits a **candidate ParameterSet**
+    (`ParametersService.createCandidate`/`activate`); bot `/weights` (view proposal + evidence) +
+    `/weights-apply` (activate). Propose-only default.
 
 Note: learning is scoped to **precision on the alerted set** (selection bias — we don't observe
 never-alerted listings). See spec §Context.
