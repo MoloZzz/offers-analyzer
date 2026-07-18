@@ -1,8 +1,8 @@
 ---
 title: Research — what counts as a "profitable" offer
 type: research
-status: Proposed (needs your review)
-updated: 2026-07-12
+status: Accepted (reframed by ADR-0006 — this note is the price core)
+updated: 2026-07-18
 ---
 
 # Research — defining a "profitable" offer
@@ -11,7 +11,18 @@ updated: 2026-07-12
 
 ## What "profitable" really means
 
-A listing is worth surfacing when its **asking price is meaningfully below the fair market value** of comparable cars **and** the risk it's a trap (scam/damaged/hidden costs) is low. True profit is the **expected resale margin**, but a full margin model needs resale-cost data we won't have on day one — so v1 approximates it with a **below-market opportunity score + risk filter**, and we evolve toward true margin later.
+**Reframed 2026-07-18 ([[0006-operator-profit-vision|ADR-0006]]):** profitable = **high
+probability the operator makes money on resale**. Price meaningfully below fair market value is
+the **dominant** input, but not the definition — liquidity, model-level repair-risk, seller
+motivation, positive condition evidence, and confidence all shape the **composite Total Deal
+Score** (spec `003-composite-deal-score`). This note remains the canonical derivation of the
+**price core** of that score: fair value, discount, confidence, and risk red-flags. The system
+is *not* a market appraiser — it ranks "чи варто подзвонити власнику зараз".
+
+A listing's price core is strong when its **asking price is meaningfully below the fair market
+value** of comparable cars **and** the risk it's a trap (scam/damaged/hidden costs) is low. True
+profit is the **expected resale margin**; until we have resale outcomes at volume, the composite
+score approximates it with explainable heuristics.
 
 ## Data we can use
 
@@ -36,9 +47,9 @@ Flag as a **candidate** when **all** hold:
 
 Score/rank candidates by `discount × confidence` (and later: minus expected costs).
 
-## Deal score ∈ [−1, 1] (v1 signal)
+## Deal score ∈ [−1, 1] (price core)
 
-Instead of a bare boolean, express each listing as a single signed **deal score**: −1 = clearly overpriced / a trap, 0 = at market or unknown, +1 = clearly below market.
+Instead of a bare boolean, express each listing as a single signed **deal score**: −1 = clearly overpriced / a trap, 0 = at market or unknown, +1 = clearly below market. Per ADR-0006 / spec 003, this becomes the **price core** of the composite Total Deal Score — bounded factor modifiers (liquidity, repair-risk, negotiation, seller, positives) multiply it, each neutral (1.0) when unknown, with a hard cap on total uplift and the invariant that price core ≤ 0 can never alert.
 
 ```
 delta       = (fair_value − asking) / fair_value      # >0 below market (good), <0 above
@@ -99,7 +110,7 @@ Cheap-vs-average is frequently a **scam, damaged, or high-friction** car. Filter
 **v1 = Option 1**, engineered to grow into 2 then 3:
 - Anchor on RIA average now; **also start storing listings from day one** so Option 2's own-statistics can switch on without rework.
 - Keep the formula, thresholds, and red-flags as **config**, not hardcoded — they will be tuned against real results.
-- Frame the output as an **"opportunity score", not a promise of profit**; add the resale-cost model (Option 3) once we have data on how flagged cars actually sell.
+- Frame the output as a **score, not a promise of profit** (now the price core of the composite **Total Deal Score** — ADR-0006 / spec 003); add the resale-cost model (Option 3) once we have data on how flagged cars actually sell.
 
 **Configuration (user-controlled, not hardcoded):** niche (SearchProfile), threshold %,
 dealer policy (`label`/`exclude`/`ignore`), and currency (switchable + FX-normalized) are all
@@ -113,4 +124,5 @@ before v1.
 
 ## Related
 
+- [[profitability-methods-coverage]] — the full survey of scoring methods, current coverage, and the ML cost/benefit verdict (companion to this note).
 - [[00-INDEX]] · [[monitoring-approaches]] · [[glossary]] · [[decisions/README]]

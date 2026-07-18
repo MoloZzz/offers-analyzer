@@ -1,7 +1,7 @@
 ---
 title: Project goals & scope (living)
 type: context
-updated: 2026-07-13
+updated: 2026-07-18
 ---
 
 # Project goals & scope
@@ -10,13 +10,25 @@ updated: 2026-07-13
 
 ## Vision
 
-Build a system that **monitors car listings on auto.ria.com** (with room for other similar sites later) and **surfaces offers that are profitable/advantageous** — i.e. priced meaningfully below fair market value with low risk.
+Build an **operator's (перекуп's) assistant** that monitors car listings on auto.ria.com (room
+for other sites later) and **ranks them by the probability of bringing the operator profit on
+resale** ([[0006-operator-profit-vision|ADR-0006]], 2026-07-18). A deal = high expected
+profitability — price below fair value stays the *dominant* factor, but liquidity, repair-risk,
+seller motivation, positive condition evidence, and confidence all shape the score. The system
+answers *"чи варто зараз подзвонити власнику?"*, not *"скільки коштує ця машина?"* — it is not
+a market appraiser. Feature litmus test: *"чи використовує це хороший перекуп при купівлі?"*
+
+> Previous framing ("priced meaningfully below fair market value with low risk") is superseded —
+> it survives as the **price core** of the composite score.
 
 ## v1 scope (decided so far)
 
 - **Source:** AUTO.RIA official API only, no scraping ([[0002-monitoring-via-official-api|ADR-0002]]).
 - **Coverage:** a **narrow niche** (a few search profiles) on the free API tier (~30 req/hour).
-- **Profitability:** "below fair value + threshold + risk red-flags", anchored on RIA average price — see [[profitability-definition]] *(still Proposed)*.
+- **Profitability:** composite **Total Deal Score** — price core (below fair value, anchored on
+  RIA robust average) × liquidity × repair-risk × negotiation × seller × positives × confidence.
+  See [[profitability-definition]], [[0006-operator-profit-vision|ADR-0006]], spec
+  `specs/003-composite-deal-score/`. (Price core is implemented; factor modifiers are spec 003.)
 - **Delivery:** Telegram bot notifications.
 - **Stack:** NestJS · PostgreSQL · TypeORM · `@nestjs/schedule` cron + in-memory rate budget · Telegram bot. (No Redis/BullMQ in v1 — see [[0004-drop-redis-bullmq|ADR-0004]].)
 - **Method:** strict Spec-Driven Development; clean code per [[coding-standards]].
@@ -25,7 +37,9 @@ Build a system that **monitors car listings on auto.ria.com** (with room for oth
 
 - Widening beyond the niche (needs a paid API package).
 - Scraping fallback (only behind the source-adapter port, for a genuinely missing field).
-- True resale-margin profitability model (needs accumulated data on how flagged cars sell).
+- True resale-margin model / probability-of-profitable-resale prediction, ML, CV (needs
+  accumulated outcomes; triggers in [[profitability-methods-coverage]] §5).
+- Time-on-market & market-demand scores (Should-Have; B25 + snapshot history).
 - Additional listing sources.
 
 ## The 4 questions — resolved as **configuration** (user-controlled)

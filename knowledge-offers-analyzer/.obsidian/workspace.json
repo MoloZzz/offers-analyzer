@@ -176,8 +176,17 @@
       "bases:Create new base": false
     }
   },
-  "active": "b9c0b6a35053acb4",
+  "active": "569830fa1e0f640c",
   "lastOpenFiles": [
+    "research/profitability-methods-coverage.md.tmp.33136.9d440a69e9d0",
+    "context/log/2026-07-18-session-01.md",
+    "context/backlog.md.tmp.33136.20d5a42163f6",
+    "context/backlog.md.tmp.33136.4119cfe543f2",
+    "00-INDEX.md.tmp.33136.815c7fcc43a4",
+    "00-INDEX.md.tmp.33136.ff9c9ade36c2",
+    "decisions/0006-operator-profit-vision.md",
+    "decisions/0006-operator-profit-vision.md.tmp.33136.bb947af5d633",
+    "research/profitability-methods-coverage.md",
     "00-INDEX.md.tmp.33464.1e69dd6ea948",
     "research/when-to-alert.md",
     "research/when-to-alert.md.tmp.33464.9871870f10fc",
@@ -196,13 +205,7 @@
     "context/log/2026-07-12-session-01.md",
     "decisions/adr-template.md",
     "domain/glossary.md",
-    "context/goals.md.tmp.18108.c98ccfe8c542",
     "context/README.md",
-    "context/log",
-    "context",
-    "00-INDEX.md.tmp.28696.fbad2ec41a9a",
-    "decisions/0002-monitoring-via-official-api.md.tmp.28696.f5320c081a53",
-    "research/profitability-definition.md.tmp.28696.2e2717922fb1",
     "research/monitoring-approaches.md",
     "Welcome.md",
     "00-INDEX.md",
@@ -210,7 +213,6 @@
     "decisions/0001-adopt-sdd-vault-rtk.md",
     "conventions/coding-standards.md",
     "architecture/overview.md",
-    "_meta/note-template.md",
-    "_meta/vault-protocol.md"
+    "_meta/note-template.md"
   ]
 }

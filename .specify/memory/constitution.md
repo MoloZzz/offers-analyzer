@@ -13,9 +13,11 @@ Sync Impact Report
 
 # Offers Analyzer Constitution
 
-Offers Analyzer monitors car listings (AUTO.RIA first, other sources later) and surfaces
-offers that are profitable relative to fair market value. These principles are binding on
-every contributor and agent. They are enforced through `CLAUDE.md` and the knowledge vault.
+Offers Analyzer monitors car listings (AUTO.RIA first, other sources later) and ranks them by
+the **probability of bringing the operator profit on resale** — an operator's (перекуп's)
+assistant, not a market appraiser (ADR-0006). Price below fair market value is the dominant
+factor of that ranking, not its definition. These principles are binding on every contributor
+and agent. They are enforced through `CLAUDE.md` and the knowledge vault.
 
 ## Core Principles
 
@@ -91,6 +93,9 @@ output before it reaches agent context. Rationale: preserve context budget for r
    (`conventions/coding-standards.md`), and that new domain terms/decisions were promoted
    into the curated vault.
 4. Complexity must be justified against Principle III; unjustified abstraction is rejected.
+5. **Operator-value test (ADR-0006):** before building any scoring/product feature, ask
+   *"чи використовує це хороший перекуп при купівлі авто?"* If not, it likely does not move
+   the operator toward profit and should be challenged in the spec.
 
 ## Governance
 
@@ -101,7 +106,8 @@ MAJOR for incompatible principle removals/redefinitions, MINOR for a new princip
 materially expanded guidance, PATCH for clarifications. All work — human or agent — is
 expected to comply; `CLAUDE.md` is the runtime enforcement of these rules.
 
-**Version**: 1.0.2 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-07-16
+**Version**: 1.1.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-07-18
 <!-- 1.0.1: PATCH — Technology stack refined to drop Redis/BullMQ from v1 (ADR-0004). -->
 <!-- 1.0.2: PATCH — Rate budget is now Postgres-backed (durable) instead of in-memory (ADR-0004, B13). -->
+<!-- 1.1.0: MINOR — Mission reframed to operator-profit ranking (composite Total Deal Score, price dominant) + operator-value workflow gate (ADR-0006). -->
 

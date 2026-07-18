@@ -15,6 +15,7 @@ updated: 2026-07-12
 - [[0003-decoupled-context-zone|ADR-0003]] — Decoupled context zone instead of a second knowledge base (Accepted)
 - [[0004-drop-redis-bullmq|ADR-0004]] — Drop Redis/BullMQ for v1; in-memory rate budget (Accepted)
 - [[0005-versioned-parameter-sets|ADR-0005]] — Versioned ParameterSets + human-in-the-loop calibration (Accepted)
+- [[0006-operator-profit-vision|ADR-0006]] — Vision shift: rank by expected operator profit (composite Total Deal Score), not just discount (Accepted)
 
 ## How to add one
 

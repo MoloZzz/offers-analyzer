@@ -1,7 +1,7 @@
 ---
 title: Offers Analyzer — Knowledge Base Index
 type: moc
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # 🧠 Offers Analyzer — Knowledge Base (Second Brain)
@@ -26,7 +26,7 @@ The code is the *how*. This vault is the *what* and *why*: architecture, domain 
 - **Operations** → [[environment-setup|Environment setup]] — tooling (RTK, Spec Kit), env, runbooks.
 - **Specs (SDD)** → [[specs/README|Feature specs index]] — links to Spec Kit artifacts under `.specify/`.
 - **Business (plain language)** → [[how-it-works|How it works & how we score]] — for non-technical stakeholders: data collection + profitability scoring, in simple words.
-- **Research** → [[monitoring-approaches|Monitoring approach]] · [[profitability-definition|Defining "profitable"]] · [[why-no-opportunities|Reaching non-zero opportunities]] · [[vin-real-mileage|Real vs claimed mileage]] · [[when-to-alert|When to alert (interestingness & relists)]] · [[explainability-gaps|Explainability gaps]] · [[alternative-sources|Alternative listing sources]] — investigations behind the decisions.
+- **Research** → [[monitoring-approaches|Monitoring approach]] · [[profitability-definition|Defining "profitable"]] · [[profitability-methods-coverage|Methods coverage & the ML question]] · [[why-no-opportunities|Reaching non-zero opportunities]] · [[vin-real-mileage|Real vs claimed mileage]] · [[when-to-alert|When to alert (interestingness & relists)]] · [[explainability-gaps|Explainability gaps]] · [[alternative-sources|Alternative listing sources]] — investigations behind the decisions.
 
 ## 🗃️ Context zone (decoupled — read for background, not part of this graph)
 
@@ -40,7 +40,7 @@ Goals, session logs, and drafts live under `context/` (path reference, deliberat
 
 ## 📌 Project one-liner
 
-> Offers Analyzer — a NestJS service that ingests and analyzes offers. _(Refine this line once the domain is defined; keep it to one sentence.)_
+> Offers Analyzer — an **operator's (перекуп's) assistant** that monitors AUTO.RIA listings and ranks them by the **probability of profitable resale** (composite Total Deal Score; price below fair value dominant). See [[0006-operator-profit-vision|ADR-0006]].
 
 ## Status
 

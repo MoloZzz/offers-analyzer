@@ -1,7 +1,7 @@
 ---
 title: Feature specs index (SDD)
 type: moc
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # Feature specs index
@@ -16,6 +16,7 @@ _TODO: none yet. First entry appears after the first `/speckit-specify` run._
 |------|---------|--------|
 | `../../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Implemented (v1 MVP + mileage/condition/report follow-ups) |
 | `../../specs/002-auto-calibration-learning/spec.md` | Capture outcomes → auto-calibrate the alert threshold → learn scoring weights; transparent, bounded, human-in-the-loop | Implemented (E1–E4; `disappeared` signal + per-profile precision deferred) |
+| `../../specs/003-composite-deal-score/spec.md` | Rank by probability of operator profit ([[0006-operator-profit-vision\|ADR-0006]]): composite Total Deal Score — price core (dominant) × liquidity × repair-risk × negotiation × seller × positives; 0–100 explanation; segment mileage norms | Draft (authored 2026-07-18, not implemented) |
 
 ## Constitution
 

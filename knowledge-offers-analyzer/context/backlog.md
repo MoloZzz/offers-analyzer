@@ -1,7 +1,7 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-17
+updated: 2026-07-18
 ---
 
 # Backlog
@@ -83,7 +83,8 @@ self-tuning reports (R).
 - [x] **C2 — Condition red-flags.** `valuation/condition.ts` (`assessCondition`) scans the description
   (uk+ru) → `desc_after_accident`/`desc_not_running` (disqualifying), `desc_needs_repair`/
   `desc_mechanical_issue` (soft) in `red-flags.ts`. **Negation-aware**: «вкладень не потребує»,
-  «не бита», «після капремонту» do not fire. Positives never inflate the score. Unit-tested
+  «не бита», «після капремонту» do not fire. Positives did not inflate the score as built
+  (that rule is since superseded by ADR-0006 §4 → spec 003 US4). Unit-tested
   (`test/unit/condition.spec.ts`).
 - [x] **C3 — Wire condition.** `evaluate` parses `input.description` centrally (poll + `/check` just
   pass `detail.description`); Ukrainian labels added to the alert/`/check` risk line. No schema change.
@@ -177,6 +178,34 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
 Note: learning is scoped to **precision on the alerted set** (selection bias — we don't observe
 never-alerted listings). See spec §Context.
 
+## 🟠 Epic — Composite Total Deal Score (spec 003, ADR-0006) — the new product vector
+
+Vision reframed 2026-07-18 ([[0006-operator-profit-vision|ADR-0006]]): rank by **probability of
+operator profit on resale**, not just discount. Full plan: `specs/003-composite-deal-score/`
+(spec + plan + tasks). Operator's P0–P15 proposal mapped against reality:
+
+| Operator item | Status |
+|---|---|
+| P0 vision, P11 profitability def, P12 not-an-appraiser, P15 operator-thinking | ✅ ADR-0006 + constitution v1.1.0 + vault sweep (this task) |
+| P1 composite score model, P13 score explanation 0–100 | Spec 003 Phase F (price core stays dominant; extends `/why`/B22, couples with B23) |
+| P2 liquidity score | Spec 003 US1 (new) |
+| P5+P8 risk / repair-cost heuristics | Spec 003 US2 (merged — model-level risk; listing-level red-flags already exist) |
+| P3 negotiation score, P4 seller score | Spec 003 US3 (dealer *policy* already exists; this adds score shading) |
+| P7 positive signals **raise** score | Spec 003 US4 (absorbs B24; supersedes its "never inflate" clause per ADR-0006 §4) |
+| P6 mileage correction by segment | Spec 003 US5 (replaces flat `age × 15k` in M2 + B21a) |
+| P9 time on market, P10 market demand, generation liquidity, confidence tuning | Should-Have — B25 (+ demand once snapshot history suffices); **not** in spec 003 v1 |
+| P14 no ML now | ✅ already the standing verdict ([[profitability-methods-coverage]] §5) |
+| Already built (from the proposal's Must-Have): condition score (C1–C3), risk red-flags, score explanation (`/why`), auto threshold calibration (E3) | ✅ pre-existing — extend, don't rebuild |
+
+- [ ] **S-F — Phase F: composite skeleton + 0–100 presentation** (blocking; behavior-identical
+  with neutral modifiers — SC-001). Land B23 persistence with it.
+- [ ] **S1 — Liquidity score** (tier tables + factor; P1).
+- [ ] **S2 — Repair-risk score** (pattern rules; P1).
+- [ ] **S3 — Seller-motivation + seller-type** (lexicon + modifier; P2).
+- [ ] **S4 — Positive signals uplift** (absorbs B24; P2).
+- [ ] **S5 — Segment mileage norms** (P2).
+- [ ] **S6 — Rollout: threshold re-validation + precision check** (after S1/S2 and S4).
+
 ## 🟢 Later — deferred (promote when picked up)
 
 - [x] **B22 — Explainable "why" breakdown** (delegated → Sonnet): `/why <id>` shows the full derivation —
@@ -238,6 +267,22 @@ never-alerted listings). See spec §Context.
   (`health-alert.spec`). Directly serves "don't sit blind if polling silently broke". tsc clean.
 - [ ] **B17 — Scale:** paid API tier / wider coverage; explore [[alternative-sources]] if the API
   stays too limiting.
+- [~] **B24 — Positive description signals** — **absorbed into spec 003 US4** (2026-07-18).
+  Scope upgraded per [[0006-operator-profit-vision|ADR-0006]] §4: positives now apply a **bounded
+  uplift** (the original "never inflate, rank/annotate only" clause is superseded) *and* reduce the
+  `unverified_bargain` dampening; price dominance + anti-gaming invariants keep the anchor safe.
+  Track in `specs/003-composite-deal-score/tasks.md` (T030–T031).
+- [ ] **B25 — Time-on-market & price-history as a scoring factor.** We already store `PriceObservation`
+  and re-observe drops but **don't score** age/markdown-count. Turn days-seen + number/size of drops
+  into a bounded score modifier + alert annotation (motivated seller ↑; long-stale ↓, hidden-problem
+  hint). Needs the "removed vs fell-out-of-paging" distinction (couples with E2c-later). **Priority
+  raised** by ADR-0006 (Should-Have, first follow-up after spec 003; a **market-demand score** — segment
+  turnover speed, distinct from liquidity — joins here once snapshot history suffices). See
+  [[profitability-methods-coverage]].
+- **ML (expected-price model) — deliberately deferred, not backlogged as actionable.** Verdict + trigger
+  conditions in [[profitability-methods-coverage]] §5: no sold-price ground truth, data-starved (~30
+  req/hr), strong free IQM baseline, explainability cost. Revisit only once we have outcome labels at
+  volume + a feature-rich stored dataset + measured evidence the rule-based baseline is losing deals.
 
 ## Related
 - [[00-INDEX]] · [[goals]] · [[monitoring-approaches]] · [[profitability-definition]]
