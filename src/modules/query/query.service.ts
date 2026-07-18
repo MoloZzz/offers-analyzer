@@ -65,6 +65,8 @@ export class QueryService {
       sampleSize: benchmark?.sampleSize ?? 0,
       minScore: this.minScore,
       minSamples: this.minSamples,
+      make: detail.make,
+      model: detail.model,
       sellerType: detail.sellerType,
       hasVinReport: detail.hasVinReport,
       damaged: detail.risk.damaged,

@@ -6,6 +6,8 @@ import { SellerType } from '../sources/ports/listing-source.port';
 
 import { assessCondition } from './condition';
 import { composeFactors, FactorScore, toTotal100 } from './factors/factor';
+import { liquidityFactor } from './factors/liquidity';
+import { HeuristicTables, HeuristicTablesService } from './factors/tables';
 import { assessMileageRisk } from './mileage-risk';
 import { evaluateRedFlags } from './red-flags';
 
@@ -16,6 +18,9 @@ export interface ValuationInput {
   minSamples: number;
   /** Minimum deal score (−1..1) for a listing to count as an Opportunity (profile config). */
   minScore: number;
+  /** Make/model — feed the composite liquidity factor (spec 003 US1). */
+  make?: string;
+  model?: string;
   sellerType: SellerType;
   hasVinReport: boolean;
   damaged?: boolean;
@@ -66,7 +71,21 @@ export interface ValuationResult {
  * Pure and deterministic (no IO) so it is fully unit-testable — constitution §VI.
  * Methodology: knowledge-offers-analyzer/research/profitability-definition.md.
  */
-export function computeValuation(input: ValuationInput, params: ScoringParams): ValuationResult {
+/**
+ * Conservative factor bounds to activate the spec-003 composite factors (via a ParameterSet whose
+ * `factorBounds` carries them). NOT auto-seeded — `buildSeedParams` stays neutral so default behavior
+ * is unchanged; enabling a factor is an explicit ParameterSet activation (rollout / threshold
+ * re-validation step).
+ */
+export const PHASE1_FACTOR_BOUNDS = {
+  liquidity: { min: 0.9, max: 1.1 },
+} as const;
+
+export function computeValuation(
+  input: ValuationInput,
+  params: ScoringParams,
+  tables: HeuristicTables = {},
+): ValuationResult {
   const fairValue = Number.isFinite(input.fairValue) ? input.fairValue : 0;
   const discountPct =
     fairValue > 0 ? ((fairValue - input.asking) / fairValue) * 100 : 0;
@@ -108,8 +127,16 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
   let priceCore = raw * confidence * penalty;
   if (disqualified) priceCore = Math.min(priceCore, 0);
 
-  // Composite factors (spec 003). None ship in Phase F, so Π = 1 and score === priceCore (SC-001).
+  // Composite factors (spec 003). Each is gated by its ParameterSet bound + heuristic table, so with
+  // the neutral seed the list is empty and score === priceCore (SC-001). US1: liquidity.
   const factors: FactorScore[] = [];
+  const liquidity = liquidityFactor(
+    { make: input.make, model: input.model },
+    tables.liquidity,
+    params.factorBounds?.liquidity,
+  );
+  if (liquidity) factors.push(liquidity);
+
   const upliftCap = params.upliftCap ?? DEFAULT_UPLIFT_CAP;
   const score = composeFactors(priceCore, factors, upliftCap);
 
@@ -136,10 +163,13 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
 
 @Injectable()
 export class ValuationService {
-  constructor(private readonly parameters: ParametersService) {}
+  constructor(
+    private readonly parameters: ParametersService,
+    private readonly tables: HeuristicTablesService,
+  ) {}
 
   evaluate(input: ValuationInput): ValuationResult {
-    return computeValuation(input, this.parameters.params());
+    return computeValuation(input, this.parameters.params(), this.tables.get());
   }
 }
 

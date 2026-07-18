@@ -7,6 +7,7 @@ import { BenchmarkCacheService } from './benchmark-cache.service';
 import { AveragePriceSnapshot } from './entities/average-price-snapshot.entity';
 import { FairValueBenchmark } from './entities/fair-value-benchmark.entity';
 import { Opportunity } from './entities/opportunity.entity';
+import { HeuristicTablesService } from './factors/tables';
 import { MileageAdjuster } from './mileage';
 import { ValuationService } from './valuation.service';
 
@@ -15,7 +16,7 @@ import { ValuationService } from './valuation.service';
     TypeOrmModule.forFeature([FairValueBenchmark, Opportunity, AveragePriceSnapshot]),
     CalibrationModule,
   ],
-  providers: [ValuationService, BenchmarkCacheService, MileageAdjuster],
+  providers: [ValuationService, BenchmarkCacheService, MileageAdjuster, HeuristicTablesService],
   exports: [ValuationService, BenchmarkCacheService, MileageAdjuster, TypeOrmModule],
 })
 export class ValuationModule {}

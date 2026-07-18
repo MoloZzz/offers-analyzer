@@ -41,14 +41,23 @@ Keep this block in sync with the code (DoD #4).
 
 ## Phase 1: US1 Liquidity + US2 Repair-risk (P1)
 
-- [ ] T010 [P] [US1] `liquidity-tiers.json` (curated: tier A–D by make/model; make + segment
-      fallbacks) + pure `liquidityFactor` + unit tests (tiered, unknown→neutral).
+- [x] T004 [F] Heuristic-table loader — landed here (first factor needs it): `factors/tables.ts`
+      `HeuristicTablesService` loads/validates `config/heuristics/*.json` at boot, tolerant of
+      absence (bad table → factor off, never crashes scoring), records content hashes.
+- [x] T010 [P] [US1] `config/heuristics/liquidity-tiers.json` (curated A–D by make/model + make
+      fallback) + pure `factors/liquidity.ts` `liquidityFactor` (tier→modifier within ParameterSet
+      bounds; unlisted→neutral-with-reason; gated off when bounds/table absent). `liquidity.spec` 7/7.
 - [ ] T011 [P] [US2] `repair-risk.json` pattern rules (gearbox: DSG/CVT/air-susp; engine/fuel/
-      age combos; reliable-list → LOW) + pure `repairRiskFactor` + unit tests.
-- [ ] T012 [US1+2] wire both factors into composition; integration cases: same-discount
-      liquid vs illiquid ordering; BMW-2005-diesel HIGH vs Corolla LOW (SC-002).
-- [ ] T013 [US1+2] vault: glossary terms (Liquidity score, Repair-risk), how-it-works factor
-      list, overview valuation row.
+      age combos; reliable-list → LOW) + pure `repairRiskFactor` + unit tests. **Blocked on a source
+      change:** `ListingDetail` has no gearbox/fuel/engine and the `/info` field names aren't in the
+      contract — must verify them against a live response first (new sub-task **T011a**), else the
+      factor is inert. Reliable-model LOW works without new fields; HIGH patterns need them.
+- [x] T012 [US1] wire liquidity into composition (`computeValuation(input, params, tables)`, gated by
+      `factorBounds.liquidity`); `ValuationInput` += make/model; `ValuationService` injects the loader;
+      poll + query pass make/model; `PHASE1_FACTOR_BOUNDS` (enable = activate a ParameterSet with these
+      bounds — default stays neutral, SC-001). Integration: liquid-vs-illiquid ordering + price-dominance
+      (US2 wiring rides on T011).
+- [x] T013 [US1] vault: glossary (Liquidity score), how-it-works factor list, overview valuation row.
 
 ## Phase 2: US3 Seller-motivation & seller-type (P2)
 

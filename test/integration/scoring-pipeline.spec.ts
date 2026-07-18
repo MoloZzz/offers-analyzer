@@ -2,8 +2,9 @@ import { buildSeedParams, ParametersService } from '../../src/modules/calibratio
 import { Currency } from '../../src/common/types/money';
 import { BenchmarkCacheService } from '../../src/modules/valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../../src/modules/valuation/cohort';
+import { HeuristicTables, HeuristicTablesService } from '../../src/modules/valuation/factors/tables';
 import { MileageAdjuster } from '../../src/modules/valuation/mileage';
-import { ValuationService } from '../../src/modules/valuation/valuation.service';
+import { PHASE1_FACTOR_BOUNDS, ValuationService } from '../../src/modules/valuation/valuation.service';
 import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/listing-source.port';
 
 /**
@@ -14,8 +15,9 @@ import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/li
  */
 
 const V1 = { params: () => buildSeedParams({ mileageAnnualK: 15, mileagePer10kPct: 2, mileageMaxAdjPct: 20 }) } as unknown as ParametersService;
+const noTables = { get: (): HeuristicTables => ({}) } as unknown as HeuristicTablesService;
 const mileage = new MileageAdjuster(V1);
-const valuation = new ValuationService(V1);
+const valuation = new ValuationService(V1, noTables);
 
 function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {
   return {
@@ -123,5 +125,59 @@ describe('scoring pipeline (integration, B15)', () => {
     const lowKm = detail({ year: 2010, mileage: 40 }); // ~16 yrs old, 40k km
     const { result } = await run(lowKm, 16000, 50);
     expect(result.redFlags.suspicious_low_mileage).toBe(true);
+  });
+
+  // spec 003 US1 — with liquidity enabled (ParameterSet bounds + table), a liquid model outranks an
+  // equally-discounted illiquid one, but neither can turn an at/above-market car into an opportunity.
+  describe('liquidity factor (US1)', () => {
+    const paramsWithFactors = {
+      params: () => ({
+        ...buildSeedParams({ mileageAnnualK: 15, mileagePer10kPct: 2, mileageMaxAdjPct: 20 }),
+        factorBounds: { liquidity: PHASE1_FACTOR_BOUNDS.liquidity },
+      }),
+    } as unknown as ParametersService;
+    const tables = {
+      get: (): HeuristicTables => ({
+        liquidity: { version: 't', models: { 'toyota|camry': 'A', 'jaguar|xf': 'D' }, makes: {} },
+      }),
+    } as unknown as HeuristicTablesService;
+    const valuationF = new ValuationService(paramsWithFactors, tables);
+
+    // Identical price/cohort inputs (18.75% below market, plenty of data) — only the model differs.
+    const evalFor = (make: string, model: string) =>
+      valuationF.evaluate({
+        asking: 13000,
+        fairValue: 16000,
+        sampleSize: 50,
+        minScore: 0.3,
+        minSamples: 10,
+        make,
+        model,
+        sellerType: 'private',
+        hasVinReport: true,
+      });
+
+    it('ranks a liquid model above an equally-discounted illiquid one', () => {
+      const liquid = evalFor('Toyota', 'Camry');
+      const illiquid = evalFor('Jaguar', 'XF');
+      expect(liquid.score).toBeGreaterThan(illiquid.score);
+      expect(liquid.factors[0]).toMatchObject({ factor: 'liquidity', modifier: 1.1 });
+      expect(illiquid.factors[0]).toMatchObject({ factor: 'liquidity', modifier: 0.9 });
+    });
+
+    it('never turns an at/above-market listing into an opportunity (price dominance)', () => {
+      const atMarket = valuationF.evaluate({
+        asking: 16000, // exactly fair value → priceCore 0
+        fairValue: 16000,
+        sampleSize: 50,
+        minScore: 0.3,
+        minSamples: 10,
+        make: 'Toyota',
+        model: 'Camry', // maximal liquidity uplift
+        sellerType: 'private',
+        hasVinReport: true,
+      });
+      expect(atMarket.isOpportunity).toBe(false);
+    });
   });
 });

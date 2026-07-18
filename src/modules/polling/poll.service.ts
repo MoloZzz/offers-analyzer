@@ -193,6 +193,8 @@ export class PollService {
       sampleSize,
       minScore: profile.minDealScore,
       minSamples: profile.confidenceMinSamples,
+      make: detail.make,
+      model: detail.model,
       sellerType: detail.sellerType,
       hasVinReport: detail.hasVinReport,
       damaged: detail.risk.damaged,
