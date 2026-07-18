@@ -34,12 +34,26 @@ describe('CalibrationService.applyProposal / revert', () => {
       findOne: jest.fn().mockResolvedValue(opts.findOneResult ?? null),
     };
 
+    const fakeParameters = {
+      params: jest.fn().mockReturnValue({ softFlagPenalty: 0.8 }),
+      getActive: jest.fn().mockReturnValue({ params: {} }),
+      createCandidate: jest.fn(),
+      latestCandidate: jest.fn().mockResolvedValue(null),
+      activate: jest.fn(),
+    };
+
+    const fakeOpps = {
+      findOne: jest.fn().mockResolvedValue(null),
+    };
+
     const service = new CalibrationService(
       fakeListings as unknown as any,
       fakeOutcomes as unknown as any,
       fakeProfiles as unknown as any,
       fakeConfig as unknown as any,
+      fakeParameters as unknown as any,
       fakeRepo as unknown as any,
+      fakeOpps as unknown as any,
     );
 
     return { service, fakeProfiles, fakeRepo, setThresholdCalls };

@@ -6,10 +6,14 @@ import { Repository } from 'typeorm';
 import { AppConfig } from '../../common/config/configuration';
 import { ListingsService } from '../listings/listings.service';
 import { ProfilesService } from '../profiles/profiles.service';
+import { Opportunity } from '../valuation/entities/opportunity.entity';
+import { SOFT_FLAG_CODES } from '../valuation/red-flags';
 
 import { CalibrationRun } from './entities/calibration-run.entity';
 import { OutcomesService } from './outcomes.service';
+import { ParametersService } from './parameters.service';
 import { CalibrationTarget, proposeThreshold } from './threshold-calibration';
+import { proposeSoftFlagPenalty, WeightProposal, WeightSample } from './weight-learning';
 
 export interface CalibrationLine {
   profileName: string;
@@ -30,8 +34,11 @@ export class CalibrationService {
     private readonly outcomes: OutcomesService,
     private readonly profiles: ProfilesService,
     private readonly config: ConfigService<AppConfig, true>,
+    private readonly parameters: ParametersService,
     @InjectRepository(CalibrationRun)
     private readonly repo: Repository<CalibrationRun>,
+    @InjectRepository(Opportunity)
+    private readonly opps: Repository<Opportunity>,
   ) {}
 
   private async globalPrecision(): Promise<{ precision: number | null; labeledCount: number }> {
@@ -144,5 +151,37 @@ export class CalibrationService {
         reason: proposal?.reason ?? '',
       };
     });
+  }
+
+  /** Learn the global soft-flag penalty from labeled outcomes; emit a candidate ParameterSet (propose-only). */
+  async proposeWeights(): Promise<{ proposal: WeightProposal; candidateVersion: number | null }> {
+    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    const labeled = (await this.outcomes.manualLabeledSince(since)).filter((o) => o.opportunityId != null);
+    const samples: WeightSample[] = [];
+    for (const o of labeled) {
+      const op = await this.opps.findOne({ where: { id: o.opportunityId as string } });
+      if (!op) continue;
+      const softFlagsFired = Object.entries(op.redFlags ?? {}).filter(
+        ([code, on]) => on && SOFT_FLAG_CODES.has(code),
+      ).length;
+      samples.push({ softFlagsFired, good: o.label === 'good' });
+    }
+    const current = this.parameters.params().softFlagPenalty;
+    const proposal = proposeSoftFlagPenalty(samples, current);
+    if (proposal.proposedSoftFlagPenalty == null) return { proposal, candidateVersion: null };
+    const active = this.parameters.getActive().params;
+    const candidate = await this.parameters.createCandidate(
+      { ...active, softFlagPenalty: proposal.proposedSoftFlagPenalty },
+      proposal.reason,
+    );
+    return { proposal, candidateVersion: candidate.version };
+  }
+
+  /** Activate the most recent weight candidate (operator approval). Returns the version, or null. */
+  async applyLatestWeightCandidate(): Promise<number | null> {
+    const candidate = await this.parameters.latestCandidate();
+    if (!candidate) return null;
+    await this.parameters.activate(candidate.version);
+    return candidate.version;
   }
 }

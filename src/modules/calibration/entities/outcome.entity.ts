@@ -18,7 +18,9 @@ export type OutcomeLabel = ManualLabel | PassiveLabel;
  * precision/calibration computation (spec 002, E2/US1). Not consumed by any service yet.
  */
 @Entity('outcomes')
-@Index(['listingId'])
+// Explicit name must match the migration's index (`IDX_outcomes_listingId`); otherwise TypeORM's
+// auto-generated hash name differs from the DB and `migration:generate` keeps drop/re-creating it.
+@Index('IDX_outcomes_listingId', ['listingId'])
 export class Outcome {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

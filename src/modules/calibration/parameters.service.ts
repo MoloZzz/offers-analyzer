@@ -77,4 +77,28 @@ export class ParametersService implements OnApplicationBootstrap {
   params(): ScoringParams {
     return this.getActive().params;
   }
+
+  /** Create a new INACTIVE candidate version (next version number) for operator review. */
+  async createCandidate(params: ScoringParams, reason: string): Promise<ParameterSet> {
+    const max = await this.repo.findOne({ where: {}, order: { version: 'DESC' } });
+    const version = (max?.version ?? 0) + 1;
+    const candidate = this.repo.create({ version, active: false, origin: 'calibration', reason, params });
+    return this.repo.save(candidate);
+  }
+
+  /** Activate a version (deactivate all others) and refresh the cache. Returns it, or null if not found. */
+  async activate(version: number): Promise<ParameterSet | null> {
+    const target = await this.repo.findOne({ where: { version } });
+    if (!target) return null;
+    await this.repo.update({ active: true }, { active: false });
+    target.active = true;
+    await this.repo.save(target);
+    await this.refresh();
+    return target;
+  }
+
+  /** Most recent inactive candidate (highest version, not active), if any. */
+  latestCandidate(): Promise<ParameterSet | null> {
+    return this.repo.findOne({ where: { active: false }, order: { version: 'DESC' } });
+  }
 }

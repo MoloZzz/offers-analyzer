@@ -55,7 +55,12 @@ export class SearchProfile {
   @Column({ type: 'enum', enum: Currency, default: Currency.USD })
   currency!: Currency;
 
-  @Column('numeric', { precision: 4, scale: 3, default: 0.3, transformer: numericTransformer })
+  @Column('numeric', {
+    precision: 4,
+    scale: 3,
+    default: () => '0.3',
+    transformer: numericTransformer,
+  })
   minDealScore!: number;
 
   @Column('int')

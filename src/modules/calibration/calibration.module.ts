@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ListingsModule } from '../listings/listings.module';
 import { ProfilesModule } from '../profiles/profiles.module';
+import { Opportunity } from '../valuation/entities/opportunity.entity';
 
 import { CalibrationService } from './calibration.service';
 import { CalibrationRun } from './entities/calibration-run.entity';
@@ -13,7 +14,7 @@ import { ParametersService } from './parameters.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ParameterSet, Outcome, CalibrationRun]),
+    TypeOrmModule.forFeature([ParameterSet, Outcome, CalibrationRun, Opportunity]),
     ListingsModule,
     ProfilesModule,
   ],

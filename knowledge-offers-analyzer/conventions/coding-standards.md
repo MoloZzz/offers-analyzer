@@ -1,7 +1,7 @@
 ---
 title: Coding standards & conventions
 type: convention
-updated: 2026-07-12
+updated: 2026-07-17
 ---
 
 # Coding standards & conventions
@@ -27,7 +27,22 @@ updated: 2026-07-12
   (`npm run migration:generate -- src/common/database/migrations/<Name>`), review it, and commit it.
   **Never delete existing migrations and regenerate** — that throws away history and breaks anyone
   who already ran them. (The only exception was the one-time initial baseline before the first real DB.)
-- Async work (polling, notifications) via a queue (BullMQ + Redis), not inline in request handlers.
+- **Keep entity metadata == DB so `migration:generate` yields an *empty* diff** (no spurious churn). Two
+  gotchas we hit and their fixes:
+  - **`numeric`/`decimal` column defaults must be a raw-SQL function**: `@Column('numeric', { default: () => '0.3' })`.
+    TypeORM's `normalizeDefault` **quotes both number and string** defaults to `'0.3'`, but Postgres
+    constant-folds a numeric column's default and introspects it **unquoted** as `0.3`, so `default: 0.3`
+    *and* `default: '0.3'` both diff forever (`'0.3' !== 0.3` → repeated `SET DEFAULT '0.3'`). Only the
+    function-default branch stays unquoted (`0.3`) and matches the DB. (Verified against the installed
+    TypeORM 0.3.20 `PostgresDriver.normalizeDefault` / `PostgresQueryRunner` default parsing.)
+  - **Name an `@Index` explicitly when the migration named it** (e.g. `@Index('IDX_outcomes_listingId', ['listingId'])`).
+    A bare `@Index(['col'])` expects TypeORM's auto-hash name; if a migration created it with a custom
+    name, the differ keeps drop/re-creating the index. Prefer letting TypeORM auto-name indexes in new
+    migrations so this doesn't arise.
+  - If a purely-spurious churn migration was already generated (only `SET DEFAULT`/index-rename no-ops),
+    fix the entity as above and **delete that one artifact migration** (it represents no real change) —
+    this is not the forbidden "delete history", it's removing an erroneous regeneration before it runs.
+- Async work (polling, notifications, calibration) via `@nestjs/schedule` cron — **no queue/BullMQ/Redis in v1** (see [[0004-drop-redis-bullmq|ADR-0004]]), not inline in request handlers.
 
 ## Testing
 

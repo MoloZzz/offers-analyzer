@@ -9,6 +9,7 @@ import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
 import { formatCalibration } from '../format/calibration-message';
 import { formatAssessment } from '../format/opportunity-message';
+import { formatWeights } from '../format/weights-message';
 import { formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
@@ -26,6 +27,8 @@ const HELP =
   '/calibrate — підібрати пороги за даними\n' +
   '/params — поточні пороги\n' +
   '/revert — відкотити останнє калібрування\n' +
+  '/weights — навчання ваг (пропозиція)\n' +
+  '/weights_apply — застосувати запропоновані ваги\n' +
   '/outcome <посилання> <результат> — записати, що сталося з авто\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
@@ -178,6 +181,18 @@ export class TelegramBotUpdate {
       if (before != null) reverted.push(`• ${p.name}: повернено до ${before}`);
     }
     await ctx.reply(reverted.length ? `Відкат:\n${reverted.join('\n')}` : 'Нема що відкочувати.');
+  }
+
+  @Command('weights')
+  async onWeights(@Ctx() ctx: Context): Promise<void> {
+    const { proposal, candidateVersion } = await this.calibration.proposeWeights();
+    await ctx.reply(formatWeights(proposal, candidateVersion));
+  }
+
+  @Command('weights_apply')
+  async onWeightsApply(@Ctx() ctx: Context): Promise<void> {
+    const version = await this.calibration.applyLatestWeightCandidate();
+    await ctx.reply(version != null ? `Активовано набір ваг v${version}.` : 'Немає кандидата для застосування.');
   }
 
   @Action(/^oc:/)
