@@ -2,6 +2,7 @@ import { Currency } from '../../../common/types/money';
 import { Listing } from '../../listings/entities/listing.entity';
 import { ListingDetail, SellerType } from '../../sources/ports/listing-source.port';
 import { Opportunity } from '../../valuation/entities/opportunity.entity';
+import { toTotal100 } from '../../valuation/factors/factor';
 import { ValuationResult } from '../../valuation/valuation.service';
 
 /** Human-readable Ukrainian labels for red-flag codes. */
@@ -48,6 +49,7 @@ function scoreEmoji(score: number): string {
 export function formatOpportunity(op: Opportunity, listing: Listing): string {
   return [
     `${scoreEmoji(op.score)} ${listing.make} ${listing.model}, ${listing.year}, ${mileageLabel(listing.mileage)}`,
+    `📊 Загальний бал: ${toTotal100(op.score)}/100`,
     `💰 Вигідність: ${signed(op.score)} (−1…+1)`,
     `Ціна: ${fmt(op.askingValue)} ${op.currency}  ·  Ринкова: ${fmt(op.fairValue)} ${op.currency}  ·  −${op.discountPct}%`,
     `Впевненість: ${op.confidence}`,
@@ -78,6 +80,7 @@ export function formatAssessment(
   const verdict = result.isOpportunity ? '✅ Вигідна пропозиція' : `ℹ️ ${result.reason}`;
   return [
     `${scoreEmoji(result.score)} ${detail.make} ${detail.model}, ${detail.year}, ${mileageLabel(detail.mileage)}`,
+    `📊 Загальний бал: ${result.total100}/100`,
     `💰 Вигідність: ${signed(result.score)} (−1…+1)`,
     `Ціна: ${fmt(detail.price.amount)} ${currency}  ·  Ринкова: ${fmt(fairValue)} ${currency}  ·  −${result.discountPct}%`,
     `Впевненість: ${result.confidence}`,

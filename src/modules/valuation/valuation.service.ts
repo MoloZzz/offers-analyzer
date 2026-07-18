@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { ScoringParams } from '../calibration/entities/parameter-set.entity';
+import { DEFAULT_UPLIFT_CAP, ScoringParams } from '../calibration/entities/parameter-set.entity';
 import { ParametersService } from '../calibration/parameters.service';
 import { SellerType } from '../sources/ports/listing-source.port';
 
 import { assessCondition } from './condition';
+import { composeFactors, FactorScore, toTotal100 } from './factors/factor';
 import { assessMileageRisk } from './mileage-risk';
 import { evaluateRedFlags } from './red-flags';
 
@@ -49,6 +50,15 @@ export interface ValuationResult {
   penalty: number;
   /** Whether a hard red-flag disqualified this listing regardless of score. */
   disqualified: boolean;
+  /**
+   * Price core `raw × confidence × penalty` (disqualifiers clamp ≤ 0), before composite factor
+   * modifiers. Equals `score` in Phase F (no factors). Price dominance gates on this being > 0.
+   */
+  priceCore: number;
+  /** Per-factor composite-score contributions (spec 003). Empty until factors ship. */
+  factors: FactorScore[];
+  /** Presentation-only 0–100 "Total Deal Score" derived from `score`. */
+  total100: number;
 }
 
 /**
@@ -94,11 +104,19 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
     params.softFlagPenalty,
   );
 
-  let score = raw * confidence * penalty;
-  if (disqualified) score = Math.min(score, 0); // a scam/damaged bargain is not a deal
+  // Price core: the pre-003 score. A disqualifier clamps it ≤ 0 (a scam/damaged bargain is not a deal).
+  let priceCore = raw * confidence * penalty;
+  if (disqualified) priceCore = Math.min(priceCore, 0);
+
+  // Composite factors (spec 003). None ship in Phase F, so Π = 1 and score === priceCore (SC-001).
+  const factors: FactorScore[] = [];
+  const upliftCap = params.upliftCap ?? DEFAULT_UPLIFT_CAP;
+  const score = composeFactors(priceCore, factors, upliftCap);
 
   const hasEnoughData = input.sampleSize >= input.minSamples;
-  const isOpportunity = score >= input.minScore && hasEnoughData && !disqualified;
+  // Price dominance: non-price factors can rank but never qualify an at/above-market listing.
+  const isOpportunity =
+    score >= input.minScore && hasEnoughData && !disqualified && priceCore > 0;
 
   return {
     isOpportunity,
@@ -110,6 +128,9 @@ export function computeValuation(input: ValuationInput, params: ScoringParams): 
     raw: round(raw),
     penalty: round(penalty),
     disqualified,
+    priceCore: round(priceCore),
+    factors,
+    total100: toTotal100(score),
   };
 }
 

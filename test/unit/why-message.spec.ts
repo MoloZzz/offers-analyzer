@@ -37,6 +37,9 @@ const result: ValuationResult = {
   raw: 0.83,
   penalty: 0.9,
   disqualified: false,
+  priceCore: 0.75,
+  factors: [],
+  total100: 88,
 };
 
 describe('formatWhy', () => {

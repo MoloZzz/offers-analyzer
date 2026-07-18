@@ -24,7 +24,7 @@ Implemented (spec 001). One NestJS module per concern:
 |--------|----------------|-------|
 | `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
 | `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore` | history from day one |
-| `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; tunables from the active `ParameterSet` | see [[profitability-definition]], [[why-no-opportunities]] |
+| `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — skeleton only, no factors yet); tunables from the active `ParameterSet` | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
 | `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts` | spec 002; [[0005-versioned-parameter-sets\|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome` |

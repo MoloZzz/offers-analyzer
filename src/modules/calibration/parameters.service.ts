@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 
-import { ParameterSet, ScoringParams } from './entities/parameter-set.entity';
+import { DEFAULT_UPLIFT_CAP, ParameterSet, ScoringParams } from './entities/parameter-set.entity';
 
 /** Mileage-correction config consumed to build the v1 seed (values currently live in AppConfig). */
 export interface MileageSeedConfig {
@@ -24,6 +24,10 @@ export function buildSeedParams(cfg: MileageSeedConfig): ScoringParams {
     scale: 30,
     softFlagPenalty: 0.8,
     ...cfg,
+    // spec 003 factor config — seeded neutral (no factors ship in Phase F, so unconsumed).
+    factorBounds: {},
+    upliftCap: DEFAULT_UPLIFT_CAP,
+    heuristicTableHashes: {},
   };
 }
 

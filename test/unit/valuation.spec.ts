@@ -51,4 +51,12 @@ describe('ValuationService (deal score −1..1)', () => {
     expect(computeValuation({ ...strict, asking: 12000 }, V1).isOpportunity).toBe(false); // score ~0.83 < 0.9
     expect(computeValuation({ ...strict, asking: 10500 }, V1).isOpportunity).toBe(true); // ~34% below → score 1.0
   });
+
+  // spec 003 Phase F — composite skeleton is behavior-identical (SC-001).
+  it('has no factors and score === priceCore with the neutral seed', () => {
+    const r = computeValuation({ ...base, asking: 12000 }, V1);
+    expect(r.factors).toEqual([]);
+    expect(r.score).toBe(r.priceCore);
+    expect(r.total100).toBe(88); // toTotal100(0.75)
+  });
 });

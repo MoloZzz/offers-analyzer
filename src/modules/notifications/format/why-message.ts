@@ -28,6 +28,7 @@ export function formatWhy(detail: ListingDetail, result: ValuationResult, ctx: W
       : 'ℹ️ Не дотягує до порогу / мало даних';
   const lines = [
     `🔍 Чому такий бал — ${detail.make} ${detail.model}, ${detail.year}`,
+    `📊 Загальний бал: ${result.total100}/100`,
     `Ціна: ${detail.price.amount} vs Ринкова: ${ctx.fairValue} ${ctx.currency} → знижка ${result.discountPct}%`,
     `Ринкова база: ${ctx.benchmarkBase} ${ctx.currency} (${ctx.mileageAware ? 'когорта з урахуванням пробігу' : 'когорта без пробігу'}, вибірка ${ctx.sampleSize})`,
   ];
@@ -37,6 +38,10 @@ export function formatWhy(detail: ListingDetail, result: ValuationResult, ctx: W
   lines.push(
     `Розклад балу: знижка → raw ${result.raw} × впевненість ${result.confidence} × штраф ${result.penalty} = ${result.score}`,
   );
+  // Per-factor composite breakdown (spec 003). Empty until factors ship (Phase F).
+  for (const f of result.factors) {
+    lines.push(`• ${f.factor}: ${f.subScore100}/100 — ${f.reasons.join(', ')}`);
+  }
   const risks = [
     ...(firedFromData.length ? [`дані AUTO.RIA: ${firedFromData.join(', ')}`] : []),
     ...(firedFromDesc.length ? [`опис: ${firedFromDesc.join(', ')}`] : []),

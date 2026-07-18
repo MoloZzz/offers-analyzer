@@ -176,8 +176,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "569830fa1e0f640c",
+  "active": "b9c0b6a35053acb4",
   "lastOpenFiles": [
+    "context/backlog.md.tmp.3920.436bf50f7ba0",
     "research/profitability-methods-coverage.md.tmp.33136.9d440a69e9d0",
     "context/log/2026-07-18-session-01.md",
     "context/backlog.md.tmp.33136.20d5a42163f6",
@@ -194,7 +195,6 @@
     "context/log/2026-07-17-session-01.md.tmp.29860.087051d82221",
     "context/backlog.md.tmp.1992.929ebf2409f4",
     "decisions/0004-drop-redis-bullmq.md",
-    "decisions/0004-drop-redis-bullmq.md.tmp.18704.749a9a2f548a",
     "context/backlog.md",
     "decisions/0003-decoupled-context-zone.md",
     "decisions/README.md",

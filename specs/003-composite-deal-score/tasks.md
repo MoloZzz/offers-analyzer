@@ -15,19 +15,29 @@
 
 ## Status (2026-07-18)
 
-Spec authored; no implementation started. Keep this block in sync with the code (DoD #4).
+Phase F core landed (T001–T003): behavior-identical composite skeleton, SC-001 held. T004
+(heuristic loader) and T005 (B23 persist) deferred — no factors/tables exist yet, so both are pulled
+forward to the phase that first ships a factor / to the B23 work respectively. tsc clean;
+`factor.spec` 7/7; typeorm-importing suites deferred to the dev machine (sandbox jest degraded).
+Keep this block in sync with the code (DoD #4).
 
 ## Phase F: Foundational — composite skeleton (blocking)
 
-- [ ] T001 [F] `Factor` interface + `FactorScore` value object + pure composition
-      (`Π modifiers`, per-factor clamps, global `upliftCap`, `priceCore > 0` opportunity gate)
-      in `computeValuation`; neutral behavior bit-identical (SC-001 guard test).
-- [ ] T002 [F] ParameterSet v-next: `factorBounds` (all neutral) + `upliftCap` +
-      `heuristicTableHashes`; seed/migrate via existing candidate→activate mechanics.
-- [ ] T003 [F] 0–100 presentation: pure `toTotal100`/`toSubScore100`; extend `formatWhy` +
-      alert formatter with total + factor lines (neutral factors hidden).
-- [ ] T004 [F] Heuristic-table loader (`config/heuristics/`, boot validation, content hash).
-- [ ] T005 [F] (couples with B23) persist `factors` in the evaluation explanation snapshot.
+- [x] T001 [F] `Factor` interface + `FactorScore` value object + pure composition
+      (`composeFactors`: Π modifiers, dampeners in full, combined uplift clamped to `upliftCap`) +
+      `priceCore > 0` opportunity gate in `computeValuation`; `ValuationResult` += `priceCore`,
+      `factors[]`, `total100`. Empty factor list → `score === priceCore` (SC-001). `factor.spec` 7/7.
+- [x] T002 [F] `ScoringParams` (jsonb) += optional `factorBounds` + `upliftCap` +
+      `heuristicTableHashes`; `buildSeedParams` seeds neutral; absent → `DEFAULT_UPLIFT_CAP` (1.25),
+      so **existing v1 rows stay valid with no migration**. (candidate→activate mechanics unchanged,
+      used when a factor actually ships.)
+- [x] T003 [F] 0–100 presentation: pure `toTotal100` (score→[0,100], at-market=50) / `toSubScore100`
+      (modifier→[0,100], neutral=50); `formatWhy`, `formatOpportunity`, `formatAssessment` render the
+      total + per-factor lines (empty until factors ship). Additive → formatter `toContain` tests hold.
+- [ ] T004 [F] Heuristic-table loader (`config/heuristics/`, boot validation, content hash) —
+      **deferred to Phase 1** (first factor to need a table brings its loader; nothing to load yet).
+- [ ] T005 [F] (couples with B23) persist `factors` in the evaluation explanation snapshot —
+      **deferred to the B23 work** (persist-explanation); factor snapshots land with it.
 
 ## Phase 1: US1 Liquidity + US2 Repair-risk (P1)
 

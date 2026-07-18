@@ -197,8 +197,13 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
 | P14 no ML now | ✅ already the standing verdict ([[profitability-methods-coverage]] §5) |
 | Already built (from the proposal's Must-Have): condition score (C1–C3), risk red-flags, score explanation (`/why`), auto threshold calibration (E3) | ✅ pre-existing — extend, don't rebuild |
 
-- [ ] **S-F — Phase F: composite skeleton + 0–100 presentation** (blocking; behavior-identical
-  with neutral modifiers — SC-001). Land B23 persistence with it.
+- [x] **S-F — Phase F: composite skeleton + 0–100 presentation** (blocking; behavior-identical
+  with neutral modifiers — SC-001). **Done** (T001–T003): `valuation/factors/factor.ts`
+  (`composeFactors` — dampeners full, combined uplift clamped to `upliftCap`; `toTotal100`/
+  `toSubScore100`); `ValuationResult` += `priceCore`/`factors[]`/`total100`; `ScoringParams` += optional
+  neutral factor config (no migration); `📊 Загальний бал N/100` in `/why` + alerts. tsc clean,
+  `factor.spec` 7/7; SC-001 holds by construction. **T004 loader + T005/B23 persist deferred** (nothing
+  to load/persist until a factor ships) — B23 no longer *blocks* Phase F, it lands with the first factor.
 - [ ] **S1 — Liquidity score** (tier tables + factor; P1).
 - [ ] **S2 — Repair-risk score** (pattern rules; P1).
 - [ ] **S3 — Seller-motivation + seller-type** (lexicon + modifier; P2).
