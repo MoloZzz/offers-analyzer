@@ -34,6 +34,9 @@ const HELP =
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
   '/profiles — які ніші зараз моніторимо\n' +
+  '/blacklist <ніша> — показати чорний список ніші\n' +
+  '/blacklist_add <ніша> <марка модель> — додати в чорний список\n' +
+  '/blacklist_remove <ніша> <марка модель> — видалити з чорного списку\n' +
   '/help — ця довідка';
 
 /** Telegram bot commands (FR-015) + on-demand queries. */
@@ -77,6 +80,54 @@ export class TelegramBotUpdate {
     const list =
       profiles.length > 0 ? profiles.map((p) => `• ${p.name}`).join('\n') : 'Активних ніш немає.';
     await ctx.reply(`Ніші, що моніторяться:\n${list}`);
+  }
+
+  @Command('blacklist')
+  async onBlacklistShow(@Ctx() ctx: Context): Promise<void> {
+    const { name } = parseQuotedOrPlain(commandArg(ctx));
+    if (!name) {
+      await ctx.reply('Вкажіть назву ніші: /blacklist "Назва ніші"');
+      return;
+    }
+    const profile = await this.profiles.findByName(name);
+    if (!profile) {
+      await ctx.reply(`Нішу "${name}" не знайдено. /profiles — список ніш.`);
+      return;
+    }
+    const bl = profile.filters?.excludeMakeModels ?? [];
+    await ctx.reply(bl.length ? `Чорний список для "${name}":\n${bl.map((x) => `• ${x}`).join('\n')}` : `Чорний список для "${name}" порожній.`);
+  }
+
+  @Command('blacklist_add')
+  async onBlacklistAdd(@Ctx() ctx: Context): Promise<void> {
+    const { name, items } = parseQuotedOrPlain(commandArg(ctx));
+    if (!name || items.length === 0) {
+      await ctx.reply('Формат: /blacklist_add "Назва ніші" "Марка Модель" ["Марка Модель"...]');
+      return;
+    }
+    const profile = await this.profiles.findByName(name);
+    if (!profile) {
+      await ctx.reply(`Нішу "${name}" не знайдено. /profiles — список ніш.`);
+      return;
+    }
+    const updated = await this.profiles.addToBlacklist(profile.id, items);
+    await ctx.reply(`Оновлено чорний список для "${name}":\n${updated.map((x) => `• ${x}`).join('\n')}`);
+  }
+
+  @Command('blacklist_remove')
+  async onBlacklistRemove(@Ctx() ctx: Context): Promise<void> {
+    const { name, items } = parseQuotedOrPlain(commandArg(ctx));
+    if (!name || items.length === 0) {
+      await ctx.reply('Формат: /blacklist_remove "Назва ніші" "Марка Модель" ["Марка Модель"...]');
+      return;
+    }
+    const profile = await this.profiles.findByName(name);
+    if (!profile) {
+      await ctx.reply(`Нішу "${name}" не знайдено. /profiles — список ніш.`);
+      return;
+    }
+    const updated = await this.profiles.removeFromBlacklist(profile.id, items);
+    await ctx.reply(`Оновлено чорний список для "${name}":\n${updated.length ? updated.map((x) => `• ${x}`).join('\n') : '(порожній)'}`);
   }
 
   @Command('check')
@@ -264,4 +315,35 @@ function parseLimit(arg: string): number {
   const n = parseInt(arg, 10);
   if (!Number.isFinite(n) || n <= 0) return 5;
   return Math.min(n, 100);
+}
+
+/** Split argument into first token (quoted or plain) and the rest. */
+function splitFirstQuotedOrPlain(arg: string): [string, string] {
+  const trimmed = arg.trim();
+  if (!trimmed) return ['', ''];
+  if (trimmed[0] === '"') {
+    const end = trimmed.indexOf('"', 1);
+    if (end === -1) return [trimmed.slice(1), ''];
+    const first = trimmed.slice(1, end);
+    const rest = trimmed.slice(end + 1).trim();
+    return [first, rest];
+  }
+  const space = trimmed.indexOf(' ');
+  if (space === -1) return [trimmed, ''];
+  return [trimmed.slice(0, space), trimmed.slice(space + 1)];
+}
+
+/** Parse profile name (quoted or plain) + items (quoted or plain, space-separated). */
+function parseQuotedOrPlain(arg: string): { name: string; items: string[] } {
+  const [name, rest] = splitFirstQuotedOrPlain(arg);
+  if (!name) return { name: '', items: [] };
+  const items: string[] = [];
+  let remaining = rest;
+  while (remaining.trim()) {
+    const [item, rest2] = splitFirstQuotedOrPlain(remaining);
+    if (!item) break;
+    items.push(item);
+    remaining = rest2;
+  }
+  return { name, items };
 }

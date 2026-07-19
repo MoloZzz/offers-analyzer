@@ -42,9 +42,48 @@ export class ProfilesService implements OnApplicationBootstrap {
     return this.profiles.find({ where: { enabled: true } });
   }
 
+  /** Find a profile by name (for bot commands). */
+  async findByName(name: string): Promise<SearchProfile | null> {
+    return this.profiles.findOne({ where: { name } });
+  }
+
   /** Set a profile's threshold directly (used by calibration apply/revert, spec 002, E3). */
   async setThreshold(profileId: string, minDealScore: number): Promise<void> {
     await this.profiles.update({ id: profileId }, { minDealScore });
+  }
+
+  /** Update a profile's excludeMakeModels blacklist. */
+  async setExcludeMakeModels(profileId: string, excludeList: string[]): Promise<void> {
+    await this.profiles.update(
+      { id: profileId },
+      { filters: () => `jsonb_set(filters, '{excludeMakeModels}', '${JSON.stringify(excludeList)}'::jsonb)` },
+    );
+  }
+
+  /** Add items to a profile's blacklist. */
+  async addToBlacklist(profileId: string, items: string[]): Promise<string[]> {
+    const profile = await this.profiles.findOne({ where: { id: profileId } });
+    if (!profile) throw new Error(`Profile ${profileId} not found`);
+    const current = profile.filters?.excludeMakeModels ?? [];
+    const merged = [...new Set([...current, ...items.map((i) => i.trim())])];
+    await this.setExcludeMakeModels(profileId, merged);
+    return merged;
+  }
+
+  /** Remove items from a profile's blacklist. */
+  async removeFromBlacklist(profileId: string, items: string[]): Promise<string[]> {
+    const profile = await this.profiles.findOne({ where: { id: profileId } });
+    if (!profile) throw new Error(`Profile ${profileId} not found`);
+    const current = profile.filters?.excludeMakeModels ?? [];
+    const toRemove = new Set(items.map((i) => i.trim().toLowerCase()));
+    const merged = current.filter((i) => !toRemove.has(i.toLowerCase()));
+    await this.setExcludeMakeModels(profileId, merged);
+    return merged;
+  }
+
+  /** Clear a profile's blacklist entirely. */
+  async clearBlacklist(profileId: string): Promise<void> {
+    await this.setExcludeMakeModels(profileId, []);
   }
 
   async onApplicationBootstrap(): Promise<void> {
