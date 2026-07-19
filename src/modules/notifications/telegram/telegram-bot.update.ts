@@ -21,8 +21,8 @@ const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
 const HELP =
   '/check <посилання> — оцінити конкретне авто\n' +
   '/why <посилання> — пояснити, чому такий бал\n' +
-  '/top — знайдені вигідні пропозиції\n' +
-  '/best — найкращі оцінені авто (навіть нижче порогу)\n' +
+  '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
+  '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
   '/calibrate — підібрати пороги за даними\n' +
   '/params — поточні пороги\n' +
@@ -119,7 +119,8 @@ export class TelegramBotUpdate {
 
   @Command('top')
   async onTop(@Ctx() ctx: Context): Promise<void> {
-    const items = await this.query.topOpportunities(5);
+    const limit = parseLimit(commandArg(ctx));
+    const items = await this.query.topOpportunities(limit);
     if (items.length === 0) {
       await ctx.reply('Поки немає знайдених вигідних пропозицій.');
       return;
@@ -131,12 +132,13 @@ export class TelegramBotUpdate {
       const link = listing ? `\n  ${listing.url}` : '';
       return `• ${name} — бал ${opportunity.score}, ${opportunity.askingValue} ${opportunity.currency}${link}`;
     });
-    await ctx.reply(`Топ вигідних пропозицій:\n${lines.join('\n')}`);
+    await ctx.reply(`Топ вигідних пропозицій (${items.length}):\n${lines.join('\n')}`);
   }
 
   @Command('best')
   async onBest(@Ctx() ctx: Context): Promise<void> {
-    const listings = await this.query.topCandidates(5);
+    const limit = parseLimit(commandArg(ctx));
+    const listings = await this.query.topCandidates(limit);
     if (listings.length === 0) {
       await ctx.reply('Ще нічого не оцінено. Дай боту попрацювати або надішли /check <посилання>.');
       return;
@@ -145,7 +147,7 @@ export class TelegramBotUpdate {
       const score = l.lastScore ?? 0;
       return `• ${l.make} ${l.model}, ${l.year} — бал ${score}, ${l.currentAmount} ${l.currentCurrency}\n  ${l.url}`;
     });
-    await ctx.reply(`Найкращі оцінені (навіть нижче порогу):\n${lines.join('\n')}`);
+    await ctx.reply(`Найкращі оцінені (${listings.length}):\n${lines.join('\n')}`);
   }
 
   @Command('report')
@@ -255,4 +257,11 @@ function commandArg(ctx: Context): string {
 function extractAutoId(input: string): string | null {
   const matches = input.match(/\d{6,}/g);
   return matches ? matches[matches.length - 1] : null;
+}
+
+/** Parse an optional numeric limit from a command argument, clamped to [1, 100]. */
+function parseLimit(arg: string): number {
+  const n = parseInt(arg, 10);
+  if (!Number.isFinite(n) || n <= 0) return 5;
+  return Math.min(n, 100);
 }

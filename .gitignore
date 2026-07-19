@@ -4,6 +4,8 @@
 /build
 /tmp
 
+/knowledge-offers-analyzer/.obsidian
+
 # Logs
 logs
 *.log
