@@ -1,4 +1,4 @@
-import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
+import { Action, Command, Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
 import { CalibrationService } from '../../calibration/calibration.service';
@@ -18,28 +18,6 @@ import { MAIN_MENU_KEYBOARD } from './ui/keyboards';
 
 /** Example listing URL shown in prompts (operators paste the auto.ria link, not a numeric id). */
 const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
-
-const HELP =
-  '/check <посилання> — оцінити конкретне авто\n' +
-  '/why <посилання> — пояснити, чому такий бал\n' +
-  '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
-  '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
-  '/last [N] — останні оцінки (за замовчуванням 10)\n' +
-  '/report — звіт по відбору + підказка порогу\n' +
-  '/calibrate — підібрати пороги за даними\n' +
-  '/params — поточні пороги\n' +
-  '/revert — відкотити останнє калібрування\n' +
-  '/weights — навчання ваг (пропозиція)\n' +
-  '/weights_apply — застосувати запропоновані ваги\n' +
-  '/outcome <посилання> <результат> — записати, що сталося з авто\n' +
-  '/start — підписатися на вигідні пропозиції\n' +
-  '/stop — відписатися\n' +
-  '/mute — тимчасово вимкнути сповіщення\n' +
-  '/profiles — які ніші зараз моніторимо\n' +
-  '/blacklist "Назва ніші" — показати чорний список ніші\n' +
-  '/blacklist_add "Назва ніші" "Марка Модель" — додати в чорний список\n' +
-  '/blacklist_remove "Назва ніші" "Марка Модель" — видалити з чорного списку\n' +
-  '/help — ця довідка';
 
 /** Telegram bot commands (FR-015) + on-demand queries. */
 @Update()
@@ -417,6 +395,49 @@ export class TelegramBotUpdate {
     await this.showWhy(ctx, externalId);
   }
 
+  @Action('history')
+  async onHistoryAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showHistory(ctx, 10, true);
+  }
+
+  @Action('profiles')
+  async onProfilesAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showProfiles(ctx, true);
+  }
+
+  @Action('blacklist')
+  async onBlacklistAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showBlacklistMenu(ctx, true);
+  }
+
+  @Action('calibrate')
+  async onCalibrateAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showCalibration(ctx, true);
+  }
+
+  @Action('notifications_mute')
+  async onNotificationsMute(@Ctx() ctx: Context): Promise<void> {
+    const chatId = String(ctx.chat!.id);
+    const sub = await this.subscribers.findByChatId(chatId);
+    if (sub) {
+      if (sub.state === 'muted') {
+        await this.subscribers.activate(chatId);
+      } else {
+        await this.subscribers.mute(chatId);
+      }
+    }
+    await this.onNotificationsAction(ctx);
+  }
+
+  @Action('calibrate_run')
+  async onCalibrateRun(@Ctx() ctx: Context): Promise<void> {
+    await ctx.answerCbQuery('Running calibration...');
+    const mode = this.calibration.configuredMode();
+    const lines = await this.calibration.runAndSummarize(mode);
+    const { formatCalibration } = await import('../format/calibration-message');
+    await ctx.editMessageText(formatCalibration(lines, mode), { parse_mode: 'HTML' });
+  }
+
   // ============ New UI helper methods ============
 
   private async showVehicleActionMenu(ctx: Context, externalId: string): Promise<void> {
@@ -576,9 +597,81 @@ export class TelegramBotUpdate {
     }
   }
 
-  @Help()
-  async onHelp(@Ctx() ctx: Context): Promise<void> {
-    await ctx.reply(HELP, { parse_mode: 'HTML' });
+  private async showHistory(ctx: Context, limit = 10, edit = false, page = 1): Promise<void> {
+    const { paginationKeyboard } = await import('./ui/keyboards');
+    const items = await this.query.getRecentEvaluations(limit * page);
+    const paginated = items.slice((page - 1) * limit, page * limit);
+    const totalPages = Math.ceil(items.length / limit) || 1;
+
+    const text = `📈 <b>Recent Evaluations</b> (page ${page}/${totalPages})\n\n` +
+      (paginated.length === 0 ? 'No evaluations yet.' :
+        paginated.map((e, i) => {
+          const score = e.lastScore ?? 0;
+          const discount = e.lastDiscountPct ?? 0;
+          const time = e.lastEvaluatedAt ? new Date(e.lastEvaluatedAt).toLocaleString('uk-UA') : '—';
+          return `${i + 1}. <b>${e.make} ${e.model}, ${e.year}</b> — Score: ${score}, Discount: ${discount.toFixed(1)}% (${time})\n  🔗 ${e.url}`;
+        }).join('\n\n')
+      );
+
+    const kb = paginationKeyboard(page, totalPages, 'history');
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb });
+    }
+  }
+
+  private async showProfiles(ctx: Context, edit = false): Promise<void> {
+    const profiles = await this.profiles.getEnabled();
+    const { formatProfiles } = await import('./ui/formatters');
+    const text = formatProfiles(profiles);
+    const { InlineKeyboard } = await import('./ui/keyboards');
+    const kb = new InlineKeyboard()
+      .button('🔄 Refresh', 'profiles')
+      .button('🚫 Blacklist', 'blacklist')
+      .row({ text: '⬅️ Back', callback_data: 'main' });
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb.build() });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb.build() });
+    }
+  }
+
+  private async showBlacklistMenu(ctx: Context, edit = false): Promise<void> {
+    const profiles = await this.profiles.getEnabled();
+    const { itemListKeyboard } = await import('./ui/keyboards');
+    const kb = itemListKeyboard(
+      profiles,
+      p => p.name,
+      p => `blacklist_show:${p.id}`,
+      'main'
+    );
+    const text = '📋 Select profile to manage blacklist:';
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb });
+    }
+  }
+
+  private async showCalibration(ctx: Context, edit = false): Promise<void> {
+    const mode = this.calibration.configuredMode();
+    const { formatCalibration } = await import('../format/calibration-message');
+    const { InlineKeyboard } = await import('./ui/keyboards');
+    const lines = await this.calibration.runAndSummarize(mode);
+    const text = formatCalibration(lines, mode);
+    const kb = new InlineKeyboard()
+      .button('▶️ Run Calibration', 'calibrate_run')
+      .row({ text: '⬅️ Back', callback_data: 'main' });
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb.build() });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb.build() });
+    }
   }
 
   /** Extract an AUTO.RIA auto_id from a listing URL (or a raw id). */
