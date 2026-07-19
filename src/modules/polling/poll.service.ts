@@ -151,6 +151,7 @@ export class PollService {
   private async processNew(profile: SearchProfile, externalId: string): Promise<void> {
     const detail = await this.source.fetch(externalId);
     if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
+    if (isExcluded(profile, detail)) return;
     const { listing } = await this.listings.recordSeen(detail);
     await this.evaluateAndNotify(profile, detail, listing, 'opportunity', null);
   }
@@ -158,6 +159,7 @@ export class PollService {
   private async reobserve(profile: SearchProfile, existing: Listing): Promise<void> {
     const previousAmount = existing.currentAmount;
     const detail = await this.source.fetch(existing.externalId);
+    if (isExcluded(profile, detail)) return;
     const { listing } = await this.listings.recordSeen(detail);
     // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of
     // budget before scoring it). Otherwise the recorded observation is enough.
@@ -261,4 +263,11 @@ function toQuery(p: SearchProfile): SourceSearchQuery {
     mileageTo: p.filters.mileageTo,
     submittedWithin: p.filters.submittedWithin,
   };
+}
+
+function isExcluded(profile: SearchProfile, detail: ListingDetail): boolean {
+  const exclude = profile.filters.excludeMakeModels;
+  if (!exclude || exclude.length === 0) return false;
+  const makeModel = `${detail.make} ${detail.model}`.toLowerCase();
+  return exclude.some((e) => makeModel.includes(e.toLowerCase()));
 }

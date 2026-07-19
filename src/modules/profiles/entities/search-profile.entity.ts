@@ -20,6 +20,8 @@ export interface ProfileFilters {
   mileageTo?: number;
   /** AUTO.RIA submission-period code (`top`): only listings posted within this window. */
   submittedWithin?: number;
+  /** Blacklist: case-insensitive substrings to skip after fetch (e.g. ["Daewoo Lanos", "ZAZ"]). */
+  excludeMakeModels?: string[];
 }
 
 /** A configured niche to monitor and how strictly to evaluate it (operator-controlled in v1). */

@@ -7,7 +7,8 @@
     "filters": {
       "makeModelPairs": [],
       "yearFrom": 2010,
-      "submittedWithin": 2
+      "submittedWithin": 2,
+      "excludeMakeModels": ["Daewoo Lanos", "ZAZ", "Lada"]
     },
     "priceFrom": null,
     "priceTo": 15000,
