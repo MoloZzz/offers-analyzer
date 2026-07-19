@@ -36,4 +36,8 @@ export class SubscribersService {
     existing.state = state;
     await this.subscribers.save(existing);
   }
+
+  async findByChatId(telegramChatId: string): Promise<Subscriber | null> {
+    return this.subscribers.findOne({ where: { telegramChatId } });
+  }
 }

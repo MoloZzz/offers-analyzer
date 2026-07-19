@@ -1,4 +1,4 @@
-import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
+import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
 import { CalibrationService } from '../../calibration/calibration.service';
@@ -14,6 +14,7 @@ import { formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
 import { parseOutcomeCallback } from './outcome-callback';
+import { MAIN_MENU_KEYBOARD } from './ui/keyboards';
 
 /** Example listing URL shown in prompts (operators paste the auto.ria link, not a numeric id). */
 const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
@@ -23,7 +24,7 @@ const HELP =
   '/why <посилання> — пояснити, чому такий бал\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
-  '/last [N] — останні оцінки (за замовчуванням 5)\n' +
+  '/last [N] — останні оцінки (за замовчуванням 10)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
   '/calibrate — підібрати пороги за даними\n' +
   '/params — поточні пороги\n' +
@@ -56,7 +57,12 @@ export class TelegramBotUpdate {
     const chatId = ctx.chat?.id;
     if (chatId == null) return;
     await this.subscribers.activate(String(chatId));
-    await ctx.reply('Готово — надсилатиму вигідні пропозиції авто. /help для команд.');
+    await ctx.replyWithHTML(
+      '👋 Welcome to RIA Analyzer!\n\n' +
+      'I\'ll help you find the best car deals on AUTO.RIA.\n\n' +
+      'Use the menu below or type commands:',
+      { reply_markup: MAIN_MENU_KEYBOARD }
+    );
   }
 
   @Command('stop')
@@ -85,7 +91,7 @@ export class TelegramBotUpdate {
 
   @Command('blacklist')
   async onBlacklistShow(@Ctx() ctx: Context): Promise<void> {
-    const { name } = parseQuotedOrPlain(commandArg(ctx));
+    const { name } = this.parseQuotedOrPlain(this.commandArg(ctx));
     if (!name) {
       await ctx.reply('Вкажіть назву ніші: /blacklist "Назва ніші"');
       return;
@@ -105,7 +111,7 @@ export class TelegramBotUpdate {
 
   @Command('blacklist_add')
   async onBlacklistAdd(@Ctx() ctx: Context): Promise<void> {
-    const { name, items } = parseQuotedOrPlain(commandArg(ctx));
+    const { name, items } = this.parseQuotedOrPlain(this.commandArg(ctx));
     if (!name || items.length === 0) {
       await ctx.reply('Формат: /blacklist_add "Назва ніші" "Марка Модель" ["Марка Модель"...]');
       return;
@@ -123,7 +129,7 @@ export class TelegramBotUpdate {
 
   @Command('blacklist_remove')
   async onBlacklistRemove(@Ctx() ctx: Context): Promise<void> {
-    const { name, items } = parseQuotedOrPlain(commandArg(ctx));
+    const { name, items } = this.parseQuotedOrPlain(this.commandArg(ctx));
     if (!name || items.length === 0) {
       await ctx.reply('Формат: /blacklist_remove "Назва ніші" "Марка Модель" ["Марка Модель"...]');
       return;
@@ -141,7 +147,7 @@ export class TelegramBotUpdate {
 
   @Command('check')
   async onCheck(@Ctx() ctx: Context): Promise<void> {
-    const externalId = extractAutoId(commandArg(ctx));
+    const externalId = this.extractAutoId(this.commandArg(ctx));
     if (!externalId) {
       await ctx.reply(`Надішліть посилання на оголошення, напр.:\n/check ${URL_EXAMPLE}`);
       return;
@@ -158,7 +164,7 @@ export class TelegramBotUpdate {
 
   @Command('why')
   async onWhy(@Ctx() ctx: Context): Promise<void> {
-    const externalId = extractAutoId(commandArg(ctx));
+    const externalId = this.extractAutoId(this.commandArg(ctx));
     if (!externalId) {
       await ctx.reply(`Надішліть посилання на оголошення, напр.:\n/why ${URL_EXAMPLE}`);
       return;
@@ -183,7 +189,7 @@ export class TelegramBotUpdate {
 
   @Command('top')
   async onTop(@Ctx() ctx: Context): Promise<void> {
-    const limit = parseLimit(commandArg(ctx));
+    const limit = this.parseLimit(this.commandArg(ctx));
     const items = await this.query.topOpportunities(limit);
     if (items.length === 0) {
       await ctx.reply('Поки немає знайдених вигідних пропозицій.');
@@ -199,7 +205,7 @@ export class TelegramBotUpdate {
 
   @Command('best')
   async onBest(@Ctx() ctx: Context): Promise<void> {
-    const limit = parseLimit(commandArg(ctx));
+    const limit = this.parseLimit(this.commandArg(ctx));
     const listings = await this.query.topCandidates(limit);
     if (listings.length === 0) {
       await ctx.reply('Ще нічого не оцінено. Дай боту попрацювати або надішли /check <посилання>.');
@@ -214,7 +220,7 @@ export class TelegramBotUpdate {
 
   @Command('last')
   async onLast(@Ctx() ctx: Context): Promise<void> {
-    const limit = parseLimit(commandArg(ctx));
+    const limit = this.parseLimit(this.commandArg(ctx));
     const evaluations = await this.query.getRecentEvaluations(limit);
     if (evaluations.length === 0) {
       await ctx.reply('Оцінок поки немає.');
@@ -292,20 +298,14 @@ export class TelegramBotUpdate {
       await ctx.answerCbQuery('Не знайдено');
       return;
     }
-    await this.outcomes.recordManual({
-      listingId: op.listingId,
-      opportunityId: op.id,
-      label: parsed.label,
-    });
-    await ctx.answerCbQuery(
-      parsed.label === 'good' ? 'Дякую — позначено вдалою' : 'Дякую — позначено невдалою',
-    );
+    await this.outcomes.recordManual({ listingId: op.listingId, opportunityId: op.id, label: parsed.label });
+    await ctx.answerCbQuery(parsed.label === 'good' ? 'Дякую — позначено вдалою' : 'Дякую — позначено невдалою');
   }
 
   @Command('outcome')
   async onOutcome(@Ctx() ctx: Context): Promise<void> {
-    const parts = commandArg(ctx).split(/\s+/).filter(Boolean);
-    const externalId = extractAutoId(parts[0] ?? '');
+    const parts = this.commandArg(ctx).split(/\s+/).filter(Boolean);
+    const externalId = this.extractAutoId(parts[0] ?? '');
     const label = parts[1] as ManualLabel;
     const note = parts.slice(2).join(' ') || null;
     const allowed: ManualLabel[] = ['good', 'bad', 'bought', 'skipped', 'resold'];
@@ -317,71 +317,318 @@ export class TelegramBotUpdate {
     }
     const listing = await this.query.findListingByExternalId(externalId);
     if (!listing) {
-      await ctx.reply(
-        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.',
-      );
+      await ctx.reply('Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.');
       return;
     }
     await this.outcomes.recordManual({ listingId: listing.id, label, note });
     await ctx.reply('Записав результат. Дякую!');
   }
 
+  // ============ NEW UI: Inline handlers ============
+
+  @Action(/^top:(\d+)$/)
+  async onTopPage(@Ctx() ctx: Context): Promise<void> {
+    const page = parseInt((ctx as any).match![1], 10);
+    if (page < 1) return;
+    await this.showTopDeals(ctx, 5, true, page);
+  }
+
+  @Action(/^best:(\d+)$/)
+  async onBestPage(@Ctx() ctx: Context): Promise<void> {
+    const page = parseInt((ctx as any).match![1], 10);
+    if (page < 1) return;
+    await this.showBestCandidates(ctx, 5, true, page);
+  }
+
+  @Action('top')
+  async onTopAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showTopDeals(ctx, 5, true);
+  }
+
+  @Action('best')
+  async onBestAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showBestCandidates(ctx, 5, true);
+  }
+
+  @Action('dashboard')
+  async onDashboardAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showDashboard(ctx, true);
+  }
+
+  @Action('settings')
+  async onSettingsAction(@Ctx() ctx: Context): Promise<void> {
+    await this.showSettings(ctx, true);
+  }
+
+  @Action('notifications')
+  async onNotificationsAction(@Ctx() ctx: Context): Promise<void> {
+    const chatId = String(ctx.chat!.id);
+    const sub = await this.subscribers.findByChatId(chatId);
+    const enabled = sub?.state === 'active';
+    const muted = sub?.state === 'muted';
+
+    const { formatNotifications } = await import('./ui/formatters');
+    const { InlineKeyboard } = await import('./ui/keyboards');
+
+    const text = formatNotifications(enabled, muted);
+    const kb = new InlineKeyboard()
+      .button(enabled ? '🔴 Disable' : '🟢 Enable', 'notifications_toggle')
+      .button(muted ? '🔊 Unmute' : '🔇 Mute', 'notifications_mute')
+      .row({ text: '⬅️ Back', callback_data: 'settings' });
+
+    await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb.build() });
+  }
+
+  @Action('notifications_toggle')
+  async onNotificationsToggle(@Ctx() ctx: Context): Promise<void> {
+    const chatId = String(ctx.chat!.id);
+    const sub = await this.subscribers.findByChatId(chatId);
+    if (sub) {
+      if (sub.state === 'muted') {
+        await this.subscribers.activate(chatId);
+      } else {
+        await this.subscribers.mute(chatId);
+      }
+    }
+    await this.onNotificationsAction(ctx);
+  }
+
+  @Action('main')
+  async onMainMenu(@Ctx() ctx: Context): Promise<void> {
+    await ctx.editMessageText('📱 <b>Main Menu</b>', {
+      parse_mode: 'HTML',
+      ...MAIN_MENU_KEYBOARD,
+    });
+  }
+
+  @Action(/^check:(.+)$/)
+  async onCheckInline(@Ctx() ctx: Context): Promise<void> {
+    const externalId = (ctx as any).match![1];
+    await ctx.answerCbQuery();
+    await ctx.editMessageText('🔍 Analyzing vehicle...', { parse_mode: 'HTML' });
+    await this.checkCar(ctx, externalId);
+  }
+
+  @Action(/^why:(.+)$/)
+  async onWhyInline(@Ctx() ctx: Context): Promise<void> {
+    const externalId = (ctx as any).match![1];
+    await ctx.answerCbQuery();
+    await ctx.editMessageText('📝 Loading explanation...', { parse_mode: 'HTML' });
+    await this.showWhy(ctx, externalId);
+  }
+
+  // ============ New UI helper methods ============
+
+  private async showVehicleActionMenu(ctx: Context, externalId: string): Promise<void> {
+    const { InlineKeyboard } = await import('./ui/keyboards');
+    const kb = new InlineKeyboard()
+      .button('🔍 Evaluate', `check:${externalId}`)
+      .button('📝 Why', `why:${externalId}`)
+      .button('💾 Save outcome', `outcome:${externalId}`)
+      .row({ text: '🌐 Open listing', url: `https://auto.ria.com/uk/auto_${externalId}.html` });
+
+    await ctx.reply(
+      '🚗 <b>AUTO.RIA listing detected.</b>\n\nWhat would you like to do?',
+      { parse_mode: 'HTML', ...kb.build() }
+    );
+  }
+
+  private async checkCar(ctx: Context, externalId: string): Promise<void> {
+    try {
+      const a = await this.query.assessById(externalId);
+      const { formatVehicleCardWithFactors } = await import('./ui/formatters');
+      const text = formatVehicleCardWithFactors(a.detail, a.result);
+      const { InlineKeyboard } = await import('./ui/keyboards');
+      const kb = new InlineKeyboard()
+        .button('📝 Why', `why:${externalId}`)
+        .button('💾 Save outcome', `outcome:${externalId}`)
+        .row({ text: '🌐 Open listing', url: `https://auto.ria.com/uk/auto_${externalId}.html` });
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb.build() });
+    } catch {
+      await ctx.reply('❌ Failed to analyze. Check link or try later.');
+    }
+  }
+
+  private async showWhy(ctx: Context, externalId: string): Promise<void> {
+    try {
+      const a = await this.query.assessById(externalId);
+      const { formatWhyMessage } = await import('./ui/formatters');
+      const text = formatWhyMessage(
+        a.detail, a.result,
+        a.fairValue, a.currency,
+        a.sampleSize, String(a.benchmarkBase), a.mileageAware
+      );
+      await ctx.reply(text, { parse_mode: 'HTML' });
+    } catch {
+      await ctx.reply('❌ Failed to explain.');
+    }
+  }
+
+  private async showTopDeals(ctx: Context, limit = 5, edit = false, page = 1): Promise<void> {
+    const { formatTopDeals } = await import('./ui/formatters');
+    const { paginationKeyboard } = await import('./ui/keyboards');
+    const items = await this.query.topOpportunities(limit * page);
+    const paginated = items.slice((page - 1) * limit, page * limit);
+    const totalPages = Math.ceil(items.length / limit) || 1;
+
+    const text = formatTopDeals(paginated, page, totalPages, limit);
+    const kb = paginationKeyboard(page, totalPages, 'top');
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb });
+    }
+  }
+
+  private async showBestCandidates(ctx: Context, limit = 5, edit = false, page = 1): Promise<void> {
+    const { formatBestCandidates } = await import('./ui/formatters');
+    const { paginationKeyboard } = await import('./ui/keyboards');
+    const items = await this.query.topCandidates(limit * page);
+    const paginated = items.slice((page - 1) * limit, page * limit);
+    const totalPages = Math.ceil(items.length / limit) || 1;
+
+    const text = formatBestCandidates(paginated, page, totalPages, limit);
+    const kb = paginationKeyboard(page, totalPages, 'best');
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb });
+    }
+  }
+
+  private async showDashboard(ctx: Context, edit = false): Promise<void> {
+    const { formatDashboard } = await import('./ui/formatters');
+    const profiles = await this.profiles.getEnabled();
+    const text = formatDashboard({
+      evaluated: 0,
+      topDeals: (await this.query.topOpportunities(1)).length,
+      profiles: profiles.length,
+      lastCalibration: null,
+      avgScore: 0,
+    });
+    const { InlineKeyboard } = await import('./ui/keyboards');
+    const kb = new InlineKeyboard()
+      .button('🔥 Top Deals', 'top')
+      .button('📊 Best Candidates', 'best')
+      .row({ text: '📋 Profiles', callback_data: 'profiles' })
+      .row({ text: '📈 History', callback_data: 'history' })
+      .row({ text: '⚙️ Settings', callback_data: 'settings' })
+      .row({ text: '⚖️ Calibrate', callback_data: 'calibrate' });
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb.build() });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb.build() });
+    }
+  }
+
+  private async showSettings(ctx: Context, edit = false): Promise<void> {
+    const { formatSettings } = await import('./ui/formatters');
+    const profiles = await this.profiles.getEnabled();
+    const text = formatSettings(true, profiles.length, 0);
+    const { InlineKeyboard } = await import('./ui/keyboards');
+    const kb = new InlineKeyboard()
+      .button('🔔 Notifications', 'notifications')
+      .button('📋 Profiles', 'profiles')
+      .row({ text: '🚫 Blacklist', callback_data: 'blacklist' })
+      .row({ text: '⬅️ Back', callback_data: 'main' });
+
+    if (edit) {
+      await ctx.editMessageText(text, { parse_mode: 'HTML', ...kb.build() });
+    } else {
+      await ctx.reply(text, { parse_mode: 'HTML', ...kb.build() });
+    }
+  }
+
+  @On('text')
+  async onText(@Ctx() ctx: Context): Promise<void> {
+    const message = ctx.message;
+    if (!message || !('text' in message)) return;
+
+    const text = message.text.trim();
+
+    // Auto-detect AUTO.RIA URL
+    const externalId = this.extractAutoId(text);
+    if (externalId && text.includes('auto.ria.com')) {
+      await this.showVehicleActionMenu(ctx, externalId);
+      return;
+    }
+
+    // Handle menu button presses
+    switch (text) {
+      case '🚗 Check car':
+        await ctx.reply('🔍 Send me an AUTO.RIA link to analyze:');
+        break;
+      case '🔥 Top deals':
+        await this.showTopDeals(ctx, 5);
+        break;
+      case '📊 Dashboard':
+        await this.showDashboard(ctx);
+        break;
+      case '⚙️ Settings':
+        await this.showSettings(ctx);
+        break;
+      default:
+        // Ignore other text
+        break;
+    }
+  }
+
   @Help()
   async onHelp(@Ctx() ctx: Context): Promise<void> {
-    await ctx.reply(HELP);
+    await ctx.reply(HELP, { parse_mode: 'HTML' });
   }
-}
 
-/** Read the text after the command (e.g. "/check <url>" -> "<url>"). */
-function commandArg(ctx: Context): string {
-  const message = ctx.message;
-  const text = message && 'text' in message ? message.text : '';
-  return text.replace(/^\/\w+(@\w+)?\s*/, '').trim();
-}
-
-/**
- * Extract an AUTO.RIA auto_id from a listing URL (or a raw id). The id is the last 6+ digit run —
- * auto.ria URLs put it at the end, e.g. `.../auto_hyundai_sonata_40143820.html` -> `40143820`.
- */
-function extractAutoId(input: string): string | null {
-  const matches = input.match(/\d{6,}/g);
-  return matches ? matches[matches.length - 1] : null;
-}
-
-/** Parse an optional numeric limit from a command argument, clamped to [1, 100]. */
-function parseLimit(arg: string, defaultLimit = 5): number {
-  const n = parseInt(arg, 10);
-  if (!Number.isFinite(n) || n <= 0) return defaultLimit;
-  return Math.min(n, 100);
-}
-
-/** Split argument into first token (quoted or plain) and the rest. */
-function splitFirstQuotedOrPlain(arg: string): [string, string] {
-  const trimmed = arg.trim();
-  if (!trimmed) return ['', ''];
-  if (trimmed[0] === '"') {
-    const end = trimmed.indexOf('"', 1);
-    if (end === -1) return [trimmed.slice(1), ''];
-    const first = trimmed.slice(1, end);
-    const rest = trimmed.slice(end + 1).trim();
-    return [first, rest];
+  /** Extract an AUTO.RIA auto_id from a listing URL (or a raw id). */
+  private extractAutoId(input: string): string | null {
+    const matches = input.match(/\d{6,}/g);
+    return matches ? matches[matches.length - 1] : null;
   }
-  const space = trimmed.indexOf(' ');
-  if (space === -1) return [trimmed, ''];
-  return [trimmed.slice(0, space), trimmed.slice(space + 1)];
-}
 
-/** Parse profile name (quoted or plain) + items (quoted or plain, space-separated). */
-function parseQuotedOrPlain(arg: string): { name: string; items: string[] } {
-  const [name, rest] = splitFirstQuotedOrPlain(arg);
-  if (!name) return { name: '', items: [] };
-  const items: string[] = [];
-  let remaining = rest;
-  while (remaining.trim()) {
-    const [item, rest2] = splitFirstQuotedOrPlain(remaining);
-    if (!item) break;
-    items.push(item);
-    remaining = rest2;
+  /** Read the text after the command (e.g. "/check <url>" -> "<url>"). */
+  private commandArg(ctx: Context): string {
+    const message = ctx.message;
+    const text = message && 'text' in message ? message.text : '';
+    return text.replace(/^\/\w+(@\w+)?\s*/, '').trim();
   }
-  return { name, items };
+
+  /** Parse an optional numeric limit from a command argument, clamped to [1, 100]. */
+  private parseLimit(arg: string, defaultLimit = 5): number {
+    const n = parseInt(arg, 10);
+    if (!Number.isFinite(n) || n <= 0) return defaultLimit;
+    return Math.min(n, 100);
+  }
+
+  /** Split argument into first token (quoted or plain) and the rest. */
+  private splitFirstQuotedOrPlain(arg: string): [string, string] {
+    const trimmed = arg.trim();
+    if (!trimmed) return ['', ''];
+    if (trimmed[0] === '"') {
+      const end = trimmed.indexOf('"', 1);
+      if (end === -1) return [trimmed.slice(1), ''];
+      const first = trimmed.slice(1, end);
+      const rest = trimmed.slice(end + 1).trim();
+      return [first, rest];
+    }
+    const space = trimmed.indexOf(' ');
+    if (space === -1) return [trimmed, ''];
+    return [trimmed.slice(0, space), trimmed.slice(space + 1)];
+  }
+
+  /** Parse profile name (quoted or plain) + items (quoted or plain, space-separated). */
+  private parseQuotedOrPlain(arg: string): { name: string; items: string[] } {
+    const [name, rest] = this.splitFirstQuotedOrPlain(arg);
+    if (!name) return { name: '', items: [] };
+    const items: string[] = [];
+    let remaining = rest;
+    while (remaining.trim()) {
+      const [item, rest2] = this.splitFirstQuotedOrPlain(remaining);
+      if (!item) break;
+      items.push(item);
+      remaining = rest2;
+    }
+return { name, items };
+  }
 }
