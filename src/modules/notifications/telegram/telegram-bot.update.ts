@@ -23,7 +23,7 @@ const HELP =
   '/why <посилання> — пояснити, чому такий бал\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
-  '/last [N] — останні оцінки (за замовчуванням 10)\n' +
+  '/last [N] — останні оцінки (за замовчуванням 5)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
   '/calibrate — підібрати пороги за даними\n' +
   '/params — поточні пороги\n' +
@@ -213,7 +213,7 @@ export class TelegramBotUpdate {
   }
 
   @Command('last')
-  async onHistory(@Ctx() ctx: Context): Promise<void> {
+  async onLast(@Ctx() ctx: Context): Promise<void> {
     const limit = parseLimit(commandArg(ctx));
     const evaluations = await this.query.getRecentEvaluations(limit);
     if (evaluations.length === 0) {
@@ -349,9 +349,9 @@ function extractAutoId(input: string): string | null {
 }
 
 /** Parse an optional numeric limit from a command argument, clamped to [1, 100]. */
-function parseLimit(arg: string): number {
+function parseLimit(arg: string, defaultLimit = 5): number {
   const n = parseInt(arg, 10);
-  if (!Number.isFinite(n) || n <= 0) return 5;
+  if (!Number.isFinite(n) || n <= 0) return defaultLimit;
   return Math.min(n, 100);
 }
 
