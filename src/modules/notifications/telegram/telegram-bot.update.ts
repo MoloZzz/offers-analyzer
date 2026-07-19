@@ -23,6 +23,7 @@ const HELP =
   '/why <посилання> — пояснити, чому такий бал\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
+  '/last [N] — останні оцінки (за замовчуванням 10)\n' +
   '/report — звіт по відбору + підказка порогу\n' +
   '/calibrate — підібрати пороги за даними\n' +
   '/params — поточні пороги\n' +
@@ -34,9 +35,9 @@ const HELP =
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
   '/profiles — які ніші зараз моніторимо\n' +
-  '/blacklist <ніша> — показати чорний список ніші\n' +
-  '/blacklist_add <ніша> <марка модель> — додати в чорний список\n' +
-  '/blacklist_remove <ніша> <марка модель> — видалити з чорного списку\n' +
+  '/blacklist "Назва ніші" — показати чорний список ніші\n' +
+  '/blacklist_add "Назва ніші" "Марка Модель" — додати в чорний список\n' +
+  '/blacklist_remove "Назва ніші" "Марка Модель" — видалити з чорного списку\n' +
   '/help — ця довідка';
 
 /** Telegram bot commands (FR-015) + on-demand queries. */
@@ -95,7 +96,11 @@ export class TelegramBotUpdate {
       return;
     }
     const bl = profile.filters?.excludeMakeModels ?? [];
-    await ctx.reply(bl.length ? `Чорний список для "${name}":\n${bl.map((x) => `• ${x}`).join('\n')}` : `Чорний список для "${name}" порожній.`);
+    await ctx.reply(
+      bl.length
+        ? `Чорний список для "${name}":\n${bl.map((x) => `• ${x}`).join('\n')}`
+        : `Чорний список для "${name}" порожній.`,
+    );
   }
 
   @Command('blacklist_add')
@@ -111,7 +116,9 @@ export class TelegramBotUpdate {
       return;
     }
     const updated = await this.profiles.addToBlacklist(profile.id, items);
-    await ctx.reply(`Оновлено чорний список для "${name}":\n${updated.map((x) => `• ${x}`).join('\n')}`);
+    await ctx.reply(
+      `Оновлено чорний список для "${name}":\n${updated.map((x) => `• ${x}`).join('\n')}`,
+    );
   }
 
   @Command('blacklist_remove')
@@ -127,7 +134,9 @@ export class TelegramBotUpdate {
       return;
     }
     const updated = await this.profiles.removeFromBlacklist(profile.id, items);
-    await ctx.reply(`Оновлено чорний список для "${name}":\n${updated.length ? updated.map((x) => `• ${x}`).join('\n') : '(порожній)'}`);
+    await ctx.reply(
+      `Оновлено чорний список для "${name}":\n${updated.length ? updated.map((x) => `• ${x}`).join('\n') : '(порожній)'}`,
+    );
   }
 
   @Command('check')
@@ -141,7 +150,9 @@ export class TelegramBotUpdate {
       const a = await this.query.assessById(externalId);
       await ctx.reply(formatAssessment(a.detail, a.result, a.fairValue, a.currency));
     } catch {
-      await ctx.reply('Не вдалося перевірити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.');
+      await ctx.reply(
+        'Не вдалося перевірити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.',
+      );
     }
   }
 
@@ -164,7 +175,9 @@ export class TelegramBotUpdate {
         }),
       );
     } catch {
-      await ctx.reply('Не вдалося пояснити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.');
+      await ctx.reply(
+        'Не вдалося пояснити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.',
+      );
     }
   }
 
@@ -177,9 +190,7 @@ export class TelegramBotUpdate {
       return;
     }
     const lines = items.map(({ opportunity, listing }) => {
-      const name = listing
-        ? `${listing.make} ${listing.model}, ${listing.year}`
-        : 'оголошення';
+      const name = listing ? `${listing.make} ${listing.model}, ${listing.year}` : 'оголошення';
       const link = listing ? `\n  ${listing.url}` : '';
       return `• ${name} — бал ${opportunity.score}, ${opportunity.askingValue} ${opportunity.currency}${link}`;
     });
@@ -199,6 +210,23 @@ export class TelegramBotUpdate {
       return `• ${l.make} ${l.model}, ${l.year} — бал ${score}, ${l.currentAmount} ${l.currentCurrency}\n  ${l.url}`;
     });
     await ctx.reply(`Найкращі оцінені (${listings.length}):\n${lines.join('\n')}`);
+  }
+
+  @Command('last')
+  async onHistory(@Ctx() ctx: Context): Promise<void> {
+    const limit = parseLimit(commandArg(ctx));
+    const evaluations = await this.query.getRecentEvaluations(limit);
+    if (evaluations.length === 0) {
+      await ctx.reply('Оцінок поки немає.');
+      return;
+    }
+    const lines = evaluations.map((l) => {
+      const score = l.lastScore ?? 0;
+      const discount = l.lastDiscountPct ?? 0;
+      const time = l.lastEvaluatedAt ? new Date(l.lastEvaluatedAt).toLocaleString('uk-UA') : '—';
+      return `• ${l.make} ${l.model}, ${l.year} — бал ${score}, знижка ${discount.toFixed(1)}% (${time})\n  ${l.url}`;
+    });
+    await ctx.reply(`Останні оцінки (${evaluations.length}):\n${lines.join('\n')}`);
   }
 
   @Command('report')
@@ -245,7 +273,9 @@ export class TelegramBotUpdate {
   @Command('weights_apply')
   async onWeightsApply(@Ctx() ctx: Context): Promise<void> {
     const version = await this.calibration.applyLatestWeightCandidate();
-    await ctx.reply(version != null ? `Активовано набір ваг v${version}.` : 'Немає кандидата для застосування.');
+    await ctx.reply(
+      version != null ? `Активовано набір ваг v${version}.` : 'Немає кандидата для застосування.',
+    );
   }
 
   @Action(/^oc:/)
@@ -262,8 +292,14 @@ export class TelegramBotUpdate {
       await ctx.answerCbQuery('Не знайдено');
       return;
     }
-    await this.outcomes.recordManual({ listingId: op.listingId, opportunityId: op.id, label: parsed.label });
-    await ctx.answerCbQuery(parsed.label === 'good' ? 'Дякую — позначено вдалою' : 'Дякую — позначено невдалою');
+    await this.outcomes.recordManual({
+      listingId: op.listingId,
+      opportunityId: op.id,
+      label: parsed.label,
+    });
+    await ctx.answerCbQuery(
+      parsed.label === 'good' ? 'Дякую — позначено вдалою' : 'Дякую — позначено невдалою',
+    );
   }
 
   @Command('outcome')
@@ -281,7 +317,9 @@ export class TelegramBotUpdate {
     }
     const listing = await this.query.findListingByExternalId(externalId);
     if (!listing) {
-      await ctx.reply('Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.');
+      await ctx.reply(
+        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.',
+      );
       return;
     }
     await this.outcomes.recordManual({ listingId: listing.id, label, note });

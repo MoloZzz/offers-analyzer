@@ -52,6 +52,15 @@ export class ListingsService {
     });
   }
 
+  /** Recently evaluated listings (for /last command). */
+  getRecentlyEvaluated(limit = 10): Promise<Listing[]> {
+    return this.listings.find({
+      where: { lastScore: Not(IsNull()), lastEvaluatedAt: Not(IsNull()) },
+      order: { lastEvaluatedAt: 'DESC' },
+      take: limit,
+    });
+  }
+
   /** All recorded deal scores (for the self-tuning report / calibration) — optionally per profile. */
   async scoresForReport(profileId?: string): Promise<number[]> {
     const qb = this.listings
@@ -119,7 +128,8 @@ export class ListingsService {
           amount: detail.price.amount,
           currency: detail.price.currency,
           // FX normalization is US2; in v1 the compare currency is USD, so amountUsd === amount.
-          amountUsd: detail.price.currency === Currency.USD ? detail.price.amount : detail.price.amount,
+          amountUsd:
+            detail.price.currency === Currency.USD ? detail.price.amount : detail.price.amount,
         }),
       );
     }

@@ -32,6 +32,14 @@ export interface RankedOpportunity {
   listing?: Listing;
 }
 
+/** Recent evaluation record for history command. */
+export interface RecentEvaluation {
+  listing: Listing;
+  score: number;
+  discountPct: number;
+  evaluatedAt: Date;
+}
+
 /** Read-mostly queries exposed to the Telegram bot (on-demand check, top deals, best candidates). */
 @Injectable()
 export class QueryService {
@@ -99,6 +107,17 @@ export class QueryService {
     return this.listings.topByScore(limit);
   }
 
+  /** Recently evaluated listings (for /history command). */
+  async recentEvaluations(limit = 10): Promise<RecentEvaluation[]> {
+    const listings = await this.listings.getRecentlyEvaluated(limit);
+    return listings.map((l) => ({
+      listing: l,
+      score: l.lastScore ?? 0,
+      discountPct: l.lastDiscountPct ?? 0,
+      evaluatedAt: l.lastEvaluatedAt ?? new Date(0),
+    }));
+  }
+
   /** Self-tuning report (R1): distribution of scores, near-misses, and a suggested threshold. */
   async report(targetCandidates = 10): Promise<ReportDigest> {
     const scores = await this.listings.scoresForReport();
@@ -126,5 +145,10 @@ export class QueryService {
   async findListingByExternalId(externalId: string): Promise<Listing | null> {
     const [listing] = await this.listings.findByExternalIds([externalId]);
     return listing ?? null;
+  }
+
+  /** Recently evaluated listings (for /history command). */
+  async getRecentEvaluations(limit = 10): Promise<Listing[]> {
+    return this.listings.getRecentlyEvaluated(limit);
   }
 }
