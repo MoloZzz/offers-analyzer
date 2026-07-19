@@ -7,6 +7,7 @@ import { SellerType } from '../sources/ports/listing-source.port';
 import { assessCondition } from './condition';
 import { composeFactors, FactorScore, toTotal100 } from './factors/factor';
 import { liquidityFactor } from './factors/liquidity';
+import { repairRiskFactor } from './factors/repair-risk';
 import { HeuristicTables, HeuristicTablesService } from './factors/tables';
 import { assessMileageRisk } from './mileage-risk';
 import { evaluateRedFlags } from './red-flags';
@@ -37,6 +38,12 @@ export interface ValuationInput {
   year?: number;
   /** Whether AUTO.RIA reports an independent VIN check (distinct from a full VIN report). */
   vinChecked?: boolean;
+  /** Gearbox type — feeds repair-risk factor (spec 003 US2). */
+  gearbox?: string;
+  /** Fuel type — feeds repair-risk factor (spec 003 US2). */
+  fuel?: string;
+  /** Engine/modification info — feeds repair-risk factor (spec 003 US2). */
+  engine?: string;
 }
 
 export interface ValuationResult {
@@ -79,6 +86,7 @@ export interface ValuationResult {
  */
 export const PHASE1_FACTOR_BOUNDS = {
   liquidity: { min: 0.9, max: 1.1 },
+  'repair-risk': { min: 0.85, max: 1.05 },
 } as const;
 
 export function computeValuation(
@@ -128,7 +136,7 @@ export function computeValuation(
   if (disqualified) priceCore = Math.min(priceCore, 0);
 
   // Composite factors (spec 003). Each is gated by its ParameterSet bound + heuristic table, so with
-  // the neutral seed the list is empty and score === priceCore (SC-001). US1: liquidity.
+  // the neutral seed the list is empty and score === priceCore (SC-001). US1: liquidity. US2: repair-risk.
   const factors: FactorScore[] = [];
   const liquidity = liquidityFactor(
     { make: input.make, model: input.model },
@@ -136,6 +144,13 @@ export function computeValuation(
     params.factorBounds?.liquidity,
   );
   if (liquidity) factors.push(liquidity);
+
+  const repairRisk = repairRiskFactor(
+    { make: input.make, model: input.model, gearbox: input.gearbox, fuel: input.fuel, engine: input.engine, year: input.year },
+    tables.repairRisk,
+    params.factorBounds?.['repair-risk'],
+  );
+  if (repairRisk) factors.push(repairRisk);
 
   const upliftCap = params.upliftCap ?? DEFAULT_UPLIFT_CAP;
   const score = composeFactors(priceCore, factors, upliftCap);

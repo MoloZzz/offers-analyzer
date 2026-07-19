@@ -1,7 +1,7 @@
 ---
 title: Domain glossary
 type: domain
-updated: 2026-07-18
+updated: 2026-07-19
 ---
 
 # Domain glossary (ubiquitous language)

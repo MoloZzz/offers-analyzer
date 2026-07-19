@@ -7,6 +7,9 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 /** Liquidity tier: A = very liquid (sells fast), D = illiquid (sits unsold). Spec 003 US1. */
 export type LiquidityTier = 'A' | 'B' | 'C' | 'D';
 
+/** Repair risk tier: LOW / MEDIUM / HIGH. Spec 003 US2. */
+export type RepairRiskTier = 'LOW' | 'MEDIUM' | 'HIGH';
+
 /**
  * Curated liquidity classification, versioned config (not learned). Keys are lowercased
  * `make|model` (models) and `make` (make-level fallback). Content-hashed for an audit trail.
@@ -17,9 +20,38 @@ export interface LiquidityTable {
   makes: Record<string, LiquidityTier>;
 }
 
+/**
+ * Curated repair-risk patterns, versioned config. Keys are lowercased `make|model` for model-specific
+ * rules, plus pattern arrays for engine/gearbox/fuel/age combinations. Content-hashed for audit trail.
+ */
+export interface RepairRiskTable {
+  version: string;
+  models: Record<string, RepairRiskTier>;
+  makes: Record<string, RepairRiskTier>;
+  patterns: RepairRiskPattern[];
+}
+
+/** A pattern that yields a risk tier when matched. */
+export interface RepairRiskPattern {
+  tier: RepairRiskTier;
+  /** Gearbox keywords (e.g. 'dsg', 'cvt', 'air suspension', 'robot') — matched case-insensitively. */
+  gearbox?: string[];
+  /** Engine keywords (e.g. 'w12', 'v8', 'v10', 'v12', 'turbo diesel', 'twin turbo') — matched case-insensitively. */
+  engine?: string[];
+  /** Fuel keywords (e.g. 'diesel', 'hybrid', 'lpg', 'cng') — matched case-insensitively. */
+  fuel?: string[];
+  /** Minimum age in years for this pattern to apply. */
+  minAge?: number;
+  /** Maximum age in years (optional). */
+  maxAge?: number;
+  /** Reason shown to operator when pattern fires. */
+  reason: string;
+}
+
 /** The heuristic tables the composite factors read (spec 003). Each optional → factor off when absent. */
 export interface HeuristicTables {
   liquidity?: LiquidityTable;
+  repairRisk?: RepairRiskTable;
 }
 
 const HEURISTICS_DIR = join(process.cwd(), 'config', 'heuristics');
@@ -42,7 +74,10 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
 
   /** (Re)load tables from disk. Safe to call at runtime (e.g. after editing config). */
   load(): void {
-    this.tables = { liquidity: this.loadLiquidity() };
+    this.tables = {
+      liquidity: this.loadLiquidity(),
+      repairRisk: this.loadRepairRisk(),
+    };
   }
 
   get(): HeuristicTables {
@@ -66,6 +101,43 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
       version: t.version,
       models: lowerKeys(t.models),
       makes: lowerKeys(t.makes),
+    };
+  }
+
+  private loadRepairRisk(): RepairRiskTable | undefined {
+    const raw = this.readJson('repair-risk.json');
+    if (!raw) return undefined;
+    const t = raw as Partial<RepairRiskTable>;
+    if (typeof t.version !== 'string' || !Array.isArray(t.patterns)) {
+      this.logger.warn('repair-risk.json failed validation — repair-risk factor disabled');
+      return undefined;
+    }
+    // Validate models/makes if present
+    const models = t.models ? lowerKeys(t.models) : {};
+    const makes = t.makes ? lowerKeys(t.makes) : {};
+    for (const tier of Object.values(models)) {
+      if (!['LOW', 'MEDIUM', 'HIGH'].includes(tier)) {
+        this.logger.warn('repair-risk.json: invalid model tier — repair-risk factor disabled');
+        return undefined;
+      }
+    }
+    for (const tier of Object.values(makes)) {
+      if (!['LOW', 'MEDIUM', 'HIGH'].includes(tier)) {
+        this.logger.warn('repair-risk.json: invalid make tier — repair-risk factor disabled');
+        return undefined;
+      }
+    }
+    for (const p of t.patterns) {
+      if (!p.tier || !['LOW', 'MEDIUM', 'HIGH'].includes(p.tier) || !p.reason) {
+        this.logger.warn('repair-risk.json: invalid pattern — repair-risk factor disabled');
+        return undefined;
+      }
+    }
+    return {
+      version: t.version,
+      models,
+      makes,
+      patterns: t.patterns,
     };
   }
 

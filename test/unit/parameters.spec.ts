@@ -14,6 +14,9 @@ describe('buildSeedParams', () => {
       mileageAnnualK: 15,
       mileagePer10kPct: 2,
       mileageMaxAdjPct: 20,
+      factorBounds: {},
+      heuristicTableHashes: {},
+      upliftCap: 1.25,
     });
   });
 });

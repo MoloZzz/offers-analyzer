@@ -1,0 +1,109 @@
+{
+  "version": "2026-07-19",
+  "_note": "Repair-risk patterns for UA used-car market. Tier: LOW (reliable), MEDIUM (average), HIGH (costly). Model/make explicit tiers + pattern rules over gearbox/engine/fuel/age. Curated heuristics — extend freely; this is versioned config, not code.",
+  "models": {
+    "toyota|corolla": "LOW",
+    "toyota|camry": "LOW",
+    "toyota|rav4": "LOW",
+    "toyota|yaris": "LOW",
+    "honda|civic": "LOW",
+    "honda|cr-v": "LOW",
+    "honda|accord": "LOW",
+    "mazda|3": "LOW",
+    "mazda|6": "LOW",
+    "mazda|cx-5": "LOW",
+    "subaru|forester": "LOW",
+    "subaru|outback": "LOW",
+    "lexus|rx": "LOW",
+    "lexus|es": "LOW"
+  },
+  "makes": {
+    "toyota": "LOW",
+    "honda": "LOW",
+    "mazda": "LOW",
+    "subaru": "LOW",
+    "lexus": "LOW",
+    "suzuki": "LOW",
+    "kia": "LOW",
+    "hyundai": "LOW",
+    "skoda": "LOW",
+    "volkswagen": "MEDIUM",
+    "ford": "MEDIUM",
+    "opel": "MEDIUM",
+    "renault": "MEDIUM",
+    "peugeot": "MEDIUM",
+    "fiat": "MEDIUM",
+    "nissan": "MEDIUM",
+    "bmw": "HIGH",
+    "mercedes-benz": "HIGH",
+    "audi": "HIGH",
+    "porsche": "HIGH",
+    "land rover": "HIGH",
+    "range rover": "HIGH",
+    "jaguar": "HIGH",
+    "volvo": "HIGH",
+    "cadillac": "HIGH",
+    "infiniti": "HIGH",
+    "alfa romeo": "HIGH"
+  },
+  "patterns": [
+    {
+      "tier": "HIGH",
+      "gearbox": ["dsg", "s-tronic", "dsg-7", "dsg-6", "dq200", "dq250", "dq381", "dq400", "dq500"],
+      "minAge": 5,
+      "reason": "DSG/двоємна коробка — високий ризик мехатроніки/зсувів після 5 років"
+    },
+    {
+      "tier": "HIGH",
+      "gearbox": ["cvt", "вариатор", "multitronic", "xtronic", "ecvt"],
+      "minAge": 5,
+      "reason": "CVT/варіатор — обмежений ресурс, дорога заміна після 5 років"
+    },
+    {
+      "tier": "HIGH",
+      "gearbox": ["air suspension", "пневмопідвіска", "air susp", "пневма"],
+      "reason": "Пневмопідвіска — дорогі ремонти балонів/компресора"
+    },
+    {
+      "tier": "HIGH",
+      "engine": ["w12", "w16", "v12", "v10", "v8", "twin turbo", "biturbo", "bi-turbo"],
+      "minAge": 7,
+      "reason": "Потужний турбо/більш 8 цил — складний двигун, висока вартість власності після 7 років"
+    },
+    {
+      "tier": "HIGH",
+      "engine": ["turbo diesel", "turbodiesel", "tdi", "cdi", "hdi", "dci", "jtd", "tdci", "tdi"],
+      "fuel": ["diesel"],
+      "minAge": 8,
+      "reason": "Турбо-дизель старше 8 років — турбіна, форсунки, ДПФ/EGR, високі витрати"
+    },
+    {
+      "tier": "HIGH",
+      "fuel": ["hybrid", "гібрид", "phev", "plug-in"],
+      "minAge": 8,
+      "reason": "Гібрид старше 8 років — ризик деградації ВБ, дорога заміна батареї"
+    },
+    {
+      "tier": "MEDIUM",
+      "gearbox": ["robot", "робот", "amt", "easytronic", "durashift", "mmt", "sensodrive", "quickshift"],
+      "reason": "Роботизована КПП — частіші несправності актуатора/зсувів"
+    },
+    {
+      "tier": "MEDIUM",
+      "engine": ["rotary", "ротативний", "ренкеля"],
+      "reason": "Ротативний двигун — специфічний ремонт, низький ресурс"
+    },
+    {
+      "tier": "MEDIUM",
+      "fuel": ["lpg", "гпл", "cng", "метан"],
+      "reason": "ГПЛ/Метан — додаткове обладнання, перевірки, можливі утечі"
+    },
+    {
+      "tier": "LOW",
+      "engine": ["naturally aspirated", "атмосферний", "atmospheric"],
+      "fuel": ["petrol", "бензин"],
+      "maxAge": 15,
+      "reason": "Атмосферний бензиновий — простіша конструкція, нижчий ризик"
+    }
+  ]
+}

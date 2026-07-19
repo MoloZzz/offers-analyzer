@@ -59,6 +59,16 @@ export interface ListingDetail {
   risk: ListingRisk;
   /** Free-text seller description (AUTO.RIA `autoData.description`) — scanned for condition signals. */
   description?: string;
+  /** Transmission type (AUTO.RIA `autoData.gearboxName` / `gearBoxId`). */
+  gearbox?: string;
+  /** Fuel type (AUTO.RIA `autoData.fuelName` / `fuelId`). */
+  fuel?: string;
+  /** Engine/modification info (AUTO.RIA `autoData.modificationName` / `modificationId`). */
+  engine?: string;
+  /** Drive type (AUTO.RIA `autoData.driveName` / `driveId`). */
+  drive?: string;
+  /** Body type id (AUTO.RIA `autoData.bodyId`). */
+  bodyId?: number;
 }
 
 export interface CohortQuery {

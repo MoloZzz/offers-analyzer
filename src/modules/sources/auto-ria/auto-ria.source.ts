@@ -73,6 +73,7 @@ export class AutoRiaSource implements ListingSource {
     const params = new URLSearchParams({ api_key: this.apiKey, auto_id: externalId });
     const d = await this.get<AutoRiaInfo>('/info', params);
     const bar = d.autoInfoBar ?? {};
+    const ad = d.autoData ?? {};
 
     return {
       externalId,
@@ -80,8 +81,8 @@ export class AutoRiaSource implements ListingSource {
       model: d.modelName ?? '',
       markId: d.markId ?? 0,
       modelId: d.modelId ?? 0,
-      year: d.autoData?.year ?? 0,
-      mileage: d.autoData?.raceInt ?? undefined,
+      year: ad.year ?? 0,
+      mileage: ad.raceInt ?? undefined,
       stateId: d.stateData?.stateId ?? undefined,
       cityId: d.stateData?.cityId ?? undefined,
       sellerType: mapSellerType(d.dealer),
@@ -100,7 +101,12 @@ export class AutoRiaSource implements ListingSource {
         abroad: bar.abroad === true,
         vinChecked: d.checkedVin?.isChecked === true,
       },
-      description: d.autoData?.description ?? undefined,
+      description: ad.description ?? undefined,
+      gearbox: ad.gearboxName ?? undefined,
+      fuel: ad.fuelName ?? undefined,
+      engine: ad.modificationName ?? undefined,
+      drive: ad.driveName ?? undefined,
+      bodyId: ad.bodyId ?? undefined,
     };
   }
 
@@ -190,7 +196,37 @@ interface AutoRiaInfo {
   linkToView?: string;
   dealer?: { id?: number };
   stateData?: { stateId?: number; cityId?: number };
-  autoData?: { year?: number; raceInt?: number; description?: string };
+  autoData?: {
+    year?: number;
+    raceInt?: number;
+    description?: string;
+    fuelNameEng?: string;
+    fuelName?: string;
+    fuelId?: number;
+    driveName?: string;
+    generationName?: string;
+    categoryNameEng?: string;
+    categoryId?: number;
+    modificationId?: number;
+    custom?: number;
+    gearboxName?: string;
+    subCategoryNameEng?: string;
+    version?: string;
+    gearBoxId?: number;
+    race?: string;
+    statusId?: number;
+    vat?: boolean;
+    modificationName?: string;
+    generationId?: number;
+    bodyId?: number;
+    active?: boolean;
+    driveId?: number;
+    equipmentName?: string;
+    mainCurrency?: string;
+    withVideoMessages?: boolean;
+    autoId?: number;
+    onModeration?: boolean;
+  };
   autoInfoBar?: {
     abroad?: boolean;
     confiscatedCar?: boolean;

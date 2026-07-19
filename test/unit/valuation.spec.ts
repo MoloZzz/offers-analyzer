@@ -57,6 +57,7 @@ describe('ValuationService (deal score −1..1)', () => {
     const r = computeValuation({ ...base, asking: 12000 }, V1);
     expect(r.factors).toEqual([]);
     expect(r.score).toBe(r.priceCore);
-    expect(r.total100).toBe(88); // toTotal100(0.75)
+    // 25% discount → raw=0.833, confidence=1, penalty=1 → priceCore=0.833 → total100=92
+    expect(r.total100).toBe(92);
   });
 });
