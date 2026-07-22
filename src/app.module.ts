@@ -1,12 +1,14 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
 
 import configuration, { AppConfig } from './common/config/configuration';
 import { validateEnv } from './common/config/env.validation';
 import { DatabaseModule } from './common/database/database.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { CalibrationModule } from './modules/calibration/calibration.module';
 import { PollingModule } from './modules/polling/polling.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
@@ -44,5 +46,6 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
     PollingModule,
     CalibrationModule,
   ],
+  providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
 export class AppModule {}

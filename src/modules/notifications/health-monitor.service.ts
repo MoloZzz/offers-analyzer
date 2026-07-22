@@ -22,16 +22,20 @@ export class HealthMonitorService {
 
   @Cron('*/15 * * * *', { name: 'health-monitor' })
   async check(): Promise<void> {
-    const minutes = this.health.minutesSinceSuccess();
-    const { message, alerted } = decideHealthAlert(minutes, this.alerted, STALE_MINUTES);
-    this.alerted = alerted;
-    if (message === 'down') {
-      await this.notifications.broadcast(
-        `⚠️ Моніторинг не оновлювався ${Math.round(minutes)} хв — можливо збій поллінгу або джерело недоступне. Перевірте сервіс.`,
-      );
-      this.logger.warn({ staleMinutes: Math.round(minutes) }, 'Health alert: stale');
-    } else if (message === 'recovered') {
-      await this.notifications.broadcast('✅ Моніторинг відновився — цикли знову проходять.');
+    try {
+      const minutes = this.health.minutesSinceSuccess();
+      const { message, alerted } = decideHealthAlert(minutes, this.alerted, STALE_MINUTES);
+      this.alerted = alerted;
+      if (message === 'down') {
+        await this.notifications.broadcast(
+          `⚠️ Моніторинг не оновлювався ${Math.round(minutes)} хв — можливо збій поллінгу або джерело недоступне. Перевірте сервіс.`,
+        );
+        this.logger.warn({ staleMinutes: Math.round(minutes) }, 'Health alert: stale');
+      } else if (message === 'recovered') {
+        await this.notifications.broadcast('✅ Моніторинг відновився — цикли знову проходять.');
+      }
+    } catch (err) {
+      this.logger.error({ err }, 'Health monitor check failed');
     }
   }
 }

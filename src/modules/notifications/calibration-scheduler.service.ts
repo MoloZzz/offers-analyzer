@@ -20,11 +20,15 @@ export class CalibrationSchedulerService {
 
   @Cron(CALIBRATION_CRON, { name: 'weekly-calibration' })
   async weeklyCalibration(): Promise<void> {
-    const mode = this.calibration.configuredMode();
-    const lines = await this.calibration.runAndSummarize(mode);
-    const changed = lines.filter((l) => l.after != null);
-    if (changed.length === 0) return; // nothing to report this week
-    await this.notifications.broadcast(formatCalibration(lines, mode));
-    this.logger.info({ mode, proposalCount: changed.length }, 'Weekly calibration ran');
+    try {
+      const mode = this.calibration.configuredMode();
+      const lines = await this.calibration.runAndSummarize(mode);
+      const changed = lines.filter((l) => l.after != null);
+      if (changed.length === 0) return; // nothing to report this week
+      await this.notifications.broadcast(formatCalibration(lines, mode));
+      this.logger.info({ mode, proposalCount: changed.length }, 'Weekly calibration ran');
+    } catch (err) {
+      this.logger.error({ err }, 'Weekly calibration failed');
+    }
   }
 }

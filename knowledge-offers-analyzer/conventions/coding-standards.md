@@ -15,7 +15,7 @@ updated: 2026-07-22
 - **Simple over flexible.** Don't add abstraction until a second real case exists (YAGNI). Extensibility where the domain clearly demands it — e.g. the `ListingSource` port for multiple sites (see [[monitoring-approaches]]) — not everywhere.
 - **Dependency inversion.** Depend on interfaces (ports), not concretions. External systems (AUTO.RIA API, Telegram, DB) sit behind adapters so they're swappable and testable.
 - **Explicit boundaries.** Domain logic isolated from framework/IO. DTOs validated at the edge; typed everywhere (no `any`).
-- **Errors are values you handle.** No silent catches; fail loud, log with context, use typed error paths.
+- **Errors are values you handle.** No silent catches; fail loud, log with context, use typed error paths. Cross-cutting nets exist as a backstop, not a substitute — the global exception filter and process-level handlers ([[0008-global-error-handling|ADR-0008]]) catch what individual handlers miss, they don't excuse skipping a local `try/catch` where you can add specific, actionable recovery (see `/check`, `/why` in `telegram-bot.update.ts`, or `poll.service.ts`'s `RateBudgetExhaustedError` handling).
 - **Log structured, not interpolated.** Every service injects `PinoLogger` (`@InjectPinoLogger(X.name)`
   from `nestjs-pino`, not `new Logger(X.name)` from `@nestjs/common`) and calls
   `logger.warn({ field1, field2 }, 'Static message')` — a merging object first, a fixed message

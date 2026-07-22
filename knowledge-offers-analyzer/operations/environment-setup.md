@@ -1,7 +1,7 @@
 ---
 title: Environment setup & tooling
 type: operations
-updated: 2026-07-12
+updated: 2026-07-22
 ---
 
 # Environment setup & tooling
@@ -35,6 +35,12 @@ updated: 2026-07-12
 
 - App: NestJS. Standard scripts (`npm run build`, `test`, `lint`) — run them through RTK.
 - Repo: `MoloZzz/offers-analyzer`.
+- **Run under a process supervisor.** Since [[0008-global-error-handling|ADR-0008]], `main.ts`
+  exits the process (`process.exit(1)`) on an uncaught exception or unhandled rejection rather
+  than trying to continue in a possibly-corrupted state. In production this requires something
+  that restarts the process automatically — e.g. `systemd` (`Restart=always`), `pm2`, or a
+  Docker `restart: unless-stopped` policy — otherwise a fatal error means the bot stays down
+  until someone restarts it manually.
 
 ## Related
 

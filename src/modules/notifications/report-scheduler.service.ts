@@ -24,9 +24,13 @@ export class ReportSchedulerService {
 
   @Cron(WEEKLY_REPORT_CRON, { name: 'weekly-report' })
   async weeklyReport(): Promise<void> {
-    const digest = await this.query.report();
-    if (digest.evaluated === 0) return; // nothing to report yet — don't spam an empty digest
-    await this.notifications.broadcast(formatReport(digest));
-    this.logger.info({ evaluated: digest.evaluated }, 'Weekly report sent');
+    try {
+      const digest = await this.query.report();
+      if (digest.evaluated === 0) return; // nothing to report yet — don't spam an empty digest
+      await this.notifications.broadcast(formatReport(digest));
+      this.logger.info({ evaluated: digest.evaluated }, 'Weekly report sent');
+    } catch (err) {
+      this.logger.error({ err }, 'Weekly report failed');
+    }
   }
 }
