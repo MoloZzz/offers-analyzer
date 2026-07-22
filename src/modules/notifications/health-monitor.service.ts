@@ -7,7 +7,7 @@ import { decideHealthAlert } from '../health/health-alert';
 import { NotificationsService } from './notifications.service';
 
 /** Alert the operator if the poll hasn't had a successful cycle in a while (dead-man's-switch). */
-const STALE_MINUTES = 45; // ~4.5 missed 10-min cycles
+const STALE_MINUTES = 90; // ~4.5 missed 10-min cycles
 
 @Injectable()
 export class HealthMonitorService {

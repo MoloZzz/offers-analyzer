@@ -204,8 +204,14 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   neutral factor config (no migration); `📊 Загальний бал N/100` in `/why` + alerts. tsc clean,
   `factor.spec` 7/7; SC-001 holds by construction. **T004 loader + T005/B23 persist deferred** (nothing
   to load/persist until a factor ships) — B23 no longer *blocks* Phase F, it lands with the first factor.
-- [ ] **S1 — Liquidity score** (tier tables + factor; P1).
-- [ ] **S2 — Repair-risk score** (pattern rules; P1).
+- [x] **S1 — Liquidity score** — done: `config/heuristics/liquidity-tiers.json` + pure
+  `factors/liquidity.ts` (tier A–D → modifier within ParameterSet bounds; unlisted→neutral-with-reason),
+  gated by `factorBounds.liquidity` + table. `liquidity.spec` 7/7.
+- [x] **S2 — Repair-risk score** — done: `config/heuristics/repair-risk.json` (model/make tiers +
+  gearbox/engine/fuel/age patterns) + pure `factors/repair-risk.ts` (HIGH→dampen, LOW→slight uplift);
+  `/info` gearbox/fuel/engine verified + mapped in `AutoRiaSource`; wired through poll + query.
+  `repair-risk.spec` 10/10. Both factors ship **off by default** (neutral seed → SC-001); enable via a
+  `ParameterSet` carrying `PHASE1_FACTOR_BOUNDS`, then re-validate thresholds (S6).
 - [ ] **S3 — Seller-motivation + seller-type** (lexicon + modifier; P2).
 - [ ] **S4 — Positive signals uplift** (absorbs B24; P2).
 - [ ] **S5 — Segment mileage norms** (P2).

@@ -180,4 +180,47 @@ describe('scoring pipeline (integration, B15)', () => {
       expect(atMarket.isOpportunity).toBe(false);
     });
   });
+
+  // spec 003 US2 — with repair-risk enabled, a reliable model outranks an equally-discounted
+  // expensive-to-maintain one (SC-002).
+  describe('repair-risk factor (US2)', () => {
+    const paramsRR = {
+      params: () => ({
+        ...buildSeedParams({ mileageAnnualK: 15, mileagePer10kPct: 2, mileageMaxAdjPct: 20 }),
+        factorBounds: { 'repair-risk': PHASE1_FACTOR_BOUNDS['repair-risk'] },
+      }),
+    } as unknown as ParametersService;
+    const tables = {
+      get: (): HeuristicTables => ({
+        repairRisk: {
+          version: 't',
+          models: { 'toyota|corolla': 'LOW' },
+          makes: { bmw: 'HIGH' },
+          patterns: [],
+        },
+      }),
+    } as unknown as HeuristicTablesService;
+    const valuationRR = new ValuationService(paramsRR, tables);
+
+    const evalFor = (make: string, model: string) =>
+      valuationRR.evaluate({
+        asking: 13000,
+        fairValue: 16000,
+        sampleSize: 50,
+        minScore: 0.3,
+        minSamples: 10,
+        make,
+        model,
+        sellerType: 'private',
+        hasVinReport: true,
+      });
+
+    it('ranks a reliable model above an equally-discounted high-repair-risk one', () => {
+      const reliable = evalFor('Toyota', 'Corolla'); // LOW → 1.05
+      const risky = evalFor('BMW', '5 Series'); // make HIGH → 0.85
+      expect(reliable.score).toBeGreaterThan(risky.score);
+      expect(reliable.factors[0]).toMatchObject({ factor: 'repair-risk', modifier: 1.05 });
+      expect(risky.factors[0]).toMatchObject({ factor: 'repair-risk', modifier: 0.85 });
+    });
+  });
 });

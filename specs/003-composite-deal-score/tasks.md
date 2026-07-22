@@ -51,11 +51,13 @@ Keep this block in sync with the code (DoD #4).
       age combos; reliable-list → LOW) + pure `repairRiskFactor` + unit tests. Source fields verified
       in live `/info` (gearboxName, fuelName, modificationName, gearBoxId, fuelId) and mapped in
       `AutoRiaSource` → `ListingDetail`.
-- [x] T012 [US1] wire liquidity into composition (`computeValuation(input, params, tables)`, gated by
-      `factorBounds.liquidity`); `ValuationInput` += make/model; `ValuationService` injects the loader;
-      poll + query pass make/model; `PHASE1_FACTOR_BOUNDS` (enable = activate a ParameterSet with these
-      bounds — default stays neutral, SC-001). Integration: liquid-vs-illiquid ordering + price-dominance
-      (US2 wiring rides on T011).
+- [x] T012 [US1+US2] wire both factors into composition (`computeValuation(input, params, tables)`,
+      each gated by its `factorBounds[...]`); `ValuationInput` += make/model/gearbox/fuel/engine;
+      `ValuationService` injects the loader; **poll + query pass make/model/gearbox/fuel/engine**;
+      `PHASE1_FACTOR_BOUNDS` (liquidity + repair-risk; enable = activate a ParameterSet with these
+      bounds — default stays neutral, SC-001). Integration cases: liquid-vs-illiquid ordering +
+      price-dominance (US1); reliable-vs-high-repair-risk ordering (US2). tsc clean; `liquidity` 7/7,
+      `repair-risk` 10/10, `factor` 7/7 (typeorm-importing integration suite deferred to dev machine).
 - [x] T013 [US1] vault: glossary (Liquidity score), how-it-works factor list, overview valuation row.
 
 ## Phase 2: US3 Seller-motivation & seller-type (P2)
