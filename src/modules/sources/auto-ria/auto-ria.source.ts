@@ -161,7 +161,7 @@ export class AutoRiaSource implements ListingSource {
       if (this.logResponses) {
         const safe = new URLSearchParams(params);
         safe.set('api_key', '***');
-        this.logger.debug({ path, params: safe.toString(), response: json }, 'AUTO.RIA request');
+        this.logger.debug({ path, params: safe.toString(), statusCode }, 'AUTO.RIA request');
       }
       return json;
     } catch (err) {
