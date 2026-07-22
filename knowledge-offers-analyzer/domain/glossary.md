@@ -1,7 +1,7 @@
 ---
 title: Domain glossary
 type: domain
-updated: 2026-07-19
+updated: 2026-07-22
 ---
 
 # Domain glossary (ubiquitous language)
@@ -27,6 +27,11 @@ updated: 2026-07-19
 | **Outcome** | The realized result of a flagged listing — `manual` (operator 👍/👎, bought/skipped/resold) or `passive` (price_dropped, disappeared). The ground truth for spec-002 precision + learning. Manual is idempotent per opportunity; passive is deduped per (listing, label). | Weak passive signals ≠ confirmed profit. |
 | **CalibrationRun** | A recorded threshold-calibration pass — inputs (per-profile scores, precision), the bounded proposal, whether it was applied, and why. Propose-only in v1. See spec 002. | Audit + revert trail. |
 | **ParameterSet** | A versioned, active bundle of scoring tunables (`scale`, soft-flag penalty, mileage factors) that live scoring reads at runtime — replaces hard-coded constants; enables tuning + rollback. One active version at a time. See [[0005-versioned-parameter-sets\|ADR-0005]]. | Not the per-profile `minDealScore` (that's profile config). |
+| **Survivorship correction (`k`)** | Empirical coefficient correcting `fair_value` for length-biased sampling: RIA's `average_price` is measured over *active* (unsold) listings, so overpriced cars — which sit far longer — are over-represented and inflate the average. `k = median(realized/last-known price of disappeared listings) / median(cohort average on disappearance date)`; computed per cohort with fallback to parent cohort → global. See backlog SPEC-004. | Hypothesis, not yet measured in prod; expected 0.85–0.95. |
+| **Days on Market (DOM)** | Days a listing has been continuously active since first seen. Drives re-check tier escalation and the `torg`/holding-cost estimate. | Distinct from `dom_days` used specifically in disappearance/calibration records (SPEC-004), which is DOM *at disappearance*. |
+| **Re-check tier (ярус)** | A listing's re-check frequency bucket, based on how close its score is to the profile threshold (tier 1: within 10%, re-checked every 2 days; tier 2: 10–25%, weekly; tier 3: beyond, every 2 weeks or never). Escalates on `DOM > 45` or any recorded price cut. See backlog SPEC-005. | Recomputed after every re-check; not the same as `ParameterSet` version. |
+| **Cohort drift** | Month-over-month change in a cohort's average price (`drift_mo`), applied to `fair_value` to project it forward to the expected sale date instead of using today's snapshot. Computed monthly from RIA's annual average-price series, clamped ±5%/mo. See backlog SPEC-008. | Distinct from the "newest by market" ingestion mode. |
+| **Z / ROI** | Proposed monetary output (backlog SPEC-006) alongside the 0–100 score: `Z` = projected profit in dollars (`X × 0.92 − B − C_fix − C_rec − C_hold`), `ROI = Z / (B + C_fix + C_rec)`. Turns the liquidity and repair-risk *multipliers* into dollar terms (holding cost, expected repair spend) instead of dimensionless factors. | Does not replace the score/gate — computed in parallel; adoption decision deferred to after a month of side-by-side comparison. |
 
 ## Business rules
 

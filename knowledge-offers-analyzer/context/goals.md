@@ -1,7 +1,7 @@
 ---
 title: Project goals & scope (living)
 type: context
-updated: 2026-07-18
+updated: 2026-07-22
 ---
 
 # Project goals & scope
@@ -24,7 +24,9 @@ a market appraiser. Feature litmus test: *"чи використовує це х
 ## v1 scope (decided so far)
 
 - **Source:** AUTO.RIA official API only, no scraping ([[0002-monitoring-via-official-api|ADR-0002]]).
-- **Coverage:** a **narrow niche** (a few search profiles) on the free API tier (~30 req/hour).
+- **Coverage:** a **narrow niche** (a few search profiles) on the free API tier — plan changed
+  2026-07-22 to a **20,000 req/month pool** (same ~30 req/hr average ceiling, spent unevenly via
+  a daily budget + priority queue; see [[0009-monthly-rate-limit-pool|ADR-0009]]).
 - **Profitability:** composite **Total Deal Score** — price core (below fair value, anchored on
   RIA robust average) × liquidity × repair-risk × negotiation × seller × positives × confidence.
   See [[profitability-definition]], [[0006-operator-profit-vision|ADR-0006]], spec

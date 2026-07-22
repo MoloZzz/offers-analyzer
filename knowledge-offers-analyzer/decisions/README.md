@@ -18,6 +18,7 @@ updated: 2026-07-22
 - [[0006-operator-profit-vision|ADR-0006]] — Vision shift: rank by expected operator profit (composite Total Deal Score), not just discount (Accepted)
 - [[0007-structured-logging-nestjs-pino|ADR-0007]] — Structured logging via nestjs-pino (Accepted)
 - [[0008-global-error-handling|ADR-0008]] — Global error handling: exception filter + cron guards + process-level net (Accepted)
+- [[0009-monthly-rate-limit-pool|ADR-0009]] — Rate limiting: monthly pool + priority queue instead of hourly window (Accepted)
 
 ## How to add one
 

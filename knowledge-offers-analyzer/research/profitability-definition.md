@@ -2,7 +2,7 @@
 title: Research — what counts as a "profitable" offer
 type: research
 status: Accepted (reframed by ADR-0006 — this note is the price core)
-updated: 2026-07-18
+updated: 2026-07-22
 ---
 
 # Research — defining a "profitable" offer
@@ -92,6 +92,17 @@ Cheap-vs-average is frequently a **scam, damaged, or high-friction** car. Filter
 
 ## Known pitfalls of the average-price anchor
 
+- **Survivorship bias (leading hypothesis, 2026-07-22).** `average_price`/interQuartileMean is
+  measured over **active** listings only. A fairly-priced car sells in ~3 weeks and drops out of
+  the sample; an overpriced one sits 3–4 months and stays in it the whole time — overpriced
+  listings are structurally over-represented, inflating `fair_value` an estimated 8–15%. This is
+  the leading explanation for why the 0.63 threshold (≈19% nominal discount) yields deals that are
+  only ~6–10% below *realized* price once haggling and paperwork are accounted for — margin-
+  negative. Correction plan (empirical `k`, measured from listings that disappear from the search
+  diff, zero extra API cost): backlog **SPEC-004**, `context/backlog.md`. Not yet measured in prod;
+  expected `k` 0.85–0.95 — if it comes back ≥0.97 this hypothesis is falsified and the cause lies
+  elsewhere (cohort composition, mileage correction). Note: IQM itself is not the problem (already
+  outlier-robust) — don't confuse this with pitfall below.
 - The average can be dragged by **overpriced stale listings** or by **damaged cheap** ones → prefer **median/percentiles** from our own data once we have volume.
 - **Regional** price variance (Kyiv ≠ regions) — always compare within region/city.
 - **Currency**: normalize UAH/USD with a stored FX rate; sellers quote both.

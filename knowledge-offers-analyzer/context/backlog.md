@@ -1,7 +1,7 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-18
+updated: 2026-07-22
 ---
 
 # Backlog
@@ -27,6 +27,174 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   round-robin across profiles + per-profile cap so one niche can't hog the ~30 req/hr budget.
 - [~] **B4 — Make the pipeline run:** now driven by `config/search-profiles.json` (copy the example,
   set numeric ids + `enabled: true`, restart). **User action** to go live.
+
+## 🔴 Epic — Оцінка вигідності v2: калібрування, лайфсайкл, гроші (2026-07-22)
+
+Operator backlog, doubling as an addendum to [[0006-operator-profit-vision|ADR-0006]] + spec 002
+(auto-tuning) + spec 003 (composite score). API plan changed to **20,000 req/mo** (≈27.4/hr
+average — ceiling unchanged vs the old ~30/hr, only the shape did: hourly window → monthly pool).
+See [[0009-monthly-rate-limit-pool|ADR-0009]].
+
+**Central hypothesis (SPEC-004):** `fair_value` (RIA `average_price` interQuartileMean) is measured
+over **active** listings only — length-biased sampling. A fairly-priced car sells in ~3 weeks and
+leaves the sample; an overpriced one sits 3–4 months and stays in it, so overpriced listings are
+structurally over-represented. Expected effect: `fair_value` inflated 8–15%, so the current 0.63
+threshold (≈19% nominal discount) is really only ~6–10% off actual realized price — margin-negative
+after haggling and paperwork. This is the leading explanation for the "deals" not panning out.
+
+- [ ] **FIX-003.1 — Verify `factorBounds` are live in prod.** P0, ~15 min. Code review found
+  `factorBounds: {}` in the seed — if so, `score === priceCore` and all of spec 003's liquidity/
+  repair-risk factors have **silently** zero effect, contradicting the "implemented" status in
+  `specs/README.md`. Check the active `ParameterSet` in prod; fill or explicitly document as
+  disabled; add a startup warning if a factor is coded as shipped but its bounds are empty.
+
+- [ ] **SPEC-004 — Realized-price calibration (survivorship correction).** P0, 0 API cost (reuses
+  the id-list search already made every cycle — a diff against the previous list detects
+  disappearances for free, no extra request).
+  - US4.1 — track disappearances: new `listing_disappearance` table
+    (`listing_id, cohort_key, last_known_price_usd, first_seen_at, disappeared_at, dom_days,
+    price_cuts_count, had_price_cut`), populated from the existing `price_history` (no new request).
+  - US4.2 — filter non-sales: disappearance ≠ sale (could be delisted/expired/banned). Use
+    `dom_days < 60`; detect relists (same VIN, or make+model+year+mileage±2k+city match within 30
+    days) → `is_relist = true`, excluded from calibration.
+  - US4.3 — compute `k` per cohort: `k = median(last_known_price_usd of filtered disappearances) /
+    median(cohort_average on the disappearance date)`. Needs ≥30 events/cohort, else fallback
+    make+model → make → global (start 0.90). Recompute weekly.
+  - US4.4 — apply: `X = RIA_average × k`, `discount = (X − asking) / X`; `k` lives in
+    `ParameterSet` ([[0005-versioned-parameter-sets|ADR-0005]]), versioned/rollbackable; `/why`
+    shows the applied `k`, its source tier, and the event count behind it.
+  - Acceptance: id-diff adds zero API requests (verify via the request counter); ≥30 disappearance
+    events for at least one active cohort after 3 weeks; measured `k` recorded in the vault —
+    expect 0.85–0.95; **if `k` ≥ 0.97 the survivorship hypothesis is falsified** and the cause is
+    elsewhere (cohort composition, mileage correction).
+  - No dependencies — start first; every day of delay pushes back everything downstream.
+
+- [ ] **SPEC-007 — Outcome labels beyond 👍/👎.** P0 (the change is trivial; data accrual is not).
+  Problem: spec 002's auto-tuning ([[E3|backlog]]) optimizes precision on 👍/👎, but 👍 means "looks
+  like a good alert," not "made money" — the operator thumbs-up cheap listings, which converges the
+  system toward "looks cheap," exactly the population of wrecked/scammy/problem cars. Better
+  auto-tuning on this label makes the *product* worse.
+  - US7.1 — post-deal outcome form: `bought`, `buy_price_usd`, `actual_costs_usd` (repair +
+    paperwork), `sold`, `sell_price_usd`, `days_on_market`, `decline_reason` (enum: condition,
+    documents, seller, price, other — cheap to capture, shows flags the system misses but a
+    physical inspection catches).
+  - US7.2 — compute realized margin = `sell_price − buy_price − actual_costs` + realized DOM.
+  - US7.3 — re-target spec 002's auto-tuning metric to `median(realized margin)` among purchases +
+    share of loss-making deals, not 👍-precision.
+  - US7.4 — calibration check: `Z_forecast` vs `Z_actual` (once [[SPEC-006]] ships) on closed deals;
+    systematic bias corrects `k`, `torg`, `C_rec`.
+  - Acceptance: one-click outcome form from the alert; fields optional, reminder after N days;
+    spec 002's threshold auto-tuning **does not move** the threshold until ≥15 closed deals
+    accumulate; a report of `Z_forecast` vs `Z_actual` with MAE and systematic bias.
+  - **Blocks CHANGE-002.1** — implement before auto-tuning is allowed to actually move the
+    threshold on live data.
+
+- [ ] **SPEC-005 — Listing lifecycle + tiered re-check.** P1, ~4,300 req/mo (funded by
+  [[0009-monthly-rate-limit-pool|ADR-0009]]). Problem: a listing is scored once, at ingest, and
+  the system never revisits it (aside from the existing ad-hoc re-observe in B10). But a motivated
+  seller rarely lists at 60% of market on day one — they list near market and cut price 3–5 weeks
+  later, once or twice. The deal this whole system exists to catch **does not exist at ingest
+  time** — it appears later. This is a logic gap, not a budget optimization: looking at a listing
+  once structurally cannot see its price dynamics.
+  - US5.1 — tiered re-check scheduler: tier 1 (score within 10% of the profile threshold, i.e.
+    already in `/report`) → every 2 days; tier 2 (10–25% from threshold) → weekly; tier 3 (beyond
+    25%) → every 2 weeks or never. Tier recomputed after every re-check; disappeared listings drop
+    out.
+  - US5.2 — behavior-based escalation: `DOM > 45` **or** `price_cuts_count ≥ 1` → bump a tier —
+    a listing that just cut price is the highest-value thing to watch, since that's exactly where
+    it crosses the threshold.
+  - US5.3 — any detected price change triggers a full re-score; alert idempotency is **relaxed**:
+    a repeat alert on the same `listing_id` is allowed if price dropped ≥5% from the price at the
+    last alert (or there was no prior alert).
+  - US5.4 — feed `price_cuts_count` / cut depth into spec 003 US3 (seller motivation) — a
+    measurable urgency signal, unlike description keywords a seller can always type.
+  - Acceptance: scheduler stays within its tier quota; tier-1 price cuts detected within ≤2 days;
+    re-score fires automatically on price change; repeat-alert-after-≥5%-cut works without
+    duplicating; target ≥30% of alerts originating from re-check (not ingest) within 2 months.
+  - Depends on [[0009-monthly-rate-limit-pool|ADR-0009]].
+
+- [ ] **SPEC-008 — Cohort market drift.** P2, ~50 req/mo. Problem: buy today, sell in 5–7 weeks; a
+  cohort dropping 1.5%/mo erodes a listing that's 15% below market today to ~12% by sale time —
+  on a $2,000 margin that's a $250–300 miss, bigger than the whole liquidity correction. Currently
+  not modeled at all.
+  - US8.1 — monthly job pulls the annual average-price series (`/auto/statistic-avarage-price/`,
+    one request returns the full year) for the top ~50 cohorts by activity — 50 req/mo total.
+  - US8.2 — store `cohort_drift` with computation date; fallback to parent cohort, then global.
+  - US8.3 — apply: `drift_mo = (avg[last mo] / avg[3 mo ago])^(1/3) − 1`,
+    `X = RIA_average × k × (1 + drift_mo × 1.5)` (1.5 mo = expected horizon to sale — swap for
+    [[SPEC-006]]'s liquidity-tier `DOM_expected` once that exists); show in `/why`.
+  - US8.4 — flag a cohort dropping >4%/mo as "market falling" in the alert.
+  - Acceptance: job stays within 50–100 req/mo; `drift` visible in `/why`; clamp ±5%/mo so a data
+    artifact can't wreck the estimate.
+
+- [ ] **SPEC-006 — Money output (Z), not just a score.** P2. Problem: the 0–100 score is
+  dimensionless; liquidity and repair-risk are genuinely *monetary* quantities (cost of capital
+  tied up, expected repair spend) currently expressed as multipliers of the wrong dimension — e.g.
+  a liquidity multiplier of ±10% on a $2,000 expected profit spans ±$200, when the real holding-
+  cost gap between a 25-day tier and a 120-day tier is ~$650 on a $10k car and doesn't scale with
+  price at all (same $30k car: real gap ~$1,950, multiplier still ×0.9). Same issue for repair
+  risk: `DSG → ×0.85` is really `p(failure) × cost ≈ 0.22 × $1,500 = $330` — a checkable number;
+  `×0.85` is not.
+  - Does not replace the score (kept for gating/sorting); computes and shows `Z` alongside:
+    `X = RIA_average × k × (1 + drift × 1.5)` (SPEC-004 `k`, SPEC-008 `drift`),
+    `B = asking × (1 − torg)` (`torg`: DOM<30→0.03, 30–90→0.05, >90→0.08, +0.02 per recorded cut),
+    `C_fix` = paperwork/inspection/fees (`ParameterSet` constant),
+    `C_rec` = Σ E[cost] per red-flag (starter table: repair-needed desc $800, engine/gearbox issue
+    $1,500, DSG/CVT+150k km $400, air suspension $350, aged turbodiesel $600, aged hybrid battery
+    $900, no VIN report $180, post-accident $2,500 — each with a σ for later Monte Carlo),
+    `C_hold = B × r × DOM_expected / 365` (`DOM_expected` from the liquidity tier: A=25, B=45,
+    C=70, D=120 days), `Z = X × 0.92 − B − C_fix − C_rec − C_hold`, `ROI = Z / (B + C_fix + C_rec)`.
+    Hard disqualifiers stay boolean (salvage, seized, under lien) — everything else becomes money.
+  - Acceptance: alert shows `Z` ($) and `ROI` (%); `/why` breaks `Z` into components; score/gate
+    unchanged (no regression); after a month of parallel operation, compare which correlates better
+    with real operator deals — record the verdict as input to a possible gate switch.
+  - Depends on SPEC-004 (`k`), SPEC-007 (calibration data), SPEC-008 (`drift`).
+
+- [ ] **CHANGE-003.2 — US3 seller-motivation: add behavioral signals.** Add `price_cuts_count`,
+  cumulative cut depth, and `DOM` (from SPEC-005) alongside the already-planned keyword/seller-type
+  signals — behavioral signals outrank text keywords a seller can always type, regardless of intent.
+
+- [ ] **CHANGE-003.3 — Segment mileage norms: use cohort median, not `age × 15k`.** Refinement to
+  the already-planned per-segment table: base it on the **cohort's median mileage** (already
+  reflects typical use for that segment) instead of an absolute `age × annualK` norm, which
+  systematically misjudges atypical-mileage segments (commercial diesels ~25k km/yr, city
+  hatchbacks ~8k km/yr) — this removes the need for a separate per-segment norm table. Also:
+  the current ±20% cap saturates at ~100k km of deviation (2% per 10k km); for 10+ year-old cars
+  that's normal variance, so the correction degenerates into a constant. Consider a logarithmic
+  mileage curve instead of the linear+cap shape.
+
+- [ ] **CHANGE-002.1 — Re-target spec 002 auto-tuning to realized margin.** See US7.3. Blocked by
+  SPEC-007.
+
+### What NOT to do (checked and rejected)
+- **Don't swap IQM for median.** Interquartile mean is already outlier-robust; outliers aren't
+  the problem here — survivorship (SPEC-004) is.
+- **Don't build a daily full-market panel.** Not feasible at 20,000 req/mo. The tiered re-check
+  (SPEC-005) gives the same signal within budget.
+- **Don't auto-disqualify uncustomed/credit-lien cars.** With a human operator in the loop these
+  are a separate queue with a computed paperwork cost, not a hard stop — revisit once SPEC-007
+  data exists.
+- **Don't manually raise the threshold to fight false alerts.** The current 0.63 is probably
+  already hand-tuned to compensate for the survivorship bias. Fix SPEC-004 first, then revisit
+  the threshold.
+
+### Execution order
+
+| # | Item | Blocks | API cost |
+|---|---|---|---|
+| 1 | FIX-003.1 | — | 0 |
+| 2 | SPEC-004 (US4.1–4.2, data collection) | SPEC-006, threshold review | 0 |
+| 3 | SPEC-007 (US7.1–7.2, fields) | CHANGE-002.1, SPEC-006 | 0 |
+| 4 | ADR-0009 | SPEC-005 | 0 |
+| 5 | SPEC-005 | CHANGE-003.2 | ~4,300/mo |
+| 6 | SPEC-004 (US4.3–4.4, apply `k`) | — | 0 |
+| 7 | SPEC-008 | — | ~50/mo |
+| 8 | SPEC-006 | — | 0 |
+| 9 | CHANGE-003.2, CHANGE-003.3 | — | 0 |
+| 10 | CHANGE-002.1 | — | 0 |
+
+The first four cost zero requests and accumulate the data everything else needs — delaying them
+delays the rest by the same amount.
 
 ## 🟡 Next — US2 (operator config + currency)
 
@@ -297,3 +465,4 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
 
 ## Related
 - [[00-INDEX]] · [[goals]] · [[monitoring-approaches]] · [[profitability-definition]]
+- [[0009-monthly-rate-limit-pool|ADR-0009]] · [[0006-operator-profit-vision|ADR-0006]] · [[0005-versioned-parameter-sets|ADR-0005]]
