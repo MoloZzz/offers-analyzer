@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /** Liquidity tier: A = very liquid (sells fast), D = illiquid (sits unsold). Spec 003 US1. */
 export type LiquidityTier = 'A' | 'B' | 'C' | 'D';
@@ -64,9 +65,12 @@ const HEURISTICS_DIR = join(process.cwd(), 'config', 'heuristics');
  */
 @Injectable()
 export class HeuristicTablesService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(HeuristicTablesService.name);
   private tables: HeuristicTables = {};
   private readonly contentHashes: Record<string, string> = {};
+
+  constructor(
+    @InjectPinoLogger(HeuristicTablesService.name) private readonly logger: PinoLogger,
+  ) {}
 
   onApplicationBootstrap(): void {
     this.load();
@@ -94,7 +98,10 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
     if (!raw) return undefined;
     const t = raw as Partial<LiquidityTable>;
     if (typeof t.version !== 'string' || !isTierMap(t.models) || !isTierMap(t.makes)) {
-      this.logger.warn('liquidity-tiers.json failed validation — liquidity factor disabled');
+      this.logger.warn(
+        { file: 'liquidity-tiers.json' },
+        'Heuristic table failed validation — liquidity factor disabled',
+      );
       return undefined;
     }
     return {
@@ -109,7 +116,10 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
     if (!raw) return undefined;
     const t = raw as Partial<RepairRiskTable>;
     if (typeof t.version !== 'string' || !Array.isArray(t.patterns)) {
-      this.logger.warn('repair-risk.json failed validation — repair-risk factor disabled');
+      this.logger.warn(
+        { file: 'repair-risk.json' },
+        'Heuristic table failed validation — repair-risk factor disabled',
+      );
       return undefined;
     }
     // Validate models/makes if present
@@ -117,19 +127,28 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
     const makes = t.makes ? lowerKeys(t.makes) : {};
     for (const tier of Object.values(models)) {
       if (!['LOW', 'MEDIUM', 'HIGH'].includes(tier)) {
-        this.logger.warn('repair-risk.json: invalid model tier — repair-risk factor disabled');
+        this.logger.warn(
+          { file: 'repair-risk.json', reason: 'invalid-model-tier' },
+          'Heuristic table failed validation — repair-risk factor disabled',
+        );
         return undefined;
       }
     }
     for (const tier of Object.values(makes)) {
       if (!['LOW', 'MEDIUM', 'HIGH'].includes(tier)) {
-        this.logger.warn('repair-risk.json: invalid make tier — repair-risk factor disabled');
+        this.logger.warn(
+          { file: 'repair-risk.json', reason: 'invalid-make-tier' },
+          'Heuristic table failed validation — repair-risk factor disabled',
+        );
         return undefined;
       }
     }
     for (const p of t.patterns) {
       if (!p.tier || !['LOW', 'MEDIUM', 'HIGH'].includes(p.tier) || !p.reason) {
-        this.logger.warn('repair-risk.json: invalid pattern — repair-risk factor disabled');
+        this.logger.warn(
+          { file: 'repair-risk.json', reason: 'invalid-pattern' },
+          'Heuristic table failed validation — repair-risk factor disabled',
+        );
         return undefined;
       }
     }
@@ -148,7 +167,7 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
       this.contentHashes[file] = createHash('sha256').update(text).digest('hex').slice(0, 12);
       return JSON.parse(text);
     } catch (err) {
-      this.logger.warn(`heuristic table ${file} not loaded: ${(err as Error).message}`);
+      this.logger.warn({ file, err }, 'Heuristic table not loaded');
       return undefined;
     }
   }

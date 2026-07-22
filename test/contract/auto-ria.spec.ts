@@ -1,9 +1,12 @@
 import { ConfigService } from '@nestjs/config';
+import { PinoLogger } from 'nestjs-pino';
 import { MockAgent, setGlobalDispatcher } from 'undici';
 
 import { AppConfig } from '../../src/common/config/configuration';
 import { RateBudgetService } from '../../src/modules/scheduling/rate-budget.service';
 import { AutoRiaSource } from '../../src/modules/sources/auto-ria/auto-ria.source';
+
+const noopLogger = { warn: () => {}, error: () => {}, info: () => {}, debug: () => {} } as unknown as PinoLogger;
 
 /**
  * Contract test for the AUTO.RIA adapter. Uses undici's MockAgent (nock does not intercept
@@ -12,7 +15,7 @@ import { AutoRiaSource } from '../../src/modules/sources/auto-ria/auto-ria.sourc
 function makeSource(): AutoRiaSource {
   const config = { get: (): string => 'TEST_KEY' } as unknown as ConfigService<AppConfig, true>;
   const budget = { tryConsume: async (): Promise<boolean> => true } as unknown as RateBudgetService;
-  return new AutoRiaSource(config, budget);
+  return new AutoRiaSource(config, budget, noopLogger);
 }
 
 describe('AutoRiaSource (contract)', () => {

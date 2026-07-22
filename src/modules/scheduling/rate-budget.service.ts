@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
@@ -14,12 +15,12 @@ import { RateBudgetWindow } from './entities/rate-budget-window.entity';
  */
 @Injectable()
 export class RateBudgetService {
-  private readonly logger = new Logger(RateBudgetService.name);
   private readonly capacity: number;
 
   constructor(
     config: ConfigService<AppConfig, true>,
     @InjectRepository(RateBudgetWindow) private readonly repo: Repository<RateBudgetWindow>,
+    @InjectPinoLogger(RateBudgetService.name) private readonly logger: PinoLogger,
   ) {
     this.capacity = config.get('rateBudgetPerHour', { infer: true });
   }
@@ -45,7 +46,7 @@ export class RateBudgetService {
       );
     }
     if (used > this.capacity) {
-      this.logger.warn(`Rate budget exhausted for ${sourceKey} (used=${used}/${this.capacity})`);
+      this.logger.warn({ sourceKey, used, capacity: this.capacity }, 'Rate budget exhausted');
       return false;
     }
     return true;

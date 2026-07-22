@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { request } from 'undici';
 
 import { AppConfig } from '../../../common/config/configuration';
@@ -30,13 +31,13 @@ const BASE_URL = 'https://developers.ria.com/auto';
 @Injectable()
 export class AutoRiaSource implements ListingSource {
   readonly key = 'auto-ria';
-  private readonly logger = new Logger(AutoRiaSource.name);
   private readonly apiKey: string;
   private readonly logResponses: boolean;
 
   constructor(
     config: ConfigService<AppConfig, true>,
     private readonly budget: RateBudgetService,
+    @InjectPinoLogger(AutoRiaSource.name) private readonly logger: PinoLogger,
   ) {
     this.apiKey = config.get('autoRiaApiKey', { infer: true });
     this.logResponses = config.get('logSourceRequests', { infer: true });
@@ -160,14 +161,14 @@ export class AutoRiaSource implements ListingSource {
       if (this.logResponses) {
         const safe = new URLSearchParams(params);
         safe.set('api_key', '***');
-        this.logger.log(`GET ${path}?${safe.toString()} → ${JSON.stringify(json)}`);
+        this.logger.debug({ path, params: safe.toString(), response: json }, 'AUTO.RIA request');
       }
       return json;
     } catch (err) {
       if (err instanceof SourceUnavailableError || err instanceof RateBudgetExhaustedError) {
         throw err;
       }
-      this.logger.error(`AUTO.RIA ${path} request failed`, err as Error);
+      this.logger.error({ err, path }, 'AUTO.RIA request failed');
       throw new SourceUnavailableError(`AUTO.RIA ${path} request failed`);
     }
   }

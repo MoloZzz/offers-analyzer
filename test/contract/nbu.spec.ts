@@ -1,15 +1,18 @@
 import { ConfigService } from '@nestjs/config';
+import { PinoLogger } from 'nestjs-pino';
 import { MockAgent, setGlobalDispatcher } from 'undici';
 
 import { AppConfig } from '../../src/common/config/configuration';
 import { Currency } from '../../src/common/types/money';
 import { NbuExchangeRate } from '../../src/modules/fx/nbu-exchange-rate';
 
+const noopLogger = { warn: () => {}, error: () => {}, info: () => {}, debug: () => {} } as unknown as PinoLogger;
+
 function makeFx(): NbuExchangeRate {
   const config = {
     get: (): string => 'https://bank.gov.ua/rates?json',
   } as unknown as ConfigService<AppConfig, true>;
-  return new NbuExchangeRate(config);
+  return new NbuExchangeRate(config, noopLogger);
 }
 
 describe('NbuExchangeRate (contract)', () => {

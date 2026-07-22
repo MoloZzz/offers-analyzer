@@ -1,8 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Repository } from 'typeorm';
 
 import { Currency } from '../../common/types/money';
@@ -32,10 +33,9 @@ interface SearchProfileConfig {
  */
 @Injectable()
 export class ProfilesService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(ProfilesService.name);
-
   constructor(
     @InjectRepository(SearchProfile) private readonly profiles: Repository<SearchProfile>,
+    @InjectPinoLogger(ProfilesService.name) private readonly logger: PinoLogger,
   ) {}
 
   getEnabled(): Promise<SearchProfile[]> {
@@ -90,7 +90,10 @@ export class ProfilesService implements OnApplicationBootstrap {
     const file =
       process.env.SEARCH_PROFILES_FILE ?? join(process.cwd(), 'config', 'search-profiles.json');
     if (!existsSync(file)) {
-      this.logger.warn(`No profiles config at ${file} — nothing to monitor. See config/search-profiles.example.json`);
+      this.logger.warn(
+        { file },
+        'No profiles config found — nothing to monitor (see config/search-profiles.example.json)',
+      );
       return;
     }
 
@@ -118,6 +121,6 @@ export class ProfilesService implements OnApplicationBootstrap {
       entity.enabled = cfg.enabled;
       await this.profiles.save(entity);
     }
-    this.logger.log(`Synced ${configs.length} search profile(s) from ${file}`);
+    this.logger.info({ file, count: configs.length }, 'Synced search profiles');
   }
 }

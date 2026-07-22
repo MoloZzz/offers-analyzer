@@ -1,7 +1,7 @@
 ---
 title: Coding standards & conventions
 type: convention
-updated: 2026-07-17
+updated: 2026-07-22
 ---
 
 # Coding standards & conventions
@@ -16,6 +16,11 @@ updated: 2026-07-17
 - **Dependency inversion.** Depend on interfaces (ports), not concretions. External systems (AUTO.RIA API, Telegram, DB) sit behind adapters so they're swappable and testable.
 - **Explicit boundaries.** Domain logic isolated from framework/IO. DTOs validated at the edge; typed everywhere (no `any`).
 - **Errors are values you handle.** No silent catches; fail loud, log with context, use typed error paths.
+- **Log structured, not interpolated.** Every service injects `PinoLogger` (`@InjectPinoLogger(X.name)`
+  from `nestjs-pino`, not `new Logger(X.name)` from `@nestjs/common`) and calls
+  `logger.warn({ field1, field2 }, 'Static message')` — a merging object first, a fixed message
+  second. Never interpolate variables into the message string (`` `Failed for ${id}` ``) — that
+  defeats the point of structured logs (queryable fields). See [[0007-structured-logging-nestjs-pino|ADR-0007]].
 
 ## NestJS structure
 

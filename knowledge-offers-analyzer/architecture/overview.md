@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-19
+updated: 2026-07-22
 ---
 
 # Architecture overview
@@ -14,6 +14,7 @@ updated: 2026-07-19
 - **DB / ORM:** PostgreSQL + TypeORM.
 - **Scheduling:** `@nestjs/schedule` cron with an in-memory rate budget (no Redis — see [[0004-drop-redis-bullmq|ADR-0004]]).
 - **Notifications:** Telegram bot.
+- **Logging:** `nestjs-pino` — structured (JSON in prod, pretty in dev), per-service `PinoLogger` injection. See [[0007-structured-logging-nestjs-pino|ADR-0007]].
 - **Repository:** `MoloZzz/offers-analyzer` (GitHub).
 
 ## Module map

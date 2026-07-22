@@ -1,6 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Repository } from 'typeorm';
 
 import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
@@ -28,7 +29,7 @@ import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationService } from '../valuation/valuation.service';
 
 /** Cap new listings processed per profile per cycle so one profile can't hog the shared budget. */
-const MAX_NEW_PER_PROFILE = 15;
+const MAX_NEW_PER_PROFILE = 30;
 /** How many already-seen listings to re-check per profile per cycle for price drops. */
 const REOBSERVE_PER_CYCLE = 5;
 
@@ -48,8 +49,6 @@ interface ProfileQueue {
  */
 @Injectable()
 export class PollService {
-  private readonly logger = new Logger(PollService.name);
-
   constructor(
     private readonly profiles: ProfilesService,
     @Inject(LISTING_SOURCE) private readonly source: ListingSource,
@@ -63,6 +62,7 @@ export class PollService {
     private readonly outcomes: OutcomesService,
     private readonly health: HealthService,
     private readonly alertedCars: AlertedCarsService,
+    @InjectPinoLogger(PollService.name) private readonly logger: PinoLogger,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -72,7 +72,7 @@ export class PollService {
       this.health.markPollSuccess();
     } catch (err) {
       this.health.markPollFailure();
-      this.logger.error('Poll cycle failed', err as Error);
+      this.logger.error({ err }, 'Poll cycle failed');
     }
   }
 
@@ -100,7 +100,7 @@ export class PollService {
         queues.push({ profile, newIds, stale });
       } catch (err) {
         if (err instanceof RateBudgetExhaustedError) return; // budget gone — resume next tick
-        this.logger.error(`Search failed for profile ${profile.id}`, err as Error);
+        this.logger.error({ err, profileId: profile.id }, 'Search failed for profile');
       }
     }
 
@@ -141,7 +141,7 @@ export class PollService {
           await handle(q.profile, item);
         } catch (err) {
           if (err instanceof RateBudgetExhaustedError) return true;
-          this.logger.warn(`Skipping item for profile ${q.profile.id}: ${(err as Error).message}`);
+          this.logger.warn({ err, profileId: q.profile.id }, 'Skipping item for profile');
         }
       }
     }
@@ -221,7 +221,11 @@ export class PollService {
     // lowest we ever alerted. No VIN → no cross-listing de-dup (behaves as before).
     const carKey = normalizeVin(detail.vin);
     if (carKey) {
-      const decision = await this.alertedCars.decideAndRecord(carKey, detail.price.amount, listing.id);
+      const decision = await this.alertedCars.decideAndRecord(
+        carKey,
+        detail.price.amount,
+        listing.id,
+      );
       if (decision === 'suppress') return;
     }
 
@@ -243,7 +247,11 @@ export class PollService {
     );
 
     if (type === 'price_drop' && previousAmount != null) {
-      await this.notifications.notifyPriceDrop(opportunity, listing, Math.round(previousAmount * rate));
+      await this.notifications.notifyPriceDrop(
+        opportunity,
+        listing,
+        Math.round(previousAmount * rate),
+      );
     } else {
       await this.notifications.notifyOpportunity(opportunity, listing);
     }

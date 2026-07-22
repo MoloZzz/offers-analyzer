@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 import { CalibrationService } from '../calibration/calibration.service';
 
@@ -11,11 +12,10 @@ const CALIBRATION_CRON = '30 9 * * 1';
 
 @Injectable()
 export class CalibrationSchedulerService {
-  private readonly logger = new Logger(CalibrationSchedulerService.name);
-
   constructor(
     private readonly calibration: CalibrationService,
     private readonly notifications: NotificationsService,
+    @InjectPinoLogger(CalibrationSchedulerService.name) private readonly logger: PinoLogger,
   ) {}
 
   @Cron(CALIBRATION_CRON, { name: 'weekly-calibration' })
@@ -25,6 +25,6 @@ export class CalibrationSchedulerService {
     const changed = lines.filter((l) => l.after != null);
     if (changed.length === 0) return; // nothing to report this week
     await this.notifications.broadcast(formatCalibration(lines, mode));
-    this.logger.log(`Weekly calibration ran (mode=${mode}, ${changed.length} proposal(s))`);
+    this.logger.info({ mode, proposalCount: changed.length }, 'Weekly calibration ran');
   }
 }

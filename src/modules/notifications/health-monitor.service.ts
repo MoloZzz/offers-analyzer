@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 import { HealthService } from '../health/health.service';
 import { decideHealthAlert } from '../health/health-alert';
@@ -11,12 +12,12 @@ const STALE_MINUTES = 90; // ~4.5 missed 10-min cycles
 
 @Injectable()
 export class HealthMonitorService {
-  private readonly logger = new Logger(HealthMonitorService.name);
   private alerted = false;
 
   constructor(
     private readonly health: HealthService,
     private readonly notifications: NotificationsService,
+    @InjectPinoLogger(HealthMonitorService.name) private readonly logger: PinoLogger,
   ) {}
 
   @Cron('*/15 * * * *', { name: 'health-monitor' })
@@ -28,7 +29,7 @@ export class HealthMonitorService {
       await this.notifications.broadcast(
         `⚠️ Моніторинг не оновлювався ${Math.round(minutes)} хв — можливо збій поллінгу або джерело недоступне. Перевірте сервіс.`,
       );
-      this.logger.warn(`Health alert: stale ${Math.round(minutes)}m`);
+      this.logger.warn({ staleMinutes: Math.round(minutes) }, 'Health alert: stale');
     } else if (message === 'recovered') {
       await this.notifications.broadcast('✅ Моніторинг відновився — цикли знову проходять.');
     }

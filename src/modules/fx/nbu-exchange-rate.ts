@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { request } from 'undici';
 
 import { AppConfig } from '../../common/config/configuration';
@@ -19,12 +20,14 @@ interface NbuRate {
  */
 @Injectable()
 export class NbuExchangeRate implements ExchangeRate {
-  private readonly logger = new Logger(NbuExchangeRate.name);
   private readonly url: string;
   private uahPerUnit: Record<string, number> = {};
   private cachedDate = '';
 
-  constructor(config: ConfigService<AppConfig, true>) {
+  constructor(
+    config: ConfigService<AppConfig, true>,
+    @InjectPinoLogger(NbuExchangeRate.name) private readonly logger: PinoLogger,
+  ) {
     this.url = config.get('nbuRateUrl', { infer: true });
   }
 
@@ -50,7 +53,7 @@ export class NbuExchangeRate implements ExchangeRate {
       this.uahPerUnit = map;
       this.cachedDate = today;
     } catch (err) {
-      this.logger.warn(`NBU rates unavailable, using no conversion: ${(err as Error).message}`);
+      this.logger.warn({ err }, 'NBU rates unavailable, using no conversion');
     }
     return this.uahPerUnit;
   }

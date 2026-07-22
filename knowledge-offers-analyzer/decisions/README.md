@@ -1,7 +1,7 @@
 ---
 title: Decision log (ADRs)
 type: moc
-updated: 2026-07-12
+updated: 2026-07-22
 ---
 
 # Decision log (Architecture Decision Records)
@@ -16,6 +16,7 @@ updated: 2026-07-12
 - [[0004-drop-redis-bullmq|ADR-0004]] — Drop Redis/BullMQ for v1; in-memory rate budget (Accepted)
 - [[0005-versioned-parameter-sets|ADR-0005]] — Versioned ParameterSets + human-in-the-loop calibration (Accepted)
 - [[0006-operator-profit-vision|ADR-0006]] — Vision shift: rank by expected operator profit (composite Total Deal Score), not just discount (Accepted)
+- [[0007-structured-logging-nestjs-pino|ADR-0007]] — Structured logging via nestjs-pino (Accepted)
 
 ## How to add one
 

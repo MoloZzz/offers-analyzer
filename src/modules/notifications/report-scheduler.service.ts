@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 import { QueryService } from '../query/query.service';
 import { formatReport } from '../query/report';
@@ -15,11 +16,10 @@ const WEEKLY_REPORT_CRON = '0 9 * * 1';
  */
 @Injectable()
 export class ReportSchedulerService {
-  private readonly logger = new Logger(ReportSchedulerService.name);
-
   constructor(
     private readonly query: QueryService,
     private readonly notifications: NotificationsService,
+    @InjectPinoLogger(ReportSchedulerService.name) private readonly logger: PinoLogger,
   ) {}
 
   @Cron(WEEKLY_REPORT_CRON, { name: 'weekly-report' })
@@ -27,6 +27,6 @@ export class ReportSchedulerService {
     const digest = await this.query.report();
     if (digest.evaluated === 0) return; // nothing to report yet — don't spam an empty digest
     await this.notifications.broadcast(formatReport(digest));
-    this.logger.log(`Weekly report sent (evaluated=${digest.evaluated})`);
+    this.logger.info({ evaluated: digest.evaluated }, 'Weekly report sent');
   }
 }
