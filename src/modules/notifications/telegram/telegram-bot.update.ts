@@ -1,19 +1,34 @@
 import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
-import { Context } from 'telegraf';
+import { Context, Markup } from 'telegraf';
 
 import { CalibrationService } from '../../calibration/calibration.service';
+import { realizedMargin } from '../../calibration/deal-margin';
+import { DealsService } from '../../calibration/deals.service';
+import { DECLINE_REASONS, DeclineReason } from '../../calibration/entities/deal-outcome.entity';
 import { ManualLabel } from '../../calibration/entities/outcome.entity';
 import { OutcomesService } from '../../calibration/outcomes.service';
 import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
 import { formatCalibration } from '../format/calibration-message';
+import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
 import { formatWeights } from '../format/weights-message';
 import { formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
+import { buildDeclineReasonCallback, parseDealCallback } from './deal-callback';
+import { parseDealArgs } from './deal-args';
 import { parseOutcomeCallback } from './outcome-callback';
+
+/** Ukrainian labels for the decline-reason keyboard. */
+const REASON_LABELS: Record<DeclineReason, string> = {
+  condition: 'Стан',
+  documents: 'Документи',
+  seller: 'Продавець',
+  price: 'Ціна',
+  other: 'Інше',
+};
 
 /** Example listing URL shown in prompts (operators paste the auto.ria link, not a numeric id). */
 const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
@@ -31,6 +46,8 @@ const HELP =
   '/weights — навчання ваг (пропозиція)\n' +
   '/weights_apply — застосувати запропоновані ваги\n' +
   '/outcome <посилання> <результат> — записати, що сталося з авто\n' +
+  '/deal <посилання> buy=.. costs=.. sell=.. dom=.. reason=.. — економіка угоди\n' +
+  '/deals — відкриті та закриті угоди + реалізована маржа\n' +
   '/start — підписатися на вигідні пропозиції\n' +
   '/stop — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
@@ -49,6 +66,7 @@ export class TelegramBotUpdate {
     private readonly query: QueryService,
     private readonly outcomes: OutcomesService,
     private readonly calibration: CalibrationService,
+    private readonly deals: DealsService,
   ) {}
 
   @Start()
@@ -324,6 +342,96 @@ export class TelegramBotUpdate {
     }
     await this.outcomes.recordManual({ listingId: listing.id, label, note });
     await ctx.reply('Записав результат. Дякую!');
+  }
+
+  @Action(/^dl:/)
+  async onDealButton(@Ctx() ctx: Context): Promise<void> {
+    const cq = ctx.callbackQuery;
+    const data = cq && 'data' in cq ? cq.data : '';
+    const parsed = parseDealCallback(data);
+    if (!parsed) {
+      await ctx.answerCbQuery();
+      return;
+    }
+    const op = await this.query.findOpportunity(parsed.opportunityId);
+    if (!op) {
+      await ctx.answerCbQuery('Не знайдено');
+      return;
+    }
+
+    if (parsed.kind === 'reason') {
+      await this.deals.markDeclined(op.listingId, parsed.reason, op.id);
+      await ctx.answerCbQuery(`Записав відмову: ${REASON_LABELS[parsed.reason].toLowerCase()}`);
+      return;
+    }
+
+    if (parsed.action === 'decline') {
+      // Ask why in one tap — a stateless inline keyboard carrying the opportunity id.
+      const keyboard = Markup.inlineKeyboard(
+        DECLINE_REASONS.map((r) =>
+          Markup.button.callback(REASON_LABELS[r], buildDeclineReasonCallback(r, op.id)),
+        ),
+        { columns: 2 },
+      );
+      await ctx.answerCbQuery();
+      await ctx.reply('Чому відмовився?', keyboard);
+      return;
+    }
+
+    // action === 'bought'
+    await this.deals.markBought(op.listingId, op.id);
+    await ctx.answerCbQuery('Записав купівлю');
+    const listing = await this.query.findListingById(op.listingId);
+    const link = listing ? listing.url : '<посилання>';
+    await ctx.reply(`Купівлю записав. Додай економіку, коли буде:\n/deal ${link} buy=8500 costs=300`);
+  }
+
+  @Command('deal')
+  async onDeal(@Ctx() ctx: Context): Promise<void> {
+    const raw = commandArg(ctx);
+    const externalId = extractAutoId(raw);
+    if (!externalId) {
+      await ctx.reply(
+        `Формат: /deal <посилання> buy=8500 costs=300 sell=10200 dom=21 reason=price [нотатка]\nНапр.: /deal ${URL_EXAMPLE} buy=8500 sell=10200`,
+      );
+      return;
+    }
+    // Strip the link token; parse the rest as key=value fields.
+    const rest = raw.replace(/\S*\d{6,}\S*/, '').trim();
+    const { patch, error } = parseDealArgs(rest);
+    if (error) {
+      await ctx.reply(
+        `${error}\nФормат: /deal <посилання> buy=8500 costs=300 sell=10200 dom=21 reason=price [нотатка]`,
+      );
+      return;
+    }
+    const listing = await this.query.findListingByExternalId(externalId);
+    if (!listing) {
+      await ctx.reply(
+        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.',
+      );
+      return;
+    }
+    const deal = await this.deals.upsertForListing(listing.id, patch);
+    const margin = realizedMargin(deal);
+    const parts: string[] = [];
+    if (deal.buyPriceUsd != null) parts.push(`купівля $${deal.buyPriceUsd}`);
+    if (deal.actualCostsUsd != null) parts.push(`витрати $${deal.actualCostsUsd}`);
+    if (deal.sellPriceUsd != null) parts.push(`продаж $${deal.sellPriceUsd}`);
+    if (deal.daysOnMarket != null) parts.push(`DOM ${deal.daysOnMarket} дн.`);
+    if (deal.declineReason != null) parts.push(`відмова: ${REASON_LABELS[deal.declineReason].toLowerCase()}`);
+    const marginStr = margin != null ? ` → маржа $${margin}` : '';
+    await ctx.reply(
+      parts.length > 0
+        ? `Записав угоду: ${parts.join(', ')}${marginStr}.`
+        : 'Записав угоду (без деталей).',
+    );
+  }
+
+  @Command('deals')
+  async onDeals(@Ctx() ctx: Context): Promise<void> {
+    const { open, closed } = await this.query.dealsOverview();
+    await ctx.reply(formatDeals(open, closed));
   }
 
   @Help()

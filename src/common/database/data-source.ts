@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 import { CalibrationRun } from '../../modules/calibration/entities/calibration-run.entity';
+import { DealOutcome } from '../../modules/calibration/entities/deal-outcome.entity';
 import { Outcome } from '../../modules/calibration/entities/outcome.entity';
 import { ParameterSet } from '../../modules/calibration/entities/parameter-set.entity';
 import { ListingDisappearance } from '../../modules/listings/entities/listing-disappearance.entity';
@@ -33,6 +34,7 @@ export const ENTITIES = [
   ParameterSet,
   Outcome,
   CalibrationRun,
+  DealOutcome,
 ];
 
 export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {

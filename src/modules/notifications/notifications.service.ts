@@ -7,9 +7,27 @@ import { Opportunity } from '../valuation/entities/opportunity.entity';
 
 import { Notification } from './entities/notification.entity';
 import { formatOpportunity, formatPriceDrop } from './format/opportunity-message';
-import { Notifier, NOTIFIER } from './ports/notifier.port';
+import { Notifier, NOTIFIER, OutboundButton } from './ports/notifier.port';
 import { SubscribersService } from './subscribers.service';
+import { buildDealCallback } from './telegram/deal-callback';
 import { buildOutcomeCallback } from './telegram/outcome-callback';
+
+/**
+ * Inline keyboard on every alert: the 👍/👎 feedback row (spec 002) plus the deal-outcome row
+ * (SPEC-007) — 🛒 Купив / ❌ Відмова to record what actually happened after the alert.
+ */
+function alertButtons(opportunityId: string): OutboundButton[][] {
+  return [
+    [
+      { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunityId) },
+      { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunityId) },
+    ],
+    [
+      { text: '🛒 Купив', data: buildDealCallback('bought', opportunityId) },
+      { text: '❌ Відмова', data: buildDealCallback('decline', opportunityId) },
+    ],
+  ];
+}
 
 /** Sends opportunity alerts to active subscribers, idempotently (unique dedupKey — FR-008). */
 @Injectable()
@@ -34,12 +52,7 @@ export class NotificationsService {
       await this.notifier.send({
         chatId: sub.telegramChatId,
         text,
-        buttons: [
-          [
-            { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunity.id) },
-            { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunity.id) },
-          ],
-        ],
+        buttons: alertButtons(opportunity.id),
       });
       await this.notifications.save(
         this.notifications.create({
@@ -70,12 +83,7 @@ export class NotificationsService {
       await this.notifier.send({
         chatId: sub.telegramChatId,
         text,
-        buttons: [
-          [
-            { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunity.id) },
-            { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunity.id) },
-          ],
-        ],
+        buttons: alertButtons(opportunity.id),
       });
       await this.notifications.save(
         this.notifications.create({

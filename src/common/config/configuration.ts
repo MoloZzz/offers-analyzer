@@ -27,6 +27,8 @@ export interface AppConfig {
   calibrationMaxVolume: number;
   /** Desired floor on realized precision (0..1) — calibration target. */
   calibrationMinPrecision: number;
+  /** Days a bought-but-unsold deal may sit before the operator is nudged to close it (SPEC-007). */
+  dealReminderDays: number;
 }
 
 export default (): AppConfig => ({
@@ -50,4 +52,5 @@ export default (): AppConfig => ({
   calibrationMinVolume: Number(process.env.CALIBRATION_MIN_VOLUME ?? 5),
   calibrationMaxVolume: Number(process.env.CALIBRATION_MAX_VOLUME ?? 20),
   calibrationMinPrecision: Number(process.env.CALIBRATION_MIN_PRECISION ?? 0.7),
+  dealReminderDays: Number(process.env.DEAL_REMINDER_DAYS ?? 30),
 });

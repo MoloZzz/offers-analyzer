@@ -49,4 +49,37 @@ describe('self-tuning report (R1)', () => {
     const digest = buildDigest([0.2, -0.1, 0.05], 1, [], 0.15, 10, null);
     expect(formatReport(digest)).toContain('поки немає оцінок');
   });
+
+  it('surfaces realized deals in the digest + report when there are closed deals', () => {
+    const digest = buildDigest([0.2], 1, [], 0.15, 10, null, {
+      closed: 3,
+      medianMarginUsd: 1200,
+      lossShare: 0,
+      medianDom: 21,
+    });
+    expect(digest.realizedDeals).toEqual({
+      closed: 3,
+      medianMarginUsd: 1200,
+      lossShare: 0,
+      medianDom: 21,
+    });
+    const text = formatReport(digest);
+    expect(text).toContain('Закриті угоди: 3');
+    expect(text).toContain('медіанна маржа $1200');
+    expect(text).toContain('медіанний DOM 21');
+  });
+
+  it('drops the realized-deals block when there are no closed deals', () => {
+    const zero = buildDigest([0.2], 1, [], 0.15, 10, null, {
+      closed: 0,
+      medianMarginUsd: null,
+      lossShare: null,
+      medianDom: null,
+    });
+    expect(zero.realizedDeals).toBeNull();
+    expect(formatReport(zero)).toContain('Закритих угод поки немає');
+
+    const none = buildDigest([0.2], 1, [], 0.15, 10, null, null);
+    expect(formatReport(none)).toContain('Закритих угод поки немає');
+  });
 });

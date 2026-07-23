@@ -5,6 +5,9 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 import { Currency } from '../../common/types/money';
+import { marginStats } from '../calibration/deal-margin';
+import { DealsService } from '../calibration/deals.service';
+import { DealOutcome } from '../calibration/entities/deal-outcome.entity';
 import { OutcomesService } from '../calibration/outcomes.service';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
@@ -40,6 +43,12 @@ export interface RecentEvaluation {
   evaluatedAt: Date;
 }
 
+/** A deal paired with its listing (for the /deals overview). */
+export interface DealWithListing {
+  deal: DealOutcome;
+  listing?: Listing;
+}
+
 /** Read-mostly queries exposed to the Telegram bot (on-demand check, top deals, best candidates). */
 @Injectable()
 export class QueryService {
@@ -53,6 +62,7 @@ export class QueryService {
     private readonly listings: ListingsService,
     private readonly mileage: MileageAdjuster,
     private readonly outcomes: OutcomesService,
+    private readonly deals: DealsService,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     config: ConfigService<AppConfig, true>,
   ) {
@@ -136,7 +146,33 @@ export class QueryService {
     const good = labeled.filter((o) => o.label === 'good').length;
     const bad = labeled.filter((o) => o.label === 'bad').length;
     const precision = realizedPrecision(good, bad);
-    return buildDigest(scores, opportunities, nearMisses, this.minScore, targetCandidates, precision);
+    const closed = await this.deals.closedDeals();
+    const realizedDeals = marginStats(closed);
+    return buildDigest(
+      scores,
+      opportunities,
+      nearMisses,
+      this.minScore,
+      targetCandidates,
+      precision,
+      realizedDeals,
+    );
+  }
+
+  /** Open (bought, unsold) + recently closed deals, each joined to its listing (for /deals). */
+  async dealsOverview(recentClosed = 10): Promise<{ open: DealWithListing[]; closed: DealWithListing[] }> {
+    const openDeals = await this.deals.openDeals();
+    const closedDeals = await this.deals.closedDeals();
+    const recent = [...closedDeals]
+      .sort((a, b) => (b.soldAt?.getTime() ?? 0) - (a.soldAt?.getTime() ?? 0))
+      .slice(0, recentClosed);
+    const ids = [...openDeals, ...recent].map((d) => d.listingId);
+    const listings = await this.listings.findByIds(ids);
+    const byId = new Map(listings.map((l) => [l.id, l]));
+    return {
+      open: openDeals.map((deal) => ({ deal, listing: byId.get(deal.listingId) })),
+      closed: recent.map((deal) => ({ deal, listing: byId.get(deal.listingId) })),
+    };
   }
 
   /** Look up a recorded opportunity by id (for the 👍/👎 outcome buttons). */
@@ -147,6 +183,12 @@ export class QueryService {
   /** Look up a listing by its source external id (for the /outcome command). */
   async findListingByExternalId(externalId: string): Promise<Listing | null> {
     const [listing] = await this.listings.findByExternalIds([externalId]);
+    return listing ?? null;
+  }
+
+  /** Look up a listing by its internal id (for the deal buttons — the reply's copy-ready link). */
+  async findListingById(id: string): Promise<Listing | null> {
+    const [listing] = await this.listings.findByIds([id]);
     return listing ?? null;
   }
 

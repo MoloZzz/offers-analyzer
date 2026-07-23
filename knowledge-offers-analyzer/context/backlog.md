@@ -42,7 +42,11 @@ structurally over-represented. Expected effect: `fair_value` inflated 8–15%, s
 threshold (≈19% nominal discount) is really only ~6–10% off actual realized price — margin-negative
 after haggling and paperwork. This is the leading explanation for the "deals" not panning out.
 
-- [ ] **FIX-003.1 — Verify `factorBounds` are live in prod.** **Verified 2026-07-23**: queried
+- [x] **FIX-003.1 — Verify `factorBounds` are live in prod.** **Resolved 2026-07-23 — decision
+  (b), [[0010-defer-factor-activation-until-k|ADR-0010]]**: factors stay intentionally disabled
+  until SPEC-004's `k` lands; then one combined ParameterSet change (k + `PHASE1_FACTOR_BOUNDS`)
+  with a single threshold re-validation (S6/T050) — now owned by spec 004 Phase C.
+  Original verification record: queried
   prod Postgres (`offers-ria`, `parameter_sets` table) — the active ParameterSet is `version 1`
   (seeded 2026-07-17, predates Phase 1 which shipped 2026-07-18/19); `factorBounds: null` /
   `upliftCap: null`. Confirmed `score === priceCore` in prod right now — liquidity and repair-risk
@@ -53,10 +57,8 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   existing active row, `CalibrationService.proposeWeights` spreads `{ ...active, ... }` so the
   absent `factorBounds` carries forward untouched, and there is no controller/CLI to activate a
   ParameterSet manually. Full record: [[2026-07-23-session-01]].
-  Remaining work is a **decision**, not further verification — pick one:
-  (a) create + activate a new ParameterSet carrying `PHASE1_FACTOR_BOUNDS` and re-validate
-  thresholds (S6/T050), or (b) explicitly keep it disabled pending a decision. Stays unchecked
-  until (a) or (b) happens. The "startup warning if shipped-but-empty-bounds" idea stays open too.
+  ~~Remaining work is a decision~~ → **decided (b)** per ADR-0010 (see above). The "startup
+  warning if shipped-but-empty-bounds" idea stays open (deferred in spec 004 tasks).
 
 - [~] **SPEC-004 — Realized-price calibration (survivorship correction).** P0, 0 API cost (reuses
   the id-list search already made every cycle — a diff against the previous list detects
@@ -98,16 +100,24 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
     elsewhere (cohort composition, mileage correction).
   - No dependencies — start first; every day of delay pushes back everything downstream.
 
-- [ ] **SPEC-007 — Outcome labels beyond 👍/👎.** P0 (the change is trivial; data accrual is not).
+- [~] **SPEC-007 — Outcome labels beyond 👍/👎.** P0 (the change is trivial; data accrual is not).
+  **Promoted to a formal spec:** `specs/007-deal-outcomes/` (spec + plan + tasks).
   Problem: spec 002's auto-tuning ([[E3|backlog]]) optimizes precision on 👍/👎, but 👍 means "looks
   like a good alert," not "made money" — the operator thumbs-up cheap listings, which converges the
   system toward "looks cheap," exactly the population of wrecked/scammy/problem cars. Better
   auto-tuning on this label makes the *product* worse.
-  - US7.1 — post-deal outcome form: `bought`, `buy_price_usd`, `actual_costs_usd` (repair +
-    paperwork), `sold`, `sell_price_usd`, `days_on_market`, `decline_reason` (enum: condition,
-    documents, seller, price, other — cheap to capture, shows flags the system misses but a
-    physical inspection catches).
-  - US7.2 — compute realized margin = `sell_price − buy_price − actual_costs` + realized DOM.
+  - [x] US7.1 — post-deal outcome form (**implemented 2026-07-23**): new stateful `deal_outcomes`
+    table (one row per listing, upserted `declined → bought → sold`; migration `1784830958818`),
+    **not** the append-style `outcomes` stream (kept untouched, so spec-002 precision is
+    unaffected). Alerts gained a 🛒 Купив / ❌ Відмова button row (`dl:` callbacks); ❌ → one-tap
+    reason keyboard (condition/documents/seller/price/other); `/deal <link> buy= costs= sell= dom=
+    reason= [note]` single-shot (every field optional, patches the same row); `/deals` overview.
+    `stage` derives monotonically (a sold deal never downgrades). Zero API cost.
+  - [x] US7.2 — realized margin (**implemented 2026-07-23**): pure `deal-margin.ts`
+    (`realizedMargin = sell − buy − costs`, `realizedDom` operator-wins-else-derived, `marginStats`
+    median/loss-share/median-DOM over **closed deals** = sold with both prices). Surfaced in
+    `/report` (💰 Закриті угоди line) and `/deals`. Daily `DealReminderService` nudges
+    bought-but-unsold deals older than `DEAL_REMINDER_DAYS` (30). tsc clean, jest 32 suites / 214.
   - US7.3 — re-target spec 002's auto-tuning metric to `median(realized margin)` among purchases +
     share of loss-making deals, not 👍-precision.
   - US7.4 — calibration check: `Z_forecast` vs `Z_actual` (once [[SPEC-006]] ships) on closed deals;
@@ -213,7 +223,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 |---|---|---|---|
 | 1 | FIX-003.1 | — | 0 |
 | 2 | SPEC-004 (US4.1–4.2, data collection) | SPEC-006, threshold review | 0 |
-| 3 | SPEC-007 (US7.1–7.2, fields) | CHANGE-002.1, SPEC-006 | 0 |
+| 3 | ✅ SPEC-007 (US7.1–7.2, fields) — done 2026-07-23 | CHANGE-002.1, SPEC-006 | 0 |
 | 4 | ADR-0009 | SPEC-005 | 0 |
 | 5 | SPEC-005 | CHANGE-003.2 | ~4,300/mo |
 | 6 | SPEC-004 (US4.3–4.4, apply `k`) | — | 0 |
@@ -411,8 +421,9 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   gearbox/engine/fuel/age patterns) + pure `factors/repair-risk.ts` (HIGH→dampen, LOW→slight uplift);
   `/info` gearbox/fuel/engine verified + mapped in `AutoRiaSource`; wired through poll + query.
   `repair-risk.spec` 10/10. Both factors ship **off by default** (neutral seed → SC-001); enable via a
-  `ParameterSet` carrying `PHASE1_FACTOR_BOUNDS`, then re-validate thresholds (S6). Confirmed still
-  off in prod as of 2026-07-23 — see FIX-003.1 above.
+  `ParameterSet` carrying `PHASE1_FACTOR_BOUNDS`, then re-validate thresholds (S6). Intentionally
+  off in prod per [[0010-defer-factor-activation-until-k|ADR-0010]] — activation ships together
+  with SPEC-004's `k` (spec 004 Phase C).
 - [ ] **S3 — Seller-motivation + seller-type** (lexicon + modifier; P2).
 - [ ] **S4 — Positive signals uplift** (absorbs B24; P2).
 - [ ] **S5 — Segment mileage norms** (P2).

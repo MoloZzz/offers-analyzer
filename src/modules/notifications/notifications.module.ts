@@ -6,11 +6,13 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { AppConfig } from '../../common/config/configuration';
 import { CalibrationModule } from '../calibration/calibration.module';
 import { HealthModule } from '../health/health.module';
+import { ListingsModule } from '../listings/listings.module';
 import { ProfilesModule } from '../profiles/profiles.module';
 import { QueryModule } from '../query/query.module';
 
 import { AlertedCarsService } from './alerted-cars.service';
 import { CalibrationSchedulerService } from './calibration-scheduler.service';
+import { DealReminderService } from './deal-reminder.service';
 import { AlertedCar } from './entities/alerted-car.entity';
 import { Notification } from './entities/notification.entity';
 import { Subscriber } from './entities/subscriber.entity';
@@ -28,6 +30,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     QueryModule,
     CalibrationModule,
     HealthModule,
+    ListingsModule,
     TypeOrmModule.forFeature([Subscriber, Notification, AlertedCar]),
     TelegrafModule.forRootAsync({
       inject: [ConfigService],
@@ -41,6 +44,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     SubscribersService,
     ReportSchedulerService,
     CalibrationSchedulerService,
+    DealReminderService,
     HealthMonitorService,
     TelegramBotUpdate,
     TelegramNotifier,

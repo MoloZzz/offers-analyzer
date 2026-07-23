@@ -25,6 +25,16 @@ export interface ReportDigest {
   /** A threshold that would yield ~targetCount candidates, or null when it ≈ current / data is thin. */
   suggestedThreshold: number | null;
   realizedPrecision: RealizedPrecision | null;
+  /** Realized economics of closed deals (SPEC-007 US7.2); null when the feature has no data yet. */
+  realizedDeals: RealizedDeals | null;
+}
+
+/** Aggregate realized economics over closed deals — mirrors `MarginStats` from deal-margin. */
+export interface RealizedDeals {
+  closed: number;
+  medianMarginUsd: number | null;
+  lossShare: number | null;
+  medianDom: number | null;
 }
 
 export interface RealizedPrecision {
@@ -69,6 +79,7 @@ export function buildDigest(
   threshold: number,
   targetCount = 10,
   precision: RealizedPrecision | null = null,
+  realizedDeals: RealizedDeals | null = null,
 ): ReportDigest {
   return {
     threshold,
@@ -78,6 +89,7 @@ export function buildDigest(
     nearMisses,
     suggestedThreshold: suggestedThreshold(scores, threshold, targetCount),
     realizedPrecision: precision,
+    realizedDeals: realizedDeals != null && realizedDeals.closed > 0 ? realizedDeals : null,
   };
 }
 
@@ -91,6 +103,9 @@ export function formatReport(d: ReportDigest): string {
       ? `Реальна точність (👍/👎, ~30 днів): 👍 ${d.realizedPrecision.good} / 👎 ${d.realizedPrecision.bad} → ${Math.round((d.realizedPrecision.precision ?? 0) * 100)}%`
       : `Реальна точність: поки немає оцінок 👍/👎`,
     `Розподіл балів: <0 — ${d.distribution.belowZero} · 0…${d.threshold} — ${d.distribution.zeroToThreshold} · ≥${d.threshold} — ${d.distribution.atOrAbove}`,
+    d.realizedDeals != null
+      ? `💰 Закриті угоди: ${d.realizedDeals.closed} · медіанна маржа $${d.realizedDeals.medianMarginUsd} · збиткових ${Math.round((d.realizedDeals.lossShare ?? 0) * 100)}%${d.realizedDeals.medianDom != null ? ` · медіанний DOM ${d.realizedDeals.medianDom} дн.` : ''}`
+      : `💰 Закритих угод поки немає.`,
   ];
   if (d.nearMisses.length > 0) {
     lines.push('Майже дотягнули (трохи нижче порогу):');

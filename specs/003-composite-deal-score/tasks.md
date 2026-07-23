@@ -87,10 +87,11 @@ Keep this block in sync with the code (DoD #4).
 ## Phase 5: Rollout & docs
 
 - [ ] T050 threshold re-validation after Phase 1 and Phase 3 (`/report` + calibration
-      proposals on the new distribution) — record in session log. **Blocked**: Phase 1 was
-      never actually activated in prod (active ParameterSet has empty `factorBounds` — verified
-      2026-07-23, see backlog FIX-003.1). Unchecked here is consistent with, not contradicting,
-      the "implemented" status elsewhere — implemented in code, not yet turned on.
+      proposals on the new distribution) — record in session log. **Deferred by decision
+      (ADR-0010, 2026-07-23)**: Phase 1 activation ships together with SPEC-004's survivorship
+      correction `k` in one ParameterSet change (spec 004 Phase C), so this re-validation runs
+      once, against the final score shape. Unchecked here is consistent with, not contradicting,
+      the "implemented" status elsewhere — implemented in code, intentionally not yet turned on.
 - [ ] T051 SC-006 precision check (30-day) vs pre-003 baseline; note results in
       profitability-methods-coverage.
 - [ ] T052 final vault sweep + specs/README status update.

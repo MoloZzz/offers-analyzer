@@ -104,7 +104,10 @@ New table **`listing_disappearances`** (entity
   events, `dom < 60`, non-relist, non-voided, `detectionMode='live'` preferred), fallback
   chain make+model → make → global (0.90). Denominator from `average_price_snapshots`.
 - **Phase C — US4.4 (later)**: `k` into `ParameterSet`; `X = RIA_average × k` in valuation;
-  `/why` shows `k`, source tier, event count.
+  `/why` shows `k`, source tier, event count. **Per ADR-0010 this phase also owns**: building
+  the ParameterSet activation path (none exists), carrying `PHASE1_FACTOR_BOUNDS` in the same
+  ParameterSet change (activating spec 003's liquidity + repair-risk factors), and the single
+  combined threshold re-validation (spec 003 S6/T050 + SC-006 precision check).
 
 ## Complexity / risk tracking
 
