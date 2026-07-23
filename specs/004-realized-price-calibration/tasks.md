@@ -31,9 +31,23 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done. `[P]` = parallelizable.
 - [x] T011 [US4.1] Zero-API verified: no source dep in the service; the only diffed
       `this.source` line is the pre-existing search call capturing its full result;
       tsc clean, jest 26 suites / 169 tests green
-- [ ] T012 [US4.1] Operator prerequisite: enable ≥1 persistent profile (no
-      `submittedWithin`, ≤100 matches) in `config/search-profiles.json` — **operator action**
-      (until then the feature is correctly inert: zero eligible profiles → zero events)
+- [x] T012 [US4.1] Operator prerequisite: a detection-capable profile —
+      **resolved via the sweep (T014–T019)**: operator rejected model-pinned niches
+      (2026-07-23); the market-wide sweep profile replaces the "persistent niche" route
+- [x] T014 [US4.1b] `ProfileFilters.sweep?: boolean` + doc comment (jsonb, no migration)
+- [x] T015 [US4.1b] Poll cycle excludes sweep profiles (never searched/ingested at 10-min
+      cadence)
+- [x] T016 [US4.1b] `DisappearancesService.processCycle` gains optional `graceHours` param
+      (default `GRACE_HOURS`); `SWEEP_GRACE_HOURS = 30` exported
+- [x] T017 [US4.1b] `SweepService` (polling module, `@Cron '30 3 * * *'`): paged budget-gated
+      crawl per sweep profile (stop: empty page / short page / total reached; `MAX_SWEEP_PAGES`
+      cap → incomplete), complete-sweep gate before detection, budget-abort stops the whole
+      run, passive outcomes — delegated → Sonnet
+- [x] T018 [US4.1b] `test/unit/sweep.spec.ts` — 7 tests (paging, total-stop, budget-abort,
+      per-profile error isolation, empty sweep, non-sweep untouched, page-cap) — delegated → Sonnet
+- [x] T019 [US4.1b] Sweep profile in `config/search-profiles.json` (Київщина ≤$15k 2010+,
+      `sweep: true`, `dealerPolicy: 'label'`) — enabled; niche measured live at ~17.9k
+      matches ⇒ ~179 pages/day ≈ 5,400 req/mo
 
 ### Deferred follow-ups (not in Phase A)
 

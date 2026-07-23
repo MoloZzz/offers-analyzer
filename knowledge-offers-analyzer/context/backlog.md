@@ -71,9 +71,16 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
     check; 24h grace + resurrection voiding (`reappearedAt`); residual bias fails conservative
     (`k` biased toward 1.0). Zero-API structurally (`DisappearancesService` has no source dep).
     Also records passive Outcome `'disappeared'` (closes E2c-later's data half — grace-based,
-    not 404-confirmed). tsc clean, jest 26 suites / 169 tests.
-    **⚠ Operator prerequisite (T012): enable ≥1 persistent profile (no `submittedWithin`,
-    ≤100 matches) — with only the "today" profile enabled, zero events accrue (by design).**
+    not 404-confirmed).
+  - [x] US4.1b — **daily market sweep** (added + implemented 2026-07-23, operator decision:
+    model-pinned niches rejected, niche = "вся Київщина ≤$15k 2010+" — measured live at
+    ~17.9k active matches, far beyond one 100-id page). `filters.sweep: true` profile
+    (excluded from the 10-min poll) is crawled fully once daily (`SweepService`,
+    03:30, paged ids-only, budget-gated, ~179 pages/day ≈ **5,400 req/mo** from the
+    [[0009-monthly-rate-limit-pool|ADR-0009]] pool); a **complete** sweep runs detection with
+    30h grace (one missed sweep never records; two do); incomplete/budget-aborted sweeps are
+    discarded. Amends the zero-cost framing for this profile class only — regular-profile
+    detection stays zero-request. tsc clean, jest 27 suites / 176 tests.
   - [x] US4.2 — filter non-sales (**implemented 2026-07-23**, same slices): `dom_days` stored for
     the `< 60` filter (applied in US4.3); relists detected on new-listing ingest — same VIN, or
     markId+modelId+year+cityId with mileage ±2k km within 30 days → `is_relist = true`.

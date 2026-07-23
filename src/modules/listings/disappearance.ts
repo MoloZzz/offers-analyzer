@@ -14,6 +14,12 @@ import { Listing } from './entities/listing.entity';
 
 /** Absence grace period before a still-active listing becomes a disappearance candidate (FR-403). */
 export const GRACE_HOURS = 24;
+/**
+ * Grace for daily-sweep detection (FR-411): just over one sweep interval, so a single missed
+ * or failed sweep (or intra-sweep pagination drift) never records an event — absence from two
+ * consecutive daily sweeps does.
+ */
+export const SWEEP_GRACE_HOURS = 30;
 /** Relist identity-match lookback window (FR-407). */
 export const RELIST_WINDOW_DAYS = 30;
 /** Relist mileage tolerance, in thousand km (same unit as `Listing.mileage`). */

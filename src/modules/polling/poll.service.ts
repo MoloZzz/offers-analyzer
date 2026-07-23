@@ -80,7 +80,9 @@ export class PollService {
   }
 
   private async runCycle(): Promise<void> {
-    const profiles = await this.profiles.getEnabled();
+    // Sweep profiles (SPEC-004 US4.1b) are crawled once daily by SweepService, ids-only —
+    // searching them every 10 minutes would burn budget on a result we can't use (truncated).
+    const profiles = (await this.profiles.getEnabled()).filter((p) => !p.filters.sweep);
 
     // Phase 1 — one search per profile; build a per-profile work queue (dedup + per-profile cap).
     // Along the way, collect every sighted id + the detection-eligible profiles for the
@@ -288,7 +290,7 @@ export class PollService {
   }
 }
 
-function toQuery(p: SearchProfile): SourceSearchQuery {
+export function toQuery(p: SearchProfile): SourceSearchQuery {
   return {
     categoryId: p.categoryId,
     stateId: p.stateId ?? undefined,

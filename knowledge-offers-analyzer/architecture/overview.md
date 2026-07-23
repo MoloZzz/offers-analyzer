@@ -33,7 +33,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
 | `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
-| `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops | budget-fair; no queue in v1 |
+| `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | budget-fair; no queue in v1; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
@@ -56,7 +56,11 @@ covers become `ListingDisappearance` events (cohort key, last USD price, DOM, pr
 and flip to `status='removed'`; a reappearance resurrects the listing and voids the event; new
 listings are checked against recent events for relists (VIN or attribute match). Feeds the
 survivorship correction `k` (spec 004 US4.3–4.4, pending). Zero extra API requests — structural
-(no source dep in `DisappearancesService`).
+(no source dep in `DisappearancesService`). For market-wide niches beyond one 100-id page, a
+**sweep profile** (`filters.sweep: true`, excluded from the 10-min poll) is instead crawled
+fully once daily by `SweepService` (paged, ids-only, budget-gated, ~5,400 req/mo for the
+~17.9k-listing Kyiv ≤$15k niche); only a *complete* crawl runs detection, with a 30h grace so a
+single missed sweep never fabricates an event.
 
 ## Entities / data model
 

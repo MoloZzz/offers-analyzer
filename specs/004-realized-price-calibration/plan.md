@@ -81,6 +81,25 @@ New table **`listing_disappearances`** (entity
   grace + event recording + resurrection + relist marking + passive outcome. Slices:
   A (source `total` + entity + migration), B (pure decision functions), C (service),
   D (poll wiring), E (vault/docs). Each slice ends tsc-clean + jest-green.
+- **Phase A2 — US4.1b daily sweep (added 2026-07-23, operator decision)**: the operator's
+  niche is market-wide (~17.9k matches — measured live), so no plain persistent profile can
+  be detection-eligible. Design:
+  - `ProfileFilters.sweep?: boolean` (jsonb — no migration). Sweep profiles are **excluded
+    from the poll cycle** (never searched/ingested there).
+  - `SweepService` (polling module — it owns the source): daily `@Cron`, for each enabled
+    sweep profile pages `source.search({ ...toQuery(profile), page })` (already supported;
+    each page budget-gated) accumulating ids until a short/empty page or ids ≥ reported
+    total. `RateBudgetExhaustedError` mid-crawl → sweep discarded (partial coverage must
+    never be diffed), retried next day.
+  - On a **complete** sweep: `disappearances.processCycle(sweepIds, [profile],
+    SWEEP_GRACE_HOURS = 30)` + passive `'disappeared'` outcomes. 30h grace ⇒ one missed/
+    failed sweep (or intra-sweep pagination drift) never records; two consecutive misses do.
+    `processCycle` gains an optional `graceHours` param (default `GRACE_HOURS`).
+  - `isSearchEligible` is NOT consulted for sweeps — completeness is established by the crawl
+    itself; `profileCovers` works unchanged (sweep profiles have persistent filters, and must
+    keep `dealerPolicy: 'label'` so dealer listings stay covered).
+  - Cost: ~179 pages/day ≈ 5,400 req/mo (ADR-0009 pool) — amends the zero-cost framing for
+    this one profile class; regular-profile detection stays zero-request.
 - **Phase B — US4.3 (later)**: weekly job computing `k` per cohort (median/median, ≥30
   events, `dom < 60`, non-relist, non-voided, `detectionMode='live'` preferred), fallback
   chain make+model → make → global (0.90). Denominator from `average_price_snapshots`.

@@ -22,6 +22,12 @@ export interface ProfileFilters {
   submittedWithin?: number;
   /** Blacklist: case-insensitive substrings to skip after fetch (e.g. ["Daewoo Lanos", "ZAZ"]). */
   excludeMakeModels?: string[];
+  /**
+   * Sweep profile (SPEC-004 US4.1b): crawled fully once a day (paged, ids-only) for
+   * disappearance detection over a market-wide niche. Excluded from the 10-minute poll —
+   * it never ingests or evaluates listings.
+   */
+  sweep?: boolean;
 }
 
 /** A configured niche to monitor and how strictly to evaluate it (operator-controlled in v1). */

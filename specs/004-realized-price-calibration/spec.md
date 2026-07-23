@@ -73,6 +73,38 @@ listing flips to `status='removed'`, and the cycle's API request count is unchan
 5. **Given** any cycle, **Then** the number of source API requests is identical to the same
    cycle without detection (id-diff adds zero requests).
 
+### User Story 4.1b — Daily market sweep (Priority: P0) — THIS PHASE (added 2026-07-23)
+
+The operator's real niche is market-wide ("all Kyiv region ≤ $15k"), which matches ~18k active
+listings — far beyond one 100-id page, so no plain persistent profile can ever be
+detection-eligible. A **sweep profile** (persistent filters + `filters.sweep: true`) is instead
+crawled **once daily** by a paged, ids-only search until the full match set is collected
+(~179 requests for 17.9k listings), budget-guarded. A *complete* sweep is full-coverage
+sighting evidence: it bumps every matched listing and then runs the same disappearance
+detection with a sweep-specific grace of 30h — so one missed/failed sweep never records an
+event (two consecutive misses do), and pagination drift within a sweep is absorbed.
+
+This deliberately amends the zero-cost framing: **detection on regular profiles stays
+zero-request; the sweep buys ~5,400 req/mo** (≈179 × 30) from the ADR-0009 pool as a
+data-collection investment — the same funding logic as SPEC-005. Sweep profiles are excluded
+from the 10-minute poll (they never ingest or evaluate; ids only).
+
+**Independent Test**: a sweep profile over a fake source with 250 matching ids collects all
+pages, bumps all sightings, and records a disappearance only for a covered listing absent
+> 30h; an incomplete sweep (budget abort mid-pages) records nothing.
+
+**Acceptance Scenarios**:
+
+1. **Given** a sweep profile and a multi-page match set, **When** the daily sweep runs,
+   **Then** it pages until the collected ids cover the reported total (or a short page),
+   and every matched known listing's sighting timestamp is bumped.
+2. **Given** the sweep aborts on budget exhaustion mid-crawl, **Then** no detection runs on
+   the partial id set and the sweep is retried next day.
+3. **Given** a complete sweep, **Then** detection runs with 30h grace — a listing missed by
+   exactly one sweep is never recorded; absent from two consecutive sweeps it is.
+4. **Given** a sweep profile, **Then** the 10-minute poll neither searches it nor ingests
+   from it (its budget cost is the daily crawl only).
+
 ### User Story 4.2 — Filter non-sales (Priority: P0) — THIS PHASE
 
 Disappearance ≠ sale (could be delisted/expired/banned/relisted). Events are annotated so
@@ -153,7 +185,16 @@ event count behind it. *(Not implemented in this phase.)*
   `'disappeared'` (spec 002 E2c-later; deduped), from the poll layer —
   `listing_disappearances` remains the sole source of truth for calibration.
 - **FR-409**: The detection service MUST NOT depend on the listing source port (structural
-  zero-API guarantee).
+  zero-API guarantee for detection itself; the sweep crawl lives in a separate service).
+- **FR-410**: A profile with `filters.sweep = true` MUST be excluded from the poll cycle
+  (never searched every 10 min, never ingested/evaluated) and crawled once daily instead:
+  paged ids-only search until the collected set covers the source-reported total (or a short
+  page), each page budget-gated.
+- **FR-411**: Detection MUST run on a sweep's id set only when the sweep is COMPLETE; a
+  budget-aborted or partial sweep MUST be discarded. Sweep detection uses a 30h grace
+  (absence from ≥2 consecutive daily sweeps) instead of the regular 24h.
+- **FR-412**: Sweep sightings MUST bump `last_seen_in_search_at` exactly like regular
+  sightings (a sighting is a sighting), so sweep and poll evidence compose.
 
 ### Key Entities
 
@@ -167,9 +208,10 @@ event count behind it. *(Not implemented in this phase.)*
 ### Measurable Outcomes
 
 - **SC-401**: Per-cycle source request count is unchanged with detection enabled (id-diff
-  adds zero API requests); the detection service has no source dependency.
-- **SC-402**: With the current config (only a `submittedWithin` profile enabled), zero
-  events are recorded — no false positives from window aging.
+  adds zero API requests); the detection service has no source dependency. The sweep's cost
+  is bounded to its daily crawl (~pages/day, ≈5,400 req/mo for the 17.9k-listing niche).
+- **SC-402**: With no eligible or sweep profile enabled, zero events are recorded — no false
+  positives from window aging.
 - **SC-403**: After 3 weeks with ≥1 persistent profile enabled, ≥30 disappearance events
   exist for at least one active cohort; the measured interim `k` is recorded in the vault —
   expectation 0.85–0.95; **`k ≥ 0.97` falsifies the survivorship hypothesis**.
@@ -179,9 +221,11 @@ event count behind it. *(Not implemented in this phase.)*
 ## Assumptions
 
 - **Operator prerequisite**: at least one *persistent* profile (no `submittedWithin`, ≤100
-  matches) must be enabled for events to accrue — with only the "today" profile enabled the
-  feature is correctly inert. Honest cost note: each enabled profile already costs
-  ~4,300 searches/mo from the 20k pool (ADR-0009) — an ingestion cost, not a detection cost.
+  matches) **or a sweep profile (US4.1b)** must be enabled for events to accrue — with only
+  the "today" profile enabled the feature is correctly inert. Cost note: a regular enabled
+  profile costs ~4,300 searches/mo (ingestion); the market-wide sweep ~5,400 req/mo (crawl) —
+  both funded by the ADR-0009 pool. Operator decision 2026-07-23: model-pinned niche profiles
+  rejected; the market-wide sweep is the chosen path.
 - Search results at `countpage=100` without explicit paging represent the full match set
   whenever reported `total ≤ ids.length` — trusted as the completeness signal.
 - `dom_days < 60` (applied in US4.3, stored now) is an acceptable plausible-sale filter.

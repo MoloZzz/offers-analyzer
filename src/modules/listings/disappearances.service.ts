@@ -56,11 +56,13 @@ export class DisappearancesService {
   /**
    * One poll cycle's worth of disappearance bookkeeping: bump sightings, resurrect anything
    * that reappeared, then record disappearances for active listings that are absent beyond
-   * grace and still covered by at least one eligible search profile.
+   * grace and still covered by at least one eligible search profile. `graceHours` defaults to
+   * the poll-cadence grace; the daily sweep passes `SWEEP_GRACE_HOURS` (FR-411).
    */
   async processCycle(
     seenExternalIds: Set<string>,
     eligibleProfiles: SearchProfile[],
+    graceHours: number = GRACE_HOURS,
   ): Promise<ListingDisappearance[]> {
     const now = new Date();
 
@@ -95,7 +97,7 @@ export class DisappearancesService {
 
     // 4. Candidates (FR-403): active, previously seen in search, absent beyond grace. Listings
     // just bumped to `now` above can never satisfy `< graceCutoff`, so they're excluded for free.
-    const graceCutoff = new Date(now.getTime() - GRACE_HOURS * 60 * 60 * 1000);
+    const graceCutoff = new Date(now.getTime() - graceHours * 60 * 60 * 1000);
     const candidates = await this.listings.find({
       where: { status: 'active', lastSeenInSearchAt: LessThan(graceCutoff) },
     });

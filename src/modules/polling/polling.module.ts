@@ -10,6 +10,7 @@ import { SourcesModule } from '../sources/sources.module';
 import { ValuationModule } from '../valuation/valuation.module';
 
 import { PollService } from './poll.service';
+import { SweepService } from './sweep.service';
 
 /** Wires the US1 pipeline. Depends on the feature modules; no cycle with SchedulingModule. */
 @Module({
@@ -23,6 +24,6 @@ import { PollService } from './poll.service';
     CalibrationModule,
     HealthModule,
   ],
-  providers: [PollService],
+  providers: [PollService, SweepService],
 })
 export class PollingModule {}
