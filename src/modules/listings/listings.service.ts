@@ -82,7 +82,10 @@ export class ListingsService {
       .getMany();
   }
 
-  async recordSeen(detail: ListingDetail): Promise<RecordResult> {
+  async recordSeen(
+    detail: ListingDetail,
+    opts?: { seenInSearch?: boolean },
+  ): Promise<RecordResult> {
     const now = new Date();
     let listing = await this.listings.findOne({
       where: { sourceKey: this.sourceKey, externalId: detail.externalId },
@@ -118,6 +121,10 @@ export class ListingsService {
       if (detail.description != null) listing.description = detail.description;
       listing.lastSeenAt = now;
     }
+    // A fetch triggered by this cycle's search results is also a search sighting (SPEC-004
+    // FR-401) — without this, a fast-selling listing created mid-cycle would have no sighting
+    // timestamp and could never be detected as disappeared.
+    if (opts?.seenInSearch) listing.lastSeenInSearchAt = now;
 
     const saved = await this.listings.save(listing);
 

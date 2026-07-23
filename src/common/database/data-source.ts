@@ -5,6 +5,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { CalibrationRun } from '../../modules/calibration/entities/calibration-run.entity';
 import { Outcome } from '../../modules/calibration/entities/outcome.entity';
 import { ParameterSet } from '../../modules/calibration/entities/parameter-set.entity';
+import { ListingDisappearance } from '../../modules/listings/entities/listing-disappearance.entity';
 import { Listing } from '../../modules/listings/entities/listing.entity';
 import { PriceObservation } from '../../modules/listings/entities/price-observation.entity';
 import { AlertedCar } from '../../modules/notifications/entities/alerted-car.entity';
@@ -21,6 +22,7 @@ export const ENTITIES = [
   SearchProfile,
   Listing,
   PriceObservation,
+  ListingDisappearance,
   FairValueBenchmark,
   AveragePriceSnapshot,
   Opportunity,

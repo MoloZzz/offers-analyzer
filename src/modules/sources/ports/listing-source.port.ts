@@ -27,6 +27,8 @@ export interface SourceSearchQuery {
 export interface SourceSearchResult {
   ids: string[];
   nextPage?: string;
+  /** Total match count reported by the source; used to detect truncated result pages. */
+  total?: number;
 }
 
 /** Risk signals read from the source (AUTO.RIA `autoInfoBar`). Drive red-flags. */

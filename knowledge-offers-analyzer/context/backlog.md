@@ -1,7 +1,7 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Backlog
@@ -42,21 +42,43 @@ structurally over-represented. Expected effect: `fair_value` inflated 8–15%, s
 threshold (≈19% nominal discount) is really only ~6–10% off actual realized price — margin-negative
 after haggling and paperwork. This is the leading explanation for the "deals" not panning out.
 
-- [ ] **FIX-003.1 — Verify `factorBounds` are live in prod.** P0, ~15 min. Code review found
-  `factorBounds: {}` in the seed — if so, `score === priceCore` and all of spec 003's liquidity/
-  repair-risk factors have **silently** zero effect, contradicting the "implemented" status in
-  `specs/README.md`. Check the active `ParameterSet` in prod; fill or explicitly document as
-  disabled; add a startup warning if a factor is coded as shipped but its bounds are empty.
+- [ ] **FIX-003.1 — Verify `factorBounds` are live in prod.** **Verified 2026-07-23**: queried
+  prod Postgres (`offers-ria`, `parameter_sets` table) — the active ParameterSet is `version 1`
+  (seeded 2026-07-17, predates Phase 1 which shipped 2026-07-18/19); `factorBounds: null` /
+  `upliftCap: null`. Confirmed `score === priceCore` in prod right now — liquidity and repair-risk
+  (`factors/liquidity.ts`, `factors/repair-risk.ts`) both gate on `if (!bounds || !table) return
+  null` and have **zero effect**, exactly as this item anticipated. Also confirmed **no code path
+  ever activates them**: `PHASE1_FACTOR_BOUNDS` (`valuation.service.ts:87-90`) is referenced only
+  in test fixtures, `ParametersService.onApplicationBootstrap` seeds once and never re-seeds an
+  existing active row, `CalibrationService.proposeWeights` spreads `{ ...active, ... }` so the
+  absent `factorBounds` carries forward untouched, and there is no controller/CLI to activate a
+  ParameterSet manually. Full record: [[2026-07-23-session-01]].
+  Remaining work is a **decision**, not further verification — pick one:
+  (a) create + activate a new ParameterSet carrying `PHASE1_FACTOR_BOUNDS` and re-validate
+  thresholds (S6/T050), or (b) explicitly keep it disabled pending a decision. Stays unchecked
+  until (a) or (b) happens. The "startup warning if shipped-but-empty-bounds" idea stays open too.
 
-- [ ] **SPEC-004 — Realized-price calibration (survivorship correction).** P0, 0 API cost (reuses
+- [~] **SPEC-004 — Realized-price calibration (survivorship correction).** P0, 0 API cost (reuses
   the id-list search already made every cycle — a diff against the previous list detects
-  disappearances for free, no extra request).
-  - US4.1 — track disappearances: new `listing_disappearance` table
-    (`listing_id, cohort_key, last_known_price_usd, first_seen_at, disappeared_at, dom_days,
-    price_cuts_count, had_price_cut`), populated from the existing `price_history` (no new request).
-  - US4.2 — filter non-sales: disappearance ≠ sale (could be delisted/expired/banned). Use
-    `dom_days < 60`; detect relists (same VIN, or make+model+year+mileage±2k+city match within 30
-    days) → `is_relist = true`, excluded from calibration.
+  disappearances for free, no extra request). **Promoted to a formal spec:**
+  `specs/004-realized-price-calibration/` (spec + plan + tasks).
+  - [x] US4.1 — track disappearances (**implemented 2026-07-23**, slices A–D, delegated → Sonnet):
+    `listing_disappearances` table (cohort_key, last_known_price_usd, first/disappeared_at,
+    dom_days, price_cuts_count, had_price_cut, is_relist, reappeared_at, detection_mode) +
+    `Listing.lastSeenInSearchAt` bulk-bumped from the Phase-1 id lists (migration `1784806436997`).
+    False-positive design: `submittedWithin` profiles never detection-eligible; truncated result
+    pages (via new free `SourceSearchResult.total`) ineligible; pure `profileCovers` coverage
+    check; 24h grace + resurrection voiding (`reappearedAt`); residual bias fails conservative
+    (`k` biased toward 1.0). Zero-API structurally (`DisappearancesService` has no source dep).
+    Also records passive Outcome `'disappeared'` (closes E2c-later's data half — grace-based,
+    not 404-confirmed). tsc clean, jest 26 suites / 169 tests.
+    **⚠ Operator prerequisite (T012): enable ≥1 persistent profile (no `submittedWithin`,
+    ≤100 matches) — with only the "today" profile enabled, zero events accrue (by design).**
+  - [x] US4.2 — filter non-sales (**implemented 2026-07-23**, same slices): `dom_days` stored for
+    the `< 60` filter (applied in US4.3); relists detected on new-listing ingest — same VIN, or
+    markId+modelId+year+cityId with mileage ±2k km within 30 days → `is_relist = true`.
+  - [ ] US4.3 / US4.4 — compute + apply `k`: later phases; tasks at pickup
+    (`specs/004-realized-price-calibration/tasks.md`).
   - US4.3 — compute `k` per cohort: `k = median(last_known_price_usd of filtered disappearances) /
     median(cohort_average on the disappearance date)`. Needs ≥30 events/cohort, else fallback
     make+model → make → global (start 0.90). Recompute weekly.
@@ -302,8 +324,11 @@ bounded, reversible, human-in-the-loop, stored-data-only (no API budget). Sequen
   - [x] **E2c — passive `price_dropped`** in the poll: on a re-observed price drop, `poll.service`
     records a deduped passive `Outcome` (weak "market moved" signal); `PollingModule` imports
     `CalibrationModule`. No extra source request. tsc clean, jest 37/37.
-    - [ ] **E2c-later — `disappeared` / time-on-market**: reliable only once the source distinguishes
-      "listing removed" (HTTP 404) from "fell out of the search/paging". Deferred (needs a source change).
+    - [~] **E2c-later — `disappeared` / time-on-market**: **partially closed by SPEC-004 US4.1
+      (2026-07-23)** — the poll now records a passive `disappeared` Outcome from grace-based
+      id-diff detection (eligibility + coverage + 24h grace filters, resurrection-voided), not
+      404 confirmation. 404-confirmed removal still needs a source change; time-on-market
+      scoring (B25) still open.
   - [ ] **E2d — realized precision** in `/report` (👍 vs 👎 over a recent window, per profile + overall).
 - [x] **E3 — US2 (P2): Threshold auto-calibration** — **complete.** Per-profile propose + bounded
   apply/revert; weekly schedule; `propose` default, `CALIBRATION_MODE=auto` for hands-off; frozen on thin
@@ -379,7 +404,8 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   gearbox/engine/fuel/age patterns) + pure `factors/repair-risk.ts` (HIGH→dampen, LOW→slight uplift);
   `/info` gearbox/fuel/engine verified + mapped in `AutoRiaSource`; wired through poll + query.
   `repair-risk.spec` 10/10. Both factors ship **off by default** (neutral seed → SC-001); enable via a
-  `ParameterSet` carrying `PHASE1_FACTOR_BOUNDS`, then re-validate thresholds (S6).
+  `ParameterSet` carrying `PHASE1_FACTOR_BOUNDS`, then re-validate thresholds (S6). Confirmed still
+  off in prod as of 2026-07-23 — see FIX-003.1 above.
 - [ ] **S3 — Seller-motivation + seller-type** (lexicon + modifier; P2).
 - [ ] **S4 — Positive signals uplift** (absorbs B24; P2).
 - [ ] **S5 — Segment mileage norms** (P2).
@@ -454,7 +480,9 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
 - [ ] **B25 — Time-on-market & price-history as a scoring factor.** We already store `PriceObservation`
   and re-observe drops but **don't score** age/markdown-count. Turn days-seen + number/size of drops
   into a bounded score modifier + alert annotation (motivated seller ↑; long-stale ↓, hidden-problem
-  hint). Needs the "removed vs fell-out-of-paging" distinction (couples with E2c-later). **Priority
+  hint). The "removed vs fell-out-of-paging" distinction now largely exists — SPEC-004 US4.1
+  (2026-07-23) marks eligible-covered-absent listings `status='removed'` with `dom_days` stored
+  per disappearance (grace-based; 404 confirmation still open). **Priority
   raised** by ADR-0006 (Should-Have, first follow-up after spec 003; a **market-demand score** — segment
   turnover speed, distinct from liquidity — joins here once snapshot history suffices). See
   [[profitability-methods-coverage]].

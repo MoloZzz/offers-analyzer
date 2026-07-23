@@ -63,11 +63,13 @@ export class AutoRiaSource implements ListingSource {
       params.append('model_id[]', String(modelId));
     }
 
-    const data = await this.get<{ result?: { search_result?: { ids?: string[] } } }>(
-      '/search',
-      params,
-    );
-    return { ids: data.result?.search_result?.ids ?? [] };
+    const data = await this.get<{
+      result?: { search_result?: { ids?: string[]; count?: number } };
+    }>('/search', params);
+    return {
+      ids: data.result?.search_result?.ids ?? [],
+      total: data.result?.search_result?.count,
+    };
   }
 
   async fetch(externalId: string): Promise<ListingDetail> {

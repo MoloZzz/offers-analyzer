@@ -72,6 +72,11 @@ export class Listing {
   @Column({ type: 'timestamptz' })
   lastSeenAt!: Date;
 
+  /** Last time this listing's id appeared in any profile's search result (distinct from
+   * lastSeenAt, which is bumped only on an actual fetch). */
+  @Column({ type: 'timestamptz', nullable: true })
+  lastSeenInSearchAt?: Date | null;
+
   // Last valuation result for this listing (recorded for every evaluated listing, not only opportunities).
   @Column('numeric', { nullable: true, transformer: numericTransformer })
   lastScore?: number | null;

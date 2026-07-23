@@ -1,7 +1,7 @@
 ---
 title: Feature specs index (SDD)
 type: moc
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Feature specs index
@@ -16,7 +16,8 @@ _TODO: none yet. First entry appears after the first `/speckit-specify` run._
 |------|---------|--------|
 | `../../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Implemented (v1 MVP + mileage/condition/report follow-ups) |
 | `../../specs/002-auto-calibration-learning/spec.md` | Capture outcomes → auto-calibrate the alert threshold → learn scoring weights; transparent, bounded, human-in-the-loop | Implemented (E1–E4; `disappeared` signal + per-profile precision deferred) |
-| `../../specs/003-composite-deal-score/spec.md` | Rank by probability of operator profit ([[0006-operator-profit-vision\|ADR-0006]]): composite Total Deal Score — price core (dominant) × liquidity × repair-risk × negotiation × seller × positives; 0–100 explanation; segment mileage norms | **Phase F + US1 + US2 implemented** (liquidity + repair-risk factors live, gated by ParameterSet bounds; negotiation/seller/positives/mileage pending) |
+| `../../specs/003-composite-deal-score/spec.md` | Rank by probability of operator profit ([[0006-operator-profit-vision\|ADR-0006]]): composite Total Deal Score — price core (dominant) × liquidity × repair-risk × negotiation × seller × positives; 0–100 explanation; segment mileage norms | **Phase F + US1 + US2 implemented, inactive in prod** (liquidity + repair-risk factors coded and gated by ParameterSet bounds — the active prod ParameterSet's bounds are currently empty, so both factors are no-ops; verified 2026-07-23, see [[backlog#FIX-003.1]]; negotiation/seller/positives/mileage pending) |
+| `../../specs/004-realized-price-calibration/spec.md` | Survivorship correction to `fair_value`: measure empirical `k` from listing disappearances (id-diff on searches already made — zero API cost), filter non-sales/relists, then apply `X = RIA_average × k` | **US4.1–4.2 implemented 2026-07-23** (disappearance tracking + relist filtering; inert until a persistent profile is enabled — see tasks T012); US4.3 (compute `k`) + US4.4 (apply) pending |
 
 ## Backlog-level specs (pre-Spec-Kit)
 
@@ -26,7 +27,6 @@ implementation per SDD (§2 of `CLAUDE.md`).
 
 | Backlog item | Summary | Priority |
 |---|---|---|
-| SPEC-004 | Survivorship correction to `fair_value` via an empirically measured `k` | P0 |
 | SPEC-005 | Listing lifecycle + tiered re-check (catches price cuts after ingest) | P1 |
 | SPEC-006 | Monetary output `Z`/`ROI` alongside the 0–100 score | P2 |
 | SPEC-007 | Post-deal outcome labels (realized margin), replacing 👍/👎 as the auto-tuning target | P0 |

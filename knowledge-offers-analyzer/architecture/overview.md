@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Architecture overview
@@ -25,8 +25,8 @@ Implemented (spec 001). One NestJS module per concern:
 | Module | Responsibility | Notes |
 |--------|----------------|-------|
 | `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
-| `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore` | history from day one |
-| `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — liquidity + repair-risk shipped; negotiation/seller/positives/segment-mileage pending); tunables from the active `ParameterSet` | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
+| `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore`; **disappearance tracking** (spec 004): pure `disappearance.ts` (eligibility/coverage/grace/relist decisions) + `DisappearancesService` (`processCycle` id-diff → `ListingDisappearance` events, `checkRelist`) — zero API cost, no source dependency | history from day one |
+| `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — liquidity + repair-risk implemented in code but **inactive in prod** as of 2026-07-23: active ParameterSet has empty `factorBounds`, so `score === priceCore` — see [[backlog#FIX-003.1]]; negotiation/seller/positives/segment-mileage pending) | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
 | `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts` | spec 002; [[0005-versioned-parameter-sets\|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome` |
@@ -49,6 +49,15 @@ module lets the bot check any listing (`/check`), list stored opportunities (`/t
 best-scoring candidates even below the alert bar (`/best`). Full design:
 `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
 
+**Disappearance detection** (spec 004, 2026-07-23): after Phase 1 of each poll, every sighted id
+bulk-bumps `Listing.lastSeenInSearchAt`; active listings absent > 24h that a *detection-eligible*
+profile (no `submittedWithin`, untruncated result — via free `SourceSearchResult.total`) still
+covers become `ListingDisappearance` events (cohort key, last USD price, DOM, price-cut stats)
+and flip to `status='removed'`; a reappearance resurrects the listing and voids the event; new
+listings are checked against recent events for relists (VIN or attribute match). Feeds the
+survivorship correction `k` (spec 004 US4.3–4.4, pending). Zero extra API requests — structural
+(no source dep in `DisappearancesService`).
+
 ## Entities / data model
 
 - **SearchProfile** — a configured niche to watch (region + make/models + price band + `minDealScore`).
@@ -62,6 +71,7 @@ best-scoring candidates even below the alert bar (`/best`). Full design:
 - **Outcome** — realized result of a listing (manual 👍/👎, bought/skipped/resold; passive price_dropped/disappeared). Feedback ground truth.
 - **CalibrationRun** — a recorded calibration pass (per-profile inputs, proposal, applied?, reason).
 - **AlertedCar** — per-car (VIN) record of the lowest price we've alerted, so a relist is only re-alerted when cheaper (B12; [[when-to-alert]]).
+- **ListingDisappearance** — one event per listing that left the market (cohort key, last known USD price, DOM, price-cut stats, `is_relist`, `reappeared_at` voiding, `detection_mode` live/backfill) — the raw material for the survivorship correction `k` (spec 004).
 
 ## Boundaries & integrations
 

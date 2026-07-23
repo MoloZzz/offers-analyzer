@@ -9,6 +9,8 @@ import { Currency } from '../../common/types/money';
 import { OutcomesService } from '../calibration/outcomes.service';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { HealthService } from '../health/health.service';
+import { isSearchEligible } from '../listings/disappearance';
+import { DisappearancesService } from '../listings/disappearances.service';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
 import { AlertedCarsService } from '../notifications/alerted-cars.service';
@@ -62,6 +64,7 @@ export class PollService {
     private readonly outcomes: OutcomesService,
     private readonly health: HealthService,
     private readonly alertedCars: AlertedCarsService,
+    private readonly disappearances: DisappearancesService,
     @InjectPinoLogger(PollService.name) private readonly logger: PinoLogger,
   ) {}
 
@@ -80,10 +83,17 @@ export class PollService {
     const profiles = await this.profiles.getEnabled();
 
     // Phase 1 — one search per profile; build a per-profile work queue (dedup + per-profile cap).
+    // Along the way, collect every sighted id + the detection-eligible profiles for the
+    // disappearance diff (SPEC-004): the id lists are already paid for, the diff is free.
     const queues: ProfileQueue[] = [];
+    const seenIds = new Set<string>();
+    const eligibleProfiles: SearchProfile[] = [];
     for (const profile of profiles) {
       try {
-        const { ids } = await this.source.search(toQuery(profile));
+        const result = await this.source.search(toQuery(profile));
+        const { ids } = result;
+        for (const id of ids) seenIds.add(id);
+        if (isSearchEligible(profile, result)) eligibleProfiles.push(profile);
         const known = await this.listings.findByExternalIds(ids);
         const knownIds = new Set(known.map((l) => l.externalId));
         const newIds = ids.filter((id) => !knownIds.has(id)).slice(0, MAX_NEW_PER_PROFILE);
@@ -102,6 +112,21 @@ export class PollService {
         if (err instanceof RateBudgetExhaustedError) return; // budget gone — resume next tick
         this.logger.error({ err, profileId: profile.id }, 'Search failed for profile');
       }
+    }
+
+    // Disappearance detection (SPEC-004 US4.1) — runs only when Phase 1 completed for every
+    // profile (a budget-exhausted Phase 1 returns above: an incomplete sighting set must never
+    // be diffed). Zero API cost: consumes only the id lists collected above. A detection error
+    // must not cost us the cycle's fresh-deal evaluation, so it is contained here.
+    try {
+      const events = await this.disappearances.processCycle(seenIds, eligibleProfiles);
+      // Passive outcome (spec 002 E2c-later): the listing left the market — a weak "probably
+      // sold" signal. listing_disappearances stays the source of truth for calibration.
+      for (const event of events) {
+        await this.outcomes.recordPassive({ listingId: event.listingId, label: 'disappeared' });
+      }
+    } catch (err) {
+      this.logger.error({ err }, 'Disappearance detection failed');
     }
 
     // Phase 2 — new listings first (that's where fresh deals are), fairly across profiles.
@@ -152,7 +177,10 @@ export class PollService {
     const detail = await this.source.fetch(externalId);
     if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
     if (isExcluded(profile, detail)) return;
-    const { listing } = await this.listings.recordSeen(detail);
+    const { listing, isNew } = await this.listings.recordSeen(detail, { seenInSearch: true });
+    // A brand-new listing may be a recently-disappeared car back under a new id (SPEC-004
+    // US4.2) — mark the old event as a relist so calibration excludes it.
+    if (isNew) await this.disappearances.checkRelist(listing);
     await this.evaluateAndNotify(profile, detail, listing, 'opportunity', null);
   }
 
@@ -160,7 +188,7 @@ export class PollService {
     const previousAmount = existing.currentAmount;
     const detail = await this.source.fetch(existing.externalId);
     if (isExcluded(profile, detail)) return;
-    const { listing } = await this.listings.recordSeen(detail);
+    const { listing } = await this.listings.recordSeen(detail, { seenInSearch: true });
     // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of
     // budget before scoring it). Otherwise the recorded observation is enough.
     const dropped = detail.price.amount < previousAmount;
