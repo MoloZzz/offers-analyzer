@@ -1,11 +1,11 @@
-import { buildSeedParams, ParametersService } from '../../src/modules/calibration/parameters.service';
 import { Currency } from '../../src/common/types/money';
+import { buildSeedParams, ParametersService } from '../../src/modules/calibration/parameters.service';
+import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../../src/modules/valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../../src/modules/valuation/cohort';
 import { HeuristicTables, HeuristicTablesService } from '../../src/modules/valuation/factors/tables';
 import { MileageAdjuster } from '../../src/modules/valuation/mileage';
 import { PHASE1_FACTOR_BOUNDS, ValuationService } from '../../src/modules/valuation/valuation.service';
-import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/listing-source.port';
 
 /**
  * End-to-end scoring pipeline (B15): composes the REAL `resolveBenchmark` + `MileageAdjuster` +
@@ -49,7 +49,7 @@ function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {
 async function run(d: ListingDetail, avgAmount: number, sampleSize: number, minScore = 0.63) {
   const source = {
     key: 'auto-ria',
-    averagePrice: async () => ({ value: { amount: avgAmount, currency: Currency.USD }, sampleSize }),
+    averagePrice: () => Promise.resolve({ value: { amount: avgAmount, currency: Currency.USD }, sampleSize }),
   } as unknown as ListingSource;
   const benchmarks = {
     getOrLoad: (_k: string, _c: unknown, loader: () => Promise<unknown>) => loader(),

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
-import { HealthService } from '../health/health.service';
 import { decideHealthAlert } from '../health/health-alert';
+import { HealthService } from '../health/health.service';
 
 import { NotificationsService } from './notifications.service';
 

@@ -27,6 +27,12 @@ describe('realizedMargin', () => {
       -500,
     );
   });
+
+  it('rounds fractional-cent float artifacts to 2 decimals', () => {
+    expect(
+      realizedMargin({ buyPriceUsd: 8500.05, actualCostsUsd: 300.02, sellPriceUsd: 10200.1 }),
+    ).toBe(1400.03);
+  });
 });
 
 describe('realizedDom', () => {

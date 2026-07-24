@@ -1,15 +1,15 @@
 import { PinoLogger } from 'nestjs-pino';
 
-import { Currency } from '../../src/common/types/money';
 import { RateBudgetExhaustedError } from '../../src/common/errors/domain-error';
+import { Currency } from '../../src/common/types/money';
 import { OutcomesService } from '../../src/modules/calibration/outcomes.service';
 import { SWEEP_GRACE_HOURS } from '../../src/modules/listings/disappearance';
 import { DisappearancesService } from '../../src/modules/listings/disappearances.service';
 import { ListingDisappearance } from '../../src/modules/listings/entities/listing-disappearance.entity';
+import { SweepService } from '../../src/modules/polling/sweep.service';
 import { ProfileFilters, SearchProfile } from '../../src/modules/profiles/entities/search-profile.entity';
 import { ProfilesService } from '../../src/modules/profiles/profiles.service';
 import { ListingSource } from '../../src/modules/sources/ports/listing-source.port';
-import { SweepService } from '../../src/modules/polling/sweep.service';
 
 /** Mirrors sweep.service.ts's private MAX_SWEEP_PAGES — kept in sync manually (not exported;
  * the constant is an internal safety cap, not part of the service's public contract). */
@@ -89,10 +89,10 @@ describe('SweepService.sweep', () => {
     const fakes = buildFakes();
     const profile = makeProfile();
     fakes.getEnabled.mockResolvedValue([profile]);
-    fakes.source.search.mockImplementation(async ({ page }: { page: number }) => {
-      if (page === 0) return { ids: idsFor(0, 100), total: 250 };
-      if (page === 1) return { ids: idsFor(1, 100), total: 250 };
-      if (page === 2) return { ids: idsFor(2, 50), total: 250 };
+    fakes.source.search.mockImplementation(({ page }: { page: number }) => {
+      if (page === 0) return Promise.resolve({ ids: idsFor(0, 100), total: 250 });
+      if (page === 1) return Promise.resolve({ ids: idsFor(1, 100), total: 250 });
+      if (page === 2) return Promise.resolve({ ids: idsFor(2, 50), total: 250 });
       throw new Error(`unexpected page ${page}`);
     });
     fakes.disappearances.processCycle.mockResolvedValue([fakeEvent('l1'), fakeEvent('l2')]);
@@ -119,10 +119,12 @@ describe('SweepService.sweep', () => {
     const fakes = buildFakes();
     const profile = makeProfile();
     fakes.getEnabled.mockResolvedValue([profile]);
-    fakes.source.search.mockImplementation(async ({ page }: { page: number }) => ({
-      ids: idsFor(page, 100),
-      total: 200,
-    }));
+    fakes.source.search.mockImplementation(({ page }: { page: number }) =>
+      Promise.resolve({
+        ids: idsFor(page, 100),
+        total: 200,
+      }),
+    );
 
     const service = buildService(fakes);
     await service.sweep();
@@ -136,8 +138,8 @@ describe('SweepService.sweep', () => {
     const fakes = buildFakes();
     const profile = makeProfile();
     fakes.getEnabled.mockResolvedValue([profile]);
-    fakes.source.search.mockImplementation(async ({ page }: { page: number }) => {
-      if (page === 0) return { ids: idsFor(0, 100), total: 300 };
+    fakes.source.search.mockImplementation(({ page }: { page: number }) => {
+      if (page === 0) return Promise.resolve({ ids: idsFor(0, 100), total: 300 });
       throw new RateBudgetExhaustedError('budget gone');
     });
 
@@ -153,9 +155,9 @@ describe('SweepService.sweep', () => {
     const failingProfile = makeProfile({ id: 'profile-fail', name: 'failing', categoryId: 1 });
     const okProfile = makeProfile({ id: 'profile-ok', name: 'ok', categoryId: 2 });
     fakes.getEnabled.mockResolvedValue([failingProfile, okProfile]);
-    fakes.source.search.mockImplementation(async ({ categoryId }: { categoryId: number }) => {
+    fakes.source.search.mockImplementation(({ categoryId }: { categoryId: number }) => {
       if (categoryId === 1) throw new Error('source blew up');
-      return { ids: idsFor(0, 10), total: 10 };
+      return Promise.resolve({ ids: idsFor(0, 10), total: 10 });
     });
 
     const service = buildService(fakes);
@@ -205,10 +207,10 @@ describe('SweepService.sweep', () => {
     const profile = makeProfile();
     fakes.getEnabled.mockResolvedValue([profile]);
     let calls = 0;
-    fakes.source.search.mockImplementation(async ({ page }: { page: number }) => {
+    fakes.source.search.mockImplementation(({ page }: { page: number }) => {
       calls++;
       // Always a full page with no reported total — nothing but the cap can stop this crawl.
-      return { ids: idsFor(page, 100) };
+      return Promise.resolve({ ids: idsFor(page, 100) });
     });
 
     const service = buildService(fakes);

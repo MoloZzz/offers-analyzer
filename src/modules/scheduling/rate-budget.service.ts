@@ -9,6 +9,10 @@ import { AppConfig } from '../../common/config/configuration';
 import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
 
+// How long to pause all consumption after the source returns HTTP 429, before
+// retrying. Keeps us from hammering an upstream that just told us to back off.
+const EXHAUSTED_COOLDOWN_MS = 5 * 60_000; // 5 minutes
+
 /**
  * ADR-0009: Monthly pool + daily sub-budget + priority queue rate limiting.
  * Replaces fixed hourly window (30 req/hour) with flexible monthly pool (20,000 req/month).
@@ -21,6 +25,7 @@ export class RateBudgetService {
   private readonly poolPerMonth: number;
   private readonly reservePct: number;
   private readonly cutoffThresholdPct: number;
+  private pausedUntil: number | null = null;
 
   constructor(
     config: ConfigService<AppConfig, true>,
@@ -40,6 +45,18 @@ export class RateBudgetService {
    * Optional tier (1-5) for priority queue; defaults to tier-1 (highest priority).
    */
   async tryConsume(sourceKey = 'auto-ria', cost = 1, tier = 1): Promise<boolean> {
+    // If we were recently 429'd, stay paused until the cooldown elapses.
+    if (this.pausedUntil != null) {
+      if (Date.now() < this.pausedUntil) {
+        this.logger.warn(
+          { sourceKey, pausedUntil: this.pausedUntil },
+          'Rate budget paused after HTTP 429, denying consumption'
+        );
+        return false;
+      }
+      this.pausedUntil = null;
+    }
+
     // Ensure daily budget is calculated for today (on-demand reset if date changed)
     const now = new Date();
     const dailyBudget = await this.ensureDailyBudgetCalculated(sourceKey, now);
@@ -49,7 +66,7 @@ export class RateBudgetService {
 
     // Check tier cutoff (if budget is tight, deny lower-priority tiers)
     const dailyUsed = state.dailyUsed ?? 0;
-    const cutoffTier = await this.determineCutoffTier(dailyBudget, dailyUsed);
+    const cutoffTier = this.determineCutoffTier(dailyBudget, dailyUsed);
     if (cutoffTier != null && tier > cutoffTier) {
       this.logger.warn(
         { sourceKey, tier, cutoffTier, dailyUsed, dailyBudget },
@@ -98,6 +115,7 @@ export class RateBudgetService {
        DO UPDATE SET "used" = GREATEST(rate_budget_windows."used", $3)`,
       [sourceKey, windowKey, this.capacityPerHour],
     );
+    this.pausedUntil = Date.now() + EXHAUSTED_COOLDOWN_MS;
   }
 
   /** Get or lazily initialize monthly budget state for the given month. */
@@ -161,20 +179,23 @@ export class RateBudgetService {
     const availablePool = Math.max(0, state.poolSize - (state.poolUsed ?? 0) - effectiveReserve);
     const dailyBudget = Math.floor(availablePool / daysRemaining);
 
-    // Update state: reset daily used and save new budget
-    state.dailyBudget = dailyBudget;
-    state.dailyUsed = 0;
-    state.lastDayCalculated = todayStr;
-    await this.stateRepo.save(state);
+    // Update state: reset daily used and save new budget.
+    // Use a targeted column update (not a full-entity save) so we never clobber
+    // `poolUsed`, which may be concurrently incremented by an atomic SQL update
+    // in recordConsumption() between our read above and this write (TOCTOU).
+    await this.stateRepo.update(
+      { sourceKey, monthKey: RateBudgetService.monthKey(now) },
+      { dailyBudget, dailyUsed: 0, lastDayCalculated: todayStr }
+    );
 
     return dailyBudget;
   }
 
   /** Determine cutoff tier based on remaining daily budget (progressive denial from tier-5 to tier-2). */
-  private async determineCutoffTier(
+  private determineCutoffTier(
     dailyBudget: number,
     dailyUsed: number
-  ): Promise<number | null> {
+  ): number | null {
     const remaining = dailyBudget - dailyUsed;
     const threshold = Math.ceil(dailyBudget * (this.cutoffThresholdPct / 100));
 

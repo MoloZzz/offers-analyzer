@@ -14,7 +14,7 @@ const noopLogger = { warn: () => {}, error: () => {}, info: () => {}, debug: () 
  */
 function makeSource(): AutoRiaSource {
   const config = { get: (): string => 'TEST_KEY' } as unknown as ConfigService<AppConfig, true>;
-  const budget = { tryConsume: async (): Promise<boolean> => true } as unknown as RateBudgetService;
+  const budget = { tryConsume: (): Promise<boolean> => Promise.resolve(true) } as unknown as RateBudgetService;
   return new AutoRiaSource(config, budget, noopLogger);
 }
 

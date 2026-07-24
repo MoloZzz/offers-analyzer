@@ -48,10 +48,10 @@ function buildFakeRepo<T extends { id?: string }>(): { repo: Repository<T>; rows
   let nextId = 1;
 
   const repo = {
-    async findOne({ where }: { where: Record<string, unknown> }) {
-      return rows.find((row) => matches(row, where)) ?? null;
+    findOne({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(rows.find((row) => matches(row, where)) ?? null);
     },
-    async find({ where, order }: { where?: Record<string, unknown>; order?: Record<string, string> }) {
+    find({ where, order }: { where?: Record<string, unknown>; order?: Record<string, string> }) {
       let result = where ? rows.filter((row) => matches(row, where)) : [...rows];
       if (order) {
         const [field, dir] = Object.entries(order)[0];
@@ -62,24 +62,24 @@ function buildFakeRepo<T extends { id?: string }>(): { repo: Repository<T>; rows
           return dir === 'DESC' ? -cmp : cmp;
         });
       }
-      return result;
+      return Promise.resolve(result);
     },
     create(x: Partial<T>) {
       return { id: `id-${nextId++}`, ...x } as T;
     },
-    async save(x: T) {
+    save(x: T) {
       const idx = rows.findIndex((row) => row.id === x.id);
       if (idx === -1) {
         rows.push(x);
       } else {
         rows[idx] = x;
       }
-      return x;
+      return Promise.resolve(x);
     },
-    async update(where: Record<string, unknown>, partial: Partial<T>) {
+    update(where: Record<string, unknown>, partial: Partial<T>) {
       const affected = rows.filter((row) => matches(row, where));
       for (const row of affected) Object.assign(row as object, partial);
-      return { affected: affected.length };
+      return Promise.resolve({ affected: affected.length });
     },
   } as unknown as Repository<T>;
 

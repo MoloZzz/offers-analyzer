@@ -1,5 +1,5 @@
-import { formatWeights } from '../../src/modules/notifications/format/weights-message';
 import { WeightProposal } from '../../src/modules/calibration/weight-learning';
+import { formatWeights } from '../../src/modules/notifications/format/weights-message';
 
 describe('formatWeights', () => {
   it('formats a proposal with a candidate version', () => {

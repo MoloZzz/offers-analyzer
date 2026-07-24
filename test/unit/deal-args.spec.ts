@@ -1,4 +1,4 @@
-import { parseDealArgs } from '../../src/modules/notifications/telegram/deal-args';
+import { parseDealArgs, splitDealCommand } from '../../src/modules/notifications/telegram/deal-args';
 
 describe('parseDealArgs', () => {
   it('parses all fields', () => {
@@ -42,5 +42,37 @@ describe('parseDealArgs', () => {
   it('rejects an unknown decline reason', () => {
     const { error } = parseDealArgs('reason=weather');
     expect(error).toContain('weather');
+  });
+});
+
+describe('splitDealCommand', () => {
+  it('does not let a 6+-digit price field leak into the link token', () => {
+    const { linkToken, rest } = splitDealCommand(
+      '.../auto_hyundai_sonata_40143820.html buy=8500 sell=100200 dom=21',
+    );
+    expect(linkToken).toContain('40143820');
+    expect(linkToken).not.toContain('100200');
+    expect(rest).toBe('buy=8500 sell=100200 dom=21');
+  });
+
+  it('link-only input leaves rest empty', () => {
+    const { linkToken, rest } = splitDealCommand(
+      '.../auto_hyundai_sonata_40143820.html',
+    );
+    expect(linkToken).toBe('.../auto_hyundai_sonata_40143820.html');
+    expect(rest).toBe('');
+  });
+
+  it('empty input yields empty link and rest', () => {
+    expect(splitDealCommand('')).toEqual({ linkToken: '', rest: '' });
+    expect(splitDealCommand('   ')).toEqual({ linkToken: '', rest: '' });
+  });
+
+  it('collapses extra internal whitespace around the rest', () => {
+    const { linkToken, rest } = splitDealCommand(
+      '  .../auto_hyundai_sonata_40143820.html   buy=8500   sell=10200  ',
+    );
+    expect(linkToken).toBe('.../auto_hyundai_sonata_40143820.html');
+    expect(rest).toBe('buy=8500   sell=10200');
   });
 });

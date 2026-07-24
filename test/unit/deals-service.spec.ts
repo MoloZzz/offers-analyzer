@@ -12,8 +12,8 @@ function buildFakeRepo(): { repo: Repository<DealOutcome>; rows: DealOutcome[] }
     Object.entries(where).every(([key, value]) => (row as never)[key] === value);
 
   const repo = {
-    async findOne({ where }: { where: Record<string, unknown> }) {
-      return rows.find((row) => matches(row, where)) ?? null;
+    findOne({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(rows.find((row) => matches(row, where)) ?? null);
     },
     create(x: Partial<DealOutcome>) {
       return {
@@ -33,22 +33,22 @@ function buildFakeRepo(): { repo: Repository<DealOutcome>; rows: DealOutcome[] }
         ...x,
       } as DealOutcome;
     },
-    async save(x: DealOutcome) {
+    save(x: DealOutcome) {
       const idx = rows.findIndex((row) => row.id === x.id);
       if (idx === -1) rows.push(x);
       else rows[idx] = x;
-      return x;
+      return Promise.resolve(x);
     },
-    async find({ where, order, take }: { where?: Record<string, unknown>; order?: never; take?: number }) {
+    find({ where, order, take }: { where?: Record<string, unknown>; order?: never; take?: number }) {
       let out = where ? rows.filter((row) => matches(row, where)) : [...rows];
       if (order) out = [...out].reverse(); // good enough for the recent() ordering assertion
       if (take != null) out = out.slice(0, take);
-      return out;
+      return Promise.resolve(out);
     },
-    async update({ id }: { id: string }, patch: Partial<DealOutcome>) {
+    update({ id }: { id: string }, patch: Partial<DealOutcome>) {
       const row = rows.find((r) => r.id === id);
       if (row) Object.assign(row, patch);
-      return { affected: row ? 1 : 0 };
+      return Promise.resolve({ affected: row ? 1 : 0 });
     },
   } as unknown as Repository<DealOutcome>;
 

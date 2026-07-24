@@ -14,7 +14,7 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
 
 ## 🔴 Now — correctness / unblock the running pipeline
 
-- [ ] **B1 — Regenerate the DB migration.** The committed initial migration still has the old
+- [x] **B1 — Regenerate the DB migration.** The committed initial migration still has the old
   `discountThresholdPct`. Existing dev data is disposable. Delete `src/common/database/migrations/*.ts`,
   `npm run migration:generate`, `migration:run`. (Migrations-only now — see [[coding-standards]].)
 - [x] **B2 — AUTO.RIA field mappings validated** against live responses. `search`/`info` fixed;

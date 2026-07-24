@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppConfig } from '../config/configuration';
+
 import { buildDataSourceOptions } from './data-source';
 
 /**

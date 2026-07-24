@@ -138,9 +138,9 @@ export class AutoRiaSource implements ListingSource {
     };
   }
 
-  async dictionaries(): Promise<SourceDictionaries> {
+  dictionaries(): Promise<SourceDictionaries> {
     // Not on the US1 hot path (profiles carry ids, info carries names). Left minimal for now.
-    return { marks: {}, models: {}, states: {}, cities: {} };
+    return Promise.resolve({ marks: {}, models: {}, states: {}, cities: {} });
   }
 
   private async get<T>(path: string, params: URLSearchParams, tier = 1): Promise<T> {

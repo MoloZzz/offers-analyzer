@@ -1,6 +1,7 @@
 import { Currency } from '../../../common/types/money';
 import { ListingDetail } from '../../sources/ports/listing-source.port';
 import { ValuationResult } from '../../valuation/valuation.service';
+
 import { FLAG_LABELS } from './opportunity-message';
 
 export interface WhyContext {

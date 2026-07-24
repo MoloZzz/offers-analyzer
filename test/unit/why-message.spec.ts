@@ -1,6 +1,6 @@
 import { Currency } from '../../src/common/types/money';
-import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
 import { formatWhy } from '../../src/modules/notifications/format/why-message';
+import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
 import { ValuationResult } from '../../src/modules/valuation/valuation.service';
 
 const detail: ListingDetail = {

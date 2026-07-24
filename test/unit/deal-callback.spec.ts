@@ -1,9 +1,9 @@
+import { DECLINE_REASONS } from '../../src/modules/calibration/entities/deal-outcome.entity';
 import {
   buildDealCallback,
   buildDeclineReasonCallback,
   parseDealCallback,
 } from '../../src/modules/notifications/telegram/deal-callback';
-import { DECLINE_REASONS } from '../../src/modules/calibration/entities/deal-outcome.entity';
 
 const OP_ID = '123e4567-e89b-12d3-a456-426614174000'; // 36-char uuid
 

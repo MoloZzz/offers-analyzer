@@ -17,8 +17,8 @@ import { formatWeights } from '../format/weights-message';
 import { formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
+import { parseDealArgs, splitDealCommand } from './deal-args';
 import { buildDeclineReasonCallback, parseDealCallback } from './deal-callback';
-import { parseDealArgs } from './deal-args';
 import { parseOutcomeCallback } from './outcome-callback';
 
 /** Ukrainian labels for the decline-reason keyboard. */
@@ -389,15 +389,14 @@ export class TelegramBotUpdate {
   @Command('deal')
   async onDeal(@Ctx() ctx: Context): Promise<void> {
     const raw = commandArg(ctx);
-    const externalId = extractAutoId(raw);
+    const { linkToken, rest } = splitDealCommand(raw);
+    const externalId = extractAutoId(linkToken);
     if (!externalId) {
       await ctx.reply(
         `Формат: /deal <посилання> buy=8500 costs=300 sell=10200 dom=21 reason=price [нотатка]\nНапр.: /deal ${URL_EXAMPLE} buy=8500 sell=10200`,
       );
       return;
     }
-    // Strip the link token; parse the rest as key=value fields.
-    const rest = raw.replace(/\S*\d{6,}\S*/, '').trim();
     const { patch, error } = parseDealArgs(rest);
     if (error) {
       await ctx.reply(

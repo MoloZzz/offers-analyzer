@@ -6,8 +6,8 @@ import { RateBudgetExhaustedError } from '../../common/errors/domain-error';
 import { OutcomesService } from '../calibration/outcomes.service';
 import { SWEEP_GRACE_HOURS } from '../listings/disappearance';
 import { DisappearancesService } from '../listings/disappearances.service';
-import { ProfilesService } from '../profiles/profiles.service';
 import { SearchProfile } from '../profiles/entities/search-profile.entity';
+import { ProfilesService } from '../profiles/profiles.service';
 import { ListingSource, LISTING_SOURCE } from '../sources/ports/listing-source.port';
 
 import { toQuery } from './poll.service';

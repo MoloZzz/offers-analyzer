@@ -31,13 +31,14 @@ describe('DealReminderService', () => {
     const reminded: string[] = [];
     const service = make(
       {
-        dueForReminder: async () => due,
-        markReminded: async (id) => {
+        dueForReminder: () => Promise.resolve(due),
+        markReminded: (id) => {
           reminded.push(id);
+          return Promise.resolve();
         },
       },
-      { findByIds: async () => [{ id: 'l1', make: 'Hyundai', model: 'Sonata', year: 2015, url: 'u' } as Listing] },
-      { broadcast: async (text) => { broadcasts.push(text); } },
+      { findByIds: () => Promise.resolve([{ id: 'l1', make: 'Hyundai', model: 'Sonata', year: 2015, url: 'u' } as Listing]) },
+      { broadcast: (text) => { broadcasts.push(text); return Promise.resolve(); } },
     );
 
     await service.remind(new Date('2026-07-01'));
@@ -50,9 +51,9 @@ describe('DealReminderService', () => {
   it('does nothing when no deals are due', async () => {
     let broadcast = 0;
     const service = make(
-      { dueForReminder: async () => [] },
-      { findByIds: async () => [] },
-      { broadcast: async () => { broadcast += 1; } },
+      { dueForReminder: () => Promise.resolve([]) },
+      { findByIds: () => Promise.resolve([]) },
+      { broadcast: () => { broadcast += 1; return Promise.resolve(); } },
     );
 
     await service.remind(new Date('2026-07-01'));

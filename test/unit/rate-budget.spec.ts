@@ -20,22 +20,24 @@ function buildFakeWindowRepo(): { repo: Repository<RateBudgetWindow>; rows: Rate
 
   const repo = {
     query: jest.fn(),
-    async findOne({ where }: { where: Record<string, unknown> }) {
-      return rows.find((row) =>
-        Object.entries(where).every(([key, value]) => (row as never)[key] === value)
-      ) ?? null;
+    findOne({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(
+        rows.find((row) =>
+          Object.entries(where).every(([key, value]) => (row as never)[key] === value)
+        ) ?? null
+      );
     },
     create(x: Partial<RateBudgetWindow>) {
       return { id: `id-${nextId++}`, createdAt: new Date(), ...x } as RateBudgetWindow;
     },
-    async save(x: RateBudgetWindow) {
+    save(x: RateBudgetWindow) {
       const idx = rows.findIndex((row) => row.id === x.id);
       if (idx === -1) {
         rows.push(x);
       } else {
         rows[idx] = x;
       }
-      return x;
+      return Promise.resolve(x);
     },
   } as unknown as Repository<RateBudgetWindow>;
 
@@ -49,10 +51,12 @@ function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: Mon
 
   const repo = {
     query: jest.fn(),
-    async findOne({ where }: { where: Record<string, unknown> }) {
-      return rows.find((row) =>
-        Object.entries(where).every(([key, value]) => (row as never)[key] === value)
-      ) ?? null;
+    findOne({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(
+        rows.find((row) =>
+          Object.entries(where).every(([key, value]) => (row as never)[key] === value)
+        ) ?? null
+      );
     },
     create(x: Partial<MonthlyBudgetState>) {
       return {
@@ -62,14 +66,23 @@ function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: Mon
         ...x,
       } as MonthlyBudgetState;
     },
-    async save(x: MonthlyBudgetState) {
+    save(x: MonthlyBudgetState) {
       const idx = rows.findIndex((row) => row.id === x.id);
       if (idx === -1) {
         rows.push(x);
       } else {
         rows[idx] = x;
       }
-      return x;
+      return Promise.resolve(x);
+    },
+    update(where: Record<string, unknown>, partial: Partial<MonthlyBudgetState>) {
+      for (const row of rows) {
+        const matches = Object.entries(where).every(([key, value]) => (row as never)[key] === value);
+        if (matches) {
+          Object.assign(row, partial);
+        }
+      }
+      return Promise.resolve({ affected: rows.length } as never);
     },
   } as unknown as Repository<MonthlyBudgetState>;
 
@@ -317,7 +330,7 @@ describe('RateBudgetService (ADR-0009)', () => {
       jest.useRealTimers();
     });
 
-    it('never denies tier-1 even when budget is exhausted', async () => {
+    it('daily-budget exhaustion overrides tier priority (tier-1 still denied)', async () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date('2026-07-15T10:00:00Z'));
 
@@ -387,6 +400,36 @@ describe('RateBudgetService (ADR-0009)', () => {
         expect.objectContaining({ poolUsed: 1000, poolSize: 1000 }),
         'Monthly pool exhausted'
       );
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('HTTP 429 back-off', () => {
+    it('denies tryConsume() after markExhausted(), then allows again after the cooldown elapses', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-07-15T10:00:00Z'));
+
+      const { repo: windowRepo } = buildFakeWindowRepo();
+      const { repo: stateRepo } = buildFakeStateRepo();
+      const config = buildFakeConfig();
+
+      const service = new RateBudgetService(config, windowRepo, stateRepo, fakeLogger as never);
+
+      (stateRepo.query as jest.Mock).mockResolvedValue([]);
+
+      await service.markExhausted('auto-ria');
+
+      // Immediately after being marked exhausted, consumption is denied.
+      const deniedDuringCooldown = await service.tryConsume('auto-ria', 1, 1);
+      expect(deniedDuringCooldown).toBe(false);
+
+      // Advance past the 5-minute cooldown.
+      jest.setSystemTime(new Date('2026-07-15T10:05:01Z'));
+      (stateRepo.query as jest.Mock).mockResolvedValue([]);
+
+      const allowedAfterCooldown = await service.tryConsume('auto-ria', 1, 1);
+      expect(allowedAfterCooldown).toBe(true);
 
       jest.useRealTimers();
     });

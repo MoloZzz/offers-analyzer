@@ -1,5 +1,5 @@
-import { repairRiskFactor } from '../../src/modules/valuation/factors/repair-risk';
 import { FactorBound } from '../../src/modules/valuation/factors/factor';
+import { repairRiskFactor } from '../../src/modules/valuation/factors/repair-risk';
 import { RepairRiskTable } from '../../src/modules/valuation/factors/tables';
 
 const mockBounds: FactorBound = { min: 0.85, max: 1.05 };

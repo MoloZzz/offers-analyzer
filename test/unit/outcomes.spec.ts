@@ -12,23 +12,23 @@ function buildFakeRepo(): { repo: Repository<Outcome>; rows: Outcome[] } {
     Object.entries(where).every(([key, value]) => (row as never)[key] === value);
 
   const repo = {
-    async findOne({ where }: { where: Record<string, unknown> }) {
-      return rows.find((row) => matches(row, where)) ?? null;
+    findOne({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(rows.find((row) => matches(row, where)) ?? null);
     },
     create(x: Partial<Outcome>) {
       return { id: `id-${nextId++}`, createdAt: new Date(), ...x } as Outcome;
     },
-    async save(x: Outcome) {
+    save(x: Outcome) {
       const idx = rows.findIndex((row) => row.id === x.id);
       if (idx === -1) {
         rows.push(x);
       } else {
         rows[idx] = x;
       }
-      return x;
+      return Promise.resolve(x);
     },
-    async find({ where }: { where: Record<string, unknown> }) {
-      return rows.filter((row) => matches(row, where));
+    find({ where }: { where: Record<string, unknown> }) {
+      return Promise.resolve(rows.filter((row) => matches(row, where)));
     },
   } as unknown as Repository<Outcome>;
 

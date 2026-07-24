@@ -1,5 +1,5 @@
-import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
 import { Currency } from '../../src/common/types/money';
+import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
 import { cohortCandidates, MILEAGE_BAND_K } from '../../src/modules/valuation/cohort';
 
 function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {

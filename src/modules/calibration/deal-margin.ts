@@ -46,7 +46,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export function realizedMargin(d: DealEconomics): number | null {
   if (d.buyPriceUsd == null || d.sellPriceUsd == null) return null;
   const costs = d.actualCostsUsd ?? 0;
-  return d.sellPriceUsd - d.buyPriceUsd - costs;
+  return Math.round((d.sellPriceUsd - d.buyPriceUsd - costs) * 100) / 100;
 }
 
 /**

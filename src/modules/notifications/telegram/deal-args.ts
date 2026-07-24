@@ -15,6 +15,20 @@ export interface ParsedDealArgs {
   error?: string;
 }
 
+/**
+ * Split a raw `/deal` argument string into the leading listing link/id token and the remaining
+ * `key=value` fields. Splitting on the FIRST whitespace-delimited token (rather than scanning the
+ * whole string for a 6+-digit run) keeps a price field like `sell=100200` from being mistaken for
+ * the listing's auto_id — that bug is exactly what motivated this helper.
+ */
+export function splitDealCommand(raw: string): { linkToken: string; rest: string } {
+  const trimmed = raw.trim();
+  if (!trimmed) return { linkToken: '', rest: '' };
+  const match = trimmed.match(/^(\S+)\s*([\s\S]*)$/);
+  if (!match) return { linkToken: trimmed, rest: '' };
+  return { linkToken: match[1], rest: match[2].trim() };
+}
+
 type NumericField = 'buyPriceUsd' | 'actualCostsUsd' | 'sellPriceUsd' | 'daysOnMarket';
 
 const NUMERIC_KEYS: Record<string, NumericField> = {
