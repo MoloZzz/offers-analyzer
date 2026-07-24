@@ -6,78 +6,244 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 
+import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
 
 /**
- * Hard cap on source API calls (AUTO.RIA free tier ~30/hour) — constitution §V, FR-012.
- * Durable fixed-window counter in Postgres: the count survives restarts (unlike the earlier
- * in-memory version), so we don't over-spend and hit HTTP 429 after a restart. See ADR-0004 (B13).
+ * ADR-0009: Monthly pool + daily sub-budget + priority queue rate limiting.
+ * Replaces fixed hourly window (30 req/hour) with flexible monthly pool (20,000 req/month).
+ * Supports 5-tier priority cutoff: tier-1 (price-drop checks) → tier-5 (cohort averages).
+ * Durable Postgres-backed counter survives restarts; see ADR-0004 (B13).
  */
 @Injectable()
 export class RateBudgetService {
-  private readonly capacity: number;
+  private readonly capacityPerHour: number;
+  private readonly poolPerMonth: number;
+  private readonly reservePct: number;
+  private readonly cutoffThresholdPct: number;
 
   constructor(
     config: ConfigService<AppConfig, true>,
-    @InjectRepository(RateBudgetWindow) private readonly repo: Repository<RateBudgetWindow>,
+    @InjectRepository(RateBudgetWindow) private readonly windowRepo: Repository<RateBudgetWindow>,
+    @InjectRepository(MonthlyBudgetState) private readonly stateRepo: Repository<MonthlyBudgetState>,
     @InjectPinoLogger(RateBudgetService.name) private readonly logger: PinoLogger,
   ) {
-    this.capacity = config.get('rateBudgetPerHour', { infer: true });
+    this.capacityPerHour = config.get('rateBudgetPerHour', { infer: true });
+    this.poolPerMonth = config.get('rateBudgetPoolPerMonth', { infer: true });
+    this.reservePct = config.get('rateBudgetReservePct', { infer: true });
+    this.cutoffThresholdPct = config.get('rateBudgetCutoffThresholdPct', { infer: true });
   }
 
-  /** Try to consume `cost` from the current hour's budget. Returns false if it would exceed the cap. */
-  async tryConsume(sourceKey = 'auto-ria', cost = 1): Promise<boolean> {
-    const windowKey = RateBudgetService.windowKey();
-    const rows = (await this.repo.query(
-      `INSERT INTO rate_budget_windows ("sourceKey", "windowKey", "used")
-       VALUES ($1, $2, $3)
-       ON CONFLICT ("sourceKey", "windowKey")
-       DO UPDATE SET "used" = rate_budget_windows."used" + $3
-       RETURNING "used"`,
-      [sourceKey, windowKey, cost],
-    )) as Array<{ used: string | number }>;
-    const used = Number(rows[0]?.used ?? cost);
+  /**
+   * Try to consume `cost` units. Returns false if denied (budget exhausted or tier cutoff).
+   * Supports both legacy hourly mode (if still configured) and new monthly pool mode (ADR-0009).
+   * Optional tier (1-5) for priority queue; defaults to tier-1 (highest priority).
+   */
+  async tryConsume(sourceKey = 'auto-ria', cost = 1, tier = 1): Promise<boolean> {
+    // Ensure daily budget is calculated for today (on-demand reset if date changed)
+    const now = new Date();
+    const dailyBudget = await this.ensureDailyBudgetCalculated(sourceKey, now);
 
-    if (used === cost) {
-      // First consume of this window — prune older windows so the table stays tiny.
-      await this.repo.query(
-        `DELETE FROM rate_budget_windows WHERE "sourceKey" = $1 AND "windowKey" <> $2`,
-        [sourceKey, windowKey],
+    // Get current monthly state
+    const state = await this.getMonthlyBudgetState(sourceKey, now);
+
+    // Check tier cutoff (if budget is tight, deny lower-priority tiers)
+    const dailyUsed = state.dailyUsed ?? 0;
+    const cutoffTier = await this.determineCutoffTier(dailyBudget, dailyUsed);
+    if (cutoffTier != null && tier > cutoffTier) {
+      this.logger.warn(
+        { sourceKey, tier, cutoffTier, dailyUsed, dailyBudget },
+        `Tier ${tier} denied (budget tight, cutoff at ${cutoffTier})`
       );
-    }
-    if (used > this.capacity) {
-      this.logger.warn({ sourceKey, used, capacity: this.capacity }, 'Rate budget exhausted');
       return false;
     }
-    return true;
+
+    // Check monthly pool exhaustion
+    if ((state.poolUsed ?? 0) + cost > state.poolSize) {
+      this.logger.warn(
+        { sourceKey, poolUsed: state.poolUsed, poolSize: state.poolSize },
+        'Monthly pool exhausted'
+      );
+      return false;
+    }
+
+    // Check daily budget exhaustion
+    if (dailyUsed + cost > dailyBudget) {
+      this.logger.warn(
+        { sourceKey, dailyUsed, dailyBudget, cost },
+        'Daily budget exhausted'
+      );
+      return false;
+    }
+
+    // All checks passed — consume and record
+    return await this.recordConsumption(sourceKey, cost, tier, now);
   }
 
-  /** Remaining calls in the current hour window. */
+  /** Remaining calls in the current hour window (legacy hourly mode). */
   async remaining(sourceKey = 'auto-ria'): Promise<number> {
-    const row = await this.repo.findOne({
-      where: { sourceKey, windowKey: RateBudgetService.windowKey() },
+    const row = await this.windowRepo.findOne({
+      where: { sourceKey, windowKey: RateBudgetService.hourlyWindowKey() },
     });
-    return Math.max(0, this.capacity - (row?.used ?? 0));
+    return Math.max(0, this.capacityPerHour - (row?.used ?? 0));
   }
 
   /** Force the current window to exhausted (e.g. the source returned HTTP 429). */
   async markExhausted(sourceKey = 'auto-ria'): Promise<void> {
-    const windowKey = RateBudgetService.windowKey();
-    await this.repo.query(
-      `INSERT INTO rate_budget_windows ("sourceKey", "windowKey", "used")
-       VALUES ($1, $2, $3)
+    const windowKey = RateBudgetService.hourlyWindowKey();
+    await this.windowRepo.query(
+      `INSERT INTO rate_budget_windows ("sourceKey", "windowKey", "used", "budgetType")
+       VALUES ($1, $2, $3, 'hourly')
        ON CONFLICT ("sourceKey", "windowKey")
        DO UPDATE SET "used" = GREATEST(rate_budget_windows."used", $3)`,
-      [sourceKey, windowKey, this.capacity],
+      [sourceKey, windowKey, this.capacityPerHour],
     );
   }
 
-  private static windowKey(): string {
+  /** Get or lazily initialize monthly budget state for the given month. */
+  private async getMonthlyBudgetState(sourceKey: string, now: Date): Promise<MonthlyBudgetState> {
+    const monthKey = RateBudgetService.monthKey(now);
+
+    let state = await this.stateRepo.findOne({ where: { sourceKey, monthKey } });
+
+    if (!state) {
+      // Lazy initialization: first call of the month creates the row
+      const monthStart = RateBudgetService.monthStart(now);
+      const monthEnd = new Date(monthStart);
+      monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
+
+      const reserveAmount = Math.round(this.poolPerMonth * (this.reservePct / 100));
+      const releaseDate = new Date(monthEnd);
+      releaseDate.setUTCDate(releaseDate.getUTCDate() - 3); // 3 days before month end
+
+      state = this.stateRepo.create({
+        sourceKey,
+        monthKey,
+        poolSize: this.poolPerMonth,
+        poolUsed: 0,
+        reserveAmount,
+        reserveReleasesAt: releaseDate,
+        dailyBudget: 0,
+        dailyUsed: 0,
+        lastDayCalculated: null,
+      });
+      state = await this.stateRepo.save(state);
+    }
+
+    return state;
+  }
+
+  /** Recalculate daily budget if date has changed since last calculation. */
+  private async ensureDailyBudgetCalculated(sourceKey: string, now: Date): Promise<number> {
+    const state = await this.getMonthlyBudgetState(sourceKey, now);
+    const todayStr = RateBudgetService.todayStr(now);
+
+    // If already calculated for today, reuse the value
+    if (state.lastDayCalculated === todayStr) {
+      return Number(state.dailyBudget) || 0;
+    }
+
+    // Recalculate for today
+    const monthStart = RateBudgetService.monthStart(now);
+    const monthEnd = new Date(monthStart);
+    monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
+
+    // Days remaining in month (inclusive of today)
+    const daysRemaining = Math.max(
+      1,
+      Math.ceil((monthEnd.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+    );
+
+    // Determine effective reserve (released 3 days before month end)
+    const effectiveReserve = now >= state.reserveReleasesAt ? 0 : state.reserveAmount;
+
+    // Daily budget = (pool remaining - effective reserve) / days remaining
+    const availablePool = Math.max(0, state.poolSize - (state.poolUsed ?? 0) - effectiveReserve);
+    const dailyBudget = Math.floor(availablePool / daysRemaining);
+
+    // Update state: reset daily used and save new budget
+    state.dailyBudget = dailyBudget;
+    state.dailyUsed = 0;
+    state.lastDayCalculated = todayStr;
+    await this.stateRepo.save(state);
+
+    return dailyBudget;
+  }
+
+  /** Determine cutoff tier based on remaining daily budget (progressive denial from tier-5 to tier-2). */
+  private async determineCutoffTier(
+    dailyBudget: number,
+    dailyUsed: number
+  ): Promise<number | null> {
+    const remaining = dailyBudget - dailyUsed;
+    const threshold = Math.ceil(dailyBudget * (this.cutoffThresholdPct / 100));
+
+    // Budget is comfortable, no cutoff
+    if (remaining > threshold) {
+      return null;
+    }
+
+    // Progressive cutoff (deny tier-5, then tier-4, etc., but never deny tier-1)
+    if (remaining <= 0) return 1; // Deny tiers 5, 4, 3, 2; allow only tier-1
+    if (remaining <= threshold * 0.25) return 2; // Deny tiers 5, 4, 3
+    if (remaining <= threshold * 0.5) return 3; // Deny tiers 5, 4
+    if (remaining <= threshold * 0.75) return 4; // Deny tier 5
+
+    return null;
+  }
+
+  /** Record consumption: update both monthly pool and daily budget. */
+  private async recordConsumption(
+    sourceKey: string,
+    cost: number,
+    tier: number,
+    now: Date
+  ): Promise<boolean> {
+    const monthKey = RateBudgetService.monthKey(now);
+    const todayStr = RateBudgetService.todayStr(now);
+
+    // Update monthly pool consumption
+    await this.stateRepo.query(
+      `UPDATE monthly_budget_states
+       SET "poolUsed" = "poolUsed" + $3,
+           "dailyUsed" = CASE WHEN "lastDayCalculated" = $4 THEN "dailyUsed" + $3 ELSE $3 END,
+           "lastDayCalculated" = CASE WHEN "lastDayCalculated" <> $4 THEN $4 ELSE "lastDayCalculated" END,
+           "updatedAt" = now()
+       WHERE "sourceKey" = $1 AND "monthKey" = $2`,
+      [sourceKey, monthKey, cost, todayStr]
+    );
+
+    // Log consumption for diagnostics
+    this.logger.debug(
+      { sourceKey, cost, tier, month: monthKey },
+      'Consumed budget'
+    );
+
+    return true;
+  }
+
+  // Helper: Legacy hourly window key (YYYYMMDDHH format)
+  private static hourlyWindowKey(): string {
     const now = new Date();
     return (
       `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}` +
       `${pad(now.getUTCHours())}`
     );
+  }
+
+  // Helper: Monthly window key (YYYYMM format)
+  private static monthKey(now: Date): string {
+    return `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}`;
+  }
+
+  // Helper: Today's date string (YYYY-MM-DD format)
+  private static todayStr(now: Date): string {
+    return `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}`;
+  }
+
+  // Helper: Start of month (first day at 00:00 UTC)
+  private static monthStart(now: Date): Date {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
   }
 }
 

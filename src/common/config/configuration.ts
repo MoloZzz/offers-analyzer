@@ -9,6 +9,12 @@ export interface AppConfig {
   telegramBotToken: string;
   nbuRateUrl: string;
   rateBudgetPerHour: number;
+  /** ADR-0009: monthly pool for flexible rate limiting (default 20,000). */
+  rateBudgetPoolPerMonth: number;
+  /** ADR-0009: reserve % held back from daily allocation (default 15%). */
+  rateBudgetReservePct: number;
+  /** ADR-0009: threshold % of daily budget for tier cutoff (default 10%). */
+  rateBudgetCutoffThresholdPct: number;
   defaultMinDealScore: number;
   defaultConfidenceMinSamples: number;
   /** Analytic mileage correction (M2): applied only when the matched cohort was not mileage-banded. */
@@ -41,6 +47,9 @@ export default (): AppConfig => ({
     process.env.NBU_RATE_URL ??
     'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
+  rateBudgetPoolPerMonth: Number(process.env.RATE_BUDGET_POOL_PER_MONTH ?? 20000),
+  rateBudgetReservePct: Number(process.env.RATE_BUDGET_RESERVE_PCT ?? 15),
+  rateBudgetCutoffThresholdPct: Number(process.env.RATE_BUDGET_CUTOFF_THRESHOLD_PCT ?? 10),
   defaultMinDealScore: Number(process.env.DEFAULT_MIN_DEAL_SCORE ?? 0.63),
   defaultConfidenceMinSamples: Number(process.env.DEFAULT_CONFIDENCE_MIN_SAMPLES ?? 10),
   mileageAnnualK: Number(process.env.MILEAGE_ANNUAL_K ?? 15),

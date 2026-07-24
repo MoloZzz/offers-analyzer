@@ -98,11 +98,12 @@ export interface SourceDictionaries {
 /**
  * A source of car listings. AUTO.RIA is the first adapter; other sites implement the same port.
  * Every call MUST go through the shared rate budget — adapters never bypass it.
+ * ADR-0009: fetch() and averagePrice() accept optional tier parameter (1-5) for priority queue.
  */
 export interface ListingSource {
   readonly key: string;
   search(query: SourceSearchQuery): Promise<SourceSearchResult>;
-  fetch(externalId: string): Promise<ListingDetail>;
-  averagePrice(cohort: CohortQuery): Promise<AveragePriceResult>;
+  fetch(externalId: string, tier?: number): Promise<ListingDetail>;
+  averagePrice(cohort: CohortQuery, tier?: number): Promise<AveragePriceResult>;
   dictionaries(): Promise<SourceDictionaries>;
 }

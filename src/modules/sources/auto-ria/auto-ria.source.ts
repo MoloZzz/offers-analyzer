@@ -65,16 +65,16 @@ export class AutoRiaSource implements ListingSource {
 
     const data = await this.get<{
       result?: { search_result?: { ids?: string[]; count?: number } };
-    }>('/search', params);
+    }>('/search', params, 3);
     return {
       ids: data.result?.search_result?.ids ?? [],
       total: data.result?.search_result?.count,
     };
   }
 
-  async fetch(externalId: string): Promise<ListingDetail> {
+  async fetch(externalId: string, tier = 2): Promise<ListingDetail> {
     const params = new URLSearchParams({ api_key: this.apiKey, auto_id: externalId });
-    const d = await this.get<AutoRiaInfo>('/info', params);
+    const d = await this.get<AutoRiaInfo>('/info', params, tier);
     const bar = d.autoInfoBar ?? {};
     const ad = d.autoData ?? {};
 
@@ -113,7 +113,7 @@ export class AutoRiaSource implements ListingSource {
     };
   }
 
-  async averagePrice(cohort: CohortQuery): Promise<AveragePriceResult> {
+  async averagePrice(cohort: CohortQuery, tier = 5): Promise<AveragePriceResult> {
     const params = new URLSearchParams({
       api_key: this.apiKey,
       marka_id: String(cohort.markId),
@@ -125,7 +125,7 @@ export class AutoRiaSource implements ListingSource {
     if (cohort.mileageFrom != null) params.append('raceInt', String(cohort.mileageFrom));
     if (cohort.mileageTo != null) params.append('raceInt', String(cohort.mileageTo));
 
-    const d = await this.get<AutoRiaAverage>('/average_price', params);
+    const d = await this.get<AutoRiaAverage>('/average_price', params, tier);
     // Prefer a robust central measure over the plain mean, which is skewed by outliers
     // (a live sample had arithmeticMean 12815 vs interQuartileMean 10584). See research note.
     const central = d.interQuartileMean ?? d.percentiles?.['50.0'] ?? d.arithmeticMean;
@@ -143,10 +143,10 @@ export class AutoRiaSource implements ListingSource {
     return { marks: {}, models: {}, states: {}, cities: {} };
   }
 
-  private async get<T>(path: string, params: URLSearchParams): Promise<T> {
-    const allowed = await this.budget.tryConsume(this.key);
+  private async get<T>(path: string, params: URLSearchParams, tier = 1): Promise<T> {
+    const allowed = await this.budget.tryConsume(this.key, 1, tier);
     if (!allowed) {
-      throw new RateBudgetExhaustedError(`AUTO.RIA request budget exhausted for ${path}`);
+      throw new RateBudgetExhaustedError(`AUTO.RIA request budget exhausted for ${path} (tier ${tier})`);
     }
     const url = `${BASE_URL}${path}?${params.toString()}`;
     try {

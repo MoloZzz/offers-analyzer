@@ -58,7 +58,7 @@ export async function resolveBenchmark(
   for (const cohort of cohortCandidates(detail)) {
     try {
       const benchmark = await benchmarks.getOrLoad('auto-ria', cohort, () =>
-        source.averagePrice(cohort),
+        source.averagePrice(cohort, 5), // Tier-5: cohort averages (ADR-0009, lowest priority)
       );
       if (benchmark.value.amount > 0 && benchmark.sampleSize >= MIN_USEFUL_SAMPLES) {
         return { ...benchmark, mileageAware: cohort.mileageFrom != null };

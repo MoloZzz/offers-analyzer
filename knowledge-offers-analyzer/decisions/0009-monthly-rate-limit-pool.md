@@ -1,14 +1,14 @@
 ---
 title: ADR-0009 — Rate limiting: monthly pool instead of hourly window
 type: decision
-status: Accepted
-updated: 2026-07-22
+status: Implemented
+updated: 2026-07-24
 ---
 
 # ADR-0009 — Rate limiting: monthly pool instead of hourly window
 
-**Status:** Accepted
-**Date:** 2026-07-22
+**Status:** Implemented (2026-07-24)
+**Accepted:** 2026-07-22
 
 ## Context
 

@@ -176,7 +176,8 @@ export class PollService {
   }
 
   private async processNew(profile: SearchProfile, externalId: string): Promise<void> {
-    const detail = await this.source.fetch(externalId);
+    // Tier-2: new-listing detail fetches (ADR-0009)
+    const detail = await this.source.fetch(externalId, 2);
     if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
     if (isExcluded(profile, detail)) return;
     const { listing, isNew } = await this.listings.recordSeen(detail, { seenInSearch: true });
@@ -188,7 +189,8 @@ export class PollService {
 
   private async reobserve(profile: SearchProfile, existing: Listing): Promise<void> {
     const previousAmount = existing.currentAmount;
-    const detail = await this.source.fetch(existing.externalId);
+    // Tier-1: price-drop re-checks (ADR-0009, highest priority)
+    const detail = await this.source.fetch(existing.externalId, 1);
     if (isExcluded(profile, detail)) return;
     const { listing } = await this.listings.recordSeen(detail, { seenInSearch: true });
     // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of
