@@ -27,6 +27,18 @@ updated: 2026-07-22
 - Feature modules (e.g. `listings`, `sources`, `valuation`, `notifications`) — each with its own controller/service/dto/entities.
 - DTOs with `class-validator` + `ValidationPipe`; never trust external input (API responses, bot commands).
 - Config via `@nestjs/config`; **no secrets in code** (API key, bot token → `.env`, already gitignored).
+- **Every new entity MUST be added to `ENTITIES` in `src/common/database/data-source.ts`.**
+  That array is the single source of truth for the connection (no glob, no `autoLoadEntities`).
+  `TypeOrmModule.forFeature([X])` is **not** registration — it only creates a repository provider
+  that resolves lazily, so a missing `ENTITIES` entry boots fine, passes DI, passes the mock-repo
+  unit tests, and then fails on the **first real query** with `EntityMetadataNotFoundError`
+  (exactly how ADR-0009's `MonthlyBudgetState` reached production). This is now enforced by
+  `test/unit/entities-registry.spec.ts`, which imports every `src/**/*.entity.ts`, reads TypeORM's
+  `getMetadataArgsStorage().tables`, and fails listing any `@Entity` class absent from `ENTITIES` —
+  so the step no longer depends on remembering a per-spec checklist item.
+- **`numeric` columns take `numericTransformer`** (`src/common/database/numeric.transformer.ts`).
+  `node-postgres` returns `numeric` as a *string*; without the transformer a field typed `number`
+  silently holds a string and callers need `Number(...)` workarounds at every read site.
 - **Schema changes go through migrations, never `synchronize`.** Migrations are **append-only
   history**: for each entity change generate a **new incremental** migration
   (`npm run migration:generate -- src/common/database/migrations/<Name>`), review it, and commit it.

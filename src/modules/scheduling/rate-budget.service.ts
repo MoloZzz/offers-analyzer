@@ -158,7 +158,7 @@ export class RateBudgetService {
 
     // If already calculated for today, reuse the value
     if (state.lastDayCalculated === todayStr) {
-      return Number(state.dailyBudget) || 0;
+      return state.dailyBudget ?? 0;
     }
 
     // Recalculate for today

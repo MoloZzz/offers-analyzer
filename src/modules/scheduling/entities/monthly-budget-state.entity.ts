@@ -1,5 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
+import { numericTransformer } from '../../../common/database/numeric.transformer';
+
 /**
  * Monthly budget pool state for ADR-0009: tracks the monthly pool allocation,
  * daily sub-budget calculation, and consumption across the month.
@@ -36,7 +38,7 @@ export class MonthlyBudgetState {
   reserveReleasesAt!: Date;
 
   /** Daily budget calculated at the start of each UTC day. */
-  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0, transformer: numericTransformer })
   dailyBudget!: number;
 
   /** Consumption on the current UTC day (reset each day). */
