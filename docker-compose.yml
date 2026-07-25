@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: offers
       POSTGRES_PASSWORD: offers
@@ -9,6 +10,30 @@ services:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U offers -d offers']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    # ADR-0008: main.ts exits on uncaught errors, so the app MUST be supervised.
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Override the .env value: inside the network the DB is `postgres`, not localhost.
+      DATABASE_URL: postgres://offers:offers@postgres:5432/offers
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+    volumes:
+      # Operator niches live outside the image (see .dockerignore).
+      - ./config/search-profiles.json:/app/config/search-profiles.json:ro
 
 volumes:
   pgdata:

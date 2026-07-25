@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-23
+updated: 2026-07-25
 ---
 
 # Architecture overview
@@ -15,7 +15,8 @@ updated: 2026-07-23
 - **Scheduling:** `@nestjs/schedule` cron with an in-memory rate budget (no Redis — see [[0004-drop-redis-bullmq|ADR-0004]]).
 - **Notifications:** Telegram bot.
 - **Logging:** `nestjs-pino` — structured (JSON in prod, pretty in dev), per-service `PinoLogger` injection. See [[0007-structured-logging-nestjs-pino|ADR-0007]].
-- **Error handling:** global `AllExceptionsFilter` (`APP_FILTER`) catches everything Nest's pipeline sees (all Telegram command/action handlers via `nestjs-telegraf`), logs structured + replies gracefully; every cron job (`poll`, `weekly-calibration`, `weekly-report`, `health-monitor`) catches and logs its own failures rather than crashing; `main.ts` has last-resort `uncaughtException`/`unhandledRejection` handlers that log fatal and exit (needs a restart supervisor — see [[environment-setup]]). See [[0008-global-error-handling|ADR-0008]].
+- **Error handling:** global `AllExceptionsFilter` (`APP_FILTER`) catches everything Nest's pipeline sees (all Telegram command/action handlers via `nestjs-telegraf`), logs structured + replies gracefully; every cron job (`poll`, `weekly-calibration`, `weekly-report`, `health-monitor`) catches and logs its own failures rather than crashing; `main.ts` has last-resort `uncaughtException`/`unhandledRejection` handlers that log fatal and exit — the required restart supervisor is the container `restart: unless-stopped` policy ([[0011-containerized-deploy-migrate-on-start|ADR-0011]]). See [[0008-global-error-handling|ADR-0008]].
+- **Deployment:** multi-stage `Dockerfile` (prod-only runtime image) + `docker-compose.yml` (`app` + `postgres`); `docker-entrypoint.sh` applies pending migrations from the compiled datasource before the app starts, so a deploy is "pull image + restart". See [[0011-containerized-deploy-migrate-on-start|ADR-0011]] and [[environment-setup]].
 - **Repository:** `MoloZzz/offers-analyzer` (GitHub).
 
 ## Module map

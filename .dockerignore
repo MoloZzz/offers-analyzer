@@ -1,0 +1,35 @@
+# Keep the build context small and secrets out of the image.
+node_modules
+dist
+build
+.git
+.gitignore
+
+# Secrets — env is injected by the orchestrator, never baked into a layer.
+.env
+.env.*
+!.env.example
+
+# The operator's real watch niches are gitignored; keep them out of image layers
+# too. Mount the file at runtime (or set SEARCH_PROFILES_FILE).
+config/search-profiles.json
+
+# Not needed to build or run the app
+knowledge-offers-analyzer
+specs
+.specify
+.claude
+.rtk
+tools
+scripts
+test
+*.log
+.vscode
+.idea
+coverage
+.eslintrc.cjs
+.prettierrc
+jest.config.js
+docker-compose*.yml
+Dockerfile
+.dockerignore

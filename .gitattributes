@@ -1,0 +1,11 @@
+# Files consumed by Linux/sh inside the container MUST keep LF endings.
+# With core.autocrlf=true (the usual Windows setting) a CRLF checkout makes
+# `#!/bin/sh` fail at container start with "no such file or directory".
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+.dockerignore   text eol=lf
+docker-compose*.yml text eol=lf
+
+# The bundled RTK binary (tools/rtk) must never be line-ending mangled.
+tools/rtk       binary
+*.tar.gz        binary

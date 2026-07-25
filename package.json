@@ -18,7 +18,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate src/common/database/migrations/migration -d src/common/database/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/common/database/data-source.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/common/database/data-source.ts"
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/common/database/data-source.ts",
+    "migration:run:prod": "typeorm migration:run -d dist/common/database/data-source.js",
+    "migration:revert:prod": "typeorm migration:revert -d dist/common/database/data-source.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.0",
