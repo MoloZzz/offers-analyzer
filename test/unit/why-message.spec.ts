@@ -1,5 +1,5 @@
 import { Currency } from '../../src/common/types/money';
-import { formatWhy } from '../../src/modules/notifications/format/why-message';
+import { formatStoredWhy, formatWhy } from '../../src/modules/notifications/format/why-message';
 import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
 import { ValuationResult } from '../../src/modules/valuation/valuation.service';
 
@@ -69,5 +69,46 @@ describe('formatWhy', () => {
     });
 
     expect(msg).toContain('Поправка на пробіг');
+  });
+
+  it('renders a persisted explanation snapshot with provenance', () => {
+    const msg = formatStoredWhy({
+      schemaVersion: 1,
+      evaluatedAt: '2026-07-28T09:00:00.000Z',
+      parameterSetVersion: 3,
+      thresholdUsed: 0.63,
+      listing: {
+        externalId: detail.externalId,
+        make: detail.make,
+        model: detail.model,
+        year: detail.year,
+        url: detail.url,
+        askingAmount: detail.price.amount,
+        currency: detail.price.currency,
+      },
+      cohort: { key: 'BMW:3:2016-2018', tier: 'year±1', sampleSize: 12, mileageAware: false },
+      fairValueBase: 15500,
+      fairValueAdjusted: 16000,
+      mileageAdjustment: 500,
+      discountPct: result.discountPct,
+      raw: result.raw,
+      confidence: result.confidence,
+      penalty: result.penalty,
+      score: result.score,
+      priceCore: result.priceCore,
+      total100: result.total100,
+      factors: [],
+      firedFlags: [{ code: 'desc_needs_repair', source: 'description' }],
+      redFlags: result.redFlags,
+      reason: result.reason,
+      isOpportunity: result.isOpportunity,
+      disqualified: result.disqualified,
+    });
+
+    expect(msg).toContain('Чому такий бал');
+    expect(msg).toContain('Параметри: ParameterSet v3, поріг 0.63');
+    expect(msg).toContain('Поправка на пробіг: +500 USD');
+    expect(msg).toContain('опис: потребує ремонту');
+    expect(msg).not.toContain('Рџ');
   });
 });

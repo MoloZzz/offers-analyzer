@@ -8,8 +8,8 @@
 
 Monitor user-configured AUTO.RIA niches through the official API, evaluate each new listing
 against a fair-value benchmark (RIA average price), flag low-risk below-market listings as
-Opportunities, and push them to subscribers via Telegram — all within the free-tier request
-budget (~30 req/hour). Approach: a NestJS backend with a rate-limited BullMQ scheduler, a
+Opportunities, and push them to subscribers via Telegram — all within the 20,000-request monthly
+pool. Approach: a NestJS backend with a Postgres-backed monthly budget and priority scheduler, a
 `ListingSource` port (AUTO.RIA adapter first), PostgreSQL for listings + price history, and a
 Telegram bot as the interface. See [research.md](./research.md) for decisions.
 
@@ -21,8 +21,8 @@ Telegram bot as the interface. See [research.md](./research.md) for decisions.
 (cron), `nestjs-telegraf` (Telegram), `@nestjs/config`, `class-validator`/`class-transformer`,
 `undici` (HTTP). No Redis/BullMQ in v1 — see ADR-0004.
 
-**Storage**: PostgreSQL (listings, price history, profiles, subscribers, opportunities). Rate
-budget is in-memory (no Redis — ADR-0004)
+**Storage**: PostgreSQL (listings, price history, profiles, subscribers, opportunities, and rate
+budget state). Rate budgeting is Postgres-backed; no Redis/BullMQ (ADR-0004, ADR-0009).
 
 **Testing**: Jest (unit + integration), `nock`/recorded fixtures for AUTO.RIA contract tests,
 Supertest for bot/HTTP surface
@@ -32,10 +32,11 @@ Supertest for bot/HTTP surface
 **Project Type**: Backend web-service (no web frontend; Telegram bot is the UI)
 
 **Performance Goals**: alert within 15 min of a listing appearing; stay 100% within the API
-request budget; process a niche's cycle comfortably inside the hourly window
+budget; preserve daily reserve while prioritizing high-value work
 
-**Constraints**: AUTO.RIA free tier ~30 req/hour (hard); required backlink to AUTO.RIA in every
-alert; secrets in env only; idempotent notifications
+**Constraints**: AUTO.RIA account pool 20,000 req/month, daily sub-budget, 15% reserve, and
+per-second pacing; required backlink to AUTO.RIA in every alert; secrets in env only; idempotent
+notifications
 
 **Scale/Scope**: v1 = a few niches, small user set, low tens of thousands of stored listings
 
@@ -85,7 +86,7 @@ src/
 │   ├── valuation/           # deal score (−1..1), confidence, red-flags + benchmark cache
 │   ├── profiles/            # SearchProfile config + seed
 │   ├── notifications/       # Telegram notifier, Subscriber, Notification, formatting
-│   ├── scheduling/          # in-memory rate budget (fixed window)
+│   ├── scheduling/          # Postgres-backed monthly pool, daily budget, priority tiers
 │   ├── polling/             # cron pipeline: search → new → value → alert
 │   └── fx/                  # ExchangeRate port (NBU adapter lands in US2)
 test/

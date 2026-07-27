@@ -1,7 +1,7 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-23
+updated: 2026-07-28
 ---
 
 # Backlog
@@ -23,8 +23,9 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   `contracts/auto-ria-api.md`.
 - [x] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Freshness **done**
   via the `top` submission-period filter (see B19) — note: AUTO.RIA `order_by` has **no** "newest" value
-  (only 0/1/2), so newest-first is `top`, not `order_by`. **Budget-smart scanning done** (see B20):
-  round-robin across profiles + per-profile cap so one niche can't hog the ~30 req/hr budget.
+  (only 0/1/2), so newest-first is `top`, not `order_by`. **Budget-smart scanning now follows
+  ADR-0009**: monthly pool + daily sub-budget + priority tiers; legacy per-profile caps remain
+  local protections, but round-robin no longer decides what the budget buys.
 - [~] **B4 — Make the pipeline run:** now driven by `config/search-profiles.json` (copy the example,
   set numeric ids + `enabled: true`, restart). **User action** to go live.
 
@@ -60,9 +61,9 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   ~~Remaining work is a decision~~ → **decided (b)** per ADR-0010 (see above). The "startup
   warning if shipped-but-empty-bounds" idea stays open (deferred in spec 004 tasks).
 
-- [~] **SPEC-004 — Realized-price calibration (survivorship correction).** P0, 0 API cost (reuses
-  the id-list search already made every cycle — a diff against the previous list detects
-  disappearances for free, no extra request). **Promoted to a formal spec:**
+- [~] **SPEC-004 — Realized-price calibration (survivorship correction).** P0; regular-profile
+  id-diff reuses the existing search at zero extra cost, while the required market sweep costs
+  ~5,400 req/mo. **Promoted to a formal spec:**
   `specs/004-realized-price-calibration/` (spec + plan + tasks).
   - [x] US4.1 — track disappearances (**implemented 2026-07-23**, slices A–D, delegated → Sonnet):
     `listing_disappearances` table (cohort_key, last_known_price_usd, first/disappeared_at,
@@ -86,18 +87,22 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   - [x] US4.2 — filter non-sales (**implemented 2026-07-23**, same slices): `dom_days` stored for
     the `< 60` filter (applied in US4.3); relists detected on new-listing ingest — same VIN, or
     markId+modelId+year+cityId with mileage ±2k km within 30 days → `is_relist = true`.
-  - [ ] US4.3 / US4.4 — compute + apply `k`: later phases; tasks at pickup
+  - [ ] US4.3 / US4.3a / US4.4 — compute, validate, then apply `k`: later phases; tasks at pickup
     (`specs/004-realized-price-calibration/tasks.md`).
-  - US4.3 — compute `k` per cohort: `k = median(last_known_price_usd of filtered disappearances) /
+  - US4.3 — compute candidate `k` per cohort: `k = median(last_known_price_usd of filtered disappearances) /
     median(cohort_average on the disappearance date)`. Needs ≥30 events/cohort, else fallback
-    make+model → make → global (start 0.90). Recompute weekly.
+    make+model → make → global (start 0.90). Recompute weekly. Last asking price and disappearance
+    are proxies, not a realized transaction price and sale.
+  - US4.3a — calibration-readiness report: cohort/fallback tier, eligible/voided/relist counts,
+    bootstrap interval, denominator snapshot date, stability/falsification verdict. It gates US4.4
+    together with B23 and operator approval ([[0011-evidence-gated-scoring-rollout|ADR-0011]]).
   - US4.4 — apply: `X = RIA_average × k`, `discount = (X − asking) / X`; `k` lives in
     `ParameterSet` ([[0005-versioned-parameter-sets|ADR-0005]]), versioned/rollbackable; `/why`
     shows the applied `k`, its source tier, and the event count behind it.
-  - Acceptance: id-diff adds zero API requests (verify via the request counter); ≥30 disappearance
-    events for at least one active cohort after 3 weeks; measured `k` recorded in the vault —
-    expect 0.85–0.95; **if `k` ≥ 0.97 the survivorship hypothesis is falsified** and the cause is
-    elsewhere (cohort composition, mileage correction).
+  - Acceptance: id-diff adds zero API requests (verify via the request counter); ≥30 eligible
+    disappearance events for at least one active cohort after 3 weeks; candidate `k` is recorded
+    with exclusions and an interval — expect 0.85–0.95; **if `k` ≥ 0.97 the survivorship hypothesis
+    is falsified** and the cause is elsewhere (cohort composition, mileage correction).
   - No dependencies — start first; every day of delay pushes back everything downstream.
 
 - [~] **SPEC-007 — Outcome labels beyond 👍/👎.** P0 (the change is trivial; data accrual is not).
@@ -128,6 +133,23 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   - **Blocks CHANGE-002.1** — implement before auto-tuning is allowed to actually move the
     threshold on live data.
 
+- [x] **B23 — Persisted evaluation explanation.** **P0 rollout gate** for SPEC-004 US4.4 and
+  factor activation: snapshot every evaluation onto `Listing.lastExplanation` and copy it to an
+  `Opportunity` (cohort/tier/sample, fair-value base and adjustment, discount/raw/confidence/
+    penalty, factor reasons, fired flags, `ParameterSet` version, threshold, timestamp). `/why`
+    reads the stored snapshot first, then only falls back to a live re-fetch. Alerts carry the
+    opportunity snapshot for later audit; the alert formatter itself still uses the existing
+    `Opportunity` fields. Matched description phrases remain a follow-up. **Implemented
+    2026-07-28:** poll evaluations persist the snapshot for all evaluated listings; opportunities
+    copy it; `/why` prefers the stored snapshot and falls back live only when absent. Full analysis:
+    [[explainability-gaps]].
+
+- [ ] **[[SPEC-009]] — Budget observability and rollout guardrails.** **P0 before SPEC-005 or an
+  additional expensive profile.** Show actual and projected spend by profile, operation, and
+  priority tier; expose daily/monthly remaining budget and reserve; reforecast ADR-0009's
+  allocation from live listing counts. This closes ADR-0009's verification debt and is a binding
+  gate under [[0011-evidence-gated-scoring-rollout|ADR-0011]].
+
 - [ ] **SPEC-005 — Listing lifecycle + tiered re-check.** P1, ~4,300 req/mo (funded by
   [[0009-monthly-rate-limit-pool|ADR-0009]]). Problem: a listing is scored once, at ingest, and
   the system never revisits it (aside from the existing ad-hoc re-observe in B10). But a motivated
@@ -150,7 +172,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   - Acceptance: scheduler stays within its tier quota; tier-1 price cuts detected within ≤2 days;
     re-score fires automatically on price change; repeat-alert-after-≥5%-cut works without
     duplicating; target ≥30% of alerts originating from re-check (not ingest) within 2 months.
-  - Depends on [[0009-monthly-rate-limit-pool|ADR-0009]].
+  - Depends on [[0009-monthly-rate-limit-pool|ADR-0009]] and the completed [[SPEC-009]] gate.
 
 - [ ] **SPEC-008 — Cohort market drift.** P2, ~50 req/mo. Problem: buy today, sell in 5–7 weeks; a
   cohort dropping 1.5%/mo erodes a listing that's 15% below market today to ~12% by sale time —
@@ -221,19 +243,19 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 
 | # | Item | Blocks | API cost |
 |---|---|---|---|
-| 1 | FIX-003.1 | — | 0 |
-| 2 | SPEC-004 (US4.1–4.2, data collection) | SPEC-006, threshold review | 0 |
-| 3 | ✅ SPEC-007 (US7.1–7.2, fields) — done 2026-07-23 | CHANGE-002.1, SPEC-006 | 0 |
-| 4 | ADR-0009 | SPEC-005 | 0 |
-| 5 | SPEC-005 | CHANGE-003.2 | ~4,300/mo |
-| 6 | SPEC-004 (US4.3–4.4, apply `k`) | — | 0 |
-| 7 | SPEC-008 | — | ~50/mo |
-| 8 | SPEC-006 | — | 0 |
-| 9 | CHANGE-003.2, CHANGE-003.3 | — | 0 |
-| 10 | CHANGE-002.1 | — | 0 |
+| 1 | B23 — persisted evaluation explanation | `k` / factor activation | 0 |
+| 2 | SPEC-009 — budget observability | SPEC-005, expensive profiles | 0 |
+| 3 | SPEC-004 US4.1–4.2/4.1b — data collection (running) | `k` validation | ~5,400/mo for sweep |
+| 4 | ✅ SPEC-007 US7.1–7.2 — outcome fields | CHANGE-002.1, SPEC-006 | 0 |
+| 5 | SPEC-005 — lifecycle + tiered re-check | CHANGE-003.2 | ~4,300/mo |
+| 6 | SPEC-004 US4.3 + US4.3a — candidate `k` + readiness gate | US4.4 | 0 |
+| 7 | SPEC-004 US4.4 + Phase-1 factor activation | threshold review | 0 |
+| 8 | SPEC-008 | — | ~50/mo |
+| 9 | SPEC-006 | — | 0 |
+| 10 | CHANGE-003.2, CHANGE-003.3, CHANGE-002.1 | — | 0 |
 
-The first four cost zero requests and accumulate the data everything else needs — delaying them
-delays the rest by the same amount.
+Data collection is already accruing evidence, while B23 and SPEC-009 make that evidence and the
+budget trustworthy. Do not enable re-checks or change live scoring until the applicable gate is met.
 
 ## 🟡 Next — US2 (operator config + currency)
 
@@ -300,10 +322,10 @@ self-tuning reports (R).
   `ListingsService.scoresForReport`/`nearMisses`. Shows #evaluated, score distribution, near-misses just
   below the threshold, and a suggested `minDealScore` that would yield ~10 candidates. Bot `/report`
   command. Unit-tested (`test/unit/report.spec.ts`). No schema change.
-- [x] **B20 — Budget-smart scanning.** `poll()` now searches every profile once (phase 1), then drains
-  new listings **round-robin** across profiles (phase 2) and re-observes for price drops (phase 3), each
-  budget-guarded. Per-profile cap `MAX_NEW_PER_PROFILE=15` so a market-wide niche can't starve the
-  others. Replaces the old profile-by-profile-to-exhaustion loop. No schema change.
+- [x] **B20 — Budget-smart scanning.** The original poll loop searched every profile, then used
+  round-robin only as an intra-category fairness order for new listings and re-observes. It is now
+  **superseded as a budget policy** by ADR-0009's monthly pool, daily sub-budget, and priority tiers;
+  the per-profile cap `MAX_NEW_PER_PROFILE=15` remains a local protection. No schema change.
 - [x] **R1b — Scheduled weekly push.** `ReportSchedulerService` (`@Cron '0 9 * * 1'` — Mon 09:00) builds
   the R1a digest and `NotificationsService.broadcast`s it to active subscribers; skips weeks with 0
   evaluated (no empty spam). Cadence is a one-line constant. No schema change.
@@ -438,14 +460,6 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   `Assessment` exposes `sampleSize`/`benchmarkBase`/`mileageAware`; pure `formatWhy` + unit test. tsc
   clean, jest 50/50. (Remaining niceties: show the exact description *phrase* that fired a flag, and
   localize the `/check` `reason` string — small follow-ups; folded into B23.)
-- [ ] **B23 — Persisted evaluation explanation** (so we can *argue* any decision, incl. past ones).
-  Snapshot the reasoning at scoring time onto `Listing.lastExplanation` (+ copy to `Opportunity`): cohort
-  {key, tier, sampleSize, mileageAware}, fair-value base/adjusted + mileage adjustment, discount, raw /
-  confidence / penalty, fired flags {code, source}, **ParameterSet version + threshold used**, timestamp.
-  `/why` + the alert read the snapshot (faithful, free, works even if the listing is gone) → live re-fetch
-  only as fallback. Then capture matched condition **phrases** and localise the `reason`. `resolveBenchmark`
-  must surface the matched cohort. Full analysis: [[explainability-gaps]].
-
 - [~] **B21 — Real (VIN-verified) mileage vs claimed.** Rolled-back odometers make frauds look like
   jackpots (Sonata 2013, claimed 181k / real 595k → false score 1, −44.55%). API exposes only
   `checkedVin.isChecked` + `linkToReport`, **not** the real number. Full note: [[vin-real-mileage]].
@@ -471,9 +485,10 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   `suppress`; poll gate in `evaluateAndNotify` (after `isOpportunity`) suppresses a re-listed car unless
   it's now **cheaper than the lowest we ever alerted** (USD compare). No VIN → behaves as before. New
   entity + migration `1784402208608`. Unit-tested. tsc clean; `relist-dedup` 7/7.
-- [x] **B13 — Durable rate budget:** Postgres-backed `rate_budget_windows` (atomic upsert per hour
-  window, prunes old windows). Survives restarts + safe across instances; 429 still authoritative. Redis
-  not needed. See [[0004-drop-redis-bullmq|ADR-0004]].
+- [x] **B13 — Durable rate budget:** Postgres-backed `rate_budget_windows` ledger and
+  `monthly_budget_states` hold the ADR-0009 monthly pool, daily sub-budget, reserve, and priority-tier
+  accounting. Survives restarts + safe across instances; 429 and independent pacing remain authoritative.
+  Redis not needed. See [[0004-drop-redis-bullmq|ADR-0004]] and [[0009-monthly-rate-limit-pool|ADR-0009]].
 - [ ] **B14 — Dictionary cache** (id↔name) if a flow needs name→id resolution. (T017)
 - [x] **B15 — Integration test — scoring pipeline** (`test/integration/scoring-pipeline.spec.ts`): composes
   the **real** `resolveBenchmark` + `MileageAdjuster` + `ValuationService` (v1 seed) against a fake source

@@ -37,7 +37,8 @@ Keep this block in sync with the code (DoD #4).
 - [ ] T004 [F] Heuristic-table loader (`config/heuristics/`, boot validation, content hash) —
       **deferred to Phase 1** (first factor to need a table brings its loader; nothing to load yet).
 - [ ] T005 [F] (couples with B23) persist `factors` in the evaluation explanation snapshot —
-      **deferred to the B23 work** (persist-explanation); factor snapshots land with it.
+      **required before factor activation** in the B23 work (persist-explanation); factor
+      snapshots land with it per ADR-0011.
 
 ## Phase 1: US1 Liquidity + US2 Repair-risk (P1)
 

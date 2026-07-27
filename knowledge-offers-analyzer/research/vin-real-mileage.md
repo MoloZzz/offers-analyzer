@@ -2,7 +2,7 @@
 title: Research — real (VIN-verified) mileage vs claimed mileage
 type: research
 status: Partly implemented (Option 1)
-updated: 2026-07-17
+updated: 2026-07-28
 ---
 
 > **Update (2026-07-17):** Option 1 shipped as **B21a** — `valuation/mileage-risk.ts` adds soft red-flags
@@ -58,7 +58,7 @@ real-mileage figure. Getting the number needs one of the options below.
 Start with **(1)** — it's free, immediately reduces false jackpots, and gives spec-002 learning a real
 signal ("unverified low mileage + big discount" → historically bad outcomes). Investigate **(2)** for
 the actual number; keep **(3)** as a fallback. Only enrich *candidates* (post-scoring shortlist), never
-every listing, to respect the ~30 req/hr budget.
+every listing, to respect the monthly API pool.
 
 ## Related
 - [[profitability-definition]] · [[why-no-opportunities]] · [[backlog]] · spec 002 (learnable weight)

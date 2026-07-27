@@ -5,6 +5,7 @@ import { In, IsNull, Not, Repository } from 'typeorm';
 import { Currency } from '../../common/types/money';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { ListingDetail } from '../sources/ports/listing-source.port';
+import { EvaluationExplanation } from '../valuation/evaluation-explanation';
 
 import { Listing } from './entities/listing.entity';
 import { PriceObservation } from './entities/price-observation.entity';
@@ -154,11 +155,13 @@ export class ListingsService {
     score: number,
     discountPct: number,
     profileId?: string | null,
+    explanation?: EvaluationExplanation | null,
   ): Promise<void> {
     listing.lastScore = score;
     listing.lastDiscountPct = discountPct;
     listing.lastEvaluatedAt = new Date();
     if (profileId != null) listing.profileId = profileId;
+    if (explanation !== undefined) listing.lastExplanation = explanation;
     await this.listings.save(listing);
   }
 }

@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 
 
 import { numericTransformer } from '../../../common/database/numeric.transformer';
 import { Currency } from '../../../common/types/money';
+import { EvaluationExplanation } from '../evaluation-explanation';
 
 /** A listing flagged as a candidate deal (discount + confidence, passed red-flags) — FR-005. */
 @Entity('opportunities')
@@ -39,6 +40,9 @@ export class Opportunity {
 
   @Column('jsonb', { default: {} })
   redFlags!: Record<string, boolean>;
+
+  @Column('jsonb', { nullable: true })
+  explanation?: EvaluationExplanation | null;
 
   @Column({ type: 'boolean', default: false })
   notified!: boolean;

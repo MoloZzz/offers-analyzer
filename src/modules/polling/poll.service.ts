@@ -25,6 +25,7 @@ import {
   SourceSearchQuery,
 } from '../sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
+import { buildEvaluationExplanation } from '../valuation/evaluation-explanation';
 import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { MileageAdjuster } from '../valuation/mileage';
@@ -246,7 +247,22 @@ export class PollService {
       vinChecked: detail.risk.vinChecked,
     });
 
-    await this.listings.recordEvaluation(listing, result.score, result.discountPct, profile.id);
+    const explanation = buildEvaluationExplanation({
+      detail,
+      benchmark,
+      fairValue,
+      result,
+      parameterSetVersion: this.valuation.activeParameterVersion(),
+      thresholdUsed: profile.minDealScore,
+    });
+
+    await this.listings.recordEvaluation(
+      listing,
+      result.score,
+      result.discountPct,
+      profile.id,
+      explanation,
+    );
     if (!result.isOpportunity) return;
 
     // Relist de-dup (B12): don't re-alert the same car (by VIN) unless it's now cheaper than the
@@ -275,6 +291,7 @@ export class PollService {
         sampleSize,
         score: result.score,
         redFlags: result.redFlags,
+        explanation,
         notified: false,
       }),
     );

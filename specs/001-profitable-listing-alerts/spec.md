@@ -60,7 +60,7 @@ Each alert explains *why* the listing was flagged — asking price vs fair marke
 ### Edge Cases
 
 - **Thin cohort**: too few comparable listings to trust the fair-value estimate → the listing is not alerted (confidence gate), not surfaced with a misleading discount.
-- **Source budget exhausted**: the hourly request budget runs out → the system degrades gracefully (defers work), never breaches the limit, and warns the operator.
+- **Source budget exhausted**: the daily sub-budget or monthly request pool runs out → the system degrades gracefully (defers lower-priority work), never breaches the limit, and warns the operator.
 - **Source unavailable**: the data source is down or errors → the system retries with backoff and does not crash or lose already-seen state.
 - **Relisted / duplicate car**: the same car reappears under a new listing id → it is recognized and not alerted again as if new.
 - **Sold/removed between detection and send**: a listing disappears before or just after alerting → handled without error; the alert may note it if known.
@@ -114,7 +114,7 @@ Each alert explains *why* the listing was flagged — asking price vs fair marke
 - The **niche is user-configured**; the system ships the mechanism (and may seed one example profile) — no fixed niche is baked in.
 - Fair value is anchored on the source's **average-price benchmark** for v1; a more robust own-statistics estimate (median/percentiles from stored history) comes later.
 - "**Profitable**" in v1 means a **below-fair-value opportunity (a lead worth a human look)**, not a guaranteed resale profit; a resale-margin model (minus costs) is a later iteration.
-- v1 runs on the **free API tier (~30 requests/hour)**; wider coverage requires a paid tier (out of scope for v1).
+- v1 runs within the **20,000 requests/month pool** and daily sub-budget defined by ADR-0009; wider coverage requires a paid tier (out of scope for v1).
 - **Telegram** is the only notification channel for v1.
 - v1 serves a **small number of users** (single operator / small group).
 

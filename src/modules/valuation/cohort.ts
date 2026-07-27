@@ -43,6 +43,10 @@ export function cohortCandidates(d: ListingDetail): CohortQuery[] {
 /** A resolved benchmark plus whether its cohort was mileage-banded (M2 skips correction if so). */
 export interface ResolvedBenchmark extends BenchmarkValue {
   mileageAware: boolean;
+  cohort: {
+    key: string;
+    tier: string;
+  };
 }
 
 /**
@@ -55,13 +59,22 @@ export async function resolveBenchmark(
   benchmarks: BenchmarkCacheService,
   detail: ListingDetail,
 ): Promise<ResolvedBenchmark | null> {
-  for (const cohort of cohortCandidates(detail)) {
+  const candidates = cohortCandidates(detail);
+  for (let index = 0; index < candidates.length; index++) {
+    const cohort = candidates[index];
     try {
       const benchmark = await benchmarks.getOrLoad('auto-ria', cohort, () =>
         source.averagePrice(cohort, 5), // Tier-5: cohort averages (ADR-0009, lowest priority)
       );
       if (benchmark.value.amount > 0 && benchmark.sampleSize >= MIN_USEFUL_SAMPLES) {
-        return { ...benchmark, mileageAware: cohort.mileageFrom != null };
+        return {
+          ...benchmark,
+          mileageAware: cohort.mileageFrom != null,
+          cohort: {
+            key: cohortKey(cohort),
+            tier: cohortTier(index, cohort),
+          },
+        };
       }
     } catch (err) {
       if (err instanceof RateBudgetExhaustedError) throw err;
@@ -69,4 +82,25 @@ export async function resolveBenchmark(
     }
   }
   return null;
+}
+
+function cohortTier(index: number, cohort: CohortQuery): string {
+  if (cohort.mileageFrom != null) return 'make_model_year_mileage';
+  if (cohort.yearFrom != null || cohort.yearTo != null) return 'make_model_year';
+  return index === 0 ? 'make_model' : 'make_model_fallback';
+}
+
+function cohortKey(cohort: CohortQuery): string {
+  return [
+    `mark:${cohort.markId}`,
+    `model:${cohort.modelId}`,
+    cohort.yearFrom != null || cohort.yearTo != null
+      ? `year:${cohort.yearFrom ?? '*'}-${cohort.yearTo ?? '*'}`
+      : null,
+    cohort.mileageFrom != null || cohort.mileageTo != null
+      ? `mileage:${cohort.mileageFrom ?? '*'}-${cohort.mileageTo ?? '*'}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join('|');
 }

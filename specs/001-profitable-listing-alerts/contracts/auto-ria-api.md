@@ -3,8 +3,9 @@
 What the AUTO.RIA adapter consumes. Basis for contract tests (recorded fixtures replayed with
 `nock`; never call live in tests — Principle VI). Docs: developers.ria.com / docs-developers.ria.com.
 
-Auth: `api_key` (query param) on every request. Free tier ~30 req/hour — the adapter MUST go
-through the shared rate budget. ToS: display a backlink to AUTO.RIA (carried into alerts).
+Auth: `api_key` (query param) on every request. The current account allocation is the
+20,000-requests/month pool; every call MUST go through the shared monthly budget and independent
+per-second pacing. ToS: display a backlink to AUTO.RIA (carried into alerts).
 
 ## Endpoints used
 

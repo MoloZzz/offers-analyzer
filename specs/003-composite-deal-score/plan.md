@@ -31,8 +31,8 @@ the spec-002 E1 pattern reused.
 - **Mileage norms:** pure `segmentOf(body, fuel, modelClass) → {annualK range}`; midpoint feeds
   `expectedMileageK`; M2 and B21a consume it. Fallback = current 15k default.
 - **Explanation:** `FactorScore[]` added to `ValuationResult`; `formatWhy`/alert formatter render
-  total 0–100 + factor lines. Couples with **B23** (persist explanation) — B23 should land with
-  or right after Phase F so factor snapshots are persisted from day one.
+  total 0–100 + factor lines. Couples with **B23** (persist explanation) — B23 is a mandatory
+  rollout gate before factor activation under [[0011-evidence-gated-scoring-rollout|ADR-0011]].
 
 ## Constitution Check
 
@@ -59,7 +59,7 @@ the spec-002 E1 pattern reused.
 `valuation/factors/` scaffold: `Factor` interface (pure: `(input, tables, bounds) →
 FactorScore`), composition in `computeValuation` (`Π modifiers`, uplift cap, priceCore gate),
 neutral seeds in a new ParameterSet version, 0–100 mapping + `formatWhy`/alert rendering.
-**Behavior identical to today** (SC-001). Land B23 persistence here if not already done.
+**Behavior identical to today** (SC-001). Land B23 persistence before activating any factor.
 
 ### Phase 1 — US1 Liquidity + US2 Repair-risk (the "does this model make money" factors)
 

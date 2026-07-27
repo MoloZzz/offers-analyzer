@@ -2,7 +2,7 @@
 title: Research — how to monitor AUTO.RIA (API vs scraping)
 type: research
 status: Decided
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # Research — monitoring approach for AUTO.RIA
@@ -13,7 +13,8 @@ updated: 2026-07-27
 
 - Continuously discover new/updated car listings in a chosen niche and evaluate them (see [[profitability-definition]]).
 - **Locked decision:** v1 runs on the **free tier**, monitoring a **narrow niche** (a few search profiles), not the whole site.
-- Dominant constraint: the official API free tier is **~30 requests/hour per key** (paid packages raise this).
+- Dominant constraint: the current account uses a **20,000 requests/month pool** with daily
+  sub-budget, reserve, and independent per-second pacing (paid packages raise coverage).
 
 ## The official AUTO.RIA API (what exists)
 
@@ -25,7 +26,7 @@ Developers portal: `developers.ria.com` (free key in the account area). Key endp
 | Listing details | `GET /auto/info?api_key=…&auto_id=<id>` | Full record: price (UAH/USD), specs, photos, seller, VIN-report link (`linkToReport`). |
 | Average price (classic) | `GET /auto/average_price?api_key=…&marka_id=…&model_id=…&city_id=…&raceInt=…` | RIA's **market average** for a cohort; supports mileage range and options (AND). Core input for "profitable". |
 | Average price (AI, by periods) | `POST /auto/statistic-avarage-price/` | Trend over time (`graphData`, UAH+USD). Useful for price-direction signals. |
-| Reference dictionaries | `/auto/categories`, `/auto/…/marks`, `/auto/…/models`, `/auto/states`, `/auto/states/:id/cities`, `/auto/…/gearboxes`, bodystyles… | Low-churn lookups — **cache once**, don't spend the hourly budget on them. |
+| Reference dictionaries | `/auto/categories`, `/auto/…/marks`, `/auto/…/models`, `/auto/states`, `/auto/states/:id/cities`, `/auto/…/gearboxes`, bodystyles… | Low-churn lookups — **cache once**, don't spend the monthly pool on them. |
 
 ToS: usage requires a visible backlink to AUTO.RIA and is governed by the RIA offer agreement.
 
@@ -44,14 +45,14 @@ ToS: usage requires a visible backlink to AUTO.RIA and is governed by the RIA of
 | Anti-bot risk (Cloudflare, bans) | ✅ None | ❌ High; IP bans, CAPTCHAs | ⚠️ Present for scraper |
 | "Average price" benchmark | ✅ First-party, free | ❌ Must reinvent from scraped data | ✅ From API |
 | Data richness | ✅ Structured, incl. VIN-report link | ⚠️ Whatever is on the page | ✅ Superset |
-| Rate limit | ❌ 30/hr free (paid raises it) | ✅ No hard cap (but bans) | ⚠️ Mixed |
+| Rate limit | ❌ Finite monthly pool + pacing (paid raises it) | ✅ No hard cap (but bans) | ⚠️ Mixed |
 | Maintenance cost | ✅ Low | ❌ High (constant fixes) | ❌ Highest |
 | Dev speed to v1 | ✅ Fast | ⚠️ Slow (anti-bot plumbing) | ⚠️ Slow |
 | Cost path to scale | 💳 Paid package | 🖥️ Proxies/infra + risk | Mixed |
 
 ## Recommendation — **A. Official API-first**
 
-Reasons: it's the only legal, stable path; it hands us the **average-price benchmark for free**, which is the backbone of the profitability logic; and it gets us to a working v1 fastest with the least maintenance. Scraping's only advantage — no 30/hr cap — is exactly what the "narrow niche on free tier" decision already neutralizes, while its costs (ToS breach, anti-bot war, brittleness) are severe.
+Reasons: it's the only legal, stable path; it hands us the **average-price benchmark for free**, which is the backbone of the profitability logic; and it gets us to a working v1 fastest with the least maintenance. Scraping's only advantage — no finite API pool — is exactly what the narrow-niche decision and priority policy already neutralize, while its costs (ToS breach, anti-bot war, brittleness) are severe.
 
 **Scaling path:** when the niche must widen, buy a paid API package (raise the limit) before considering scraping.
 
@@ -60,7 +61,9 @@ Reasons: it's the only legal, stable path; it hands us the **average-price bench
 ## Architecture implications (feed into the spec/plan)
 
 1. **Source-adapter port.** Define a `ListingSource` interface (search → ids, fetch → detail, averagePrice → benchmark). AUTO.RIA API is the first adapter; future sites/scrapers implement the same port. ("Maybe other sites later" is designed-in now.)
-2. **Request budgeting.** Cache dictionaries; spend the 30/hr on `search` (cheap, paged) + `info` for **new** candidates only + `average_price` per cohort (cache per cohort/day).
+2. **Request budgeting.** Cache dictionaries; spend the monthly pool through its daily sub-budget
+   and priority tiers on `search` (cheap, paged) + `info` for **new** candidates only +
+   `average_price` per cohort (cache per cohort/day).
 3. **Dedup & state.** Persist seen `auto_id`s; only pull `info` for unseen/changed listings; track price changes and relists.
 4. **Scheduling.** A cron that respects the monthly pool with backoff and a dead-man's-switch alert when the budget is exhausted. *(Originally proposed BullMQ + Redis; v1 now uses a `@nestjs/schedule` cron + Postgres-backed monthly pool / daily sub-budget / priority queue instead — see [[0004-drop-redis-bullmq|ADR-0004]] and [[0009-monthly-rate-limit-pool|ADR-0009]].)*
 5. **History.** Store listings + observed prices over time (own statistics + price-drop detection). See [[overview]].

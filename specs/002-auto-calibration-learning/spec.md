@@ -113,7 +113,9 @@ bounds, with the supporting statistic shown, and that nothing changes until the 
 - **Sparse or conflicting feedback**: below the minimum labeled-sample threshold, learning freezes; conflicting labels on the same car take the latest manual one.
 - **Concept drift**: the market shifts (season, FX, war-driven supply) → calibration uses a recent window and can move again next run; bounds prevent overreaction to a single week.
 - **Passive-signal ambiguity**: "disappeared" ≠ "sold at a good price" → passive signals are weak evidence, weighted below manual labels and never treated as confirmed profit.
-- **Gaming / feedback loops**: bounded per-run steps + versioning + rollback prevent runaway drift; auto-apply is opt-in and capped.
+- **Gaming / feedback loops**: bounded per-run steps + versioning + rollback prevent runaway drift.
+  In the current rollout, threshold and factor changes are propose-only until the evidence,
+  explanation, budget, and approval gates in ADR-0011 are satisfied.
 - **Cold start**: with no outcomes, US2/US3 propose nothing and the system behaves exactly as today.
 - **Multi-profile**: thresholds calibrate per profile; shared weights (SCALE, penalties, mileage, condition) are global and change more conservatively.
 
@@ -127,7 +129,12 @@ bounds, with the supporting statistic shown, and that nothing changes until the 
 - **FR-004**: System MUST compute and expose **realized precision** (👍 vs 👎) over a recent window, per profile and overall, in the report.
 - **FR-005**: System MUST store scoring configuration as **versioned ParameterSets** (threshold defaults, `SCALE`, red-flag penalties, mileage factors, condition weights), with exactly one active version, and MUST let the operator roll back to any prior version.
 - **FR-006**: A **calibration run** MUST propose a per-profile `minDealScore` toward an operator-set target (volume corridor and/or minimum precision), bounded by a per-run maximum step, and MUST record inputs, proposal, projected effect, and reason.
-- **FR-007**: System MUST support **propose-only** and **auto-apply** modes per capability (threshold, weights); auto-apply MUST write a new active ParameterSet and announce the change; propose-only MUST leave the active set unchanged and deliver the proposal for accept/reject.
+- **FR-007**: System MUST support **propose-only** and **auto-apply** modes per capability
+  (threshold, weights). For live threshold, `k`, and factor-bound changes, the current mode is
+  mandatory propose-only: ADR-0011 requires a ready evidence report, persisted explanation
+  provenance, validation-slice review, and explicit operator approval before activation.
+  Auto-apply, when permitted by a future ADR, MUST write a new active ParameterSet and announce the
+  change; propose-only MUST leave the active set unchanged and deliver the proposal for accept/reject.
 - **FR-008**: **Weight learning** MUST propose only bounded, explainable adjustments to named weights, each justified by a stored statistic, and MUST default to propose-only.
 - **FR-009**: All learning/calibration MUST **freeze** (propose nothing) when the relevant labeled-sample count is below a configured minimum, and MUST say so.
 - **FR-010**: System MUST NOT consume AUTO.RIA request budget for any calibration/learning work (stored-data only).
@@ -147,7 +154,7 @@ bounds, with the supporting statistic shown, and that nothing changes until the 
 - **SC-001**: After enabling feedback, ≥ 80% of alerts the operator engages with produce a stored Outcome, and the report shows realized precision.
 - **SC-002**: With calibration on (any mode), the weekly candidate volume moves into and stays within the operator's corridor within 4 calibration cycles, without oscillating outside it.
 - **SC-003**: Realized precision on the alerted set is **non-decreasing** over a rolling 8-week window after calibration is enabled (no regression vs the fixed-threshold baseline).
-- **SC-004**: 100% of automated changes are versioned, reason-tagged, and reversible in one action; a rollback restores prior behavior exactly.
+- **SC-004**: 100% of applied changes are versioned, reason-tagged, and reversible in one action; a rollback restores prior behavior exactly.
 - **SC-005**: Zero AUTO.RIA requests are attributable to calibration/learning.
 - **SC-006**: With no outcomes present, behavior is byte-for-byte the current system (safe cold start).
 

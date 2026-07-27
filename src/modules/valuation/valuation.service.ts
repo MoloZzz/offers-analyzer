@@ -186,6 +186,10 @@ export class ValuationService {
   evaluate(input: ValuationInput): ValuationResult {
     return computeValuation(input, this.parameters.params(), this.tables.get());
   }
+
+  activeParameterVersion(): number {
+    return this.parameters.getActive().version;
+  }
 }
 
 function reasonFor(p: {

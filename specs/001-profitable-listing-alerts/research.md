@@ -13,15 +13,18 @@ Alternatives. Foundational investigation lives in the vault:
   brittle (ADR-0002).
 - **Alternatives**: headless scraping (rejected), hybrid (deferred).
 
-## R2. Respecting the ~30 req/hour budget
+## R2. Respecting the monthly request pool
 
-- **Decision**: a **token-bucket rate budget** persisted in Redis (configurable capacity/refill),
-  consumed by a **BullMQ rate-limited queue**. `@nestjs/schedule` cron enqueues per-niche poll
-  jobs; workers spend budget in priority order: `search` (paged) → `info` for **new** ids only →
-  `average_price` per cohort (cached per cohort/day). Dictionaries never spend the live budget.
-- **Rationale**: hard external cap must be enforced centrally with backpressure, not per-caller.
-- **Alternatives**: naive cron with sleeps (no backpressure, races); per-request limiter only
-  (can't coordinate across job types).
+- **Decision**: a Postgres-backed **20,000 requests/month pool** with daily sub-budget, 15%
+  reserve, and five priority tiers. `@nestjs/schedule` cron calls the pipeline directly; a
+  token bucket (~1 request / 2 sec) remains independent of the pool. Work is cut from the lowest
+  tier when the daily budget is tight: tier-1 price-drop re-checks, new details, search/id-diff,
+  tier-2 re-checks, then cohort averages. Dictionaries never spend the live budget.
+- **Rationale**: the monthly account allowance must be enforced centrally with backpressure and
+  visible consumption, not per-caller. It shifts idle nighttime capacity to high-value work while
+  keeping undocumented per-second limits safe.
+- **Alternatives**: Redis/BullMQ (rejected by ADR-0004); naive cron with sleeps (no shared
+  accounting); per-request limiter only (cannot coordinate job types).
 
 ## R3. Fair value, confidence & red-flags (valuation)
 
@@ -65,13 +68,14 @@ Alternatives. Foundational investigation lives in the vault:
 
 - **Decision**: record real AUTO.RIA responses once into fixtures; replay with `nock` in contract
   tests. Tests never hit the live rate-limited endpoint. Valuation/dedup/budget logic unit-tested.
-- **Rationale**: Principle VI; protects the 30/hr budget and the core logic.
+- **Rationale**: Principle VI; protects the finite monthly pool and the core logic.
 - **Alternatives**: live calls in CI (rejected — burns budget, flaky).
 
 ## R8. Configuration & secrets
 
-- **Decision**: `@nestjs/config` with `.env` (already gitignored). API key, bot token, DB/Redis
-  URLs, NBU endpoint, and default thresholds are configuration. SearchProfiles stored in DB.
+- **Decision**: `@nestjs/config` with `.env` (already gitignored). API key, bot token, DB URL,
+  NBU endpoint, rate-budget controls, and default thresholds are configuration. SearchProfiles
+  are stored in DB.
 - **Rationale**: Principle V (no secrets in code); profiles are user-tunable data.
 - **Alternatives**: config in code (rejected).
 

@@ -36,6 +36,7 @@ function buildUpdate(): {
   update: TelegramBotUpdate;
   subscribers: SubscriberMocks;
   profiles: ProfileMocks;
+  query: QueryService & { assessById: jest.Mock; whyById: jest.Mock };
 } {
   const subscriberMocks: SubscriberMocks = {
     subscribeAll: jest.fn().mockResolvedValue(undefined),
@@ -53,6 +54,7 @@ function buildUpdate(): {
 
   const query = {
     assessById: jest.fn(),
+    whyById: jest.fn(),
     topOpportunities: jest.fn(),
     topCandidates: jest.fn(),
     getRecentEvaluations: jest.fn(),
@@ -92,6 +94,7 @@ function buildUpdate(): {
     update: new TelegramBotUpdate(subscribers, profiles, query, outcomes, calibration, deals),
     subscribers: subscriberMocks,
     profiles: profileMocks,
+    query: query as QueryService & { assessById: jest.Mock; whyById: jest.Mock },
   };
 }
 
@@ -132,5 +135,50 @@ describe('TelegramBotUpdate', () => {
 
     expect(subscribers.unsubscribe).toHaveBeenCalledWith('77');
     expect(ctx.reply).toHaveBeenCalled();
+  });
+
+  it('uses a stored /why explanation without live reassessment', async () => {
+    const { update, query } = buildUpdate();
+    query.whyById.mockResolvedValue({
+      stored: {
+        schemaVersion: 1,
+        evaluatedAt: '2026-07-28T10:00:00.000Z',
+        parameterSetVersion: 3,
+        thresholdUsed: 0.4,
+        listing: {
+          externalId: '40143820',
+          make: 'Hyundai',
+          model: 'Sonata',
+          year: 2013,
+          url: 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html',
+          askingAmount: 8000,
+          currency: 'USD',
+        },
+        cohort: { key: 'mark:1|model:2', tier: 'make_model', sampleSize: 12, mileageAware: false },
+        fairValueBase: 10000,
+        fairValueAdjusted: 9500,
+        mileageAdjustment: -500,
+        discountPct: 16,
+        raw: 0.53,
+        confidence: 1,
+        penalty: 1,
+        score: 0.53,
+        priceCore: 0.53,
+        total100: 77,
+        factors: [],
+        firedFlags: [],
+        redFlags: {},
+        reason: 'deal score 0.53 >= threshold 0.4',
+        isOpportunity: true,
+        disqualified: false,
+      },
+    });
+
+    const ctx = buildContext('/why https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html');
+    await update.onWhy(ctx);
+
+    expect(query.whyById).toHaveBeenCalledWith('40143820');
+    expect(query.assessById).not.toHaveBeenCalled();
+    expect(ctx.reply.mock.calls[0][0]).toContain('ParameterSet v3');
   });
 });

@@ -2,7 +2,7 @@
 title: Research — "profitability" methods coverage (what we chose, what's built, do we need ML)
 type: research
 status: Living
-updated: 2026-07-18
+updated: 2026-07-28
 ---
 
 # Defining "profitability": methods considered, coverage, and the ML question
@@ -18,8 +18,8 @@ updated: 2026-07-18
 Any judgement about a scoring method has to be read against four hard constraints. They are the
 reason we reject some textbook-optimal approaches.
 
-- **Data budget:** AUTO.RIA official API, free tier ≈ **30 requests/hour**. We are permanently
-  data-starved; every scoring input that costs a request is expensive.
+- **Data budget:** AUTO.RIA official API, a **20,000 requests/month pool** with daily budget and
+  reserve. We are permanently data-constrained; every scoring input that costs a request is expensive.
 - **No sold-price ground truth:** the API exposes **asking** prices and an aggregate
   `interQuartileMean` per cohort — never the price a car *actually sold for*. We do not know true
   resale value.
@@ -166,8 +166,8 @@ price-quality."
   prices — including the overpriced stale ones — which is exactly the anchor bias we deliberately
   sidestep by using the trimmed IQM. Without sold prices, ML has **no better signal than what we
   already get for free** per query.
-- **Data starvation.** At ~30 req/hr we cannot assemble a large, feature-rich, freshly-labelled
-  training set in reasonable time.
+- **Data starvation.** At 20,000 requests/month we cannot assemble a large, feature-rich,
+  freshly-labelled training set in reasonable time.
 - **Strong free baseline.** AUTO.RIA's `interQuartileMean` is effectively a robust market model
   computed over their *entire* inventory and handed to us per query. An in-house model would strain
   to beat it with far less data.

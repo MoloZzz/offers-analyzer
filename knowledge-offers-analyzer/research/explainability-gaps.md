@@ -1,8 +1,8 @@
 ---
 title: Research — explainability gaps (arguing WHY an evaluation was made)
 type: research
-status: Proposed
-updated: 2026-07-17
+status: Implemented
+updated: 2026-07-28
 ---
 
 # Explainability — what's missing to argue any evaluation
@@ -69,8 +69,24 @@ matched cohort so the trace is complete.
 ## Recommendation
 
 Do **X1 + X2** first (persist + read the snapshot) — that alone closes the core gap ("argue a past
-decision faithfully, for free"). Then **X3** (phrases) and **X4** (localized argument) as polish. Tracked
-as **B23** in [[backlog]].
+decision faithfully, for free"). Then **X3** (phrases) and **X4** (localized argument) as polish.
+**B23 is now a rollout gate, not deferred polish:** it must land before `k`, factor bounds, or a
+new threshold is activated, per [[0011-evidence-gated-scoring-rollout|ADR-0011]].
+
+## Implementation note (2026-07-28)
+
+B23 implemented X1 + X2 as the first persisted-provenance slice:
+
+- `Listing.lastExplanation` stores a compact `EvaluationExplanation` for every poll evaluation,
+  including cohort key/tier/sample, fair-value base/adjusted values, mileage adjustment,
+  raw/confidence/penalty/score, fired flags, `ParameterSet` version, threshold, and timestamp.
+- `Opportunity.explanation` copies the same snapshot when an evaluation crosses the profile
+  threshold.
+- `/why` first renders the stored snapshot for a known listing and only falls back to live fetch +
+  recompute when no snapshot exists.
+
+X3 (matched phrases) and X4 (richer localized business argument) remain follow-up polish; live scoring
+behavior was deliberately unchanged.
 
 ## Related
 - [[profitability-definition]] · [[how-it-works]] · [[overview]] · [[backlog]]

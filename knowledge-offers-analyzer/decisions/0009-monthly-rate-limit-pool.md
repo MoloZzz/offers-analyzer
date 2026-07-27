@@ -76,7 +76,10 @@ low-value ones (cohort averages) still run, if the priority order is wrong or un
 
 **Verification debt:** acceptance criteria (see backlog) require a dashboard/log of actual spend
 by line item — without it, drift between the indicative table and reality won't be caught.
+[[0011-evidence-gated-scoring-rollout|ADR-0011]] makes this a rollout gate before SPEC-005 or
+additional expensive profiles are enabled: the target allocation must be reforecast from real
+profile counts, and actual spend must be visible by profile, operation, and priority tier.
 
 ## Related
-- [[decisions/README]] · [[0004-drop-redis-bullmq|ADR-0004]] · [[backlog]]
+- [[decisions/README]] · [[0004-drop-redis-bullmq|ADR-0004]] · [[0011-evidence-gated-scoring-rollout|ADR-0011]] · [[backlog]]
 - Backlog items: SPEC-005 (tiered re-check, blocked by this ADR), SPEC-004, SPEC-008

@@ -30,6 +30,11 @@ export interface Assessment {
   mileageAware: boolean;
 }
 
+export interface WhyLookup {
+  stored?: Listing['lastExplanation'];
+  live?: Assessment;
+}
+
 export interface RankedOpportunity {
   opportunity: Opportunity;
   listing?: Listing;
@@ -105,6 +110,13 @@ export class QueryService {
     const benchmarkBase = benchmark?.value.amount ?? 0;
     const mileageAware = benchmark?.mileageAware ?? false;
     return { detail, result, fairValue, currency, sampleSize, benchmarkBase, mileageAware };
+  }
+
+  /** Prefer the persisted B23 explanation snapshot; fall back to live assessment only when absent. */
+  async whyById(externalId: string): Promise<WhyLookup> {
+    const listing = await this.findListingByExternalId(externalId);
+    if (listing?.lastExplanation) return { stored: listing.lastExplanation };
+    return { live: await this.assessById(externalId) };
   }
 
   /** The highest-scoring opportunities recorded so far. */

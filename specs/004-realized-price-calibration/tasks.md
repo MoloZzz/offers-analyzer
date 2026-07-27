@@ -55,11 +55,22 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done. `[P]` = parallelizable.
       `/best`/`/top`/`/report` stop showing removed listings (operator-visible change —
       separate slice)
 
-## Phase B — US4.3 (compute `k`) — tasks at pickup time
+## Phase B — US4.3 + US4.3a (compute and validate candidate `k`) — tasks at pickup time
 
 _Weekly cohort `k` computation (median/median, ≥30 events, `dom<60`, non-relist, non-voided),
 fallback make+model → make → global 0.90; denominator from `average_price_snapshots`._
 
+- [ ] T020 [US4.3] Compute and store candidate `k` with cohort/fallback provenance; never call
+      the last known asking price a realized sale price.
+- [ ] T021 [US4.3a] Build a stored calibration-readiness report with eligible/voided/relist counts,
+      denominator date, bootstrap interval, cohort-stability verdict, and `k ≥ 0.97` falsification.
+- [ ] T022 [US4.3a] Unit-test sparse cohorts, fallbacks, exclusions, interval determinism, and
+      activation blocking when the report is not ready.
+
 ## Phase C — US4.4 (apply `k`) — tasks at pickup time
 
-_`k` in ParameterSet; `X = RIA_average × k`; `/why` shows `k` + tier + event count._
+_`k` in ParameterSet; `X = RIA_average × k`; `/why` shows `k` + tier + event count. This phase
+also activates Phase-1 factor bounds, after one validation-slice review._
+
+- [ ] T023 [US4.4] Require a ready US4.3a report, B23 explanation provenance, and explicit
+      operator approval before creating or activating the combined `ParameterSet`.

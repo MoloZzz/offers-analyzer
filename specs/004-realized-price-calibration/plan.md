@@ -100,14 +100,19 @@ New table **`listing_disappearances`** (entity
     keep `dealerPolicy: 'label'` so dealer listings stay covered).
   - Cost: ~179 pages/day ≈ 5,400 req/mo (ADR-0009 pool) — amends the zero-cost framing for
     this one profile class; regular-profile detection stays zero-request.
-- **Phase B — US4.3 (later)**: weekly job computing `k` per cohort (median/median, ≥30
-  events, `dom < 60`, non-relist, non-voided, `detectionMode='live'` preferred), fallback
-  chain make+model → make → global (0.90). Denominator from `average_price_snapshots`.
+- **Phase B — US4.3 + US4.3a (later)**: weekly job computing candidate `k` per cohort
+  (median/median, ≥30 events, `dom < 60`, non-relist, non-voided, `detectionMode='live'`
+  preferred), fallback chain make+model → make → global (0.90). It produces a readiness report
+  with event/exclusion counts, fallback tier, denominator-snapshot date, bootstrap interval, and
+  a cohort-stability/falsification verdict. Denominator comes from `average_price_snapshots`.
 - **Phase C — US4.4 (later)**: `k` into `ParameterSet`; `X = RIA_average × k` in valuation;
   `/why` shows `k`, source tier, event count. **Per ADR-0010 this phase also owns**: building
   the ParameterSet activation path (none exists), carrying `PHASE1_FACTOR_BOUNDS` in the same
   ParameterSet change (activating spec 003's liquidity + repair-risk factors), and the single
-  combined threshold re-validation (spec 003 S6/T050 + SC-006 precision check).
+  combined threshold re-validation (spec 003 S6/T050 + SC-006 precision check). **Per
+  ADR-0011**, it may proceed only from a ready report with B23 explanation provenance and
+  explicit operator approval; candidate scoring is evaluated on a frozen or rolling validation
+  slice before activation.
 
 ## Complexity / risk tracking
 

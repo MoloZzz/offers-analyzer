@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-23
 
-**Status**: Draft (US4.1–4.2 in implementation; US4.3–4.4 later phases)
+**Status**: Draft (US4.1–4.2 + US4.1b implemented; US4.3a–4.4 later phases)
 
 **Input**: Backlog epic "Оцінка вигідності v2" (2026-07-22), SPEC-004 entry — central
 hypothesis: `fair_value` (RIA `average_price` interQuartileMean) is measured over **active**
@@ -20,8 +20,8 @@ average we anchor fair value on. Expected effect: `fair_value` inflated 8–15%,
 margin-negative after haggling and paperwork. This is the leading explanation for the "deals"
 not panning out.
 
-The correction: measure an empirical factor `k` from realized "sales" — listings that
-*disappear* from search results — and apply `X = RIA_average × k`. Zero API cost: the
+The correction: measure a candidate factor `k` from plausible exits — listings that *disappear*
+from search results — and, only after validation, apply `X = RIA_average × k`. Zero API cost: the
 per-profile id-list search is already made every cycle; a diff against what we saw before
 detects disappearances for free.
 
@@ -42,6 +42,10 @@ detects disappearances for free.
   cause of bad deals is elsewhere (cohort composition, mileage correction).
 - **`k` is versioned.** When applied (US4.4), `k` lives in the `ParameterSet`
   (ADR-0005) — rollbackable, shown in `/why` with its source tier and event count.
+- **Evidence before activation.** A disappearance and its last asking price are proxies, not a
+  confirmed sale and transaction price. US4.3a's readiness report and persisted evaluation
+  explanations are mandatory before a candidate `k` can affect live scoring
+  ([[0011-evidence-gated-scoring-rollout|ADR-0011]]).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -127,13 +131,37 @@ does not.
 3. **Given** an event already voided by reappearance or already marked relist, **Then** it is
    never re-marked.
 
-### User Story 4.3 — Compute `k` per cohort (Priority: P0) — LATER PHASE
+### User Story 4.3 — Compute candidate `k` per cohort (Priority: P0) — LATER PHASE
 
 `k = median(last_known_price_usd of filtered disappearances) / median(cohort average on the
 disappearance date)` per cohort; ≥30 events/cohort required, else fallback make+model → make →
-global (start 0.90). Recomputed weekly. *(Not implemented in this phase — tasks created at
-pickup. `average_price_snapshots` already accrues the denominator series keyed by the same
-cohort-key format.)*
+global (start 0.90). Recomputed weekly. It is an estimate of active-listing bias, not a claimed
+realized-sale price. *(Not implemented in this phase — tasks created at pickup.
+`average_price_snapshots` already accrues the denominator series keyed by the same cohort-key
+format.)*
+
+### User Story 4.3a — Validate the candidate before rollout (Priority: P0) — LATER PHASE
+
+Before US4.4 can create or activate a `ParameterSet`, the operator receives a reproducible
+calibration-readiness report. It shows the candidate `k` by cohort and fallback tier, eligible
+event count, excluded/voided/relist count, bootstrap confidence interval, and stability across
+materially different cohorts. The report explicitly marks `k ≥ 0.97` as a falsification, not a
+candidate to tune around.
+
+**Independent Test**: seed eligible, voided, relisted, and sparse cohorts; run the report → it
+uses only eligible live events, exposes its exclusions and interval, labels sparse/fallback data,
+and refuses to mark the candidate ready when a required field is missing.
+
+**Acceptance Scenarios**:
+
+1. **Given** a cohort with ≥30 eligible live events, **When** the weekly report runs, **Then** it
+   publishes `k`, an interval, event/exclusion counts, and the denominator-snapshot date.
+2. **Given** a sparse cohort, **When** the report runs, **Then** it shows the exact fallback tier
+   and does not present the result as cohort-level evidence.
+3. **Given** `k ≥ 0.97`, **When** the report runs, **Then** it marks the survivorship hypothesis
+   falsified and blocks US4.4 from proposing an activation.
+4. **Given** a candidate report without persisted evaluation explanations, **When** an operator
+   tries to activate it, **Then** activation is blocked and the missing provenance is named.
 
 ### User Story 4.4 — Apply `k` (Priority: P0) — LATER PHASE
 
@@ -195,6 +223,12 @@ event count behind it. *(Not implemented in this phase.)*
   (absence from ≥2 consecutive daily sweeps) instead of the regular 24h.
 - **FR-412**: Sweep sightings MUST bump `last_seen_in_search_at` exactly like regular
   sightings (a sighting is a sighting), so sweep and poll evidence compose.
+- **FR-413**: US4.3a MUST build a reproducible calibration-readiness report from stored events:
+  source cohort/fallback tier, eligible/voided/relist counts, candidate `k`, bootstrap interval,
+  denominator-snapshot date, and an explicit falsification/ready status.
+- **FR-414**: US4.4 MUST NOT create or activate a live `ParameterSet` from `k` unless the latest
+  readiness report is ready, evaluation explanations are persisted, and the operator explicitly
+  approves the candidate, per ADR-0011.
 
 ### Key Entities
 
@@ -212,11 +246,13 @@ event count behind it. *(Not implemented in this phase.)*
   is bounded to its daily crawl (~pages/day, ≈5,400 req/mo for the 17.9k-listing niche).
 - **SC-402**: With no eligible or sweep profile enabled, zero events are recorded — no false
   positives from window aging.
-- **SC-403**: After 3 weeks with ≥1 persistent profile enabled, ≥30 disappearance events
-  exist for at least one active cohort; the measured interim `k` is recorded in the vault —
-  expectation 0.85–0.95; **`k ≥ 0.97` falsifies the survivorship hypothesis**.
+- **SC-403**: After 3 weeks with ≥1 persistent profile enabled, ≥30 eligible disappearance events
+  exist for at least one active cohort; a candidate `k` and its exclusions are recorded in the
+  readiness report — expectation 0.85–0.95; **`k ≥ 0.97` falsifies the survivorship hypothesis**.
 - **SC-404**: All existing tests pass unchanged; new pure functions and service behavior are
   unit-tested (eligibility, coverage, grace, resurrection, relist, cut stats).
+- **SC-405**: No candidate `k` reaches live scoring without a ready report, stored explanation
+  provenance, and explicit operator approval.
 
 ## Assumptions
 

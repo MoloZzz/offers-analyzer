@@ -24,7 +24,8 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 
 - [X] T001 Initialize NestJS project (package.json, strict tsconfig, `src/main.ts`, `src/app.module.ts`) at repo root
 - [X] T002 [P] Configure ESLint (typescript-eslint strict) + Prettier in `.eslintrc.cjs`, `.prettierrc`
-- [X] T003 [P] Add dependencies (TypeORM, pg, bullmq, ioredis, @nestjs/schedule, nestjs-telegraf, @nestjs/config, class-validator/transformer, undici, jest, nock) in `package.json`
+- [X] T003 [P] Initial dependency scaffold. The originally planned `bullmq`/`ioredis` pieces were
+  removed and superseded by ADR-0004; the current scheduler uses `@nestjs/schedule` + Postgres.
 - [X] T004 [P] Add `docker-compose.yml` for local PostgreSQL + Redis
 - [X] T005 Configure `@nestjs/config` + `.env` schema and validation in `src/common/config/`
 
@@ -41,7 +42,8 @@ Single NestJS backend: `src/`, `test/` at repo root (per plan.md).
 - [X] T007 [P] Error handling (`DomainError` + typed subclasses) in `src/common/errors/`; logging via Nest `Logger`
 - [X] T008 [P] Shared `Money` type + `Currency` enum in `src/common/types/money.ts`
 - [X] T009 [P] Define ports (`ListingSource`, `Notifier`, `ExchangeRate`) in `src/modules/*/ports/` per `contracts/`
-- [X] T010 Redis connection wired (ioredis) in `src/modules/scheduling/` (BullMQ queue added with the poll pipeline in US1)
+- [X] T010 Historical Redis/BullMQ scheduling task — superseded by ADR-0004 and not present in the
+  current implementation; `@nestjs/schedule` + Postgres-backed rate budgeting is the source of truth.
 - [X] T011 Implement Redis rate-budget in `src/modules/scheduling/rate-budget.service.ts`
 - [X] T012 Create all 7 entities per `data-model.md` in `src/modules/*/entities/` (schema via generated migration in `src/common/database/migrations/`)
 

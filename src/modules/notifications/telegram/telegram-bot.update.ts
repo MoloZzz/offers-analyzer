@@ -14,7 +14,7 @@ import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
 import { formatWeights } from '../format/weights-message';
-import { formatWhy } from '../format/why-message';
+import { formatStoredWhy, formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
 import { parseDealArgs, splitDealCommand } from './deal-args';
@@ -214,7 +214,13 @@ export class TelegramBotUpdate {
       return;
     }
     try {
-      const a = await this.query.assessById(externalId);
+      const why = await this.query.whyById(externalId);
+      if (why.stored) {
+        await ctx.reply(formatStoredWhy(why.stored));
+        return;
+      }
+      const a = why.live;
+      if (!a) throw new Error('missing live assessment');
       await ctx.reply(
         formatWhy(a.detail, a.result, {
           fairValue: a.fairValue,

@@ -3,6 +3,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Unique
 import { numericTransformer } from '../../../common/database/numeric.transformer';
 import { Currency } from '../../../common/types/money';
 import { SellerType } from '../../sources/ports/listing-source.port';
+import { EvaluationExplanation } from '../../valuation/evaluation-explanation';
 
 export type ListingStatus = 'active' | 'removed' | 'sold';
 
@@ -86,6 +87,9 @@ export class Listing {
 
   @Column({ type: 'timestamptz', nullable: true })
   lastEvaluatedAt?: Date | null;
+
+  @Column('jsonb', { nullable: true })
+  lastExplanation?: EvaluationExplanation | null;
 
   /** The profile that most recently surfaced/evaluated this listing (for per-profile calibration). */
   @Column({ type: 'uuid', nullable: true })

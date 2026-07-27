@@ -33,7 +33,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
 | `scheduling` | Postgres-backed monthly pool (`rate_budget_windows` ledger), daily sub-budget calculator, priority queue | enforces the monthly cap with tiered spending; survives restarts |
-| `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | budget-fair; no queue in v1; sweep ≈5,400 req/mo |
+| `polling` | cron pipeline: search profiles → priority-tier value/re-check work; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | monthly pool + daily sub-budget; priority is a policy, not Redis/BullMQ infrastructure; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
@@ -42,8 +42,10 @@ End-to-end path (v1): `scheduling` cron runs a poll per active `profile` → `so
 market-wide profiles set `top` submission-period for "newest by market") → `listings` filters to new
 ids → `sources` fetch details (budgeted) → `valuation` resolves a benchmark via **`cohort.ts`
 widen-and-retry** (make+model+year±1 → make+model until `sampleSize ≥ 10`), computes
-discount/confidence/red-flags → every evaluated listing records its score; an **Opportunity**
-(score ≥ threshold) is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
+discount/confidence/red-flags → every evaluated listing records its score plus a persisted
+**EvaluationExplanation** snapshot (`ParameterSet` version, profile threshold, cohort provenance,
+fair-value base/adjustment, score breakdown, fired flags); an **Opportunity** (score ≥ threshold)
+copies that same snapshot and is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
 The poll also re-observes a few known listings each cycle for price drops. On demand, the `query`
 module lets the bot check any listing (`/check`), list stored opportunities (`/top`), or list the
 best-scoring candidates even below the alert bar (`/best`). Full design:
@@ -65,9 +67,13 @@ single missed sweep never fabricates an event.
 ## Entities / data model
 
 - **SearchProfile** — a configured niche to watch (region + make/models + price band + `minDealScore`).
-- **Listing** — a car listing (auto_id, specs, seller, current price, latest description snapshot, `profileId` = the niche that last evaluated it) fetched via the source adapter.
+- **Listing** — a car listing (auto_id, specs, seller, current price, latest description snapshot,
+  `profileId` = the niche that last evaluated it, `lastExplanation` = latest persisted evaluation
+  provenance) fetched via the source adapter.
 - **PriceObservation** — price of a listing at a point in time (history, drop detection).
-- **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags). See [[profitability-definition]].
+- **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags) with a copied
+  `explanation` snapshot so historical alerts remain reproducible even if the listing later changes
+  or disappears. See [[profitability-definition]].
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
 - **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
 - **RateBudgetWindow** — durable request-budget ledger used by the monthly pool / daily sub-budget accounting.

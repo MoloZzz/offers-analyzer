@@ -1,7 +1,7 @@
 ---
 title: Project goals & scope (living)
 type: context
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # Project goals & scope
@@ -30,7 +30,11 @@ a market appraiser. Feature litmus test: *"чи використовує це х
 - **Profitability:** composite **Total Deal Score** — price core (below fair value, anchored on
   RIA robust average) × liquidity × repair-risk × negotiation × seller × positives × confidence.
   See [[profitability-definition]], [[0006-operator-profit-vision|ADR-0006]], spec
-  `specs/003-composite-deal-score/`. (Price core is implemented; factor modifiers are spec 003.)
+  `specs/003-composite-deal-score/`. **Current production behavior is the price core only**:
+  liquidity and repair-risk stay intentionally inactive until SPEC-004 validates and applies `k`.
+  Their combined activation and threshold review are evidence-gated by
+  [[0010-defer-factor-activation-until-k|ADR-0010]] and
+  [[0011-evidence-gated-scoring-rollout|ADR-0011]].
 - **Delivery:** Telegram bot notifications.
 - **Stack:** NestJS · PostgreSQL · TypeORM · `@nestjs/schedule` cron + Postgres-backed monthly pool / daily sub-budget / priority queue · Telegram bot. (No Redis/BullMQ in v1 — see [[0004-drop-redis-bullmq|ADR-0004]] and [[0009-monthly-rate-limit-pool|ADR-0009]].)
 - **Method:** strict Spec-Driven Development; clean code per [[coding-standards]].

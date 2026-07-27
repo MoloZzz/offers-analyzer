@@ -161,9 +161,17 @@ function buildFakes(): Fakes {
       score: 0,
       discountPct: 0,
       confidence: 0,
-      redFlags: [],
+      redFlags: {},
       isOpportunity: false,
+      reason: 'below threshold',
+      raw: 0,
+      penalty: 1,
+      disqualified: false,
+      priceCore: 0,
+      factors: [],
+      total100: 50,
     }),
+    activeParameterVersion: jest.fn().mockReturnValue(7),
   } as unknown as ValuationService;
 
   const benchmarks = {
@@ -259,5 +267,88 @@ describe('PollService priority order', () => {
     expect(fakes.source.fetch).toHaveBeenCalledTimes(2);
     expect(fakes.source.fetch.mock.calls.map((call) => call[1])).toEqual([1, 2]);
     expect(fakes.source.fetch.mock.calls.map((call) => call[0])).toEqual(['old-1', 'new-1']);
+  });
+
+  it('persists an explanation snapshot for evaluated non-opportunities', async () => {
+    const fakes = buildFakes();
+    const service = buildService(fakes);
+    const listing = makeListing({ externalId: 'new-1', lastScore: null });
+
+    (fakes.source.search as jest.Mock).mockResolvedValue({ ids: ['new-1'], total: 1 });
+    (fakes.listingsService.findByExternalIds as jest.Mock).mockResolvedValue([]);
+    (fakes.source.fetch as jest.Mock).mockResolvedValue(makeDetail({ externalId: 'new-1' }));
+    (fakes.listingsService.recordSeen as jest.Mock).mockResolvedValue({ listing, isNew: true });
+    (fakes.benchmarks.getOrLoad as jest.Mock).mockResolvedValue({
+      value: { amount: 12000, currency: Currency.USD },
+      sampleSize: 15,
+    });
+    (fakes.mileage.fairValue as jest.Mock).mockReturnValue(11800);
+
+    await (service as unknown as { runCycle: () => Promise<void> }).runCycle();
+
+    expect(fakes.listingsService.recordEvaluation).toHaveBeenCalledWith(
+      listing,
+      0,
+      0,
+      'profile-1',
+      expect.objectContaining({
+        parameterSetVersion: 7,
+        thresholdUsed: 0.3,
+        fairValueBase: 12000,
+        fairValueAdjusted: 11800,
+        cohort: expect.objectContaining({ sampleSize: 15 }),
+      }),
+    );
+    expect(fakes.opportunities.save).not.toHaveBeenCalled();
+  });
+
+  it('copies the same explanation snapshot onto opportunities', async () => {
+    const fakes = buildFakes();
+    const service = buildService(fakes);
+    const listing = makeListing({ externalId: 'new-1', lastScore: null });
+    const created: Partial<Opportunity>[] = [];
+
+    (fakes.source.search as jest.Mock).mockResolvedValue({ ids: ['new-1'], total: 1 });
+    (fakes.listingsService.findByExternalIds as jest.Mock).mockResolvedValue([]);
+    (fakes.source.fetch as jest.Mock).mockResolvedValue(makeDetail({ externalId: 'new-1' }));
+    (fakes.listingsService.recordSeen as jest.Mock).mockResolvedValue({ listing, isNew: true });
+    (fakes.benchmarks.getOrLoad as jest.Mock).mockResolvedValue({
+      value: { amount: 12000, currency: Currency.USD },
+      sampleSize: 15,
+    });
+    (fakes.mileage.fairValue as jest.Mock).mockReturnValue(11800);
+    (fakes.valuationService.evaluate as jest.Mock).mockReturnValue({
+      score: 0.5,
+      discountPct: 17,
+      confidence: 1,
+      redFlags: { no_vin_report: true },
+      isOpportunity: true,
+      reason: 'deal score 0.5 >= threshold 0.3',
+      raw: 0.57,
+      penalty: 0.8,
+      disqualified: false,
+      priceCore: 0.46,
+      factors: [],
+      total100: 75,
+    });
+    (fakes.opportunities.create as jest.Mock).mockImplementation((x) => {
+      created.push(x);
+      return x;
+    });
+    (fakes.opportunities.save as jest.Mock).mockImplementation((x) =>
+      Promise.resolve({ id: 'opp-1', ...x }),
+    );
+
+    await (service as unknown as { runCycle: () => Promise<void> }).runCycle();
+
+    const listingExplanation = (fakes.listingsService.recordEvaluation as jest.Mock).mock.calls[0][4];
+    expect(created[0].explanation).toBe(listingExplanation);
+    expect(created[0].explanation).toEqual(
+      expect.objectContaining({
+        parameterSetVersion: 7,
+        thresholdUsed: 0.3,
+        firedFlags: [{ code: 'no_vin_report', source: 'auto-ria' }],
+      }),
+    );
   });
 });

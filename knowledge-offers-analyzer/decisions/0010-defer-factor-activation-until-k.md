@@ -2,7 +2,7 @@
 title: ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
 type: decision
 status: Accepted
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
@@ -30,7 +30,8 @@ factor `k` expected ~3 weeks later.
 
 **Option (b): the spec-003 factors stay intentionally disabled until `k` lands.** When SPEC-004
 US4.4 applies `k`, the same ParameterSet change activates `PHASE1_FACTOR_BOUNDS`, and thresholds
-are re-validated **once** (S6/T050) against the final score shape.
+are re-validated **once** (S6/T050) against the final score shape. This rollout also satisfies
+the evidence, explanation, and approval gates in [[0011-evidence-gated-scoring-rollout|ADR-0011]].
 
 Rationale: activating bounded factor modifiers on top of a mismeasured price anchor would force
 two threshold re-validations (one now, one when `k` shifts every score again), with the interim
@@ -43,6 +44,8 @@ do" verdict points the same way: fix the survivorship bias first, then revisit t
   threshold risk now.
 - One combined rollout (k + factor bounds + single re-validation) instead of two — less
   operator churn, one clean before/after precision comparison in `/report`.
+- The rollout cannot skip data-quality evidence, persisted evaluation explanations, or operator
+  approval merely because a candidate `k` is available.
 - FIX-003.1 is closed as *decided*; the activation work moves into spec 004 **Phase C**
   (apply `k`), which now also owns building the ParameterSet activation path and S6/T050.
 - Risk accepted: if SPEC-004 is falsified (`k ≥ 0.97`), factor activation was delayed ~3 weeks
@@ -54,6 +57,7 @@ do" verdict points the same way: fix the survivorship bias first, then revisit t
 
 - [[backlog#FIX-003.1]] · [[0006-operator-profit-vision|ADR-0006]] ·
   [[0005-versioned-parameter-sets|ADR-0005]] · spec `004-realized-price-calibration` (Phase C)
+- [[0011-evidence-gated-scoring-rollout|ADR-0011]]
 - Verification note: `context/log/2026-07-23-session-01.md`
 - Implementation note: `context/log/2026-07-23-session-02.md`
 - [[decisions/README]]
