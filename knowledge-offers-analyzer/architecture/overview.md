@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # Architecture overview
@@ -27,7 +27,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
 | `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore`; **disappearance tracking** (spec 004): pure `disappearance.ts` (eligibility/coverage/grace/relist decisions) + `DisappearancesService` (`processCycle` id-diff → `ListingDisappearance` events, `checkRelist`) — zero API cost, no source dependency | history from day one |
 | `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — liquidity + repair-risk implemented in code but **intentionally inactive in prod** per [[0010-defer-factor-activation-until-k|ADR-0010]]: activation deferred until SPEC-004's `k` lands, then one combined ParameterSet change + single threshold re-validation (spec 004 Phase C); until then `score === priceCore`; negotiation/seller/positives/segment-mileage pending) | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
-| `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts`; **`DealOutcome` + `DealsService`** (spec 007: stateful post-deal record) + pure `deal-margin.ts` (realized margin/DOM, monotonic stage) | spec 002 + 007; [[0005-versioned-parameter-sets\|ADR-0005]] |
+| `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts`; **`DealOutcome` + `DealsService`** (spec 007: stateful post-deal record) + pure `deal-margin.ts` (realized margin/DOM, monotonic stage) | spec 002 + 007; [[0005-versioned-parameter-sets|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome`, `/deal`, `/deals` |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |

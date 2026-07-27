@@ -2,7 +2,7 @@
 title: ADR-0009 — Rate limiting: monthly pool instead of hourly window
 type: decision
 status: Implemented
-updated: 2026-07-24
+updated: 2026-07-28
 ---
 
 # ADR-0009 — Rate limiting: monthly pool instead of hourly window
@@ -23,7 +23,7 @@ What the pool unlocks that the hourly window did not:
    240 req/day went to empty poll cycles — ~7,000/mo of dead quota. A monthly pool lets that budget
    shift to daytime, ~1.5× the effective daily budget for the same monthly figure.
 2. **Bursts become possible** — e.g. a one-off calibration pull of 2,000–3,000 requests.
-3. **Priority queue replaces round-robin.** Round-robin ([[B20]] in [[backlog]]) existed to stop one
+3. **Priority queue replaces round-robin.** Round-robin (`B20` in [[backlog]]) existed to stop one
    wide niche from starving the hourly window. With a monthly pool the constraint isn't equal
    sharing between niches, it's prioritizing requests by expected value.
 

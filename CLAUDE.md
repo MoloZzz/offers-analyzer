@@ -77,6 +77,9 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
   `operations/environment-setup.md`).
 - Where hooks do not run (e.g. Cowork), **prefix commands with `rtk` yourself**:
   `rtk npm test`, `rtk git diff`, `rtk tsc`, `rtk grep …`.
+- Where RTK itself is unavailable (for example, a Windows-only agent runtime), run the
+  native equivalent and state the fallback in the task record. Do not block a quality
+  gate solely because the Linux/musl wrapper cannot run.
 - Full command reference and rules: **@.claude/RTK.md**.
 
 ---
@@ -88,4 +91,5 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
 3. The **vault is updated** to reflect the change (§1 write protocol), **and the
    supersession sweep has been run** if any decision changed — no note may
    contradict an ADR (§1).
-4. For features: the SDD artifacts under `.specify/` are consistent with the code.
+4. `npm run vault:check` passes after a vault change.
+5. For features: the SDD artifacts under `.specify/` are consistent with the code.

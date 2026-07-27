@@ -1,7 +1,7 @@
 ---
 title: Offers Analyzer — Knowledge Base Index
 type: moc
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # 🧠 Offers Analyzer — Knowledge Base (Second Brain)
@@ -37,6 +37,8 @@ Goals, session logs, and drafts live under `context/` (path reference, deliberat
 - `.specify/` — Spec-Driven Development (Spec Kit) tooling: constitution, memory, templates, scripts, workflows. Feature specs live in repo-root `specs/` and are linked from [[specs/README]]. Workflow: `/speckit-constitution → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement`.
 - `.claude/RTK.md` — RTK (token-saving command wrapper) usage rules.
 - `../CLAUDE.md` — the enforced operating rules that bind this vault, SDD, and RTK together.
+- `../AGENTS.md` — a compact entry point for Codex and other agent runtimes; it points back to
+  `CLAUDE.md` so the operating policy has one owner.
 
 ## 📌 Project one-liner
 

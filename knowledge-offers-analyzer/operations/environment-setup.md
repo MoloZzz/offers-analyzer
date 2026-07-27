@@ -1,7 +1,7 @@
 ---
 title: Environment setup & tooling
 type: operations
-updated: 2026-07-22
+updated: 2026-07-28
 ---
 
 # Environment setup & tooling
@@ -22,6 +22,8 @@ updated: 2026-07-22
     ```
   - If `tools/rtk` is missing after a fresh checkout, restore it: `tar -xzf tools/rtk-x86_64-unknown-linux-musl.tar.gz -C tools && chmod +x tools/rtk`.
 - Note: hooks run only under the **Claude Code CLI**. Cowork does not execute PreToolUse hooks, so there RTK is a discipline (use `rtk …` yourself) rather than automatic.
+- If the runtime cannot execute the Linux/musl RTK binary, run the native command and record that
+  fallback in the session log. Quality gates must still run.
 - Custom filters: `.rtk/filters.toml`.
 
 ## Spec Kit (SDD)

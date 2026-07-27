@@ -102,7 +102,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 
 - [~] **SPEC-007 — Outcome labels beyond 👍/👎.** P0 (the change is trivial; data accrual is not).
   **Promoted to a formal spec:** `specs/007-deal-outcomes/` (spec + plan + tasks).
-  Problem: spec 002's auto-tuning ([[E3|backlog]]) optimizes precision on 👍/👎, but 👍 means "looks
+  Problem: spec 002's auto-tuning (E3 in this backlog) optimizes precision on 👍/👎, but 👍 means "looks
   like a good alert," not "made money" — the operator thumbs-up cheap listings, which converges the
   system toward "looks cheap," exactly the population of wrecked/scammy/problem cars. Better
   auto-tuning on this label makes the *product* worse.
@@ -161,7 +161,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   - US8.2 — store `cohort_drift` with computation date; fallback to parent cohort, then global.
   - US8.3 — apply: `drift_mo = (avg[last mo] / avg[3 mo ago])^(1/3) − 1`,
     `X = RIA_average × k × (1 + drift_mo × 1.5)` (1.5 mo = expected horizon to sale — swap for
-    [[SPEC-006]]'s liquidity-tier `DOM_expected` once that exists); show in `/why`.
+    `SPEC-006`'s liquidity-tier `DOM_expected` once that exists); show in `/why`.
   - US8.4 — flag a cohort dropping >4%/mo as "market falling" in the alert.
   - Acceptance: job stays within 50–100 req/mo; `drift` visible in `/why`; clamp ±5%/mo so a data
     artifact can't wreck the estimate.

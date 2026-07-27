@@ -1,7 +1,7 @@
 ---
 title: Vault Protocol — how agents use and maintain the knowledge base
 type: meta
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # Vault Protocol (read + maintain)
@@ -58,6 +58,8 @@ How the two interact **without breaking the vault**:
 - Every note carries frontmatter: `title`, `type`, `updated` (ISO date). Bump `updated` when you edit.
 - Use `TODO:` inline for known gaps. Never invent facts to fill a skeleton — leave the TODO.
 - Keep prose tight. This is working memory, not documentation theater.
+- Run `npm run vault:check` after editing the vault. It enforces required frontmatter and
+  malformed-link checks; unresolved future-note links remain warnings because they are valid TODOs.
 
 ## Note types
 
