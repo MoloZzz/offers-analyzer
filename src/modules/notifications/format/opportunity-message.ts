@@ -2,7 +2,6 @@ import { Currency } from '../../../common/types/money';
 import { Listing } from '../../listings/entities/listing.entity';
 import { ListingDetail, SellerType } from '../../sources/ports/listing-source.port';
 import { Opportunity } from '../../valuation/entities/opportunity.entity';
-import { toTotal100 } from '../../valuation/factors/factor';
 import { ValuationResult } from '../../valuation/valuation.service';
 
 /** Human-readable Ukrainian labels for red-flag codes. */
@@ -31,30 +30,38 @@ function risksLabel(redFlags: Record<string, boolean>): string {
 }
 
 function sellerLabel(sellerType: SellerType): string {
-  return sellerType === 'dealer' ? 'дилер' : sellerType === 'private' ? 'приватний' : 'невідомо';
+  return sellerType === 'dealer'
+    ? 'дилер'
+    : sellerType === 'private'
+      ? 'приватний'
+      : 'невідомо';
 }
 
 function mileageLabel(mileage?: number | null): string {
   return mileage != null ? `${mileage} тис. км` : 'пробіг н/д';
 }
 
+function regionLabel(listing: Listing): string {
+  if (listing.stateId == null) return 'н/д';
+  return listing.cityId != null ? `${listing.stateId}/${listing.cityId}` : `${listing.stateId}`;
+}
+
 function scoreEmoji(score: number): string {
-  return score >= 0.6 ? '🔥' : '👍';
+  return score >= 0.6 ? '🚗' : '📌';
 }
 
 /**
- * Opportunity alert — leads with the deal score, explains the reasoning, ends with the AUTO.RIA
- * backlink (ToS + FR-007). US3.
+ * Opportunity alert includes the contract-required region and sample-size count, and ends
+ * with the AUTO.RIA backlink (ToS + FR-007). US3.
  */
 export function formatOpportunity(op: Opportunity, listing: Listing): string {
   return [
-    `${scoreEmoji(op.score)} ${listing.make} ${listing.model}, ${listing.year}, ${mileageLabel(listing.mileage)}`,
-    `📊 Загальний бал: ${toTotal100(op.score)}/100`,
-    `💰 Вигідність: ${signed(op.score)} (−1…+1)`,
-    `Ціна: ${fmt(op.askingValue)} ${op.currency}  ·  Ринкова: ${fmt(op.fairValue)} ${op.currency}  ·  −${op.discountPct}%`,
-    `Впевненість: ${op.confidence}`,
+    `🚗 ${listing.make} ${listing.model}, ${listing.year}, ${mileageLabel(listing.mileage)} — ${regionLabel(listing)}`,
+    `Ціна: ${fmt(op.askingValue)} ${op.currency}   |   Ринкова (сер.): ${fmt(op.fairValue)} ${op.currency}`,
+    `Знижка: ${op.discountPct}%   |   Впевненість: ${op.confidence} (${op.sampleSize} оголошень)`,
+    `Рейтинг: ${scoreEmoji(op.score)} ${signed(op.score)} (-1...+1)`,
+    `Перевірки: ${risksLabel(op.redFlags)}`,
     `Продавець: ${sellerLabel(listing.sellerType)}`,
-    `⚠️ Ризики: ${risksLabel(op.redFlags)}`,
     `🔗 ${listing.url}`,
   ].join('\n');
 }
@@ -64,13 +71,13 @@ export function formatPriceDrop(op: Opportunity, listing: Listing, oldAmount: nu
   const dropPct = oldAmount > 0 ? Math.round(((oldAmount - op.askingValue) / oldAmount) * 100) : 0;
   return [
     `📉 Ціна знижена: ${listing.make} ${listing.model}, ${listing.year}`,
-    `Було ${fmt(oldAmount)} → стало ${fmt(op.askingValue)} ${op.currency} (−${dropPct}%)`,
-    `💰 Вигідність: ${signed(op.score)}  ·  від ринку −${op.discountPct}%`,
+    `Було ${fmt(oldAmount)} → стало ${fmt(op.askingValue)} ${op.currency} (-${dropPct}%)`,
+    `💰 Вигідність: ${signed(op.score)}  ·  від ринку -${op.discountPct}%`,
     `🔗 ${listing.url}`,
   ].join('\n');
 }
 
-/** On-demand `/check` reply — assessment of a single listing the user asked about. */
+/** On-demand `/check` reply: assessment of a single listing the user asked about. */
 export function formatAssessment(
   detail: ListingDetail,
   result: ValuationResult,
@@ -81,8 +88,8 @@ export function formatAssessment(
   return [
     `${scoreEmoji(result.score)} ${detail.make} ${detail.model}, ${detail.year}, ${mileageLabel(detail.mileage)}`,
     `📊 Загальний бал: ${result.total100}/100`,
-    `💰 Вигідність: ${signed(result.score)} (−1…+1)`,
-    `Ціна: ${fmt(detail.price.amount)} ${currency}  ·  Ринкова: ${fmt(fairValue)} ${currency}  ·  −${result.discountPct}%`,
+    `💰 Вигідність: ${signed(result.score)} (-1...+1)`,
+    `Ціна: ${fmt(detail.price.amount)} ${currency}  ·  Ринкова: ${fmt(fairValue)} ${currency}  ·  -${result.discountPct}%`,
     `Впевненість: ${result.confidence}`,
     `Продавець: ${sellerLabel(detail.sellerType)}`,
     `⚠️ Ризики: ${risksLabel(result.redFlags)}`,

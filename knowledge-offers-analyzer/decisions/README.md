@@ -1,7 +1,7 @@
 ---
 title: Decision log (ADRs)
 type: moc
-updated: 2026-07-22
+updated: 2026-07-27
 ---
 
 # Decision log (Architecture Decision Records)
@@ -13,7 +13,7 @@ updated: 2026-07-22
 - [[0001-adopt-sdd-vault-rtk|ADR-0001]] — Adopt Spec-Driven Development, a knowledge vault, and RTK (Accepted)
 - [[0002-monitoring-via-official-api|ADR-0002]] — Monitor AUTO.RIA via the official API, narrow niche on free tier (Accepted)
 - [[0003-decoupled-context-zone|ADR-0003]] — Decoupled context zone instead of a second knowledge base (Accepted)
-- [[0004-drop-redis-bullmq|ADR-0004]] — Drop Redis/BullMQ for v1; in-memory rate budget (Accepted)
+- [[0004-drop-redis-bullmq|ADR-0004]] — Drop Redis/BullMQ for v1; historical origin of the budget ledger (superseded by ADR-0009 monthly pool) (Accepted)
 - [[0005-versioned-parameter-sets|ADR-0005]] — Versioned ParameterSets + human-in-the-loop calibration (Accepted)
 - [[0006-operator-profit-vision|ADR-0006]] — Vision shift: rank by expected operator profit (composite Total Deal Score), not just discount (Accepted)
 - [[0007-structured-logging-nestjs-pino|ADR-0007]] — Structured logging via nestjs-pino (Accepted)

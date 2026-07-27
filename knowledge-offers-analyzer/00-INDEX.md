@@ -1,7 +1,7 @@
 ---
 title: Offers Analyzer — Knowledge Base Index
 type: moc
-updated: 2026-07-18
+updated: 2026-07-27
 ---
 
 # 🧠 Offers Analyzer — Knowledge Base (Second Brain)
@@ -24,7 +24,7 @@ The code is the *how*. This vault is the *what* and *why*: architecture, domain 
 - **Decisions** → [[decisions/README|Decision log (ADRs)]] — why things are the way they are.
 - **Conventions** → [[coding-standards|Coding standards]] — NestJS patterns, testing, style.
 - **Operations** → [[environment-setup|Environment setup]] — tooling (RTK, Spec Kit), env, runbooks.
-- **Specs (SDD)** → [[specs/README|Feature specs index]] — links to Spec Kit artifacts under `.specify/`.
+- **Specs (SDD)** → [[specs/README|Feature specs index]] — repo-root feature specs; `.specify/` holds Spec Kit tooling, memory, templates, and workflows.
 - **Business (plain language)** → [[how-it-works|How it works & how we score]] — for non-technical stakeholders: data collection + profitability scoring, in simple words.
 - **Research** → [[monitoring-approaches|Monitoring approach]] · [[profitability-definition|Defining "profitable"]] · [[profitability-methods-coverage|Methods coverage & the ML question]] · [[why-no-opportunities|Reaching non-zero opportunities]] · [[vin-real-mileage|Real vs claimed mileage]] · [[when-to-alert|When to alert (interestingness & relists)]] · [[explainability-gaps|Explainability gaps]] · [[alternative-sources|Alternative listing sources]] — investigations behind the decisions.
 
@@ -34,7 +34,7 @@ Goals, session logs, and drafts live under `context/` (path reference, deliberat
 
 ## 🔗 Related project infrastructure
 
-- `.specify/` — Spec-Driven Development (Spec Kit): constitution, templates, scripts. Workflow: `/speckit-constitution → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement`.
+- `.specify/` — Spec-Driven Development (Spec Kit) tooling: constitution, memory, templates, scripts, workflows. Feature specs live in repo-root `specs/` and are linked from [[specs/README]]. Workflow: `/speckit-constitution → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement`.
 - `.claude/RTK.md` — RTK (token-saving command wrapper) usage rules.
 - `../CLAUDE.md` — the enforced operating rules that bind this vault, SDD, and RTK together.
 

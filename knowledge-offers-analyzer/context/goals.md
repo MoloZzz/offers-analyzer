@@ -1,7 +1,7 @@
 ---
 title: Project goals & scope (living)
 type: context
-updated: 2026-07-22
+updated: 2026-07-27
 ---
 
 # Project goals & scope
@@ -32,7 +32,7 @@ a market appraiser. Feature litmus test: *"чи використовує це х
   See [[profitability-definition]], [[0006-operator-profit-vision|ADR-0006]], spec
   `specs/003-composite-deal-score/`. (Price core is implemented; factor modifiers are spec 003.)
 - **Delivery:** Telegram bot notifications.
-- **Stack:** NestJS · PostgreSQL · TypeORM · `@nestjs/schedule` cron + in-memory rate budget · Telegram bot. (No Redis/BullMQ in v1 — see [[0004-drop-redis-bullmq|ADR-0004]].)
+- **Stack:** NestJS · PostgreSQL · TypeORM · `@nestjs/schedule` cron + Postgres-backed monthly pool / daily sub-budget / priority queue · Telegram bot. (No Redis/BullMQ in v1 — see [[0004-drop-redis-bullmq|ADR-0004]] and [[0009-monthly-rate-limit-pool|ADR-0009]].)
 - **Method:** strict Spec-Driven Development; clean code per [[coding-standards]].
 
 ## Explicitly later (not v1)

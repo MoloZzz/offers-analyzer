@@ -48,8 +48,10 @@ const HELP =
   '/outcome <посилання> <результат> — записати, що сталося з авто\n' +
   '/deal <посилання> buy=.. costs=.. sell=.. dom=.. reason=.. — економіка угоди\n' +
   '/deals — відкриті та закриті угоди + реалізована маржа\n' +
-  '/start — підписатися на вигідні пропозиції\n' +
+  '/start — підписатися на всі ніші\n' +
+  '/subscribe [profile] — підписатися на всі ніші або на названу\n' +
   '/stop — відписатися\n' +
+  '/unsubscribe — відписатися\n' +
   '/mute — тимчасово вимкнути сповіщення\n' +
   '/profiles — які ніші зараз моніторимо\n' +
   '/blacklist "Назва ніші" — показати чорний список ніші\n' +
@@ -73,8 +75,30 @@ export class TelegramBotUpdate {
   async onStart(@Ctx() ctx: Context): Promise<void> {
     const chatId = ctx.chat?.id;
     if (chatId == null) return;
-    await this.subscribers.activate(String(chatId));
+    await this.subscribers.subscribeAll(String(chatId));
     await ctx.reply('Готово — надсилатиму вигідні пропозиції авто. /help для команд.');
+  }
+
+  @Command('subscribe')
+  async onSubscribe(@Ctx() ctx: Context): Promise<void> {
+    const chatId = ctx.chat?.id;
+    if (chatId == null) return;
+
+    const { name } = parseQuotedOrPlain(commandArg(ctx));
+    if (!name) {
+      await this.subscribers.subscribeAll(String(chatId));
+      await ctx.reply('Підписано на всі активні ніші. /mute щоб тимчасово вимкнути сповіщення.');
+      return;
+    }
+
+    const profile = await this.profiles.findByName(name);
+    if (!profile) {
+      await ctx.reply(`Нішу "${name}" не знайдено. /profiles — список ніш.`);
+      return;
+    }
+
+    await this.subscribers.subscribeToProfile(String(chatId), profile.id);
+    await ctx.reply(`Підписано на "${profile.name}".`);
   }
 
   @Command('stop')
@@ -83,6 +107,14 @@ export class TelegramBotUpdate {
     if (chatId == null) return;
     await this.subscribers.unsubscribe(String(chatId));
     await ctx.reply('Зупинено. /start щоб відновити.');
+  }
+
+  @Command('unsubscribe')
+  async onUnsubscribe(@Ctx() ctx: Context): Promise<void> {
+    const chatId = ctx.chat?.id;
+    if (chatId == null) return;
+    await this.subscribers.unsubscribe(String(chatId));
+    await ctx.reply('Відписано. /subscribe щоб відновити.');
   }
 
   @Command('mute')
@@ -336,7 +368,7 @@ export class TelegramBotUpdate {
     const listing = await this.query.findListingByExternalId(externalId);
     if (!listing) {
       await ctx.reply(
-        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.',
+        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтеся поллінгу.',
       );
       return;
     }
@@ -407,7 +439,7 @@ export class TelegramBotUpdate {
     const listing = await this.query.findListingByExternalId(externalId);
     if (!listing) {
       await ctx.reply(
-        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтесь поллінгу.',
+        'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтеся поллінгу.',
       );
       return;
     }

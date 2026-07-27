@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-23
+updated: 2026-07-27
 ---
 
 # Architecture overview
@@ -12,7 +12,7 @@ updated: 2026-07-23
 
 - **Runtime/Framework:** Node.js + NestJS.
 - **DB / ORM:** PostgreSQL + TypeORM.
-- **Scheduling:** `@nestjs/schedule` cron with an in-memory rate budget (no Redis — see [[0004-drop-redis-bullmq|ADR-0004]]).
+- **Scheduling:** `@nestjs/schedule` cron with a Postgres-backed monthly pool, daily sub-budget, and priority queue (no Redis — see [[0004-drop-redis-bullmq|ADR-0004]] and [[0009-monthly-rate-limit-pool|ADR-0009]]).
 - **Notifications:** Telegram bot.
 - **Logging:** `nestjs-pino` — structured (JSON in prod, pretty in dev), per-service `PinoLogger` injection. See [[0007-structured-logging-nestjs-pino|ADR-0007]].
 - **Error handling:** global `AllExceptionsFilter` (`APP_FILTER`) catches everything Nest's pipeline sees (all Telegram command/action handlers via `nestjs-telegraf`), logs structured + replies gracefully; every cron job (`poll`, `weekly-calibration`, `weekly-report`, `health-monitor`) catches and logs its own failures rather than crashing; `main.ts` has last-resort `uncaughtException`/`unhandledRejection` handlers that log fatal and exit (needs a restart supervisor — see [[environment-setup]]). See [[0008-global-error-handling|ADR-0008]].
@@ -32,7 +32,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome`, `/deal`, `/deals` |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
-| `scheduling` | Postgres-backed rate budget (durable fixed window) | enforces ~30 req/hr; survives restarts |
+| `scheduling` | Postgres-backed monthly pool (`rate_budget_windows` ledger), daily sub-budget calculator, priority queue | enforces the monthly cap with tiered spending; survives restarts |
 | `polling` | cron pipeline: search all profiles → round-robin value new → re-observe price drops; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | budget-fair; no queue in v1; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
@@ -70,7 +70,7 @@ single missed sweep never fabricates an event.
 - **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags). See [[profitability-definition]].
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
 - **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
-- **RateBudgetWindow** — durable per-hour request-budget counter (scheduling).
+- **RateBudgetWindow** — durable request-budget ledger used by the monthly pool / daily sub-budget accounting.
 - **ParameterSet** — versioned, active scoring tunables (scale, penalty, mileage factors); v1 = seeded from config. Spec 002 / [[0005-versioned-parameter-sets|ADR-0005]].
 - **Outcome** — realized result of a listing (manual 👍/👎, bought/skipped/resold; passive price_dropped/disappeared). Feedback ground truth.
 - **DealOutcome** — stateful post-deal economics (spec 007): one row per listing (`stage` declined/bought/sold, decline reason, buy/costs/sell USD, realized DOM); realized margin = `sell − buy − costs`. Separate from Outcome; the future auto-tuning target (US7.3).

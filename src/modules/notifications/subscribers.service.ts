@@ -15,11 +15,20 @@ export class SubscribersService {
     return this.subscribers.find({ where: { state: 'active' } });
   }
 
-  async activate(telegramChatId: string): Promise<void> {
+  async activate(telegramChatId: string, profileIds: string[] | null = null): Promise<void> {
     const existing = await this.subscribers.findOne({ where: { telegramChatId } });
     const entity = existing ?? this.subscribers.create({ telegramChatId });
     entity.state = 'active';
+    entity.profileIds = profileIds != null && profileIds.length > 0 ? [...new Set(profileIds)] : null;
     await this.subscribers.save(entity);
+  }
+
+  async subscribeAll(telegramChatId: string): Promise<void> {
+    await this.activate(telegramChatId, null);
+  }
+
+  async subscribeToProfile(telegramChatId: string, profileId: string): Promise<void> {
+    await this.activate(telegramChatId, [profileId]);
   }
 
   async unsubscribe(telegramChatId: string): Promise<void> {

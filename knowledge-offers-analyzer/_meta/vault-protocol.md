@@ -1,7 +1,7 @@
 ---
 title: Vault Protocol — how agents use and maintain the knowledge base
 type: meta
-updated: 2026-07-13
+updated: 2026-07-27
 ---
 
 # Vault Protocol (read + maintain)
@@ -28,7 +28,7 @@ Updating the vault is part of "done." A change is not complete until the knowled
 - **Non-trivial decision** (library choice, pattern, tradeoff) → add an ADR via [[decisions/README|the decision log]].
 - **New convention or pattern** → record it in [[coding-standards]].
 - **New tool / env / runbook step** → update [[environment-setup]].
-- **New spec** (Spec Kit) → link it from [[specs/README]].
+- **New feature spec** (Spec Kit) -> link the repo-root spec from [[specs/README]]. `.specify/` is the Spec Kit toolchain (constitution, templates, scripts), not the feature-spec home.
 
 **Supersession sweep — REQUIRED whenever a decision changes.** Writing a new ADR (or
 editing anything that supersedes, reverses, or narrows an earlier decision) is not

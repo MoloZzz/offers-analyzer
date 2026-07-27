@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
 
 import { Currency } from '../../common/types/money';
+import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { ListingDetail } from '../sources/ports/listing-source.port';
 
 import { Listing } from './entities/listing.entity';
@@ -22,6 +23,7 @@ export class ListingsService {
   constructor(
     @InjectRepository(Listing) private readonly listings: Repository<Listing>,
     @InjectRepository(PriceObservation) private readonly observations: Repository<PriceObservation>,
+    @Inject(EXCHANGE_RATE) private readonly fx: ExchangeRate,
   ) {}
 
   async isKnown(externalId: string): Promise<boolean> {
@@ -129,14 +131,16 @@ export class ListingsService {
     const saved = await this.listings.save(listing);
 
     if (isNew || priceChanged) {
+      const amountUsd =
+        detail.price.currency === Currency.USD
+          ? detail.price.amount
+          : detail.price.amount * (await this.fx.rate(detail.price.currency, Currency.USD, now));
       await this.observations.save(
         this.observations.create({
           listingId: saved.id,
           amount: detail.price.amount,
           currency: detail.price.currency,
-          // FX normalization is US2; in v1 the compare currency is USD, so amountUsd === amount.
-          amountUsd:
-            detail.price.currency === Currency.USD ? detail.price.amount : detail.price.amount,
+          amountUsd,
         }),
       );
     }

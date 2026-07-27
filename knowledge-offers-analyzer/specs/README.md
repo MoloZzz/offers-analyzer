@@ -1,30 +1,28 @@
 ---
 title: Feature specs index (SDD)
 type: moc
-updated: 2026-07-23
+updated: 2026-07-27
 ---
 
 # Feature specs index
 
-> Bridge between the vault and Spec Kit. Each feature specified via `/speckit-specify` lives under `.specify/` (and its feature branch/dir); link it here with a one-line summary so the knowledge base stays the single map.
+> Bridge between the vault and Spec Kit. The repo-root `specs/` directory holds the feature specs; `.specify/` holds the Spec Kit tooling, memory, templates, and workflows used to produce them. Link each spec here with a one-line summary so the knowledge base stays the single map.
 
 ## Specs
 
-_TODO: none yet. First entry appears after the first `/speckit-specify` run._
-
 | Spec | Summary | Status |
 |------|---------|--------|
-| `../../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches → flag below-fair-value, low-risk listings → alert via Telegram | Implemented (v1 MVP + mileage/condition/report follow-ups) |
-| `../../specs/002-auto-calibration-learning/spec.md` | Capture outcomes → auto-calibrate the alert threshold → learn scoring weights; transparent, bounded, human-in-the-loop | Implemented (E1–E4; `disappeared` signal + per-profile precision deferred) |
-| `../../specs/003-composite-deal-score/spec.md` | Rank by probability of operator profit ([[0006-operator-profit-vision\|ADR-0006]]): composite Total Deal Score — price core (dominant) × liquidity × repair-risk × negotiation × seller × positives; 0–100 explanation; segment mileage norms | **Phase F + US1 + US2 implemented, intentionally inactive in prod per [[0010-defer-factor-activation-until-k\|ADR-0010]]** (liquidity + repair-risk activation deferred until SPEC-004's `k` lands — one combined ParameterSet change + single threshold re-validation, owned by spec 004 Phase C; negotiation/seller/positives/mileage pending) |
-| `../../specs/004-realized-price-calibration/spec.md` | Survivorship correction to `fair_value`: measure empirical `k` from listing disappearances (id-diff on searches already made — zero API cost), filter non-sales/relists, then apply `X = RIA_average × k` | **US4.1–4.2 + US4.1b implemented 2026-07-23** (disappearance tracking + relist filtering + daily market sweep over the Kyiv ≤$15k niche, ~5,400 req/mo — active once the app restarts); US4.3 (compute `k`) + US4.4 (apply) pending |
-| `../../specs/007-deal-outcomes/spec.md` | Capture real post-deal economics (bought/declined/sold + prices + costs + realized DOM) as a stateful `deal_outcomes` record, and compute realized margin (`sell − buy − costs`) — the ground truth 👍/👎 only approximates | **US7.1–7.2 implemented 2026-07-23** (deal buttons + `/deal`/`/deals`, realized-margin in `/report`, daily reminder to close bought-but-unsold deals; zero API cost); US7.3 (re-target auto-tuning, CHANGE-002.1) + US7.4 (`Z` calibration) pending |
+| `../../specs/001-profitable-listing-alerts/spec.md` | Monitor configured AUTO.RIA niches -> flag below-fair-value, low-risk listings -> alert via Telegram | Draft (v1 MVP implemented; mileage/condition/report follow-ups pending) |
+| `../../specs/002-auto-calibration-learning/spec.md` | Capture outcomes -> auto-calibrate the alert threshold -> learn scoring weights; transparent, bounded, human-in-the-loop | Draft (E1-E4 implemented; `disappeared` signal + per-profile precision auto-apply deferred) |
+| `../../specs/003-composite-deal-score/spec.md` | Rank by probability of operator profit ([[0006-operator-profit-vision\|ADR-0006]]): composite Total Deal Score - price core (dominant) x liquidity x repair-risk x negotiation x seller x positives; 0-100 explanation; segment mileage norms | Draft (core score implemented but intentionally inactive in prod per [[0010-defer-factor-activation-until-k\|ADR-0010]]; factor activation deferred until SPEC-004's `k` lands, then one combined ParameterSet change + single threshold re-validation, owned by spec 004 Phase C; negotiation/seller/positives/mileage pending) |
+| `../../specs/004-realized-price-calibration/spec.md` | Survivorship correction to `fair_value`: measure empirical `k` from listing disappearances (id-diff on searches already made - zero API cost), filter non-sales/relists, then apply `X = RIA_average x k` | Draft (US4.1-US4.2 + US4.1b implemented 2026-07-23; US4.3 (compute `k`) + US4.4 (apply) pending) |
+| `../../specs/007-deal-outcomes/spec.md` | Capture real post-deal economics (bought/declined/sold + prices + costs + realized DOM) as a stateful `deal_outcomes` record, and compute realized margin (`sell - buy - costs`) - the ground truth 👍/👎 only approximates | Draft (US7.1-US7.2 implemented 2026-07-23; US7.3 (re-target auto-tuning, CHANGE-002.1) + US7.4 (`Z` calibration) pending) |
 
 ## Backlog-level specs (pre-Spec-Kit)
 
 Not yet run through `/speckit-specify` — captured directly in `context/backlog.md` (2026-07-22) as
-an addendum to ADR-0006/spec 003 and spec 002. Promote to a formal `.specify/` spec before
-implementation per SDD (§2 of `CLAUDE.md`).
+an addendum to ADR-0006/spec 003 and spec 002. Promote to a formal repo-root `specs/<id>/spec.md`
+spec before implementation per SDD (§2 of `CLAUDE.md`).
 
 | Backlog item | Summary | Priority |
 |---|---|---|
@@ -35,7 +33,7 @@ implementation per SDD (§2 of `CLAUDE.md`).
 
 ## Constitution
 
-Project principles are ratified in `../.specify/memory/constitution.md` (v1.0.0, 2026-07-12) —
+Project principles are ratified in `../.specify/memory/constitution.md` (v1.1.0, 2026-07-18) —
 the non-negotiable rules every spec must satisfy. Amendments require an ADR + version bump.
 
 ## How this connects

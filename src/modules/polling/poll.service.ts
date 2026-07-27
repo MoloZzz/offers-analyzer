@@ -43,11 +43,11 @@ interface ProfileQueue {
 }
 
 /**
- * The MVP pipeline (US1): each cycle searches every enabled niche, then values fresh listings and
- * re-checks a few known ones for price drops (FR-009). Work is drained **round-robin** across profiles
- * so no single niche (e.g. a market-wide one) spends the whole ~30 req/hr budget before the others run.
- * Runs on a cron (no queue in v1); when the budget is exhausted (or the source returns HTTP 429) the
- * cycle stops cleanly and resumes next tick (FR-012).
+ * The MVP pipeline (US1): each cycle searches every enabled niche, then re-checks known listings for
+ * price drops before valuing fresh listings (FR-009). Work is drained **round-robin** across profiles
+ * within each phase so no single niche (e.g. a market-wide one) spends the whole budget before the
+ * others run. Runs on a cron (no queue in v1); when the budget is exhausted (or the source returns
+ * HTTP 429) the cycle stops cleanly and resumes next tick (FR-012).
  */
 @Injectable()
 export class PollService {
@@ -131,19 +131,19 @@ export class PollService {
       this.logger.error({ err }, 'Disappearance detection failed');
     }
 
-    // Phase 2 — new listings first (that's where fresh deals are), fairly across profiles.
+    // Phase 2 — tier-1 re-checks first so price-drop work cannot starve behind fresh deals.
     const exhausted = await this.drainRoundRobin(
-      queues,
-      (q) => q.newIds,
-      (profile, externalId) => this.processNew(profile, externalId),
-    );
-    if (exhausted) return;
-
-    // Phase 3 — re-observe known listings for price drops (and score any never-scored), budget permitting.
-    await this.drainRoundRobin(
       queues,
       (q) => q.stale,
       (profile, listing) => this.reobserve(profile, listing),
+    );
+    if (exhausted) return;
+
+    // Phase 3 — tier-2 new listings, budget permitting.
+    await this.drainRoundRobin(
+      queues,
+      (q) => q.newIds,
+      (profile, externalId) => this.processNew(profile, externalId),
     );
   }
 
@@ -272,6 +272,7 @@ export class PollService {
         askingValue: Math.round(detail.price.amount * rate),
         discountPct: result.discountPct,
         confidence: result.confidence,
+        sampleSize,
         score: result.score,
         redFlags: result.redFlags,
         notified: false,

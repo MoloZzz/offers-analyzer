@@ -31,6 +31,9 @@ export class Opportunity {
   @Column('numeric', { transformer: numericTransformer })
   confidence!: number;
 
+  @Column('int', { default: 0 })
+  sampleSize!: number;
+
   @Column('numeric', { transformer: numericTransformer })
   score!: number;
 

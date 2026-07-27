@@ -2,7 +2,7 @@
 title: ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
 type: decision
 status: Accepted
-updated: 2026-07-23
+updated: 2026-07-27
 ---
 
 # ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
@@ -15,7 +15,8 @@ updated: 2026-07-23
 Spec 003's liquidity and repair-risk factors are coded, tested, and merged, but inert in prod:
 the active `ParameterSet` (version 1, seeded 2026-07-17, before the factors shipped) has
 `factorBounds: null` / `upliftCap: null`, both factors gate on those bounds, and no code path
-ever re-seeds or activates a new ParameterSet (verified 2026-07-23 — [[2026-07-23-session-01]]).
+ever re-seeds or activates a new ParameterSet (verified 2026-07-23; see
+`context/log/2026-07-23-session-01.md`).
 So `score === priceCore` in prod. FIX-003.1 asked for a decision: (a) activate now (build an
 activation mechanism, seed `PHASE1_FACTOR_BOUNDS`, re-validate thresholds per S6/T050), or
 (b) keep disabled explicitly.
@@ -53,5 +54,6 @@ do" verdict points the same way: fix the survivorship bias first, then revisit t
 
 - [[backlog#FIX-003.1]] · [[0006-operator-profit-vision|ADR-0006]] ·
   [[0005-versioned-parameter-sets|ADR-0005]] · spec `004-realized-price-calibration` (Phase C)
-- [[2026-07-23-session-01]] (verification) · [[2026-07-23-session-02]] (SPEC-004 implementation)
+- Verification note: `context/log/2026-07-23-session-01.md`
+- Implementation note: `context/log/2026-07-23-session-02.md`
 - [[decisions/README]]

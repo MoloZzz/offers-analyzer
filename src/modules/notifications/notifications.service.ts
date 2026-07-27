@@ -6,6 +6,7 @@ import { Listing } from '../listings/entities/listing.entity';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 
 import { Notification } from './entities/notification.entity';
+import { Subscriber } from './entities/subscriber.entity';
 import { formatOpportunity, formatPriceDrop } from './format/opportunity-message';
 import { Notifier, NOTIFIER, OutboundButton } from './ports/notifier.port';
 import { SubscribersService } from './subscribers.service';
@@ -39,7 +40,7 @@ export class NotificationsService {
   ) {}
 
   async notifyOpportunity(opportunity: Opportunity, listing: Listing): Promise<void> {
-    const recipients = await this.subscribers.listActive();
+    const recipients = await this.activeRecipientsForProfile(opportunity.profileId);
     if (recipients.length === 0) return;
 
     const text = formatOpportunity(opportunity, listing);
@@ -70,7 +71,7 @@ export class NotificationsService {
     listing: Listing,
     oldAmount: number,
   ): Promise<void> {
-    const recipients = await this.subscribers.listActive();
+    const recipients = await this.activeRecipientsForProfile(opportunity.profileId);
     if (recipients.length === 0) return;
 
     const text = formatPriceDrop(opportunity, listing, oldAmount);
@@ -102,5 +103,10 @@ export class NotificationsService {
     for (const sub of recipients) {
       await this.notifier.send({ chatId: sub.telegramChatId, text });
     }
+  }
+
+  private async activeRecipientsForProfile(profileId: string): Promise<Subscriber[]> {
+    const recipients = await this.subscribers.listActive();
+    return recipients.filter((sub) => !sub.profileIds?.length || sub.profileIds.includes(profileId));
   }
 }
