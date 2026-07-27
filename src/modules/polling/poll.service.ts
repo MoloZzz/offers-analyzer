@@ -93,7 +93,11 @@ export class PollService {
     const eligibleProfiles: SearchProfile[] = [];
     for (const profile of profiles) {
       try {
-        const result = await this.source.search(toQuery(profile));
+        const result = await this.source.search(toQuery(profile), {
+          operation: 'search',
+          profileId: profile.id,
+          profileName: profile.name,
+        });
         const { ids } = result;
         for (const id of ids) seenIds.add(id);
         if (isSearchEligible(profile, result)) eligibleProfiles.push(profile);
@@ -178,7 +182,11 @@ export class PollService {
 
   private async processNew(profile: SearchProfile, externalId: string): Promise<void> {
     // Tier-2: new-listing detail fetches (ADR-0009)
-    const detail = await this.source.fetch(externalId, 2);
+    const detail = await this.source.fetch(externalId, 2, {
+      operation: 'new_listing_detail',
+      profileId: profile.id,
+      profileName: profile.name,
+    });
     if (profile.dealerPolicy === 'exclude' && detail.sellerType === 'dealer') return;
     if (isExcluded(profile, detail)) return;
     const { listing, isNew } = await this.listings.recordSeen(detail, { seenInSearch: true });
@@ -191,7 +199,11 @@ export class PollService {
   private async reobserve(profile: SearchProfile, existing: Listing): Promise<void> {
     const previousAmount = existing.currentAmount;
     // Tier-1: price-drop re-checks (ADR-0009, highest priority)
-    const detail = await this.source.fetch(existing.externalId, 1);
+    const detail = await this.source.fetch(existing.externalId, 1, {
+      operation: 'recheck_detail',
+      profileId: profile.id,
+      profileName: profile.name,
+    });
     if (isExcluded(profile, detail)) return;
     const { listing } = await this.listings.recordSeen(detail, { seenInSearch: true });
     // Evaluate on a price drop, OR if this listing was never scored (e.g. a prior cycle ran out of

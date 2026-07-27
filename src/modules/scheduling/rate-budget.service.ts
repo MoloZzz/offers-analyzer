@@ -7,11 +7,23 @@ import { Repository } from 'typeorm';
 import { AppConfig } from '../../common/config/configuration';
 
 import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
+import {
+  BudgetActivity,
+  BudgetDenialReason,
+  BudgetOperation,
+} from './entities/budget-activity.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
+import { buildBudgetReport, BudgetReportDigest } from './budget-report';
 
 // How long to pause all consumption after the source returns HTTP 429, before
 // retrying. Keeps us from hammering an upstream that just told us to back off.
 const EXHAUSTED_COOLDOWN_MS = 5 * 60_000; // 5 minutes
+
+export interface BudgetRequestContext {
+  operation: BudgetOperation;
+  profileId?: string;
+  profileName?: string;
+}
 
 /**
  * ADR-0009: Monthly pool + daily sub-budget + priority queue rate limiting.
@@ -30,8 +42,10 @@ export class RateBudgetService {
   constructor(
     config: ConfigService<AppConfig, true>,
     @InjectRepository(RateBudgetWindow) private readonly windowRepo: Repository<RateBudgetWindow>,
-    @InjectRepository(MonthlyBudgetState) private readonly stateRepo: Repository<MonthlyBudgetState>,
+    @InjectRepository(MonthlyBudgetState)
+    private readonly stateRepo: Repository<MonthlyBudgetState>,
     @InjectPinoLogger(RateBudgetService.name) private readonly logger: PinoLogger,
+    @InjectRepository(BudgetActivity) private readonly activityRepo?: Repository<BudgetActivity>,
   ) {
     this.capacityPerHour = config.get('rateBudgetPerHour', { infer: true });
     this.poolPerMonth = config.get('rateBudgetPoolPerMonth', { infer: true });
@@ -44,21 +58,27 @@ export class RateBudgetService {
    * Supports both legacy hourly mode (if still configured) and new monthly pool mode (ADR-0009).
    * Optional tier (1-5) for priority queue; defaults to tier-1 (highest priority).
    */
-  async tryConsume(sourceKey = 'auto-ria', cost = 1, tier = 1): Promise<boolean> {
+  async tryConsume(
+    sourceKey = 'auto-ria',
+    cost = 1,
+    tier = 1,
+    context: BudgetRequestContext = { operation: 'on_demand' },
+  ): Promise<boolean> {
+    const now = new Date();
     // If we were recently 429'd, stay paused until the cooldown elapses.
     if (this.pausedUntil != null) {
       if (Date.now() < this.pausedUntil) {
         this.logger.warn(
           { sourceKey, pausedUntil: this.pausedUntil },
-          'Rate budget paused after HTTP 429, denying consumption'
+          'Rate budget paused after HTTP 429, denying consumption',
         );
+        await this.recordActivity(sourceKey, cost, tier, context, 'denied', 'cooldown', now);
         return false;
       }
       this.pausedUntil = null;
     }
 
     // Ensure daily budget is calculated for today (on-demand reset if date changed)
-    const now = new Date();
     const dailyBudget = await this.ensureDailyBudgetCalculated(sourceKey, now);
 
     // Get current monthly state
@@ -70,8 +90,9 @@ export class RateBudgetService {
     if (cutoffTier != null && tier > cutoffTier) {
       this.logger.warn(
         { sourceKey, tier, cutoffTier, dailyUsed, dailyBudget },
-        `Tier ${tier} denied (budget tight, cutoff at ${cutoffTier})`
+        `Tier ${tier} denied (budget tight, cutoff at ${cutoffTier})`,
       );
+      await this.recordActivity(sourceKey, cost, tier, context, 'denied', 'tier_cutoff', now);
       return false;
     }
 
@@ -79,22 +100,35 @@ export class RateBudgetService {
     if ((state.poolUsed ?? 0) + cost > state.poolSize) {
       this.logger.warn(
         { sourceKey, poolUsed: state.poolUsed, poolSize: state.poolSize },
-        'Monthly pool exhausted'
+        'Monthly pool exhausted',
       );
+      await this.recordActivity(sourceKey, cost, tier, context, 'denied', 'monthly_exhausted', now);
       return false;
     }
 
     // Check daily budget exhaustion
     if (dailyUsed + cost > dailyBudget) {
-      this.logger.warn(
-        { sourceKey, dailyUsed, dailyBudget, cost },
-        'Daily budget exhausted'
-      );
+      this.logger.warn({ sourceKey, dailyUsed, dailyBudget, cost }, 'Daily budget exhausted');
+      await this.recordActivity(sourceKey, cost, tier, context, 'denied', 'daily_exhausted', now);
       return false;
     }
 
     // All checks passed — consume and record
-    return await this.recordConsumption(sourceKey, cost, tier, now);
+    const allowed = await this.recordConsumption(sourceKey, cost, tier, now);
+    if (allowed)
+      await this.recordActivity(sourceKey, cost, tier, context, 'allowed', 'allowed', now);
+    return allowed;
+  }
+
+  /** Read-only SPEC-009 report; it does not touch a listing source or consume budget. */
+  async report(sourceKey = 'auto-ria', now = new Date()): Promise<BudgetReportDigest | null> {
+    const monthKey = RateBudgetService.monthKey(now);
+    const state = await this.stateRepo.findOne({ where: { sourceKey, monthKey } });
+    if (!state) return null;
+    const activities = this.activityRepo
+      ? await this.activityRepo.find({ where: { sourceKey, monthKey } })
+      : [];
+    return buildBudgetReport(state, activities, now);
   }
 
   /** Remaining calls in the current hour window (legacy hourly mode). */
@@ -169,7 +203,7 @@ export class RateBudgetService {
     // Days remaining in month (inclusive of today)
     const daysRemaining = Math.max(
       1,
-      Math.ceil((monthEnd.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+      Math.ceil((monthEnd.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)),
     );
 
     // Determine effective reserve (released 3 days before month end)
@@ -185,17 +219,14 @@ export class RateBudgetService {
     // in recordConsumption() between our read above and this write (TOCTOU).
     await this.stateRepo.update(
       { sourceKey, monthKey: RateBudgetService.monthKey(now) },
-      { dailyBudget, dailyUsed: 0, lastDayCalculated: todayStr }
+      { dailyBudget, dailyUsed: 0, lastDayCalculated: todayStr },
     );
 
     return dailyBudget;
   }
 
   /** Determine cutoff tier based on remaining daily budget (progressive denial from tier-5 to tier-2). */
-  private determineCutoffTier(
-    dailyBudget: number,
-    dailyUsed: number
-  ): number | null {
+  private determineCutoffTier(dailyBudget: number, dailyUsed: number): number | null {
     const remaining = dailyBudget - dailyUsed;
     const threshold = Math.ceil(dailyBudget * (this.cutoffThresholdPct / 100));
 
@@ -218,7 +249,7 @@ export class RateBudgetService {
     sourceKey: string,
     cost: number,
     tier: number,
-    now: Date
+    now: Date,
   ): Promise<boolean> {
     const monthKey = RateBudgetService.monthKey(now);
     const todayStr = RateBudgetService.todayStr(now);
@@ -231,16 +262,38 @@ export class RateBudgetService {
            "lastDayCalculated" = CASE WHEN "lastDayCalculated" <> $4 THEN $4 ELSE "lastDayCalculated" END,
            "updatedAt" = now()
        WHERE "sourceKey" = $1 AND "monthKey" = $2`,
-      [sourceKey, monthKey, cost, todayStr]
+      [sourceKey, monthKey, cost, todayStr],
     );
 
     // Log consumption for diagnostics
-    this.logger.debug(
-      { sourceKey, cost, tier, month: monthKey },
-      'Consumed budget'
-    );
+    this.logger.debug({ sourceKey, cost, tier, month: monthKey }, 'Consumed budget');
 
     return true;
+  }
+
+  private async recordActivity(
+    sourceKey: string,
+    cost: number,
+    priorityTier: number,
+    context: BudgetRequestContext,
+    outcome: 'allowed' | 'denied',
+    reason: BudgetDenialReason,
+    now: Date,
+  ): Promise<void> {
+    if (!this.activityRepo) return;
+    await this.activityRepo.save(
+      this.activityRepo.create({
+        sourceKey,
+        monthKey: RateBudgetService.monthKey(now),
+        operation: context.operation,
+        priorityTier,
+        profileId: context.profileId ?? null,
+        profileName: context.profileName ?? null,
+        cost,
+        outcome,
+        reason,
+      }),
+    );
   }
 
   // Helper: Legacy hourly window key (YYYYMMDDHH format)

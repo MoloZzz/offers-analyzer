@@ -1,4 +1,5 @@
 import { Money } from '../../../common/types/money';
+import type { BudgetRequestContext } from '../../scheduling/rate-budget.service';
 
 /** DI token for the active listing source (constitution §IV: ports & adapters). */
 export const LISTING_SOURCE = Symbol('LISTING_SOURCE');
@@ -102,8 +103,12 @@ export interface SourceDictionaries {
  */
 export interface ListingSource {
   readonly key: string;
-  search(query: SourceSearchQuery): Promise<SourceSearchResult>;
-  fetch(externalId: string, tier?: number): Promise<ListingDetail>;
-  averagePrice(cohort: CohortQuery, tier?: number): Promise<AveragePriceResult>;
+  search(query: SourceSearchQuery, context?: BudgetRequestContext): Promise<SourceSearchResult>;
+  fetch(externalId: string, tier?: number, context?: BudgetRequestContext): Promise<ListingDetail>;
+  averagePrice(
+    cohort: CohortQuery,
+    tier?: number,
+    context?: BudgetRequestContext,
+  ): Promise<AveragePriceResult>;
   dictionaries(): Promise<SourceDictionaries>;
 }

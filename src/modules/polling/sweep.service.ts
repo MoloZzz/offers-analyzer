@@ -60,12 +60,19 @@ export class SweepService {
 
     try {
       for (;;) {
-        const result = await this.source.search({ ...toQuery(profile), page });
+        const result = await this.source.search(
+          { ...toQuery(profile), page },
+          { operation: 'sweep', profileId: profile.id, profileName: profile.name },
+        );
         pagesCalled++;
         total = result.total;
         for (const id of result.ids) ids.add(id);
 
-        if (result.ids.length === 0 || result.ids.length < 100 || (total != null && ids.size >= total)) {
+        if (
+          result.ids.length === 0 ||
+          result.ids.length < 100 ||
+          (total != null && ids.size >= total)
+        ) {
           complete = true;
           break;
         }
@@ -98,7 +105,14 @@ export class SweepService {
     }
 
     this.logger.info(
-      { profile: profile.name, pages: pagesCalled, ids: ids.size, total, complete, recorded: events.length },
+      {
+        profile: profile.name,
+        pages: pagesCalled,
+        ids: ids.size,
+        total,
+        complete,
+        recorded: events.length,
+      },
       'Sweep complete',
     );
     return false;

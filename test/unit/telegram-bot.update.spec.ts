@@ -59,6 +59,7 @@ function buildUpdate(): {
     topCandidates: jest.fn(),
     getRecentEvaluations: jest.fn(),
     report: jest.fn(),
+    budgetReport: jest.fn(),
     dealsOverview: jest.fn(),
     findOpportunity: jest.fn(),
     findListingByExternalId: jest.fn(),
@@ -180,5 +181,32 @@ describe('TelegramBotUpdate', () => {
     expect(query.whyById).toHaveBeenCalledWith('40143820');
     expect(query.assessById).not.toHaveBeenCalled();
     expect(ctx.reply.mock.calls[0][0]).toContain('ParameterSet v3');
+  });
+
+  it('renders the read-only /budget report', async () => {
+    const { update, query } = buildUpdate();
+    (query as unknown as { budgetReport: jest.Mock }).budgetReport.mockResolvedValue({
+      poolUsed: 10,
+      poolSize: 20000,
+      poolRemaining: 19990,
+      dailyUsed: 10,
+      dailyBudget: 1000,
+      dailyRemaining: 990,
+      reserveActive: 3000,
+      reserveAmount: 3000,
+      reserveReleased: false,
+      ledgerAllowed: 10,
+      reconciliationDifference: 0,
+      forecastMonthEnd: 21,
+      operationActual: [],
+      profileActual: [],
+      deferred: [],
+      rolloutReady: true,
+      rolloutReason: 'потрібне ручне схвалення reforecast',
+    });
+    const ctx = buildContext('/budget');
+    await update.onBudget(ctx);
+    expect((query as unknown as { budgetReport: jest.Mock }).budgetReport).toHaveBeenCalled();
+    expect(ctx.reply.mock.calls[0][0]).toContain('Бюджет AUTO.RIA');
   });
 });

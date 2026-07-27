@@ -10,6 +10,7 @@ import { OutcomesService } from '../../calibration/outcomes.service';
 import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
+import { formatBudgetReport } from '../../scheduling/budget-report';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
@@ -291,6 +292,14 @@ export class TelegramBotUpdate {
     await ctx.reply(formatReport(digest));
   }
 
+  @Command('budget')
+  async onBudget(@Ctx() ctx: Context): Promise<void> {
+    const digest = await this.query.budgetReport();
+    await ctx.reply(
+      digest ? formatBudgetReport(digest) : 'Бюджет цього місяця ще не ініціалізовано.',
+    );
+  }
+
   @Command('calibrate')
   async onCalibrate(@Ctx() ctx: Context): Promise<void> {
     const mode = this.calibration.configuredMode();
@@ -421,7 +430,9 @@ export class TelegramBotUpdate {
     await ctx.answerCbQuery('Записав купівлю');
     const listing = await this.query.findListingById(op.listingId);
     const link = listing ? listing.url : '<посилання>';
-    await ctx.reply(`Купівлю записав. Додай економіку, коли буде:\n/deal ${link} buy=8500 costs=300`);
+    await ctx.reply(
+      `Купівлю записав. Додай економіку, коли буде:\n/deal ${link} buy=8500 costs=300`,
+    );
   }
 
   @Command('deal')
@@ -456,7 +467,8 @@ export class TelegramBotUpdate {
     if (deal.actualCostsUsd != null) parts.push(`витрати $${deal.actualCostsUsd}`);
     if (deal.sellPriceUsd != null) parts.push(`продаж $${deal.sellPriceUsd}`);
     if (deal.daysOnMarket != null) parts.push(`DOM ${deal.daysOnMarket} дн.`);
-    if (deal.declineReason != null) parts.push(`відмова: ${REASON_LABELS[deal.declineReason].toLowerCase()}`);
+    if (deal.declineReason != null)
+      parts.push(`відмова: ${REASON_LABELS[deal.declineReason].toLowerCase()}`);
     const marginStr = margin != null ? ` → маржа $${margin}` : '';
     await ctx.reply(
       parts.length > 0

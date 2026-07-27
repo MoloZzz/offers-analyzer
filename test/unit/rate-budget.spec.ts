@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../src/common/config/configuration';
 import { MonthlyBudgetState } from '../../src/modules/scheduling/entities/monthly-budget-state.entity';
+import { BudgetActivity } from '../../src/modules/scheduling/entities/budget-activity.entity';
 import { RateBudgetWindow } from '../../src/modules/scheduling/entities/rate-budget-window.entity';
 import { RateBudgetService } from '../../src/modules/scheduling/rate-budget.service';
 
@@ -23,8 +24,8 @@ function buildFakeWindowRepo(): { repo: Repository<RateBudgetWindow>; rows: Rate
     findOne({ where }: { where: Record<string, unknown> }) {
       return Promise.resolve(
         rows.find((row) =>
-          Object.entries(where).every(([key, value]) => (row as never)[key] === value)
-        ) ?? null
+          Object.entries(where).every(([key, value]) => (row as never)[key] === value),
+        ) ?? null,
       );
     },
     create(x: Partial<RateBudgetWindow>) {
@@ -45,7 +46,10 @@ function buildFakeWindowRepo(): { repo: Repository<RateBudgetWindow>; rows: Rate
 }
 
 /** Fake state repository — tracks monthly budget states. */
-function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: MonthlyBudgetState[] } {
+function buildFakeStateRepo(): {
+  repo: Repository<MonthlyBudgetState>;
+  rows: MonthlyBudgetState[];
+} {
   const rows: MonthlyBudgetState[] = [];
   let nextId = 1;
 
@@ -54,8 +58,8 @@ function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: Mon
     findOne({ where }: { where: Record<string, unknown> }) {
       return Promise.resolve(
         rows.find((row) =>
-          Object.entries(where).every(([key, value]) => (row as never)[key] === value)
-        ) ?? null
+          Object.entries(where).every(([key, value]) => (row as never)[key] === value),
+        ) ?? null,
       );
     },
     create(x: Partial<MonthlyBudgetState>) {
@@ -77,7 +81,9 @@ function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: Mon
     },
     update(where: Record<string, unknown>, partial: Partial<MonthlyBudgetState>) {
       for (const row of rows) {
-        const matches = Object.entries(where).every(([key, value]) => (row as never)[key] === value);
+        const matches = Object.entries(where).every(
+          ([key, value]) => (row as never)[key] === value,
+        );
         if (matches) {
           Object.assign(row, partial);
         }
@@ -86,6 +92,21 @@ function buildFakeStateRepo(): { repo: Repository<MonthlyBudgetState>; rows: Mon
     },
   } as unknown as Repository<MonthlyBudgetState>;
 
+  return { repo, rows };
+}
+
+function buildFakeActivityRepo(): { repo: Repository<BudgetActivity>; rows: BudgetActivity[] } {
+  const rows: BudgetActivity[] = [];
+  const repo = {
+    create(x: Partial<BudgetActivity>) {
+      return { id: `activity-${rows.length + 1}`, createdAt: new Date(), ...x } as BudgetActivity;
+    },
+    save(x: BudgetActivity) {
+      rows.push(x);
+      return Promise.resolve(x);
+    },
+    find: jest.fn().mockResolvedValue(rows),
+  } as unknown as Repository<BudgetActivity>;
   return { repo, rows };
 }
 
@@ -398,7 +419,7 @@ describe('RateBudgetService (ADR-0009)', () => {
       expect(allowed).toBe(false);
       expect(fakeLogger.warn).toHaveBeenCalledWith(
         expect.objectContaining({ poolUsed: 1000, poolSize: 1000 }),
-        'Monthly pool exhausted'
+        'Monthly pool exhausted',
       );
 
       jest.useRealTimers();
@@ -433,5 +454,46 @@ describe('RateBudgetService (ADR-0009)', () => {
 
       jest.useRealTimers();
     });
+  });
+
+  it('persists attributed allowed and denied attempts for the audit ledger', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-07-15T10:00:00Z'));
+    const { repo: windowRepo } = buildFakeWindowRepo();
+    const { repo: stateRepo, rows: stateRows } = buildFakeStateRepo();
+    const { repo: activityRepo, rows: activityRows } = buildFakeActivityRepo();
+    const service = new RateBudgetService(
+      buildFakeConfig(),
+      windowRepo,
+      stateRepo,
+      fakeLogger as never,
+      activityRepo,
+    );
+    (stateRepo.query as jest.Mock).mockResolvedValue([]);
+
+    await service.tryConsume('auto-ria', 1, 3, {
+      operation: 'search',
+      profileId: 'p-1',
+      profileName: 'Kyiv',
+    });
+    stateRows[0].dailyUsed = stateRows[0].dailyBudget;
+    await service.tryConsume('auto-ria', 1, 5, { operation: 'cohort_average' });
+
+    expect(activityRows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          outcome: 'allowed',
+          operation: 'search',
+          profileName: 'Kyiv',
+          priorityTier: 3,
+        }),
+        expect.objectContaining({
+          outcome: 'denied',
+          operation: 'cohort_average',
+          reason: 'tier_cutoff',
+        }),
+      ]),
+    );
+    jest.useRealTimers();
   });
 });

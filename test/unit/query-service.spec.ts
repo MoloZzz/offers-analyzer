@@ -55,6 +55,7 @@ describe('QueryService.whyById', () => {
       {} as never,
       {} as never,
       {} as never,
+      {} as never,
       config as never,
     );
 

@@ -32,7 +32,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome`, `/deal`, `/deals` |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
-| `scheduling` | Postgres-backed monthly pool (`rate_budget_windows` ledger), daily sub-budget calculator, priority queue | enforces the monthly cap with tiered spending; survives restarts |
+| `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
 | `polling` | cron pipeline: search profiles → priority-tier value/re-check work; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | monthly pool + daily sub-budget; priority is a policy, not Redis/BullMQ infrastructure; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
@@ -77,6 +77,9 @@ single missed sweep never fabricates an event.
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
 - **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
 - **RateBudgetWindow** — durable request-budget ledger used by the monthly pool / daily sub-budget accounting.
+- **BudgetActivity** — immutable allowed/denied monthly-pool admission attempt with operation,
+  profile (when applicable), priority tier, cost, and reason; the audit input to `/budget` and
+  SPEC-005's rollout guardrail (SPEC-009).
 - **ParameterSet** — versioned, active scoring tunables (scale, penalty, mileage factors); v1 = seeded from config. Spec 002 / [[0005-versioned-parameter-sets|ADR-0005]].
 - **Outcome** — realized result of a listing (manual 👍/👎, bought/skipped/resold; passive price_dropped/disappeared). Feedback ground truth.
 - **DealOutcome** — stateful post-deal economics (spec 007): one row per listing (`stage` declined/bought/sold, decline reason, buy/costs/sell USD, realized DOM); realized margin = `sell − buy − costs`. Separate from Outcome; the future auto-tuning target (US7.3).

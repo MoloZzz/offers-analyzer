@@ -32,6 +32,11 @@ spec before implementation per SDD (§2 of `CLAUDE.md`).
 | [[SPEC-009]] | Budget observability and rollout guardrails for the monthly pool | P0 |
 | ADR-0009 | Monthly rate-limit pool + priority queue (funds SPEC-005) | — (Accepted) |
 
+`SPEC-009` is formalized at `../../specs/009-budget-observability/`: it is implemented with a
+durable allowed/denied budget ledger and read-only `/budget` report. The rollout gate becomes
+evidence-ready only after the current month's ledger reconciles with the pool and its forecast
+fits the allocation; it does not auto-enable SPEC-005 or profiles.
+
 ## Constitution
 
 Project principles are ratified in `../.specify/memory/constitution.md` (v1.1.0, 2026-07-18) —

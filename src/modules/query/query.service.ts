@@ -17,6 +17,8 @@ import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
+import { RateBudgetService } from '../scheduling/rate-budget.service';
+import type { BudgetReportDigest } from '../scheduling/budget-report';
 
 import { buildDigest, realizedPrecision, ReportDigest } from './report';
 
@@ -68,6 +70,7 @@ export class QueryService {
     private readonly mileage: MileageAdjuster,
     private readonly outcomes: OutcomesService,
     private readonly deals: DealsService,
+    private readonly budget: RateBudgetService,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     config: ConfigService<AppConfig, true>,
   ) {
@@ -77,7 +80,7 @@ export class QueryService {
 
   /** Fetch + evaluate a single listing on demand (spends budget). */
   async assessById(externalId: string): Promise<Assessment> {
-    const detail = await this.source.fetch(externalId);
+    const detail = await this.source.fetch(externalId, 2, { operation: 'on_demand' });
     const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
     const fairValue = benchmark ? this.mileage.fairValue(benchmark, detail) : 0;
     const currency = benchmark?.value.currency ?? Currency.USD;
@@ -171,8 +174,14 @@ export class QueryService {
     );
   }
 
+  budgetReport(): Promise<BudgetReportDigest | null> {
+    return this.budget.report();
+  }
+
   /** Open (bought, unsold) + recently closed deals, each joined to its listing (for /deals). */
-  async dealsOverview(recentClosed = 10): Promise<{ open: DealWithListing[]; closed: DealWithListing[] }> {
+  async dealsOverview(
+    recentClosed = 10,
+  ): Promise<{ open: DealWithListing[]; closed: DealWithListing[] }> {
     const openDeals = await this.deals.openDeals();
     const closedDeals = await this.deals.closedDeals();
     const recent = [...closedDeals]

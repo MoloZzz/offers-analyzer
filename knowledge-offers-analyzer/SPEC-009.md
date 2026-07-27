@@ -1,7 +1,7 @@
 ---
 title: SPEC-009 — Budget observability and rollout guardrails
 type: spec-backlog
-status: Backlog
+status: Implemented
 priority: P0
 updated: 2026-07-28
 ---
@@ -9,7 +9,7 @@ updated: 2026-07-28
 # SPEC-009 — Budget observability and rollout guardrails
 
 Backlog-level specification for the verification debt in [[0009-monthly-rate-limit-pool|ADR-0009]].
-Promote it through Spec Kit before implementation.
+Formalized and implemented at `../specs/009-budget-observability/` on 2026-07-28.
 
 ## Goal
 
@@ -37,6 +37,16 @@ feature, not a dashboard for its own sake.
 2. A profile or priority tier that consumes more than its approved forecast is identifiable.
 3. The operator can see which lower-priority work was deferred because of the daily cutoff.
 4. SPEC-005 is blocked in the rollout checklist until this evidence exists for the active profiles.
+
+## Implementation record
+
+- `budget_activities` stores immutable allowed and denied attempts with operation, profile (when
+  applicable), priority tier, cost, and reason.
+- `/budget` is read-only: it reports daily/monthly remaining capacity, reserve state, actual and
+  projected spend, deferred work, ledger-vs-pool reconciliation, and the evidence-gate verdict;
+  it makes no AUTO.RIA request.
+- The report is intentionally **not** permission automation: a reconciled, in-allocation forecast
+  makes evidence ready for a human reforecast/approval, but cannot enable SPEC-005 or a profile.
 
 ## Related
 

@@ -144,11 +144,13 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
     copy it; `/why` prefers the stored snapshot and falls back live only when absent. Full analysis:
     [[explainability-gaps]].
 
-- [ ] **[[SPEC-009]] — Budget observability and rollout guardrails.** **P0 before SPEC-005 or an
-  additional expensive profile.** Show actual and projected spend by profile, operation, and
-  priority tier; expose daily/monthly remaining budget and reserve; reforecast ADR-0009's
-  allocation from live listing counts. This closes ADR-0009's verification debt and is a binding
-  gate under [[0011-evidence-gated-scoring-rollout|ADR-0011]].
+- [x] **[[SPEC-009]] — Budget observability and rollout guardrails.** **Implemented 2026-07-28:**
+  immutable allowed/denied request activity by profile/operation/tier, plus a no-source-call
+  `/budget` report for daily/monthly remaining pool, reserve, actual-vs-ADR-0009 allocation,
+  deferred work, forecast, reconciliation and gate verdict. **P0 evidence gate remains active**
+  before SPEC-005 or an additional expensive profile: it becomes evidence-ready only after live
+  current-month history reconciles and fits the forecast; human reforecast approval is still
+  required under [[0011-evidence-gated-scoring-rollout|ADR-0011]].
 
 - [ ] **SPEC-005 — Listing lifecycle + tiered re-check.** P1, ~4,300 req/mo (funded by
   [[0009-monthly-rate-limit-pool|ADR-0009]]). Problem: a listing is scored once, at ingest, and
@@ -244,7 +246,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 | # | Item | Blocks | API cost |
 |---|---|---|---|
 | 1 | B23 — persisted evaluation explanation | `k` / factor activation | 0 |
-| 2 | SPEC-009 — budget observability | SPEC-005, expensive profiles | 0 |
+| 2 | ✅ SPEC-009 — budget observability (live evidence gate remains) | SPEC-005, expensive profiles | 0 |
 | 3 | SPEC-004 US4.1–4.2/4.1b — data collection (running) | `k` validation | ~5,400/mo for sweep |
 | 4 | ✅ SPEC-007 US7.1–7.2 — outcome fields | CHANGE-002.1, SPEC-006 | 0 |
 | 5 | SPEC-005 — lifecycle + tiered re-check | CHANGE-003.2 | ~4,300/mo |

@@ -7,7 +7,10 @@ import { SWEEP_GRACE_HOURS } from '../../src/modules/listings/disappearance';
 import { DisappearancesService } from '../../src/modules/listings/disappearances.service';
 import { ListingDisappearance } from '../../src/modules/listings/entities/listing-disappearance.entity';
 import { SweepService } from '../../src/modules/polling/sweep.service';
-import { ProfileFilters, SearchProfile } from '../../src/modules/profiles/entities/search-profile.entity';
+import {
+  ProfileFilters,
+  SearchProfile,
+} from '../../src/modules/profiles/entities/search-profile.entity';
 import { ProfilesService } from '../../src/modules/profiles/profiles.service';
 import { ListingSource } from '../../src/modules/sources/ports/listing-source.port';
 
@@ -22,7 +25,10 @@ const noopLogger = {
   debug: () => {},
 } as unknown as PinoLogger;
 
-function makeProfile(overrides: Partial<SearchProfile> = {}, filters: Partial<ProfileFilters> = {}): SearchProfile {
+function makeProfile(
+  overrides: Partial<SearchProfile> = {},
+  filters: Partial<ProfileFilters> = {},
+): SearchProfile {
   return {
     id: 'profile-1',
     name: 'sweep profile',
@@ -74,14 +80,22 @@ function buildFakes(): Fakes {
     averagePrice: jest.fn(),
     dictionaries: jest.fn(),
   } as unknown as ListingSource & { search: jest.Mock };
-  const disappearances = { processCycle } as unknown as DisappearancesService & { processCycle: jest.Mock };
+  const disappearances = { processCycle } as unknown as DisappearancesService & {
+    processCycle: jest.Mock;
+  };
   const outcomes = { recordPassive } as unknown as OutcomesService & { recordPassive: jest.Mock };
 
   return { profilesService, source, disappearances, outcomes, getEnabled };
 }
 
 function buildService(fakes: Fakes): SweepService {
-  return new SweepService(fakes.profilesService, fakes.source, fakes.disappearances, fakes.outcomes, noopLogger);
+  return new SweepService(
+    fakes.profilesService,
+    fakes.source,
+    fakes.disappearances,
+    fakes.outcomes,
+    noopLogger,
+  );
 }
 
 describe('SweepService.sweep', () => {
@@ -111,8 +125,14 @@ describe('SweepService.sweep', () => {
     expect(graceArg).toBe(SWEEP_GRACE_HOURS);
 
     expect(fakes.outcomes.recordPassive).toHaveBeenCalledTimes(2);
-    expect(fakes.outcomes.recordPassive).toHaveBeenCalledWith({ listingId: 'l1', label: 'disappeared' });
-    expect(fakes.outcomes.recordPassive).toHaveBeenCalledWith({ listingId: 'l2', label: 'disappeared' });
+    expect(fakes.outcomes.recordPassive).toHaveBeenCalledWith({
+      listingId: 'l1',
+      label: 'disappeared',
+    });
+    expect(fakes.outcomes.recordPassive).toHaveBeenCalledWith({
+      listingId: 'l2',
+      label: 'disappeared',
+    });
   });
 
   it('stops as soon as the collected ids reach the reported total, even on full pages', async () => {
@@ -164,11 +184,21 @@ describe('SweepService.sweep', () => {
     await expect(service.sweep()).resolves.toBeUndefined();
 
     // Both profiles were attempted (the failure on the first did not stop the run)...
-    expect(fakes.source.search).toHaveBeenCalledWith(expect.objectContaining({ categoryId: 1, page: 0 }));
-    expect(fakes.source.search).toHaveBeenCalledWith(expect.objectContaining({ categoryId: 2, page: 0 }));
+    expect(fakes.source.search).toHaveBeenCalledWith(
+      expect.objectContaining({ categoryId: 1, page: 0 }),
+      expect.objectContaining({ operation: 'sweep' }),
+    );
+    expect(fakes.source.search).toHaveBeenCalledWith(
+      expect.objectContaining({ categoryId: 2, page: 0 }),
+      expect.objectContaining({ operation: 'sweep' }),
+    );
     // ...but detection only ran for the profile whose crawl completed.
     expect(fakes.disappearances.processCycle).toHaveBeenCalledTimes(1);
-    expect(fakes.disappearances.processCycle).toHaveBeenCalledWith(expect.any(Set), [okProfile], SWEEP_GRACE_HOURS);
+    expect(fakes.disappearances.processCycle).toHaveBeenCalledWith(
+      expect.any(Set),
+      [okProfile],
+      SWEEP_GRACE_HOURS,
+    );
   });
 
   it('treats an empty first page as a complete (trivial) sweep and still runs detection', async () => {
@@ -199,7 +229,10 @@ describe('SweepService.sweep', () => {
     await service.sweep();
 
     expect(fakes.source.search).toHaveBeenCalledTimes(1);
-    expect(fakes.source.search).toHaveBeenCalledWith(expect.objectContaining({ categoryId: 1 }));
+    expect(fakes.source.search).toHaveBeenCalledWith(
+      expect.objectContaining({ categoryId: 1 }),
+      expect.objectContaining({ operation: 'sweep' }),
+    );
   });
 
   it('caps the crawl at MAX_SWEEP_PAGES and treats the result as incomplete (no detection)', async () => {
