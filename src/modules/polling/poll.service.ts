@@ -25,9 +25,9 @@ import {
   SourceSearchQuery,
 } from '../sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
-import { buildEvaluationExplanation } from '../valuation/evaluation-explanation';
 import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
+import { buildEvaluationExplanation } from '../valuation/evaluation-explanation';
 import { MileageAdjuster } from '../valuation/mileage';
 import { ValuationService } from '../valuation/valuation.service';
 

@@ -331,11 +331,11 @@ describe('PollService priority order', () => {
       factors: [],
       total100: 75,
     });
-    (fakes.opportunities.create as jest.Mock).mockImplementation((x) => {
+    (fakes.opportunities.create).mockImplementation((x) => {
       created.push(x);
       return x;
     });
-    (fakes.opportunities.save as jest.Mock).mockImplementation((x) =>
+    (fakes.opportunities.save).mockImplementation((x) =>
       Promise.resolve({ id: 'opp-1', ...x }),
     );
 

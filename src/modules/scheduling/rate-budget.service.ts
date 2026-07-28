@@ -6,14 +6,14 @@ import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 
-import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
+import { buildBudgetReport, BudgetReportDigest } from './budget-report';
 import {
   BudgetActivity,
   BudgetDenialReason,
   BudgetOperation,
 } from './entities/budget-activity.entity';
+import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
-import { buildBudgetReport, BudgetReportDigest } from './budget-report';
 
 // How long to pause all consumption after the source returns HTTP 429, before
 // retrying. Keeps us from hammering an upstream that just told us to back off.

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { BudgetActivity } from './entities/budget-activity.entity';
+import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
 import { RateBudgetService } from './rate-budget.service';
 

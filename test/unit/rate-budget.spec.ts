@@ -2,8 +2,8 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../src/common/config/configuration';
-import { MonthlyBudgetState } from '../../src/modules/scheduling/entities/monthly-budget-state.entity';
 import { BudgetActivity } from '../../src/modules/scheduling/entities/budget-activity.entity';
+import { MonthlyBudgetState } from '../../src/modules/scheduling/entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from '../../src/modules/scheduling/entities/rate-budget-window.entity';
 import { RateBudgetService } from '../../src/modules/scheduling/rate-budget.service';
 

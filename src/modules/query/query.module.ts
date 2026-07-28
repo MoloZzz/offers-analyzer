@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 
 import { CalibrationModule } from '../calibration/calibration.module';
 import { ListingsModule } from '../listings/listings.module';
+import { SchedulingModule } from '../scheduling/scheduling.module';
 import { SourcesModule } from '../sources/sources.module';
 import { ValuationModule } from '../valuation/valuation.module';
-import { SchedulingModule } from '../scheduling/scheduling.module';
 
 import { QueryService } from './query.service';
 
