@@ -24,6 +24,8 @@ updated: 2026-07-28
 - [[0012-material-repeat-alert-threshold|ADR-0012]] — Require a 5% price reduction for a same-listing repeat alert (Accepted)
 - [[0013-budget-stabilization-before-lifecycle-rechecks|ADR-0013]] — Stabilize legacy demand before any lifecycle rechecks (Accepted)
 
+- [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]] - Prefer median benchmarks and guard claimed-mileage uplifts (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

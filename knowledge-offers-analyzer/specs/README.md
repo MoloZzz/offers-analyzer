@@ -21,6 +21,8 @@ updated: 2026-07-28
 
 | `../../specs/010-budget-stabilization/spec.md` | Reduce legacy rechecks and unshareable cohort requests while preserving production discovery | Implemented; observe ledger before any further budget expansion |
 
+| `../../specs/011-valuation-sanity-guards/spec.md` | Prefer median AUTO.RIA benchmarks and prevent unverified or old claimed mileage from inflating fair value | Implemented 2026-07-29; no additional API calls |
+
 ## Backlog-level specs (pre-Spec-Kit)
 
 Not yet run through `/speckit-specify` — captured directly in `context/backlog.md` (2026-07-22) as

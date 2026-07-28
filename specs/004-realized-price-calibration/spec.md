@@ -7,7 +7,7 @@
 **Status**: Draft (US4.1–4.2 + US4.1b implemented; US4.3a–4.4 later phases)
 
 **Input**: Backlog epic "Оцінка вигідності v2" (2026-07-22), SPEC-004 entry — central
-hypothesis: `fair_value` (RIA `average_price` interQuartileMean) is measured over **active**
+hypothesis: `fair_value` (RIA `average_price` median) is measured over **active**
 listings only — length-biased sampling. Addendum to
 [ADR-0006](../../knowledge-offers-analyzer/decisions/0006-operator-profit-vision.md).
 

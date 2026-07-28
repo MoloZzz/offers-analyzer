@@ -19,7 +19,8 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done · `[blocked]`.
   `npm run migration:generate`, `migration:run`. (Migrations-only now — see [[coding-standards]].)
 - [x] **B2 — AUTO.RIA field mappings validated** against live responses. `search`/`info` fixed;
   red-flags enriched from `autoInfoBar`; `/average_price` confirmed → fair value now uses the robust
-  **`interQuartileMean`** (not the outlier-skewed `arithmeticMean`), `total` = sample size. Full map in
+  **`interQuartileMean`** (not the outlier-skewed `arithmeticMean`), `total` = sample size. Superseded
+  2026-07-29 by SPEC-011: percentile-50 median is now the primary fair-value base. Full map in
   `contracts/auto-ria-api.md`.
 - [x] **B3 — Search strategy: N+1** (`search` = ids only). `countpage=100` **done**. Freshness **done**
   via the `top` submission-period filter (see B19) — note: AUTO.RIA `order_by` has **no** "newest" value
@@ -36,7 +37,7 @@ Operator backlog, doubling as an addendum to [[0006-operator-profit-vision|ADR-0
 average — ceiling unchanged vs the old ~30/hr, only the shape did: hourly window → monthly pool).
 See [[0009-monthly-rate-limit-pool|ADR-0009]].
 
-**Central hypothesis (SPEC-004):** `fair_value` (RIA `average_price` interQuartileMean) is measured
+**Central hypothesis (SPEC-004):** `fair_value` (RIA `average_price` median) is measured
 over **active** listings only — length-biased sampling. A fairly-priced car sells in ~3 weeks and
 leaves the sample; an overpriced one sits 3–4 months and stays in it, so overpriced listings are
 structurally over-represented. Expected effect: `fair_value` inflated 8–15%, so the current 0.63
@@ -234,8 +235,9 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   SPEC-007.
 
 ### What NOT to do (checked and rejected)
-- **Don't swap IQM for median.** Interquartile mean is already outlier-robust; outliers aren't
-  the problem here — survivorship (SPEC-004) is.
+- [x] **SPEC-011 supersedes the old IQM-only rule.** AUTO.RIA median is now the primary benchmark
+  because the Opel Astra case showed a broad cohort's IQM can create a false high discount. This
+  does not disprove the separate survivorship hypothesis in SPEC-004.
 - **Don't build a daily full-market panel.** Not feasible at 20,000 req/mo. The tiered re-check
   (SPEC-005) gives the same signal within budget.
 - **Don't auto-disqualify uncustomed/credit-lien cars.** With a human operator in the loop these
@@ -484,7 +486,7 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   never-scored recovery remains, protecting fresh-listing discovery. Lifecycle price-drop work resumes
   only through approved SPEC-005.
 - [ ] **B11 — Own-statistics valuation** — mostly **obviated**: RIA `/average_price` already returns
-  `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
+  a percentile median plus fallback statistics for free, which we now use. Only worth revisiting if we
   need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].
 - [x] **B12 — Relist de-dup** (delegated → Sonnet) — definition in [[when-to-alert]]. Alert only when it's
   a deal **and** new info about that car: identity = **VIN** (`normalizeVin`), track `alerted_cars`

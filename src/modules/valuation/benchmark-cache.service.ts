@@ -15,6 +15,9 @@ export interface BenchmarkValue {
 
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000; // one day — average price is a daily-stable figure
 
+/** Bump whenever the persisted benchmark value changes meaning (SPEC-011 median switch). */
+const BENCHMARK_ESTIMATOR_VERSION = 'median-v2';
+
 /** Caches cohort average prices so we don't spend request budget re-fetching the same cohort. */
 @Injectable()
 export class BenchmarkCacheService {
@@ -32,7 +35,10 @@ export class BenchmarkCacheService {
     ttlMs: number = DEFAULT_TTL_MS,
   ): Promise<BenchmarkValue> {
     const cohortKey = BenchmarkCacheService.cohortKey(cohort);
-    const existing = await this.repo.findOne({ where: { sourceKey, cohortKey } });
+    // Keep the snapshot cohort identity stable for disappearance calibration, but make a changed
+    // estimator miss the short-lived cache instead of serving an old IQM value for a day.
+    const cacheKey = `${BENCHMARK_ESTIMATOR_VERSION}|${cohortKey}`;
+    const existing = await this.repo.findOne({ where: { sourceKey, cohortKey: cacheKey } });
     if (existing && existing.expiresAt.getTime() > Date.now()) {
       return {
         value: { amount: existing.value, currency: existing.currency },
@@ -55,7 +61,7 @@ export class BenchmarkCacheService {
       );
     }
 
-    const entity = existing ?? this.repo.create({ sourceKey, cohortKey });
+    const entity = existing ?? this.repo.create({ sourceKey, cohortKey: cacheKey });
     entity.value = loaded.value.amount;
     entity.currency = loaded.value.currency;
     entity.sampleSize = loaded.sampleSize;

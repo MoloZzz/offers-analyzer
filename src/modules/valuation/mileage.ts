@@ -25,6 +25,10 @@ export interface MileageAdjustOptions {
   per10kPct: number;
   /** Absolute cap on the adjustment, in percent. */
   maxAdjPct: number;
+  /** False means claimed low mileage may not increase fair value. Defaults to true for pure callers. */
+  allowPositiveAdjustment?: boolean;
+  /** Optional tighter cap for an upward adjustment; the general cap remains authoritative when lower. */
+  maxPositiveAdjPct?: number;
   /** Reference "now" (defaults to the current date). */
   now?: Date;
 }
@@ -43,7 +47,9 @@ export function mileageAdjustmentPct(
   const expected = expectedMileageK(year, opts.annualK, opts.now);
   const deviationK = expected - mileageK; // >0: less worn than typical → worth more
   const pct = (deviationK / 10) * opts.per10kPct;
-  return clamp(pct, -opts.maxAdjPct, opts.maxAdjPct);
+  if (pct > 0 && opts.allowPositiveAdjustment === false) return 0;
+  const positiveCap = Math.min(opts.maxAdjPct, opts.maxPositiveAdjPct ?? opts.maxAdjPct);
+  return clamp(pct, -opts.maxAdjPct, positiveCap);
 }
 
 /** Apply the mileage correction to a fair value. No-op when fair or mileage is unusable. */
@@ -73,10 +79,14 @@ export class MileageAdjuster {
   fairValue(benchmark: ResolvedBenchmark, detail: ListingDetail): number {
     if (benchmark.mileageAware) return benchmark.value.amount;
     const p = this.parameters.params();
+    const age = expectedMileageK(detail.year, 1);
+    const hasVinEvidence = detail.hasVinReport || detail.risk.vinChecked;
     return adjustFairForMileage(benchmark.value.amount, detail.mileage, detail.year, {
       annualK: p.mileageAnnualK,
       per10kPct: p.mileagePer10kPct,
       maxAdjPct: p.mileageMaxAdjPct,
+      allowPositiveAdjustment: hasVinEvidence,
+      maxPositiveAdjPct: age >= 15 ? 5 : p.mileageMaxAdjPct,
     });
   }
 }

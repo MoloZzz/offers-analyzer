@@ -34,8 +34,8 @@ score approximates it with explainable heuristics.
 ## Fair value & the opportunity score
 
 ```
-fair_value(FV)  = RIA robust cohort average — interQuartileMean (fallback: median),
-                  NOT the plain arithmetic mean, which outliers skew. Cohort must be
+fair_value(FV)  = RIA percentile-50 cohort median (fallback: interQuartileMean,
+                  then arithmetic mean). Cohort must be
                   narrowed by year + mileage band + region.
 discount        = (FV − asking_price) / FV
 ```
@@ -69,6 +69,15 @@ The threshold history: 0.3 → 0.15 (2026-07-16, to surface candidates; [[why-no
 > bargain (our mileage math rewards low mileage). AUTO.RIA's VIN check often has the *real* figure, but
 > the API doesn't expose it directly. Open research: [[vin-real-mileage]].
 
+## Valuation guard (SPEC-011)
+
+The live price core uses percentile-50 (median) from AUTO.RIA before interquartile and arithmetic
+fallbacks. A broad model/year cohort is still not a generation or trim appraisal, so claimed
+low mileage is treated conservatively: it can raise fair value only when AUTO.RIA exposes VIN
+evidence, and the upward adjustment is at most 5% once a car reaches 15 years. A high claimed
+mileage can still lower fair value. This replaces the previous unconditional positive M2 uplift;
+see [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]].
+
 ## Worked example (what the system actually does)
 
 1. It sees an ad: **VW Passat B8, 2017, 150 000 km, Kyiv — asking $13 000**.
@@ -92,7 +101,7 @@ Cheap-vs-average is frequently a **scam, damaged, or high-friction** car. Filter
 
 ## Known pitfalls of the average-price anchor
 
-- **Survivorship bias (leading hypothesis, 2026-07-22).** `average_price`/interQuartileMean is
+- **Survivorship bias (leading hypothesis, 2026-07-22).** `average_price`/median is
   measured over **active** listings only. A fairly-priced car sells in ~3 weeks and drops out of
   the sample; an overpriced one sits 3–4 months and stays in it the whole time — overpriced
   listings are structurally over-represented, inflating `fair_value` an estimated 8–15%. This is

@@ -52,6 +52,11 @@ module lets the bot check any listing (`/check`), list stored opportunities (`/t
 best-scoring candidates even below the alert bar (`/best`). Full design:
 `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
 
+**Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
+the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage
+requires AUTO.RIA VIN evidence and is capped at 5% once a car is 15 years old; this adds no API
+calls beyond one post-deployment refresh per active cohort and protects the reusable-cohort hot path ([[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]).
+
 **Disappearance detection** (spec 004, 2026-07-23): after Phase 1 of each poll, every sighted id
 bulk-bumps `Listing.lastSeenInSearchAt`; active listings absent > 24h that a *detection-eligible*
 profile (no `submittedWithin`, untruncated result — via free `SourceSearchResult.total`) still

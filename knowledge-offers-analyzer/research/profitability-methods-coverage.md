@@ -20,8 +20,8 @@ reason we reject some textbook-optimal approaches.
 
 - **Data budget:** AUTO.RIA official API, a **20,000 requests/month pool** with daily budget and
   reserve. We are permanently data-constrained; every scoring input that costs a request is expensive.
-- **No sold-price ground truth:** the API exposes **asking** prices and an aggregate
-  `interQuartileMean` per cohort — never the price a car *actually sold for*. We do not know true
+- **No sold-price ground truth:** the API exposes **asking** prices and aggregate cohort statistics
+  (median plus fallbacks) — never the price a car *actually sold for*. We do not know true
   resale value.
 - **Two business rules that dominate design:** *don't lose a genuinely good deal through a bug*
   and *don't spam the operator*. A method that is more accurate on average but occasionally hides a
@@ -42,8 +42,9 @@ disqualifying risk** — one signed **deal score ∈ [−1, 1]** (−1 = overpri
 market/unknown, +1 = clearly below market):
 
 ```
-fairValue   = AUTO.RIA interQuartileMean of the matched cohort   (robust; outliers trimmed)
-              corrected for mileage when the cohort isn't mileage-banded (analytic %, capped ±20%)
+fairValue   = AUTO.RIA percentile-50 median of the matched cohort (fallback: IQM, arithmetic mean)
+              corrected for mileage only when the cohort is not mileage-banded; a positive claimed-
+              mileage correction needs VIN evidence and is capped at 5% after 15 years
 discountPct = (fairValue − asking) / fairValue × 100
 raw         = clamp(discountPct / SCALE, −1, 1)                  # SCALE≈30 → a 30% discount ≈ 1.0
 confidence  = min(1, sampleSize / (minSamples × 2))             # thin cohort → score shrinks to 0
@@ -65,8 +66,8 @@ The list below is the full menu (the eight approaches a general model proposes, 
 
 | # | Approach | Why it's good | Why it's a poor/partial fit for us | Status |
 |---|---|---|---|---|
-| 1 | **Compare to market price** — `(market − asking)/market` | Cheap, first-party benchmark, fully explainable; directly the thing we care about | Aggregate can be dragged by stale/overpriced or cheap-damaged cars → we use the **robust IQM**, not the plain mean | ✅ **Core, implemented** |
-| 2 | **Nearest-analogues cohort** (percentile-rank within closest peers) | Fairer than a market-wide average; captures trim/mileage locally | We match a tight cohort but score against its **central value (IQM)**, not the listing's **percentile rank**. Percentile would need many raw peer prices per query = budget we don't have | ⚠️ **Partial** (cohort yes, percentile no) |
+| 1 | **Compare to market price** — `(market − asking)/market` | Cheap, first-party benchmark, fully explainable; directly the thing we care about | Aggregate can be dragged by stale/overpriced or cheap-damaged cars → we use the **median**, not a mean | ✅ **Core, implemented** |
+| 2 | **Nearest-analogues cohort** (percentile-rank within closest peers) | Fairer than a market-wide average; captures trim/mileage locally | We match a tight cohort but score against its **central value (median)**, not the listing's **percentile rank**. Percentile rank would need many raw peer prices per query = budget we don't have | ⚠️ **Partial** (cohort yes, percentile rank no) |
 | 3 | **ML expected-price model** (CatBoost/XGBoost/RF) | Learns non-linear feature interactions; could estimate fair value *without* a live request | No sold-price labels → it would learn to predict **asking** prices (the very bias we avoid); data-starved; black-box vs our explainability rule | ❌ **Not implemented — see §5** |
 | 4 | **0–100 additive index** (points for low mileage, one owner, service history, minus for stale/too-cheap) | Intuitive; blends many signals; easy to tune | We use a **multiplicative** [−1,1] score instead (price × confidence × penalty) — degrades gracefully to 0 under uncertainty, which an additive index doesn't. Several of its bonus signals (one owner, service book, fresh photos) we don't extract yet | ⚠️ **Different shape; some signals missing** |
 | 5 | **Time-on-market** (DaysOnMarket / price-drop count) | Strong liquidity signal — good cars sell fast; a long-stale ad hints at hidden problems or overpricing | We record price history and react to drops, but **do not use age/drop-count as a scoring factor**. AUTO.RIA doesn't cleanly expose "removed vs fell out of paging" (E2c-later) | ⚠️ **Data captured, not scored** → planned **B25** |
@@ -84,12 +85,12 @@ Two safeguards we run that the generic list omits, both serving §0's business r
 
 ## 3. What is implemented today (code-level)
 
-- **Fair value:** AUTO.RIA `interQuartileMean` of a cohort resolved by `valuation/cohort.ts`
+- **Fair value:** AUTO.RIA percentile-50 median of a cohort resolved by `valuation/cohort.ts`
   (`resolveBenchmark`, widen-and-retry: make+model+year±1+mileage±25k → year±1 → make+model, until
   `sampleSize ≥ 10`; city never used).
 - **Mileage correction:** `valuation/mileage.ts` (`MileageAdjuster`) — when the cohort isn't
-  mileage-banded, shifts fair value by `(expected − actual)/10 × per10kPct` %, capped ±20%
-  (`expected = age × 15k`).
+  mileage-banded, shifts fair value by `(expected − actual)/10 × per10kPct` %. Positive uplift
+  needs VIN evidence and is capped at 5% after 15 years (`expected = age × 15k`).
 - **Score:** `valuation/valuation.service.ts::computeValuation` — `raw × confidence × penalty`, hard
   flags clamp ≤ 0, `ParameterSet`-driven tunables.
 - **Condition (negatives) from text:** `valuation/condition.ts` — uk+ru, negation-aware; feeds
@@ -168,7 +169,7 @@ price-quality."
   already get for free** per query.
 - **Data starvation.** At 20,000 requests/month we cannot assemble a large, feature-rich,
   freshly-labelled training set in reasonable time.
-- **Strong free baseline.** AUTO.RIA's `interQuartileMean` is effectively a robust market model
+- **Strong free baseline.** AUTO.RIA's cohort median is effectively a robust market model
   computed over their *entire* inventory and handed to us per query. An in-house model would strain
   to beat it with far less data.
 - **Explainability.** A gradient-boosted number is hard to defend to the operator in one message;

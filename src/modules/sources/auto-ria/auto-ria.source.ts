@@ -138,9 +138,9 @@ export class AutoRiaSource implements ListingSource {
     if (cohort.mileageTo != null) params.append('raceInt', String(cohort.mileageTo));
 
     const d = await this.get<AutoRiaAverage>('/average_price', params, tier, context);
-    // Prefer a robust central measure over the plain mean, which is skewed by outliers
-    // (a live sample had arithmeticMean 12815 vs interQuartileMean 10584). See research note.
-    const central = d.interQuartileMean ?? d.percentiles?.['50.0'] ?? d.arithmeticMean;
+    // Prefer the median: even an interquartile mean can be pulled by generations/trims in a
+    // broad model cohort. Keep the other measures only as compatibility fallbacks (SPEC-011).
+    const central = d.percentiles?.['50.0'] ?? d.interQuartileMean ?? d.arithmeticMean;
     // Guard: only a finite number may become a benchmark (Postgres numeric would store NaN otherwise).
     const amount = isFiniteNumber(central) ? central : 0;
     const sampleSize = isFiniteNumber(d.total) ? d.total : (d.prices?.length ?? 0);
