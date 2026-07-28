@@ -124,7 +124,12 @@ export class QueryService {
 
   /** The highest-scoring opportunities recorded so far. */
   async topOpportunities(limit = 5): Promise<RankedOpportunity[]> {
-    const ops = await this.opportunities.find({ order: { score: 'DESC' }, take: limit });
+    const ops = await this.opportunities
+      .createQueryBuilder('o')
+      .innerJoin(Listing, 'l', "l.id = o.listingId AND l.status = 'active'")
+      .orderBy('o.score', 'DESC')
+      .take(limit)
+      .getMany();
     const listings = await this.listings.findByIds(ops.map((o) => o.listingId));
     const byId = new Map(listings.map((l) => [l.id, l]));
     return ops.map((opportunity) => ({ opportunity, listing: byId.get(opportunity.listingId) }));
@@ -149,7 +154,10 @@ export class QueryService {
   /** Self-tuning report (R1): distribution of scores, near-misses, and a suggested threshold. */
   async report(targetCandidates = 10): Promise<ReportDigest> {
     const scores = await this.listings.scoresForReport();
-    const opportunities = await this.opportunities.count();
+    const opportunities = await this.opportunities
+      .createQueryBuilder('o')
+      .innerJoin(Listing, 'l', "l.id = o.listingId AND l.status = 'active'")
+      .getCount();
     const nm = await this.listings.nearMisses(Math.max(0, this.minScore - 0.1), this.minScore, 5);
     const nearMisses = nm.map((l) => ({
       label: `${l.make} ${l.model}, ${l.year}`,

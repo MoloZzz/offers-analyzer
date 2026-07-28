@@ -25,7 +25,9 @@ updated: 2026-07-17
    - Otherwise (same car, same-or-higher price than we already flagged) → **suppress** — the operator
      already has this, nothing new.
 
-Plus the existing idempotency: never alert the **same listing id / opportunity** twice.
+For the same listing id, a repeat alert after a lifecycle re-check requires a price at least 5%
+below the last alert for that listing ([[0012-material-repeat-alert-threshold|ADR-0012]]). The
+VIN-level relist rule below remains strictly-cheaper because it concerns a new listing id.
 
 This makes the relist case correct both ways: a car reposted **cheaper** and still a deal → we alert
 (labelled "знову в продажу, дешевше"); reposted at the **same/higher** price → silent.
@@ -57,8 +59,8 @@ lowest. Fast, tiny, and it's also a clean audit of "which cars we've told the op
 
 ## Edge cases
 
-- **Price-drop on the *same* listing id** already has its own alert path — unchanged; it also updates the
-  car's lowest so relists are compared fairly.
+- **Price-drop on the *same* listing id** uses the 5% materiality rule in ADR-0012; it also updates
+  the car's lowest when an alert is sent so relists are compared fairly.
 - **Currency**: compare within the profile currency (we already convert to it before storing amounts).
 - **VIN missing then present** (seller adds VIN on repost) → treated as first sighting of that VIN; minor,
   acceptable.

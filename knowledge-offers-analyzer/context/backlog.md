@@ -158,7 +158,9 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   seller rarely lists at 60% of market on day one — they list near market and cut price 3–5 weeks
   later, once or twice. The deal this whole system exists to catch **does not exist at ingest
   time** — it appears later. This is a logic gap, not a budget optimization: looking at a listing
-  once structurally cannot see its price dynamics.
+  once structurally cannot see its price dynamics. **Formal Spec Kit package:**
+  `specs/005-listing-lifecycle-rechecks/` (2026-07-28); implementation remains gated by live
+  SPEC-009 budget evidence plus explicit operator approval.
   - US5.1 — tiered re-check scheduler: tier 1 (score within 10% of the profile threshold, i.e.
     already in `/report`) → every 2 days; tier 2 (10–25% from threshold) → weekly; tier 3 (beyond
     25%) → every 2 weeks or never. Tier recomputed after every re-check; disappeared listings drop

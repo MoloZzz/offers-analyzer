@@ -49,7 +49,7 @@ export class ListingsService {
   /** Best-scoring evaluated listings (even below the alert threshold) — the "best available now". */
   topByScore(limit = 5): Promise<Listing[]> {
     return this.listings.find({
-      where: { lastScore: Not(IsNull()) },
+      where: { status: 'active', lastScore: Not(IsNull()) },
       order: { lastScore: 'DESC' },
       take: limit,
     });
@@ -58,7 +58,7 @@ export class ListingsService {
   /** Recently evaluated listings (for /last command). */
   getRecentlyEvaluated(limit = 10): Promise<Listing[]> {
     return this.listings.find({
-      where: { lastScore: Not(IsNull()), lastEvaluatedAt: Not(IsNull()) },
+      where: { status: 'active', lastScore: Not(IsNull()), lastEvaluatedAt: Not(IsNull()) },
       order: { lastEvaluatedAt: 'DESC' },
       take: limit,
     });
@@ -69,7 +69,8 @@ export class ListingsService {
     const qb = this.listings
       .createQueryBuilder('l')
       .select('l.lastScore', 'lastScore')
-      .where('l.lastScore IS NOT NULL');
+      .where('l.lastScore IS NOT NULL')
+      .andWhere("l.status = 'active'");
     if (profileId) qb.andWhere('l.profileId = :profileId', { profileId });
     const rows = await qb.getRawMany<{ lastScore: string }>();
     return rows.map((r) => Number(r.lastScore)).filter((n) => Number.isFinite(n));
@@ -80,6 +81,7 @@ export class ListingsService {
     return this.listings
       .createQueryBuilder('l')
       .where('l.lastScore >= :min AND l.lastScore < :max', { min, max: maxExclusive })
+      .andWhere("l.status = 'active'")
       .orderBy('l.lastScore', 'DESC')
       .limit(limit)
       .getMany();

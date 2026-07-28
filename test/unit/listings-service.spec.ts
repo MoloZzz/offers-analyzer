@@ -8,12 +8,16 @@ import { ListingDetail } from '../../src/modules/sources/ports/listing-source.po
 function buildRepo<T extends { id?: string }>() {
   const rows: T[] = [];
   let nextId = 1;
-  return {
+  const result = {
     rows,
+    findCalls: [] as unknown[],
     repo: {
       findOne: ({ where }: { where: Record<string, unknown> }) =>
         Promise.resolve(rows.find((row) => Object.entries(where).every(([k, v]) => (row as never)[k] === v)) ?? null),
-      find: () => Promise.resolve([...rows]),
+      find: (options?: unknown) => {
+        result.findCalls.push(options);
+        return Promise.resolve([...rows]);
+      },
       create: (x: Partial<T>) => ({ id: `id-${nextId++}`, ...x } as T),
       save: (x: T) => {
         const idx = rows.findIndex((row) => row.id === x.id);
@@ -23,7 +27,8 @@ function buildRepo<T extends { id?: string }>() {
       },
       count: () => Promise.resolve(rows.length),
     } as never,
-  };
+  } as const;
+  return result;
 }
 
 function makeDetail(overrides: Partial<ListingDetail> = {}): ListingDetail {
@@ -67,5 +72,21 @@ describe('ListingsService.recordSeen', () => {
     expect(observations.rows[0].amount).toBe(300000);
     expect(observations.rows[0].currency).toBe(Currency.UAH);
     expect(observations.rows[0].amountUsd).toBe(7500);
+  });
+});
+
+describe('ListingsService operator views', () => {
+  it('requests only active listings for best and recent views', async () => {
+    const listings = buildRepo<Listing>();
+    const observations = buildRepo<PriceObservation>();
+    const fx: Pick<ExchangeRate, 'rate'> = { rate: jest.fn() };
+    const service = new ListingsService(listings.repo, observations.repo, fx as ExchangeRate);
+
+    await service.topByScore();
+    await service.getRecentlyEvaluated();
+
+    expect(listings.findCalls).toHaveLength(2);
+    expect(listings.findCalls[0]).toMatchObject({ where: { status: 'active' } });
+    expect(listings.findCalls[1]).toMatchObject({ where: { status: 'active' } });
   });
 });

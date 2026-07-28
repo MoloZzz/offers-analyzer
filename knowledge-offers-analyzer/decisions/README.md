@@ -21,6 +21,7 @@ updated: 2026-07-28
 - [[0009-monthly-rate-limit-pool|ADR-0009]] — Rate limiting: monthly pool + priority queue instead of hourly window (Accepted)
 - [[0010-defer-factor-activation-until-k|ADR-0010]] — Keep spec-003 factors inactive until the survivorship correction `k` lands; one combined activation + threshold re-validation (Accepted)
 - [[0011-evidence-gated-scoring-rollout|ADR-0011]] — Require evidence, explanation provenance, and budget observability before scoring rollout (Accepted)
+- [[0012-material-repeat-alert-threshold|ADR-0012]] — Require a 5% price reduction for a same-listing repeat alert (Accepted)
 
 ## How to add one
 

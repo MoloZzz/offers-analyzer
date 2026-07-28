@@ -86,6 +86,7 @@ single missed sweep never fabricates an event.
 - **CalibrationRun** — a recorded calibration pass (per-profile inputs, proposal, applied?, reason).
 - **AlertedCar** — per-car (VIN) record of the lowest price we've alerted, so a relist is only re-alerted when cheaper (B12; [[when-to-alert]]).
 - **ListingDisappearance** — one event per listing that left the market (cohort key, last known USD price, DOM, price-cut stats, `is_relist`, `reappeared_at` voiding, `detection_mode` live/backfill) — the raw material for the survivorship correction `k` (spec 004).
+- **Re-check schedule** *(planned, spec 005)* — an active listing's derived urgency tier and next due time; it enables direct detail re-checks independent of paginated search results. Production enablement requires the SPEC-009 evidence gate and operator approval.
 
 ## Boundaries & integrations
 
