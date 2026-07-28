@@ -22,6 +22,10 @@ describe('CalibrationService.applyProposal / revert', () => {
     const fakeOutcomes = {
       manualLabeledSince: jest.fn().mockResolvedValue([]),
     };
+    const fakeDeals = {
+      closedDeals: jest.fn().mockResolvedValue([]),
+      closedDealsForProfile: jest.fn().mockResolvedValue([]),
+    };
 
     const fakeConfig = {
       get: jest.fn().mockReturnValue(0.63),
@@ -48,6 +52,7 @@ describe('CalibrationService.applyProposal / revert', () => {
 
     const service = new CalibrationService(
       fakeListings as unknown as any,
+      fakeDeals as unknown as any,
       fakeOutcomes as unknown as any,
       fakeProfiles as unknown as any,
       fakeConfig as unknown as any,

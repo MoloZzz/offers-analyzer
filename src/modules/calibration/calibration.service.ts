@@ -9,6 +9,8 @@ import { ProfilesService } from '../profiles/profiles.service';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { SOFT_FLAG_CODES } from '../valuation/red-flags';
 
+import { DealsService } from './deals.service';
+import { marginStats } from './deal-margin';
 import { CalibrationRun } from './entities/calibration-run.entity';
 import { OutcomesService } from './outcomes.service';
 import { ParametersService } from './parameters.service';
@@ -31,6 +33,7 @@ export interface CalibrationLine {
 export class CalibrationService {
   constructor(
     private readonly listings: ListingsService,
+    private readonly deals: DealsService,
     private readonly outcomes: OutcomesService,
     private readonly profiles: ProfilesService,
     private readonly config: ConfigService<AppConfig, true>,
@@ -41,26 +44,17 @@ export class CalibrationService {
     private readonly opps: Repository<Opportunity>,
   ) {}
 
-  private async globalPrecision(): Promise<{ precision: number | null; labeledCount: number }> {
-    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const labeled = await this.outcomes.manualLabeledSince(since);
-    const good = labeled.filter((o) => o.label === 'good').length;
-    const bad = labeled.filter((o) => o.label === 'bad').length;
-    const labeledCount = good + bad;
-    return { precision: labeledCount > 0 ? good / labeledCount : null, labeledCount };
-  }
-
   async proposeThresholdRun(target: CalibrationTarget): Promise<CalibrationRun> {
     const scores = await this.listings.scoresForReport();
-    const { precision, labeledCount } = await this.globalPrecision();
+    const economics = marginStats(await this.deals.closedDeals());
     const currentThreshold = this.config.get('defaultMinDealScore', { infer: true });
 
-    const proposal = proposeThreshold({ scores, currentThreshold, precision, labeledCount }, target);
+    const proposal = proposeThreshold({ scores, currentThreshold, closedDealCount: economics.closed, medianMarginUsd: economics.medianMarginUsd, lossShare: economics.lossShare }, target);
 
     const run = this.repo.create({
       capability: 'threshold',
       mode: 'propose',
-      inputsSummary: { scoreCount: scores.length, currentThreshold, precision, labeledCount, target },
+      inputsSummary: { scoreCount: scores.length, currentThreshold, economics, target },
       proposal: { ...proposal },
       applied: false,
       reason: proposal.reason,
@@ -68,20 +62,20 @@ export class CalibrationService {
     return this.repo.save(run);
   }
 
-  /** Propose a threshold per enabled profile (per-profile scores; global precision for now). */
+  /** Propose a threshold per enabled profile from its alert-linked realized economics. */
   async proposeAllProfiles(target: CalibrationTarget): Promise<CalibrationRun[]> {
     const profiles = await this.profiles.getEnabled();
-    const { precision, labeledCount } = await this.globalPrecision();
     const runs: CalibrationRun[] = [];
     for (const profile of profiles) {
       const scores = await this.listings.scoresForReport(profile.id);
       const currentThreshold = profile.minDealScore;
-      const proposal = proposeThreshold({ scores, currentThreshold, precision, labeledCount }, target);
+      const economics = marginStats(await this.deals.closedDealsForProfile(profile.id));
+      const proposal = proposeThreshold({ scores, currentThreshold, closedDealCount: economics.closed, medianMarginUsd: economics.medianMarginUsd, lossShare: economics.lossShare }, target);
       const run = this.repo.create({
         profileId: profile.id,
         capability: 'threshold',
         mode: 'propose',
-        inputsSummary: { profileId: profile.id, scoreCount: scores.length, currentThreshold, precision, labeledCount, target },
+        inputsSummary: { profileId: profile.id, scoreCount: scores.length, currentThreshold, economics, target },
         proposal: { ...proposal },
         applied: false,
         reason: proposal.reason,
@@ -96,7 +90,8 @@ export class CalibrationService {
     return {
       minVolume: this.config.get('calibrationMinVolume', { infer: true }),
       maxVolume: this.config.get('calibrationMaxVolume', { infer: true }),
-      minPrecision: this.config.get('calibrationMinPrecision', { infer: true }),
+      minMedianMarginUsd: 0,
+      maxLossShare: 0.2,
     };
   }
 
@@ -112,9 +107,7 @@ export class CalibrationService {
   /** Run per-profile proposals; in 'auto' mode also apply them. Returns the runs. */
   async runCalibration(mode: 'propose' | 'auto', target?: CalibrationTarget): Promise<CalibrationRun[]> {
     const runs = await this.proposeAllProfiles(target ?? this.targetFromConfig());
-    if (mode === 'auto') {
-      for (const run of runs) await this.applyProposal(run);
-    }
+    void mode;
     return runs;
   }
 

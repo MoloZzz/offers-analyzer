@@ -7,19 +7,19 @@ import {
 describe('proposeThreshold', () => {
   it('freezes when there are too few recorded scores', () => {
     const scores = Array.from({ length: MIN_SCORES - 1 }, (_, i) => 0.4 + i * 0.01);
-    const result = proposeThreshold({ scores, currentThreshold: 0.6, precision: null, labeledCount: 0 }, {});
+    const result = proposeThreshold({ scores, currentThreshold: 0.6, closedDealCount: 15, medianMarginUsd: 100, lossShare: 0 }, {});
 
     expect(result.proposed).toBeNull();
     expect(result.reason).toContain('замало даних');
   });
 
-  it('raises the threshold when realized precision misses the target', () => {
+  it('raises the threshold when realized economics miss the target', () => {
     const scores = Array.from({ length: 30 }, (_, i) => i / 30);
     const currentThreshold = 0.6;
 
     const result = proposeThreshold(
-      { scores, currentThreshold, precision: 0.5, labeledCount: 20 },
-      { minPrecision: 0.7 },
+      { scores, currentThreshold, closedDealCount: 15, medianMarginUsd: -100, lossShare: 0.3 },
+      { minMedianMarginUsd: 0, maxLossShare: 0.2 },
     );
 
     expect(result.proposed).not.toBeNull();
@@ -34,7 +34,7 @@ describe('proposeThreshold', () => {
     const scores = [...highScores, ...lowScores];
 
     const result = proposeThreshold(
-      { scores, currentThreshold, precision: null, labeledCount: 0 },
+      { scores, currentThreshold, closedDealCount: 15, medianMarginUsd: 100, lossShare: 0 },
       { maxVolume: 5 },
     );
 
@@ -50,7 +50,7 @@ describe('proposeThreshold', () => {
     const scores = [...highScores, ...lowScores];
 
     const result = proposeThreshold(
-      { scores, currentThreshold, precision: null, labeledCount: 0 },
+      { scores, currentThreshold, closedDealCount: 15, medianMarginUsd: 100, lossShare: 0 },
       { minVolume: 25 },
     );
 
@@ -65,7 +65,7 @@ describe('proposeThreshold', () => {
     const scores = [...highScores, ...lowScores];
 
     const result = proposeThreshold(
-      { scores, currentThreshold, precision: null, labeledCount: 0 },
+      { scores, currentThreshold, closedDealCount: 15, medianMarginUsd: 100, lossShare: 0 },
       { minVolume: 5, maxVolume: 15 },
     );
 
@@ -80,11 +80,21 @@ describe('proposeThreshold', () => {
     const scores = Array.from({ length: 40 }, (_, i) => (i / 40) * 0.5); // 0..~0.49, all below threshold
 
     const result = proposeThreshold(
-      { scores, currentThreshold, precision: null, labeledCount: 0 },
+      { scores, currentThreshold, closedDealCount: 15, medianMarginUsd: 100, lossShare: 0 },
       { minVolume: 40 },
     );
 
     expect(result.proposed).not.toBeNull();
     expect(Math.abs((result.proposed as number) - currentThreshold)).toBeLessThanOrEqual(MAX_STEP + 1e-9);
+  });
+
+  it('freezes until 15 closed deals exist', () => {
+    const scores = Array.from({ length: 30 }, (_, i) => i / 30);
+    const result = proposeThreshold(
+      { scores, currentThreshold: 0.6, closedDealCount: 14, medianMarginUsd: -100, lossShare: 1 },
+      { minMedianMarginUsd: 0, maxLossShare: 0.2 },
+    );
+    expect(result.proposed).toBeNull();
+    expect(result.reason).toContain('14/15');
   });
 });

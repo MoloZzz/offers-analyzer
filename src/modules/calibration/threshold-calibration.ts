@@ -9,18 +9,20 @@ export interface CalibrationTarget {
   minVolume?: number;
   /** Desired max # of qualifying listings (scores >= threshold). */
   maxVolume?: number;
-  /** Desired floor on realized precision (0..1). */
-  minPrecision?: number;
+  /** Minimum acceptable median realized margin in USD. */
+  minMedianMarginUsd?: number;
+  /** Maximum acceptable share (0..1) of loss-making closed deals. */
+  maxLossShare?: number;
 }
 
 export interface CalibrationInput {
   /** All recorded lastScores (population for volume projection). */
   scores: number[];
   currentThreshold: number;
-  /** Realized precision (0..1) or null when there is no labeled data. */
-  precision: number | null;
-  /** # of 👍/👎 labels behind `precision`. */
-  labeledCount: number;
+  /** Closed, alert-linked deals for this profile. */
+  closedDealCount: number;
+  medianMarginUsd: number | null;
+  lossShare: number | null;
 }
 
 export interface ThresholdProposal {
@@ -35,8 +37,8 @@ export interface ThresholdProposal {
 export const MAX_STEP = 0.1;
 /** Freeze below this many scores. */
 export const MIN_SCORES = 20;
-/** Precision rule needs at least this many labels. */
-export const MIN_LABELED = 10;
+/** Economic evidence needs at least this many closed deals. */
+export const MIN_CLOSED_DEALS = 15;
 
 function volumeAt(scores: number[], t: number): number {
   return scores.filter((s) => s >= t).length;
@@ -56,7 +58,7 @@ function clampToStep(currentThreshold: number, t: number): number {
 }
 
 export function proposeThreshold(input: CalibrationInput, target: CalibrationTarget): ThresholdProposal {
-  const { scores, currentThreshold, precision, labeledCount } = input;
+  const { scores, currentThreshold, closedDealCount, medianMarginUsd, lossShare } = input;
 
   if (scores.length < MIN_SCORES) {
     return {
@@ -66,17 +68,23 @@ export function proposeThreshold(input: CalibrationInput, target: CalibrationTar
     };
   }
 
+  if (closedDealCount < MIN_CLOSED_DEALS) {
+    return {
+      proposed: null,
+      projectedVolume: volumeAt(scores, currentThreshold),
+      reason: `недостатньо закритих угод: ${closedDealCount}/${MIN_CLOSED_DEALS}`,
+    };
+  }
+
   let t: number;
   let reason: string;
 
   if (
-    target.minPrecision != null &&
-    labeledCount >= MIN_LABELED &&
-    precision != null &&
-    precision < target.minPrecision
+    (target.minMedianMarginUsd != null && medianMarginUsd != null && medianMarginUsd < target.minMedianMarginUsd) ||
+    (target.maxLossShare != null && lossShare != null && lossShare > target.maxLossShare)
   ) {
     t = currentThreshold + MAX_STEP;
-    reason = `реальна точність ${precision} < цілі ${target.minPrecision} — піднімаємо поріг`;
+    reason = `економіка поза ціллю — піднімаємо поріг`;
   } else {
     const vol = volumeAt(scores, currentThreshold);
     if (target.maxVolume != null && vol > target.maxVolume) {

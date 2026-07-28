@@ -58,7 +58,7 @@ function buildFakeRepo(): { repo: Repository<DealOutcome>; rows: DealOutcome[] }
 describe('DealsService', () => {
   it('upsertForListing is idempotent per listing — patches, does not duplicate', async () => {
     const { repo, rows } = buildFakeRepo();
-    const service = new DealsService(repo);
+    const service = new DealsService(repo, { find: jest.fn().mockResolvedValue([]) } as never);
 
     await service.upsertForListing('listing-1', { buyPriceUsd: 8000 }, 'opp-1');
     await service.upsertForListing('listing-1', { sellPriceUsd: 10000 });
@@ -72,7 +72,7 @@ describe('DealsService', () => {
 
   it('progresses declined → bought → sold and never downgrades', async () => {
     const { rows, repo } = buildFakeRepo();
-    const service = new DealsService(repo);
+    const service = new DealsService(repo, { find: jest.fn().mockResolvedValue([]) } as never);
 
     await service.markDeclined('l', 'price', 'op');
     expect(rows[0].stage).toBe('declined');
@@ -90,7 +90,7 @@ describe('DealsService', () => {
 
   it('stamps boughtAt once, soldAt once', async () => {
     const { rows, repo } = buildFakeRepo();
-    const service = new DealsService(repo);
+    const service = new DealsService(repo, { find: jest.fn().mockResolvedValue([]) } as never);
 
     const t1 = new Date('2026-06-01T00:00:00Z');
     await service.markBought('l', null, t1);
@@ -108,7 +108,7 @@ describe('DealsService', () => {
 
   it('closedDeals excludes sold rows missing a price', async () => {
     const { repo } = buildFakeRepo();
-    const service = new DealsService(repo);
+    const service = new DealsService(repo, { find: jest.fn().mockResolvedValue([]) } as never);
 
     await service.upsertForListing('complete', { buyPriceUsd: 8000, sellPriceUsd: 9000 });
     await service.upsertForListing('no-buy', { sellPriceUsd: 9000 }); // sold, but no buy price
@@ -119,7 +119,7 @@ describe('DealsService', () => {
 
   it('dueForReminder respects boughtAt vs lastRemindedAt window', async () => {
     const { rows, repo } = buildFakeRepo();
-    const service = new DealsService(repo);
+    const service = new DealsService(repo, { find: jest.fn().mockResolvedValue([]) } as never);
     const now = new Date('2026-07-01T00:00:00Z');
 
     await service.markBought('old', null, new Date('2026-05-01T00:00:00Z')); // 61 days ago

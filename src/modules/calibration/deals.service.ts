@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { Opportunity } from '../valuation/entities/opportunity.entity';
+
 import { DealPatch, deriveStage } from './deal-margin';
 import { DealOutcome, DeclineReason } from './entities/deal-outcome.entity';
 
@@ -18,6 +20,8 @@ export class DealsService {
   constructor(
     @InjectRepository(DealOutcome)
     private readonly repo: Repository<DealOutcome>,
+    @InjectRepository(Opportunity)
+    private readonly opportunities: Repository<Opportunity>,
   ) {}
 
   /**
@@ -83,6 +87,15 @@ export class DealsService {
   async closedDeals(): Promise<DealOutcome[]> {
     const sold = await this.repo.find({ where: { stage: 'sold' } });
     return sold.filter((d) => d.buyPriceUsd != null && d.sellPriceUsd != null);
+  }
+
+  /** Closed alert-linked deals for one profile — the only valid threshold evidence. */
+  async closedDealsForProfile(profileId: string): Promise<DealOutcome[]> {
+    const opportunities = await this.opportunities.find({ where: { profileId } });
+    const ids = new Set(opportunities.map((opportunity) => opportunity.id));
+    return (await this.closedDeals()).filter(
+      (deal) => deal.opportunityId != null && ids.has(deal.opportunityId),
+    );
   }
 
   /** Most recently touched deals (for /deals), newest first. */
