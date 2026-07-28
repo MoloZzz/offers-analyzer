@@ -1,6 +1,6 @@
 # Implementation Plan: Listing Lifecycle and Tiered Re-checks
 
-**Spec**: [spec.md](spec.md) | **Created**: 2026-07-28 | **Status**: Ready
+**Spec**: [spec.md](spec.md) | **Created**: 2026-07-28 | **Status**: Paused pending demonstrated operator profit
 
 ## Summary
 

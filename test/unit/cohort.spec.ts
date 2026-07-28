@@ -1,6 +1,7 @@
 import { Currency } from '../../src/common/types/money';
-import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
-import { cohortCandidates, MILEAGE_BAND_K } from '../../src/modules/valuation/cohort';
+import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/listing-source.port';
+import { BenchmarkCacheService } from '../../src/modules/valuation/benchmark-cache.service';
+import { cohortCandidates, MILEAGE_BAND_K, resolveBenchmark } from '../../src/modules/valuation/cohort';
 
 function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {
   return {
@@ -59,5 +60,31 @@ describe('cohortCandidates (mileage-aware, widest-data fallback)', () => {
   it('never constrains by city (city starves the sample)', () => {
     const candidates = cohortCandidates(detail({ cityId: 287 }));
     expect(candidates.every((c) => c.cityId === undefined)).toBe(true);
+  });
+});
+
+describe('resolveBenchmark (budget-stabilized hot path)', () => {
+  it('does not load a mileage-banded cohort from the live source', async () => {
+    const averagePrice = jest.fn().mockResolvedValue({
+      value: { amount: 12000, currency: Currency.USD },
+      sampleSize: 20,
+    });
+    const source = {
+      averagePrice,
+    } as unknown as ListingSource;
+    const cache = {
+      getOrLoad: jest.fn((_key: string, _cohort: unknown, loader: () => Promise<unknown>) => loader()),
+    } as unknown as BenchmarkCacheService;
+
+    const result = await resolveBenchmark(source, cache, detail());
+
+    expect(result?.mileageAware).toBe(false);
+    expect((cache.getOrLoad as jest.Mock).mock.calls[0][1]).toEqual({
+      markId: 9,
+      modelId: 3219,
+      yearFrom: 2016,
+      yearTo: 2018,
+    });
+    expect(averagePrice).toHaveBeenCalledTimes(1);
   });
 });

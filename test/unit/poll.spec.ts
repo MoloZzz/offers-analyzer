@@ -230,12 +230,12 @@ function buildService(fakes: Fakes): PollService {
   );
 }
 
-describe('PollService priority order', () => {
+describe('PollService budget-stabilized work selection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('processes tier-1 re-checks before tier-2 new listings when budget is tight', async () => {
+  it('does not routinely re-check an already scored listing', async () => {
     const fakes = buildFakes();
     const service = buildService(fakes);
 
@@ -253,20 +253,58 @@ describe('PollService priority order', () => {
     (fakes.listingsService.findByExternalIds as jest.Mock).mockResolvedValue([staleListing]);
     (fakes.listingsService.recordSeen as jest.Mock).mockResolvedValue({ listing: staleListing, isNew: false });
 
-    (fakes.source.fetch as jest.Mock)
-      .mockImplementationOnce(() =>
-        makeDetail({
-          externalId: 'old-1',
-          price: { amount: 10000, currency: Currency.USD },
-        }),
-      )
-      .mockRejectedValueOnce(new RateBudgetExhaustedError('budget gone'));
+    (fakes.source.fetch as jest.Mock).mockRejectedValueOnce(new RateBudgetExhaustedError('budget gone'));
 
     await expect((service as unknown as { runCycle: () => Promise<void> }).runCycle()).resolves.toBeUndefined();
 
-    expect(fakes.source.fetch).toHaveBeenCalledTimes(2);
-    expect(fakes.source.fetch.mock.calls.map((call) => call[1])).toEqual([1, 2]);
-    expect(fakes.source.fetch.mock.calls.map((call) => call[0])).toEqual(['old-1', 'new-1']);
+    expect(fakes.source.fetch).toHaveBeenCalledTimes(1);
+    expect(fakes.source.fetch).toHaveBeenCalledWith(
+      'new-1',
+      2,
+      expect.objectContaining({ operation: 'new_listing_detail' }),
+    );
+  });
+
+  it('recovers at most one never-scored listing in a 30-minute window', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-07-28T10:30:00Z'));
+    const fakes = buildFakes();
+    const service = buildService(fakes);
+    const oldest = makeListing({ externalId: 'oldest', lastScore: null, lastSeenAt: new Date('2026-07-20T00:00:00Z') });
+    const newer = makeListing({ externalId: 'newer', lastScore: null, lastSeenAt: new Date('2026-07-21T00:00:00Z') });
+    (fakes.source.search as jest.Mock).mockResolvedValue({ ids: ['oldest', 'newer'], total: 2 });
+    (fakes.listingsService.findByExternalIds as jest.Mock).mockResolvedValue([oldest, newer]);
+    (fakes.source.fetch as jest.Mock).mockRejectedValue(new RateBudgetExhaustedError('budget gone'));
+
+    await (service as unknown as { runCycle: () => Promise<void> }).runCycle();
+
+    expect(fakes.source.fetch).toHaveBeenCalledTimes(1);
+    expect(fakes.source.fetch).toHaveBeenCalledWith('oldest', 1, expect.anything());
+    jest.useRealTimers();
+  });
+
+  it('continues collecting fresh listings when a tier-5 benchmark is refused', async () => {
+    const fakes = buildFakes();
+    const service = buildService(fakes);
+    const first = makeListing({ id: 'first', externalId: 'new-1', lastScore: null });
+    const second = makeListing({ id: 'second', externalId: 'new-2', lastScore: null });
+    (fakes.source.search as jest.Mock).mockResolvedValue({ ids: ['new-1', 'new-2'], total: 2 });
+    (fakes.listingsService.findByExternalIds as jest.Mock).mockResolvedValue([]);
+    (fakes.source.fetch as jest.Mock)
+      .mockResolvedValueOnce(makeDetail({ externalId: 'new-1' }))
+      .mockResolvedValueOnce(makeDetail({ externalId: 'new-2' }));
+    (fakes.listingsService.recordSeen as jest.Mock)
+      .mockResolvedValueOnce({ listing: first, isNew: true })
+      .mockResolvedValueOnce({ listing: second, isNew: true });
+    (fakes.benchmarks.getOrLoad as jest.Mock)
+      .mockRejectedValueOnce(new RateBudgetExhaustedError('tier-5 denied'))
+      .mockResolvedValueOnce({ value: { amount: 12000, currency: Currency.USD }, sampleSize: 15 });
+    (fakes.mileage.fairValue as jest.Mock).mockReturnValue(11800);
+
+    await (service as unknown as { runCycle: () => Promise<void> }).runCycle();
+
+    expect(fakes.source.fetch.mock.calls.map((call) => call[0])).toEqual(['new-1', 'new-2']);
+    expect(fakes.listingsService.recordEvaluation).toHaveBeenCalledTimes(1);
   });
 
   it('persists an explanation snapshot for evaluated non-opportunities', async () => {

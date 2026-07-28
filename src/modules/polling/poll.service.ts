@@ -33,10 +33,11 @@ import { ValuationService } from '../valuation/valuation.service';
 
 /** Cap new listings processed per profile per cycle so one profile can't hog the shared budget. */
 const MAX_NEW_PER_PROFILE = 30;
-/** How many already-seen listings to re-check per profile per cycle for price drops. */
-const REOBSERVE_PER_CYCLE = 5;
+/** Recovery only: one never-scored listing per profile in each 30-minute window (SPEC-010). */
+const RECOVERY_REOBSERVE_PER_WINDOW = 1;
+const RECOVERY_REOBSERVE_WINDOW_MINUTES = 30;
 
-/** A profile's per-cycle work: fresh listings to value, and known ones to re-check for price drops. */
+/** A profile's per-cycle work: fresh listings plus bounded never-scored recovery work. */
 interface ProfileQueue {
   profile: SearchProfile;
   newIds: string[];
@@ -45,7 +46,7 @@ interface ProfileQueue {
 
 /**
  * The MVP pipeline (US1): each cycle searches every enabled niche, then re-checks known listings for
- * price drops before valuing fresh listings (FR-009). Work is drained **round-robin** across profiles
+ * bounded recovery work before valuing fresh listings. Work is drained **round-robin** across profiles
  * within each phase so no single niche (e.g. a market-wide one) spends the whole budget before the
  * others run. Runs on a cron (no queue in v1); when the budget is exhausted (or the source returns
  * HTTP 429) the cycle stops cleanly and resumes next tick (FR-012).
@@ -106,14 +107,12 @@ export class PollService {
         const newIds = ids.filter((id) => !knownIds.has(id)).slice(0, MAX_NEW_PER_PROFILE);
         // Never-scored listings first (a prior cycle likely hit the budget limit mid-evaluation),
         // then oldest-seen — so nothing stays unscored forever.
-        const stale = [...known]
-          .sort((a, b) => {
-            const aUnscored = a.lastScore == null ? 0 : 1;
-            const bUnscored = b.lastScore == null ? 0 : 1;
-            if (aUnscored !== bUnscored) return aUnscored - bUnscored;
-            return a.lastSeenAt.getTime() - b.lastSeenAt.getTime();
-          })
-          .slice(0, REOBSERVE_PER_CYCLE);
+        const stale = isRecoveryRecheckWindow()
+          ? known
+              .filter((listing) => listing.lastScore == null)
+              .sort((a, b) => a.lastSeenAt.getTime() - b.lastSeenAt.getTime())
+              .slice(0, RECOVERY_REOBSERVE_PER_WINDOW)
+          : [];
         queues.push({ profile, newIds, stale });
       } catch (err) {
         if (err instanceof RateBudgetExhaustedError) return; // budget gone — resume next tick
@@ -230,7 +229,21 @@ export class PollService {
     type: 'opportunity' | 'price_drop',
     previousAmount: number | null,
   ): Promise<void> {
-    const benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
+    let benchmark;
+    try {
+      benchmark = await resolveBenchmark(this.source, this.benchmarks, detail);
+    } catch (err) {
+      if (err instanceof RateBudgetExhaustedError) {
+        // The detail is already retained. A denied tier-5 average must not discard the rest
+        // of the fresh-listing queue; this listing becomes bounded recovery work instead.
+        this.logger.info(
+          { listingId: listing.id, profileId: profile.id },
+          'Benchmark budget unavailable; leaving listing unscored for recovery',
+        );
+        return;
+      }
+      throw err;
+    }
     const fairValue = benchmark ? this.mileage.fairValue(benchmark, detail) : 0;
     const sampleSize = benchmark?.sampleSize ?? 0;
 
@@ -343,4 +356,8 @@ function isExcluded(profile: SearchProfile, detail: ListingDetail): boolean {
   if (!exclude || exclude.length === 0) return false;
   const makeModel = `${detail.make} ${detail.model}`.toLowerCase();
   return exclude.some((e) => makeModel.includes(e.toLowerCase()));
+}
+
+function isRecoveryRecheckWindow(now = new Date()): boolean {
+  return now.getUTCMinutes() % RECOVERY_REOBSERVE_WINDOW_MINUTES === 0;
 }

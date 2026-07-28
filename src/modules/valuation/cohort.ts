@@ -59,7 +59,10 @@ export async function resolveBenchmark(
   benchmarks: BenchmarkCacheService,
   detail: ListingDetail,
 ): Promise<ResolvedBenchmark | null> {
-  const candidates = cohortCandidates(detail);
+  // Start with cohorts reusable across many incoming listings. A live mileage band is
+  // commonly unique to one car and defeats the 24-hour cache; mileage is still adjusted
+  // analytically downstream when the selected benchmark is not mileage-aware (SPEC-010).
+  const candidates = cohortCandidates(detail).filter((cohort) => cohort.mileageFrom == null);
   for (let index = 0; index < candidates.length; index++) {
     const cohort = candidates[index];
     try {

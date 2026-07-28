@@ -152,7 +152,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   current-month history reconciles and fits the forecast; human reforecast approval is still
   required under [[0011-evidence-gated-scoring-rollout|ADR-0011]].
 
-- [ ] **SPEC-005 — Listing lifecycle + tiered re-check.** P1, ~4,300 req/mo (funded by
+- [blocked] **SPEC-005 — Listing lifecycle + tiered re-check.** P1, ~4,300 req/mo (funded by
   [[0009-monthly-rate-limit-pool|ADR-0009]]). Problem: a listing is scored once, at ingest, and
   the system never revisits it (aside from the existing ad-hoc re-observe in B10). But a motivated
   seller rarely lists at 60% of market on day one — they list near market and cut price 3–5 weeks
@@ -160,7 +160,9 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   time** — it appears later. This is a logic gap, not a budget optimization: looking at a listing
   once structurally cannot see its price dynamics. **Formal Spec Kit package:**
   `specs/005-listing-lifecycle-rechecks/` (2026-07-28); implementation remains gated by live
-  SPEC-009 budget evidence plus explicit operator approval.
+  SPEC-009 budget evidence plus explicit operator approval. **Operator decision 2026-07-28:** pause
+  implementation and production enablement until the current monitor demonstrates operator profit;
+  production monitoring and all non-SPEC-005 development continue.
   - US5.1 — tiered re-check scheduler: tier 1 (score within 10% of the profile threshold, i.e.
     already in `/report`) → every 2 days; tier 2 (10–25% from threshold) → weekly; tier 3 (beyond
     25%) → every 2 weeks or never. Tier recomputed after every re-check; disappeared listings drop
@@ -476,10 +478,11 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
     behind the source port — enrich *candidates only* (budget). Then the low-claimed-mileage trap can be
     hard-caught, not just flagged.
 
-- [x] **B10 — Price-drop detection (FR-009):** after new ids, the poll re-observes up to
-  `REOBSERVE_PER_CYCLE` known listings (oldest `lastSeenAt` first), budget-permitting; on a price drop
-  that re-qualifies as an opportunity it sends a distinct `📉 Ціна знижена` alert (idempotent
-  `price_drop` dedupKey). `ListingsService.findByExternalIds` + `NotificationsService.notifyPriceDrop`.
+- [x] **B10 — Price-drop detection (FR-009):** historical implementation re-observed known listings
+  and sent a distinct `📉 Ціна знижена` alert on a re-qualifying drop. **Narrowed 2026-07-28 by
+  ADR-0013:** while SPEC-005 is paused, scored listings receive no routine recheck; only bounded
+  never-scored recovery remains, protecting fresh-listing discovery. Lifecycle price-drop work resumes
+  only through approved SPEC-005.
 - [ ] **B11 — Own-statistics valuation** — mostly **obviated**: RIA `/average_price` already returns
   `interQuartileMean` + `percentiles` (robust) for free, which we now use. Only worth revisiting if we
   need stats RIA doesn't give (e.g. our own regional/trim cuts). See [[profitability-definition]].

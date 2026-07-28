@@ -2,7 +2,7 @@
 
 **Feature Branch**: `005-listing-lifecycle-rechecks`  
 **Created**: 2026-07-28  
-**Status**: Draft  
+**Status**: Paused — implementation and production enablement deferred until the current monitor demonstrates operator profit.  
 **Input**: Catch viable listings that become deals after a price reduction while staying inside the approved monthly request pool.
 
 ## User Scenarios & Testing

@@ -33,7 +33,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
 | `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
-| `polling` | cron pipeline: search profiles → priority-tier value/re-check work; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | monthly pool + daily sub-budget; priority is a policy, not Redis/BullMQ infrastructure; sweep ≈5,400 req/mo |
+| `polling` | cron pipeline: search profiles → fresh-listing value work plus bounded recovery of never-scored listings; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | scored-listing lifecycle rechecks are paused (SPEC-005); monthly pool + daily sub-budget; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
 ## Data flow
@@ -46,7 +46,8 @@ discount/confidence/red-flags → every evaluated listing records its score plus
 **EvaluationExplanation** snapshot (`ParameterSet` version, profile threshold, cohort provenance,
 fair-value base/adjustment, score breakdown, fired flags); an **Opportunity** (score ≥ threshold)
 copies that same snapshot and is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
-The poll also re-observes a few known listings each cycle for price drops. On demand, the `query`
+The poll only recovers a bounded number of never-scored listings while SPEC-005 is paused; it does
+not routinely re-observe scored listings for price drops. On demand, the `query`
 module lets the bot check any listing (`/check`), list stored opportunities (`/top`), or list the
 best-scoring candidates even below the alert bar (`/best`). Full design:
 `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
