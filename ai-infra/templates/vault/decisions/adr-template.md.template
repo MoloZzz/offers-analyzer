@@ -1,0 +1,44 @@
+---
+title: ADR — [short decision title]
+type: decision
+status: Proposed
+updated: {{DATE}}
+---
+
+# ADR — [short decision title]
+
+**Status:** Proposed | Accepted | Superseded | Rejected
+
+**Date:** {{DATE}}
+
+## Context
+
+[What durable problem, constraint, or competing concern requires a decision?]
+
+## Decision
+
+[State the selected option and its boundary precisely.]
+
+## Consequences
+
+### Positive
+
+- [Benefit or capability gained.]
+
+### Costs and risks
+
+- [Maintenance cost, limitation, or operational risk accepted.]
+
+## Alternatives considered
+
+- **[Alternative]:** [Why it was not selected now.]
+
+## Supersession
+
+[State which earlier decision this extends, narrows, replaces, or leaves unchanged. If it changes
+an earlier decision, update every durable note that repeats the old fact in the same task.]
+
+## Related
+
+- [[decisions/README|Decision log]]
+- [Relevant spec, architecture note, or requirement]

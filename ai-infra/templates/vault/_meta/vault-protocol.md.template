@@ -1,0 +1,78 @@
+---
+title: Vault protocol
+type: meta
+updated: {{DATE}}
+summary: Portable rules for project memory, progressive retrieval, promotion, and validation.
+---
+
+# Vault protocol
+
+This vault is a curated project-memory and navigation layer. It is not a passive document folder,
+an automatic decision maker, or a replacement for source code and review.
+
+## Information hierarchy
+
+| Level | Purpose | Typical source |
+|---|---|---|
+| L1 — orientation | Current mission and handoff | `context/goals.md`, `context/CURRENT.md`, latest session log |
+| L2 — map | Locate the relevant owner | [[00-INDEX]], [[Roadmap & Status]], `find` |
+| L3 — source of truth | Read the actual rule, plan, or decision | vision, requirements, invariant, ADR, or spec |
+| L4 — implementation evidence | Confirm exact behavior | focused source, test, configuration, migration, or external evidence |
+
+Generated briefs and maps accelerate L1/L2 but are never the authority. Do not assume a particular
+agent runtime automatically loads context or runs a hook.
+
+## Read protocol
+
+Before a task:
+
+1. Read `context/goals.md`, `context/CURRENT.md`, and the latest dated context log.
+2. Start from [[00-INDEX]] or a generated brief and find the smallest owning note.
+3. Read the relevant section, ADR, or feature spec before opening broad implementation source.
+4. Use focused source evidence only when verifying or editing behavior.
+
+## Write and promotion protocol
+
+Updating durable knowledge is part of done. Put the changed fact in its canonical owner:
+
+- Product outcome, user, scope, or non-goal → [[business/vision-and-goals|Product vision and goals]].
+- Product obligation or release guardrail → [[business/requirements|Product requirements]].
+- Priority, status, blocker, or evidence exit → [[Roadmap & Status|Roadmap & Status]].
+- Refactor-resistant boundary or property → [[architecture/invariants|Architecture invariants]].
+- Durable trade-off → [[decisions/README|Decision log]].
+- Feature contract and delivery plan → [[specs/README|Feature specs index]].
+
+Also record concrete work in a dated context log. Keep `CURRENT.md` short and replace it when the
+active focus changes; it must never become a second roadmap.
+
+Start a new curated note from [[note-template]] and select the note type that owns its fact.
+
+## Context zone
+
+`context/` is an append-preserving inbox for orientation, handoffs, logs, drafts, and retained
+history. It is excluded from curated graph and ranked retrieval truth. Promote mature knowledge to
+the owning curated note and leave the context entry as history.
+
+## Generated output and validation
+
+The explicit build command is the normal writer for generated vault output. Check, retrieval, and
+diagnostic commands must remain read-only so they are safe in CI and optional hooks.
+
+```sh
+{{QUALITY_COMMANDS}}
+```
+
+If curated notes, source-fact inputs, configuration, or the chosen adapter change, rebuild before
+strict validation. Start new integrity rules as visible findings; make them blocking only after a
+clean, understood baseline and documented remediation path.
+
+## Decision supersession sweep
+
+When a decision changes, search durable notes for the old statement and update every relevant
+duplicate in the same task. A contradiction between a decision and another canonical note is a
+defect, not harmless history.
+
+## Extension boundary
+
+Source adapters, CI, hooks, runtime integrations, and evidence collection are optional. They must
+be explicitly enabled, have an owner, and never gain authority to make production changes.

@@ -91,42 +91,42 @@
           "level": 2,
           "text": "Completed / operating",
           "line": 36,
-          "endLine": 52
+          "endLine": 53
         },
         {
           "n": 4,
           "level": 2,
           "text": "Blocked / paused",
-          "line": 53,
-          "endLine": 59
+          "line": 54,
+          "endLine": 60
         },
         {
           "n": 5,
           "level": 2,
           "text": "Next",
-          "line": 60,
-          "endLine": 66
+          "line": 61,
+          "endLine": 67
         },
         {
           "n": 6,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 67,
-          "endLine": 72
+          "line": 68,
+          "endLine": 73
         },
         {
           "n": 7,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 73,
-          "endLine": 82
+          "line": 74,
+          "endLine": 83
         },
         {
           "n": 8,
           "level": 2,
           "text": "Related",
-          "line": 83,
-          "endLine": 90
+          "line": 84,
+          "endLine": 91
         }
       ]
     },
@@ -455,42 +455,42 @@
           "level": 2,
           "text": "Engineering knowledge tooling",
           "line": 21,
-          "endLine": 28
+          "endLine": 33
         },
         {
           "n": 3,
           "level": 2,
           "text": "Module map",
-          "line": 29,
-          "endLine": 46
+          "line": 34,
+          "endLine": 51
         },
         {
           "n": 4,
           "level": 2,
           "text": "Data flow",
-          "line": 47,
-          "endLine": 80
+          "line": 52,
+          "endLine": 85
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 81,
-          "endLine": 104
+          "line": 86,
+          "endLine": 109
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 105,
-          "endLine": 110
+          "line": 110,
+          "endLine": 115
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 111,
-          "endLine": 117
+          "line": 116,
+          "endLine": 122
         }
       ]
     },
@@ -1324,6 +1324,45 @@
       ]
     },
     {
+      "rel": "decisions/0016-portable-ai-infra-kit.md",
+      "path": "knowledge-offers-analyzer/decisions/0016-portable-ai-infra-kit.md",
+      "name": "0016-portable-ai-infra-kit",
+      "title": "Portable AI infrastructure kit",
+      "type": "decision",
+      "summary": "Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 24
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 25,
+          "endLine": 43
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 44,
+          "endLine": 50
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 51,
+          "endLine": 58
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1337,21 +1376,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 29
+          "endLine": 31
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 30,
-          "endLine": 36
+          "line": 32,
+          "endLine": 38
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 37,
-          "endLine": 40
+          "line": 39,
+          "endLine": 42
         }
       ]
     },
@@ -1452,16 +1491,23 @@
         {
           "n": 4,
           "level": 2,
-          "text": "Project",
+          "text": "Portable AI infrastructure kit",
           "line": 71,
-          "endLine": 81
+          "endLine": 90
         },
         {
           "n": 5,
           "level": 2,
+          "text": "Project",
+          "line": 91,
+          "endLine": 101
+        },
+        {
+          "n": 6,
+          "level": 2,
           "text": "Related",
-          "line": 82,
-          "endLine": 87
+          "line": 102,
+          "endLine": 107
         }
       ]
     },
@@ -2008,35 +2054,35 @@
           "level": 2,
           "text": "Specs",
           "line": 11,
-          "endLine": 26
+          "endLine": 27
         },
         {
           "n": 2,
           "level": 2,
           "text": "Backlog-level specs (pre-Spec-Kit)",
-          "line": 27,
-          "endLine": 44
+          "line": 28,
+          "endLine": 45
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 45,
-          "endLine": 49
+          "line": 46,
+          "endLine": 50
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 50,
-          "endLine": 54
+          "line": 51,
+          "endLine": 55
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 55,
-          "endLine": 59
+          "line": 56,
+          "endLine": 60
         }
       ]
     }

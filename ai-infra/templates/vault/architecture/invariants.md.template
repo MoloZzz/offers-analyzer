@@ -1,0 +1,37 @@
+---
+title: Architecture invariants
+type: architecture
+updated: {{DATE}}
+summary: Refactor-resistant properties, boundaries, and safety rules owned by the architecture.
+---
+
+# Architecture invariants
+
+> These are properties that must remain true while implementation changes. Record the trade-off in
+> an ADR when an invariant is created, narrowed, or replaced.
+
+## Boundary invariants
+
+- [A dependency, integration, or domain boundary that must remain explicit.]
+- [A rule for isolating external-system or framework-specific behavior.]
+
+## Data and compatibility invariants
+
+- [A durability, ownership, versioning, or compatibility property.]
+- [A rule for migration, deletion, or recovery of important state.]
+
+## Reliability and safety invariants
+
+- [A failure mode that must degrade safely.]
+- [A limit on automated, irreversible, or externally visible behavior.]
+
+## Explainability and change invariants
+
+- [Information needed to explain a consequential output or decision.]
+- [A rollback, approval, or versioning property for material changes.]
+
+## Related
+
+- [[business/requirements|Product requirements]]
+- [[decisions/README|Decision log]]
+- [[Roadmap & Status|Roadmap & Status]]

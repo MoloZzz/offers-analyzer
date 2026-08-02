@@ -1,0 +1,46 @@
+---
+title: Product vision and goals
+type: business
+updated: {{DATE}}
+summary: Canonical product outcome, intended users, scope, non-goals, and decision test.
+---
+
+# Product vision and goals
+
+> Canonical statement of product intent. Replace each bracketed prompt before relying on this note.
+
+## Product one-liner
+
+[Describe the product, the primary user, and the valuable outcome in one sentence.]
+
+## User and job
+
+- **Primary user or stakeholder:** [Who has the decision or problem?]
+- **Job to be done:** [What progress are they trying to make?]
+- **Why now:** [What makes timely help valuable?]
+
+## Desired outcomes
+
+- [Outcome that indicates the user receives value.]
+- [Outcome that indicates the project is safe, understandable, or sustainable.]
+- [Outcome that indicates the team can learn from real use.]
+
+## Scope boundaries
+
+- **In scope:** [The smallest current problem the project commits to solve.]
+- **Out of scope:** [A tempting adjacent problem the project deliberately does not solve.]
+- **Assumptions to test:** [Conditions that could invalidate the approach.]
+
+## Product decision test
+
+Before accepting a feature or change, ask:
+
+1. Does it improve the named user's ability to make progress on the core job?
+2. Does it support the stated outcome without violating a scope boundary or guardrail?
+3. Can the result and its important limitations be understood by the intended user or operator?
+
+## Related
+
+- [[business/requirements|Product requirements]]
+- [[Roadmap & Status|Roadmap & Status]]
+- [[architecture/invariants|Architecture invariants]]

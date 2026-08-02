@@ -1,0 +1,30 @@
+---
+title: Context zone
+type: context
+updated: {{DATE}}
+---
+
+# Context zone
+
+This directory preserves working memory without turning session history into a competing project
+specification. It is deliberately outside the curated navigation graph and ranked retrieval corpus.
+
+## What belongs here
+
+- `goals.md` — short orientation that points to canonical product notes.
+- `CURRENT.md` — overwriteable handoff: active focus, next pickup, and immediate blocker.
+- `log/YYYY-MM-DD-short-topic.md` — dated historical session record.
+- Drafts, investigation notes, and retained historical planning material that have not become
+  durable truth.
+
+## Promotion rule
+
+At task close, move the substance of a durable finding to its curated owner: vision, requirements,
+roadmap, invariants, ADR, or feature spec. Keep the context entry as history and link to the owner
+where helpful. Do not maintain a second vision, roadmap, decision record, or requirements list
+here.
+
+## Related
+
+- [[_meta/vault-protocol|Vault protocol]]
+- [[00-INDEX]]

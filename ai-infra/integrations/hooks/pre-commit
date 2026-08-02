@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Optional local hook. Copy to the target repository and enable deliberately:
+#   git config core.hooksPath .githooks
+#
+# It is read-only: it does not regenerate files and does not access services.
+set -eu
+
+node ai-infra/engine/v.mjs check --strict

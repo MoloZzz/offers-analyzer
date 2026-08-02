@@ -27,6 +27,8 @@ updated: 2026-08-02
 - [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]] - Prefer median benchmarks and guard claimed-mileage uplifts (Accepted)
 - [[0015-hybrid-executable-vault|ADR-0015]] — Adopt a hybrid executable vault with bounded retrieval and phased enforcement (Accepted)
 
+- [[0016-portable-ai-infra-kit|ADR-0016]] — Package reusable AI infrastructure as a portable bootstrap kit (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

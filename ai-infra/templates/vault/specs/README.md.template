@@ -1,0 +1,28 @@
+---
+title: Feature specs index
+type: moc
+updated: {{DATE}}
+summary: Entry point for feature contracts, plans, tasks, and their relationship to the roadmap.
+---
+
+# Feature specs index
+
+Feature packages live in the repository `specs/` directory. A spec owns a feature contract and its
+delivery plan; the roadmap owns only high-level status and sequencing.
+
+## Workflow
+
+1. Create a package from the templates in `specs/` for a non-trivial change.
+2. Clarify requirements, plan the implementation, and identify verification before coding.
+3. Link consequential trade-offs to ADRs and reflect completed delivery status in the roadmap.
+4. Preserve old packages as historical implementation evidence unless intentionally archived.
+
+## Feature packages
+
+- [Add links to active and completed feature packages here.]
+
+## Related
+
+- [[Roadmap & Status|Roadmap & Status]]
+- [[decisions/README|Decision log]]
+- [[business/requirements|Product requirements]]

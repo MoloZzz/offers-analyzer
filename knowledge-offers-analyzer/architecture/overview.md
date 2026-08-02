@@ -26,6 +26,11 @@ NestJS/TypeORM source tree. These files are generated navigation evidence, not a
 dependencies and not a replacement for the MOCs/ADRs. See [[0015-hybrid-executable-vault|ADR-0015]],
 [[vault-protocol]], and [[persistence-surface]].
 
+The repository also maintains `ai-infra/`, a separate, versioned bootstrap kit that packages only
+the generic second-brain and context-control mechanism for other projects. It is not used at
+application runtime and deliberately excludes this project's product knowledge and TypeORM adapter;
+see [[0016-portable-ai-infra-kit|ADR-0016]].
+
 ## Module map
 
 Implemented (spec 001). One NestJS module per concern:

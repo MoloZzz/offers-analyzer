@@ -17,6 +17,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run vault:test
+      - run: npm run ai-infra:test
       - run: npm run vault:check:strict
       - run: npm run typecheck
       - run: npm run lint

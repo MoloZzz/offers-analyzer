@@ -68,6 +68,26 @@ git config core.hooksPath .githooks
 
 The hook runs the same strict check as CI and never builds artifacts or accesses the database.
 
+## Portable AI infrastructure kit
+
+`ai-infra/` is a versioned, copy-and-own bootstrap kit for other repositories. It packages the
+generic second-brain, product-vision loop, context-control protocol, retrieval engine, and
+collision-safe initializer. It is not an application runtime dependency and does not replace this
+project's configured `tools/vault/` or Offers-specific source adapter.
+
+Validate the kit while developing it here:
+
+```bash
+npm run ai-infra:test
+```
+
+To inspect a fresh target without writing, run `node ai-infra/bin/ai-infra.mjs init --target
+<path> --project-name "Name" --dry-run`; use `--apply` only after reviewing the file plan. A
+target starts with `adapter: "none"`, direct Node commands, and no enabled hooks, CI, source
+adapter, network call, or evidence query. Copy optional integrations only after that target has a
+clean generated-artifact baseline. See [[0016-portable-ai-infra-kit|ADR-0016]] and
+`../ai-infra/README.md`.
+
 ## Project
 
 - App: NestJS. Standard scripts (`npm run build`, `test`, `lint`) — run them through RTK.

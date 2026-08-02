@@ -1,0 +1,21 @@
+# Tasks: [short feature name]
+
+**Spec:** [spec.md](spec.md) | **Plan:** [plan.md](plan.md)
+
+Status: `[ ]` todo · `[~]` in progress · `[x]` done.
+
+## Preparation
+
+- [ ] T001 Confirm owning notes, constraints, and acceptance criteria.
+- [ ] T002 Record any material trade-off in an ADR.
+
+## Implementation
+
+- [ ] T003 [Smallest independently verifiable implementation slice.]
+- [ ] T004 [Next bounded implementation slice.]
+
+## Verification and knowledge
+
+- [ ] T005 Add or update focused verification.
+- [ ] T006 Update the owning roadmap, notes, and dated context log.
+- [ ] T007 Rebuild generated knowledge when relevant and run strict validation.

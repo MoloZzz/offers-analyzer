@@ -1,0 +1,20 @@
+# Copy this file into a target repository only after its generated knowledge
+# artifacts have a clean baseline. It intentionally checks but never rebuilds.
+name: Knowledge infrastructure
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  knowledge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test ai-infra/engine/test/*.test.mjs
+      - run: node ai-infra/engine/v.mjs check --strict

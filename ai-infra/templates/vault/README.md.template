@@ -1,0 +1,25 @@
+---
+title: {{PROJECT_NAME}} knowledge base
+type: meta
+updated: {{DATE}}
+---
+
+# {{PROJECT_NAME}} knowledge base
+
+This directory is the curated, reviewable memory for the project. It owns durable product intent,
+requirements, decisions, architecture, conventions, operations, and the feature-spec index. It is
+not a replacement for source code or a transcript of every session.
+
+Start at [[00-INDEX]] and follow the smallest source that owns the question. The separate
+`context/` directory holds handoffs, logs, drafts, and history; it is intentionally excluded from
+curated graph and ranked retrieval truth. Rules: [[_meta/vault-protocol|Vault protocol]].
+
+## Setup required
+
+Replace the bracketed prompts in the product and roadmap notes before treating them as project
+authority. Add new durable facts to their owning note rather than creating parallel summaries.
+
+## Related
+
+- [[00-INDEX]]
+- [[_meta/vault-protocol|Vault protocol]]

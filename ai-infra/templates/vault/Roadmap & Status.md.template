@@ -1,0 +1,49 @@
+---
+title: Roadmap & Status
+type: roadmap
+updated: {{DATE}}
+summary: Canonical high-level delivery status, priorities, blockers, and exit evidence.
+---
+
+# Roadmap & Status
+
+> Canonical high-level delivery status. Feature detail belongs in specifications; trade-offs belong
+> in ADRs; session history belongs in context.
+
+## Current
+
+[State the current product or delivery focus, its intended outcome, and what must remain true.]
+
+## Active outcomes and evidence
+
+| Outcome | Current state | Blocker or risk | Exit evidence |
+|---|---|---|---|
+| [Outcome] | [State] | [Blocker] | [Evidence or review needed] |
+
+## Completed / operating
+
+| Area | Status | Evidence |
+|---|---|---|
+| [Completed capability or decision] | [State] | [Reference to spec, ADR, test, or review] |
+
+## Blocked / paused
+
+- [Work deliberately paused, why it is paused, and the condition to resume.]
+
+## Next
+
+- [ ] [Next outcome selected after current evidence or approval gate.]
+
+## Work-entry rule
+
+For a non-trivial change, create or update a feature specification before implementation. Update
+this roadmap only for priority, phase, status, blocker, or exit evidence; do not turn it into a
+duplicate design document.
+
+## Related
+
+- [[business/vision-and-goals|Product vision and goals]]
+- [[business/requirements|Product requirements]]
+- [[architecture/invariants|Architecture invariants]]
+- [[specs/README|Feature specs index]]
+- [[decisions/README|Decision log]]

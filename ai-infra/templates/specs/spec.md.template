@@ -1,0 +1,44 @@
+# Feature specification: [short feature name]
+
+**Created:** {{DATE}}
+
+**Status:** Draft
+
+## Problem and outcome
+
+[Describe the user or stakeholder problem, intended outcome, and why it matters now.]
+
+## Scope
+
+- **In scope:** [Smallest committed capability.]
+- **Out of scope:** [Explicitly deferred work.]
+- **Assumptions:** [Conditions to validate.]
+
+## User scenarios
+
+### Scenario 1 — [outcome]
+
+**Given** [starting condition], **when** [action or event], **then** [observable outcome].
+
+## Functional requirements
+
+- **FR-001:** [Testable requirement.]
+- **FR-002:** [Testable requirement.]
+
+## Constraints and guardrails
+
+- [Requirement, invariant, decision, or operational boundary that applies.]
+
+## Success criteria
+
+- [Measurable outcome or acceptance check.]
+- [Quality, safety, or rollback condition.]
+
+## Open questions
+
+- [Question requiring evidence, decision, or owner input.]
+
+## Related
+
+- [Canonical roadmap item]
+- [Relevant ADR or architecture note]

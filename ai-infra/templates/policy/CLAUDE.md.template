@@ -1,0 +1,4 @@
+# Runtime compatibility entry point
+
+Read and follow `AGENT-POLICY.md`. This file exists only for runtimes that look for this filename;
+the project policy itself is runtime-neutral and is maintained in one place.

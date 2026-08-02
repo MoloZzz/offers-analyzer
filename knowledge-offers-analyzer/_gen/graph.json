@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 44,
-    "links": 346,
+    "notes": 45,
+    "links": 354,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -80,7 +80,7 @@
       "name": "vault-protocol",
       "title": "Vault Protocol - how agents use and maintain the knowledge base",
       "type": "meta",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 18
     },
     {
@@ -97,7 +97,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 17,
-      "outDeg": 25
+      "outDeg": 26
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -144,7 +144,7 @@
       "name": "0001-adopt-sdd-vault-rtk",
       "title": "ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK",
       "type": "decision",
-      "inDeg": 3,
+      "inDeg": 4,
       "outDeg": 4
     },
     {
@@ -160,7 +160,7 @@
       "name": "0003-decoupled-context-zone",
       "title": "ADR-0003 — Decoupled context zone instead of a second knowledge base",
       "type": "decision",
-      "inDeg": 2,
+      "inDeg": 3,
       "outDeg": 8
     },
     {
@@ -256,6 +256,14 @@
       "name": "0015-hybrid-executable-vault",
       "title": "ADR-0015 — Hybrid executable vault and phased enforcement",
       "type": "decision",
+      "inDeg": 5,
+      "outDeg": 4
+    },
+    {
+      "rel": "decisions/0016-portable-ai-infra-kit.md",
+      "name": "0016-portable-ai-infra-kit",
+      "title": "Portable AI infrastructure kit",
+      "type": "decision",
       "inDeg": 4,
       "outDeg": 4
     },
@@ -265,7 +273,7 @@
       "title": "Decision log (ADRs)",
       "type": "moc",
       "inDeg": 21,
-      "outDeg": 19
+      "outDeg": 20
     },
     {
       "rel": "decisions/adr-template.md",
@@ -289,7 +297,7 @@
       "title": "Environment setup & tooling",
       "type": "operations",
       "inDeg": 8,
-      "outDeg": 5
+      "outDeg": 6
     },
     {
       "rel": "research/alternative-sources.md",
@@ -361,7 +369,7 @@
       "title": "Feature specs index (SDD)",
       "type": "moc",
       "inDeg": 6,
-      "outDeg": 11
+      "outDeg": 12
     }
   ],
   "edges": [
@@ -524,21 +532,21 @@
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
-      "line": 87
+      "line": 88
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/requirements.md",
       "anchor": null,
       "embed": false,
-      "line": 86
+      "line": 87
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 85
+      "line": 86
     },
     {
       "from": "Roadmap & Status.md",
@@ -559,14 +567,14 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 89
+      "line": 90
     },
     {
       "from": "Roadmap & Status.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 88
+      "line": 89
     },
     {
       "from": "SPEC-005.md",
@@ -860,7 +868,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 113
+      "line": 118
     },
     {
       "from": "architecture/overview.md",
@@ -888,14 +896,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 116
+      "line": 121
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 107
+      "line": 112
     },
     {
       "from": "architecture/overview.md",
@@ -909,14 +917,14 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 38
+      "line": 43
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 97
+      "line": 102
     },
     {
       "from": "architecture/overview.md",
@@ -944,14 +952,14 @@
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 42
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 71
     },
     {
       "from": "architecture/overview.md",
@@ -962,17 +970,24 @@
     },
     {
       "from": "architecture/overview.md",
+      "to": "decisions/0016-portable-ai-infra-kit.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 115
+      "line": 120
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 114
+      "line": 119
     },
     {
       "from": "architecture/overview.md",
@@ -986,49 +1001,49 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 35
+      "line": 40
     },
     {
       "from": "architecture/overview.md",
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 107
+      "line": 112
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 42
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 90
+      "line": 95
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-methods-coverage.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 42
     },
     {
       "from": "architecture/overview.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 101
+      "line": 106
     },
     {
       "from": "architecture/overview.md",
       "to": "research/why-no-opportunities.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 42
     },
     {
       "from": "architecture/persistence-surface.md",
@@ -1927,25 +1942,53 @@
       "line": 84
     },
     {
+      "from": "decisions/0016-portable-ai-infra-kit.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0016-portable-ai-infra-kit.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "decisions/0016-portable-ai-infra-kit.md",
+      "to": "decisions/0003-decoupled-context-zone.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "decisions/0016-portable-ai-infra-kit.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 41
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 35
+      "line": 37
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 35
+      "line": 37
     },
     {
       "from": "decisions/README.md",
@@ -2051,6 +2094,13 @@
       "anchor": null,
       "embed": false,
       "line": 28
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0016-portable-ai-infra-kit.md",
+      "anchor": null,
+      "embed": false,
+      "line": 30
     },
     {
       "from": "decisions/README.md",
@@ -2162,14 +2212,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 84
+      "line": 104
     },
     {
       "from": "operations/environment-setup.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 85
+      "line": 105
     },
     {
       "from": "operations/environment-setup.md",
@@ -2183,14 +2233,21 @@
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 86
+      "line": 106
     },
     {
       "from": "operations/environment-setup.md",
       "to": "decisions/0008-global-error-handling.md",
       "anchor": null,
       "embed": false,
-      "line": 75
+      "line": 95
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "decisions/0016-portable-ai-infra-kit.md",
+      "anchor": null,
+      "embed": false,
+      "line": 88
     },
     {
       "from": "research/alternative-sources.md",
@@ -2715,42 +2772,42 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 57
+      "line": 58
     },
     {
       "from": "specs/README.md",
       "to": "SPEC-006.md",
       "anchor": null,
       "embed": false,
-      "line": 35
+      "line": 36
     },
     {
       "from": "specs/README.md",
       "to": "SPEC-008.md",
       "anchor": null,
       "embed": false,
-      "line": 36
+      "line": 37
     },
     {
       "from": "specs/README.md",
       "to": "SPEC-009.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 38
     },
     {
       "from": "specs/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 54
     },
     {
       "from": "specs/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 58
+      "line": 59
     },
     {
       "from": "specs/README.md",
@@ -2775,17 +2832,24 @@
     },
     {
       "from": "specs/README.md",
+      "to": "decisions/0016-portable-ai-infra-kit.md",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "specs/README.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 54
     },
     {
       "from": "specs/README.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 52
+      "line": 53
     }
   ],
   "dangling": [],
@@ -2824,6 +2888,7 @@
       "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "decisions/0015-hybrid-executable-vault.md",
+      "decisions/0016-portable-ai-infra-kit.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",

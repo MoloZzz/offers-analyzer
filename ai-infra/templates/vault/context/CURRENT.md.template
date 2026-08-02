@@ -1,0 +1,26 @@
+---
+title: Current task handoff
+type: context
+updated: {{DATE}}
+---
+
+# Current task handoff
+
+> Replace the active-work section when focus changes. This is a handoff, not a roadmap.
+
+## Active work
+
+[Describe the narrow current task and link to its owning roadmap item, ADR, or spec.]
+
+## Next pickup
+
+[State the smallest useful next action and the source to read first.]
+
+## Verification / blockers
+
+- [Check performed or still required.]
+- [Concrete blocker, dependency, decision, or evidence needed.]
+
+## Promotion reminder
+
+[Name any durable fact that must be promoted before this work is closed.]

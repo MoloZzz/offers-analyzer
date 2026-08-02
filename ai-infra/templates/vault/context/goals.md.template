@@ -1,0 +1,28 @@
+---
+title: Project orientation
+type: context
+updated: {{DATE}}
+---
+
+# Project orientation
+
+> A short entry point for a work session, not the canonical product specification.
+
+## Read order
+
+1. Read this orientation, `CURRENT.md`, and the latest dated context log.
+2. Open [[00-INDEX]] and follow the relevant curated map.
+3. Read the smallest source of truth before opening implementation detail.
+
+## Project in one sentence
+
+[Summarize the product outcome from the canonical vision note.]
+
+## Current durable guardrail
+
+[State one current constraint or link to the canonical requirement, ADR, or roadmap section.]
+
+## Context-zone rule
+
+Use context for handoff, session history, drafts, and temporary investigation. Promote durable
+facts to curated owners; do not copy a second vision or delivery status document here.

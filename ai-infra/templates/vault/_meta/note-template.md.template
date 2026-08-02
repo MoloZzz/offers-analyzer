@@ -1,0 +1,22 @@
+---
+title: [concept name]
+type: business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log
+updated: {{DATE}}
+---
+
+# [concept name]
+
+> [One-sentence factual summary.]
+
+## Context / What
+
+[What this note owns.]
+
+## Details
+
+[The durable substance. Link to related curated notes with `[[wikilinks]]`; link to focused code
+or external evidence only when it is relevant.]
+
+## Related
+
+- [[00-INDEX]]

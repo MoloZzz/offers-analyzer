@@ -43,6 +43,7 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 | Budget stabilization (SPEC-010) | Implemented to protect fresh-listing discovery and make cohorts reusable. |
 | Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. |
 | Executable hybrid vault (SPEC-012) | Implemented: generated L1 context, bounded retrieval, verified Offers source facts, strict CI validation, and advisory-only evidence. |
+| Portable AI infrastructure kit (SPEC-013) | Implemented: clean-room, copy-and-own second-brain/bootstrap kit with safe docs-only defaults and opt-in extensions. |
 
 - [x] Core monitoring and Telegram delivery are implemented.
 - [x] Initial outcome feedback and bounded calibration slices are implemented.

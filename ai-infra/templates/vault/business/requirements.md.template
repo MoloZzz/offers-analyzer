@@ -1,0 +1,40 @@
+---
+title: Product requirements
+type: business
+updated: {{DATE}}
+summary: Durable user-facing obligations, safety guardrails, and release conditions.
+---
+
+# Product requirements
+
+> Requirements describe what must be true for users and stakeholders. Keep implementation choices
+> in architecture notes, feature specs, and ADRs.
+
+## Core obligations
+
+1. [Observable user-facing capability or outcome.]
+2. [Reliability, safety, privacy, accessibility, or quality obligation.]
+3. [Explanation, control, or feedback obligation where relevant.]
+
+## Guardrails
+
+1. [A harmful or misleading behavior the system must prevent.]
+2. [A boundary on automated action, cost, data use, or operational risk.]
+3. [A condition under which the system must degrade safely or pause.]
+
+## Release and evidence gates
+
+1. [Evidence required before a material behavior becomes active.]
+2. [Required owner review or approval for an irreversible or high-impact change.]
+3. [Required rollback, observation, or support condition.]
+
+## Non-requirements
+
+- [Capability intentionally deferred or explicitly not promised.]
+- [Unsupported integration, audience, environment, or automation level.]
+
+## Related
+
+- [[business/vision-and-goals|Product vision and goals]]
+- [[architecture/invariants|Architecture invariants]]
+- [[Roadmap & Status|Roadmap & Status]]
