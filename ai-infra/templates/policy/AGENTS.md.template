@@ -1,5 +1,0 @@
-# Agent instructions
-
-Read and follow `AGENT-POLICY.md` before changing code, specifications, or the knowledge base.
-That file is the single project-owned policy source; do not copy its rules into additional runtime
-files.

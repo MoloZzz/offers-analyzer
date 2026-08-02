@@ -1,5 +1,0 @@
-# query<TAB>expected reference<TAB>top|within
-#
-# Add representative questions only after the curated corpus has a trustworthy baseline. The
-# expected reference must resolve to a curated note or stable section. Context notes do not belong
-# in this file because they are intentionally excluded from ranked retrieval truth.
