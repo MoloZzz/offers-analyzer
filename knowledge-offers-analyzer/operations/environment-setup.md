@@ -101,6 +101,14 @@ clean generated-artifact baseline. See [[0016-portable-ai-infra-kit|ADR-0016]] a
 
 ## Related
 
+## Telegram monitoring administration
+
+Set `TELEGRAM_ADMIN_CHAT_IDS` to a comma-separated list of Telegram chat IDs before deployment.
+After SPEC-014 is deployed, an authorized admin can use `/daily_limit off`, `/daily_limit on`, and
+`/daily_limit status` to control the persisted `auto-ria` daily request-limit state without
+restarting the app. The monthly pool remains enforced; `/stop` and `/mute` only affect
+notifications.
+
 - [[00-INDEX]]
 - [[coding-standards]]
 - [[0001-adopt-sdd-vault-rtk]]

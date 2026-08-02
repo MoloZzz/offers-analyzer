@@ -7,6 +7,7 @@ import { SubscribersService } from '../../src/modules/notifications/subscribers.
 import { TelegramBotUpdate } from '../../src/modules/notifications/telegram/telegram-bot.update';
 import { ProfilesService } from '../../src/modules/profiles/profiles.service';
 import { QueryService } from '../../src/modules/query/query.service';
+import { SourceControlService } from '../../src/modules/scheduling/source-control.service';
 
 type TestContext = Context & { reply: jest.Mock };
 
@@ -36,6 +37,7 @@ function buildUpdate(): {
   update: TelegramBotUpdate;
   subscribers: SubscriberMocks;
   profiles: ProfileMocks;
+  sourceControl: { setDailyLimitEnabled: jest.Mock; isDailyLimitEnabled: jest.Mock };
   query: QueryService & { assessById: jest.Mock; whyById: jest.Mock };
 } {
   const subscriberMocks: SubscriberMocks = {
@@ -90,16 +92,48 @@ function buildUpdate(): {
 
   const subscribers = subscriberMocks as unknown as SubscribersService;
   const profiles = profileMocks as unknown as ProfilesService;
+  const sourceControl = {
+    setDailyLimitEnabled: jest.fn().mockResolvedValue(true),
+    isDailyLimitEnabled: jest.fn().mockResolvedValue(true),
+  } as unknown as SourceControlService;
+  const config = { get: jest.fn().mockReturnValue(['77']) } as never;
 
   return {
-    update: new TelegramBotUpdate(subscribers, profiles, query, outcomes, calibration, deals),
+    update: new TelegramBotUpdate(subscribers, profiles, query, outcomes, calibration, deals, sourceControl, config),
     subscribers: subscriberMocks,
     profiles: profileMocks,
+    sourceControl: sourceControl as unknown as {
+      setDailyLimitEnabled: jest.Mock;
+      isDailyLimitEnabled: jest.Mock;
+    },
     query: query as QueryService & { assessById: jest.Mock; whyById: jest.Mock },
   };
 }
 
 describe('TelegramBotUpdate', () => {
+  it('allows an admin to disable, inspect, and re-enable the daily limit', async () => {
+    const { update, sourceControl } = buildUpdate();
+
+    await update.onDailyLimit(buildContext('/daily_limit off'));
+    await update.onDailyLimit(buildContext('/daily_limit status'));
+    await update.onDailyLimit(buildContext('/daily_limit on'));
+
+    expect(sourceControl.setDailyLimitEnabled).toHaveBeenNthCalledWith(1, 'auto-ria', false);
+    expect(sourceControl.isDailyLimitEnabled).toHaveBeenCalledWith('auto-ria');
+    expect(sourceControl.setDailyLimitEnabled).toHaveBeenNthCalledWith(2, 'auto-ria', true);
+  });
+
+  it('rejects source-control commands from non-admin chats', async () => {
+    const { update, sourceControl } = buildUpdate();
+    const ctx = buildContext('/daily_limit off');
+    (ctx.chat as { id: number }).id = 88;
+
+    await update.onDailyLimit(ctx);
+
+    expect(sourceControl.setDailyLimitEnabled).not.toHaveBeenCalled();
+    expect(ctx.reply).toHaveBeenCalledWith('This command is available to administrators only.');
+  });
+
   it('keeps /start as a full subscription reset and /stop as unsubscribe', async () => {
     const { update, subscribers } = buildUpdate();
     const ctx = buildContext('/start');

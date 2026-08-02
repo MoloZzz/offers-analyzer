@@ -7,7 +7,7 @@ code:
   - src/common/database/data-source.ts
   - src/common/database/migrations/*.ts
   - src/modules/**/entities/*.ts
-rev: cd1eff55a902
+rev: 3af0fcad03ef
 ---
 
 # Persistence surface

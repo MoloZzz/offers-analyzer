@@ -1,6 +1,8 @@
+import { ConfigService } from '@nestjs/config';
 import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
 import { Context, Markup } from 'telegraf';
 
+import { AppConfig } from '../../../common/config/configuration';
 import { CalibrationService } from '../../calibration/calibration.service';
 import { realizedMargin } from '../../calibration/deal-margin';
 import { DealsService } from '../../calibration/deals.service';
@@ -11,6 +13,7 @@ import { ProfilesService } from '../../profiles/profiles.service';
 import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
 import { formatBudgetReport } from '../../scheduling/budget-report';
+import { SourceControlService } from '../../scheduling/source-control.service';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
@@ -70,7 +73,36 @@ export class TelegramBotUpdate {
     private readonly outcomes: OutcomesService,
     private readonly calibration: CalibrationService,
     private readonly deals: DealsService,
+    private readonly sourceControl: SourceControlService,
+    private readonly config: ConfigService<AppConfig, true>,
   ) {}
+
+  @Command('daily_limit')
+  async onDailyLimit(@Ctx() ctx: Context): Promise<void> {
+    if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
+    const argument = commandArg(ctx).trim().toLowerCase();
+    if (argument === 'off') {
+      await this.sourceControl.setDailyLimitEnabled('auto-ria', false);
+      await ctx.reply('AUTO.RIA daily request limit disabled. Monthly pool remains enforced.');
+      return;
+    }
+    if (argument === 'on') {
+      await this.sourceControl.setDailyLimitEnabled('auto-ria', true);
+      await ctx.reply('AUTO.RIA daily request limit enabled.');
+      return;
+    }
+    const enabled = await this.sourceControl.isDailyLimitEnabled('auto-ria');
+    await ctx.reply(`AUTO.RIA daily request limit: ${enabled ? 'enabled' : 'disabled'}.`);
+  }
+
+  private isAdmin(ctx: Context): boolean {
+    const chatId = ctx.chat?.id;
+    return chatId != null && this.config.get('telegramAdminChatIds', { infer: true }).includes(String(chatId));
+  }
+
+  private async replyAdminOnly(ctx: Context): Promise<void> {
+    await ctx.reply('This command is available to administrators only.');
+  }
 
   @Start()
   async onStart(@Ctx() ctx: Context): Promise<void> {

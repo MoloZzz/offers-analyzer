@@ -16,16 +16,16 @@ AUTO.RIA official API + Telegram
 checkboxes  done=5 open=5
 
 ## CODE (derived from .)
-entities    17
-migrations  18
+entities    18
+migrations  20
 providers   AutoRiaSource(auto-ria)
-tests       unit 250/41 files
+tests       unit 253/41 files
             integration 9/1 files
 map         knowledge-offers-analyzer/_gen/code-map.txt (read before source edits)
 facts       knowledge-offers-analyzer/_gen/facts.txt (verified adapter facts)
 
 ## ENVIRONMENT
-used=23 documented=23
+used=24 documented=24
 
 ## QUALITY COMMANDS
 npm run typecheck

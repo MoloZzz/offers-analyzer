@@ -14,6 +14,7 @@ import {
 } from './entities/budget-activity.entity';
 import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
+import { SourceControlService } from './source-control.service';
 
 // How long to pause all consumption after the source returns HTTP 429, before
 // retrying. Keeps us from hammering an upstream that just told us to back off.
@@ -46,6 +47,7 @@ export class RateBudgetService {
     private readonly stateRepo: Repository<MonthlyBudgetState>,
     @InjectPinoLogger(RateBudgetService.name) private readonly logger: PinoLogger,
     @InjectRepository(BudgetActivity) private readonly activityRepo?: Repository<BudgetActivity>,
+    private readonly sourceControl?: SourceControlService,
   ) {
     this.capacityPerHour = config.get('rateBudgetPerHour', { infer: true });
     this.poolPerMonth = config.get('rateBudgetPoolPerMonth', { infer: true });
@@ -80,14 +82,18 @@ export class RateBudgetService {
 
     // Ensure daily budget is calculated for today (on-demand reset if date changed)
     const dailyBudget = await this.ensureDailyBudgetCalculated(sourceKey, now);
+    const dailyLimitEnabled =
+      !this.sourceControl || (await this.sourceControl.isDailyLimitEnabled(sourceKey));
 
     // Get current monthly state
     const state = await this.getMonthlyBudgetState(sourceKey, now);
 
     // Check tier cutoff (if budget is tight, deny lower-priority tiers)
     const dailyUsed = state.dailyUsed ?? 0;
-    const cutoffTier = this.determineCutoffTier(dailyBudget, dailyUsed);
-    if (cutoffTier != null && tier > cutoffTier) {
+    const cutoffTier = dailyLimitEnabled
+      ? this.determineCutoffTier(dailyBudget, dailyUsed)
+      : null;
+    if (dailyLimitEnabled && cutoffTier != null && tier > cutoffTier) {
       this.logger.warn(
         { sourceKey, tier, cutoffTier, dailyUsed, dailyBudget },
         `Tier ${tier} denied (budget tight, cutoff at ${cutoffTier})`,
@@ -107,7 +113,7 @@ export class RateBudgetService {
     }
 
     // Check daily budget exhaustion
-    if (dailyUsed + cost > dailyBudget) {
+    if (dailyLimitEnabled && dailyUsed + cost > dailyBudget) {
       this.logger.warn({ sourceKey, dailyUsed, dailyBudget, cost }, 'Daily budget exhausted');
       await this.recordActivity(sourceKey, cost, tier, context, 'denied', 'daily_exhausted', now);
       return false;

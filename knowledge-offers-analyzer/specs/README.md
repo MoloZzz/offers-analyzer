@@ -43,6 +43,10 @@ durable allowed/denied budget ledger and read-only `/budget` report. The rollout
 evidence-ready only after the current month's ledger reconciles with the pool and its forecast
 fits the allocation; it does not auto-enable SPEC-005 or profiles.
 
+`SPEC-014` is implemented at `../../specs/014-telegram-monitoring-control/`: it adds durable,
+admin-only Telegram controls to disable/re-enable the AUTO.RIA daily request limit while retaining
+the monthly pool cap.
+
 ## Constitution
 
 Project principles are ratified in `../.specify/memory/constitution.md` (v1.2.0, 2026-08-02) —

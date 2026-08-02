@@ -5,7 +5,7 @@ export type BudgetOperation =
 
 export type BudgetActivityOutcome = 'allowed' | 'denied';
 export type BudgetDenialReason =
-  'allowed' | 'tier_cutoff' | 'daily_exhausted' | 'monthly_exhausted' | 'cooldown';
+  'allowed' | 'tier_cutoff' | 'daily_exhausted' | 'monthly_exhausted' | 'cooldown' | 'paused';
 
 /** Immutable audit trail for one budget admission attempt (SPEC-009). */
 @Entity('budget_activities')

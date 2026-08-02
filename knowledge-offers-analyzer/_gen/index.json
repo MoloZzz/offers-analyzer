@@ -490,7 +490,14 @@
           "level": 2,
           "text": "Related",
           "line": 116,
-          "endLine": 122
+          "endLine": 117
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Runtime monitoring control",
+          "line": 118,
+          "endLine": 128
         }
       ]
     },
@@ -501,7 +508,7 @@
       "title": "Persistence surface",
       "type": "architecture",
       "summary": "Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.",
-      "rev": "cd1eff55a902",
+      "rev": "3af0fcad03ef",
       "headings": [
         {
           "n": 1,
@@ -1507,7 +1514,14 @@
           "level": 2,
           "text": "Related",
           "line": 102,
-          "endLine": 107
+          "endLine": 103
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Telegram monitoring administration",
+          "line": 104,
+          "endLine": 115
         }
       ]
     },
@@ -2061,28 +2075,28 @@
           "level": 2,
           "text": "Backlog-level specs (pre-Spec-Kit)",
           "line": 28,
-          "endLine": 45
+          "endLine": 49
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 46,
-          "endLine": 50
+          "line": 50,
+          "endLine": 54
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 51,
-          "endLine": 55
+          "line": 55,
+          "endLine": 59
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 56,
-          "endLine": 60
+          "line": 60,
+          "endLine": 64
         }
       ]
     }

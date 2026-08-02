@@ -9,6 +9,7 @@ import { HealthModule } from '../health/health.module';
 import { ListingsModule } from '../listings/listings.module';
 import { ProfilesModule } from '../profiles/profiles.module';
 import { QueryModule } from '../query/query.module';
+import { SchedulingModule } from '../scheduling/scheduling.module';
 
 import { AlertedCarsService } from './alerted-cars.service';
 import { CalibrationSchedulerService } from './calibration-scheduler.service';
@@ -31,6 +32,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     CalibrationModule,
     HealthModule,
     ListingsModule,
+    SchedulingModule,
     TypeOrmModule.forFeature([Subscriber, Notification, AlertedCar]),
     TelegrafModule.forRootAsync({
       inject: [ConfigService],

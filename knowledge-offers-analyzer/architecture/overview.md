@@ -115,6 +115,12 @@ single missed sweep never fabricates an event.
 
 ## Related
 
+## Runtime monitoring control
+
+`SourceControl` stores a durable source-level daily-limit setting in PostgreSQL. `RateBudgetService`
+uses it to bypass or enforce daily cutoff/exhaustion checks while always enforcing the monthly pool.
+Admin-only Telegram `/daily_limit off|on|status` changes the setting without an app restart.
+
 - [[00-INDEX]]
 - [[glossary]]
 - [[decisions/README]]

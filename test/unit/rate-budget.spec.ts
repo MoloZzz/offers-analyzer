@@ -118,6 +118,7 @@ function buildFakeConfig(overrides?: Partial<AppConfig>) {
     databaseUrl: '',
     autoRiaApiKey: 'key',
     telegramBotToken: 'token',
+    telegramAdminChatIds: [],
     nbuRateUrl: 'url',
     rateBudgetPerHour: 30,
     rateBudgetPoolPerMonth: 20000,
@@ -494,6 +495,28 @@ describe('RateBudgetService (ADR-0009)', () => {
         }),
       ]),
     );
+    jest.useRealTimers();
+  });
+  it('bypasses daily enforcement while the daily limit is disabled', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-07-15T12:00:00Z'));
+    const { repo: windowRepo } = buildFakeWindowRepo();
+    const { repo: stateRepo } = buildFakeStateRepo();
+    const { repo: activityRepo, rows: activityRows } = buildFakeActivityRepo();
+    const sourceControl = { isDailyLimitEnabled: jest.fn().mockResolvedValue(false) };
+    const service = new RateBudgetService(
+      buildFakeConfig(),
+      windowRepo,
+      stateRepo,
+      fakeLogger as never,
+      activityRepo,
+      sourceControl as never,
+    );
+
+    const allowed = await service.tryConsume('auto-ria', 1, 1, { operation: 'search' });
+
+    expect(allowed).toBe(true);
+    expect(sourceControl.isDailyLimitEnabled.mock.calls).toContainEqual(['auto-ria']);
+    expect(activityRows).toEqual(expect.arrayContaining([expect.objectContaining({ outcome: 'allowed' })]));
     jest.useRealTimers();
   });
 });

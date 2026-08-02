@@ -16,6 +16,7 @@ import { SearchProfile } from '../../modules/profiles/entities/search-profile.en
 import { BudgetActivity } from '../../modules/scheduling/entities/budget-activity.entity';
 import { MonthlyBudgetState } from '../../modules/scheduling/entities/monthly-budget-state.entity';
 import { RateBudgetWindow } from '../../modules/scheduling/entities/rate-budget-window.entity';
+import { SourceControl } from '../../modules/scheduling/entities/source-control.entity';
 import { AveragePriceSnapshot } from '../../modules/valuation/entities/average-price-snapshot.entity';
 import { FairValueBenchmark } from '../../modules/valuation/entities/fair-value-benchmark.entity';
 import { Opportunity } from '../../modules/valuation/entities/opportunity.entity';
@@ -33,6 +34,7 @@ export const ENTITIES = [
   Notification,
   AlertedCar,
   RateBudgetWindow,
+  SourceControl,
   MonthlyBudgetState,
   BudgetActivity,
   ParameterSet,

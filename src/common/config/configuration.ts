@@ -7,6 +7,7 @@ export interface AppConfig {
   databaseUrl: string;
   autoRiaApiKey: string;
   telegramBotToken: string;
+  telegramAdminChatIds: string[];
   nbuRateUrl: string;
   rateBudgetPerHour: number;
   /** ADR-0009: monthly pool for flexible rate limiting (default 20,000). */
@@ -43,6 +44,10 @@ export default (): AppConfig => ({
   databaseUrl: process.env.DATABASE_URL ?? '',
   autoRiaApiKey: process.env.AUTO_RIA_API_KEY ?? '',
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
+  telegramAdminChatIds: (process.env.TELEGRAM_ADMIN_CHAT_IDS ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean),
   nbuRateUrl:
     process.env.NBU_RATE_URL ??
     'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
