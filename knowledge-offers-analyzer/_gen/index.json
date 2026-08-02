@@ -1,0 +1,2044 @@
+{
+  "version": 1,
+  "indexNote": "00-INDEX.md",
+  "contextExcluded": "knowledge-offers-analyzer/context",
+  "notes": [
+    {
+      "rel": "00-INDEX.md",
+      "path": "knowledge-offers-analyzer/00-INDEX.md",
+      "name": "00-INDEX",
+      "title": "Offers Analyzer - Knowledge Base Index",
+      "type": "moc",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Start here",
+          "line": 15,
+          "endLine": 23
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Product and delivery",
+          "line": 24,
+          "endLine": 30
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Maps of Content",
+          "line": 31,
+          "endLine": 43
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Context zone",
+          "line": 44,
+          "endLine": 49
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Project infrastructure",
+          "line": 50,
+          "endLine": 57
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Project one-liner",
+          "line": 58,
+          "endLine": 63
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Status",
+          "line": 64,
+          "endLine": 68
+        }
+      ]
+    },
+    {
+      "rel": "Roadmap & Status.md",
+      "path": "knowledge-offers-analyzer/Roadmap & Status.md",
+      "name": "Roadmap & Status",
+      "title": "Roadmap & Status",
+      "type": "roadmap",
+      "summary": "Canonical current delivery status, evidence gates, completed work, and next sequence.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Current",
+          "line": 13,
+          "endLine": 35
+        },
+        {
+          "n": 2,
+          "level": 3,
+          "text": "Prove the next scoring rollout",
+          "line": 22,
+          "endLine": 35
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Completed / operating",
+          "line": 36,
+          "endLine": 52
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Blocked / paused",
+          "line": 53,
+          "endLine": 59
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Next",
+          "line": 60,
+          "endLine": 66
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Work-entry rule",
+          "line": 67,
+          "endLine": 72
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Legacy queue migration",
+          "line": 73,
+          "endLine": 82
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Related",
+          "line": 83,
+          "endLine": 90
+        }
+      ]
+    },
+    {
+      "rel": "SPEC-005.md",
+      "path": "knowledge-offers-analyzer/SPEC-005.md",
+      "name": "SPEC-005",
+      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 12,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 20,
+          "endLine": 25
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 26,
+          "endLine": 30
+        }
+      ]
+    },
+    {
+      "rel": "SPEC-006.md",
+      "path": "knowledge-offers-analyzer/SPEC-006.md",
+      "name": "SPEC-006",
+      "title": "SPEC-006 - Monetary output Z and ROI",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 11,
+          "endLine": 18
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 19,
+          "endLine": 24
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 25,
+          "endLine": 29
+        }
+      ]
+    },
+    {
+      "rel": "SPEC-008.md",
+      "path": "knowledge-offers-analyzer/SPEC-008.md",
+      "name": "SPEC-008",
+      "title": "SPEC-008 - Cohort market drift correction",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 13,
+          "endLine": 18
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 19,
+          "endLine": 23
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 24,
+          "endLine": 27
+        }
+      ]
+    },
+    {
+      "rel": "SPEC-009.md",
+      "path": "knowledge-offers-analyzer/SPEC-009.md",
+      "name": "SPEC-009",
+      "title": "SPEC-009 — Budget observability and rollout guardrails",
+      "type": "spec-backlog",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Goal",
+          "line": 14,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Required outcome",
+          "line": 20,
+          "endLine": 32
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Acceptance criteria",
+          "line": 33,
+          "endLine": 40
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Implementation record",
+          "line": 41,
+          "endLine": 50
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 51,
+          "endLine": 55
+        }
+      ]
+    },
+    {
+      "rel": "Welcome.md",
+      "path": "knowledge-offers-analyzer/Welcome.md",
+      "name": "Welcome",
+      "title": "Welcome",
+      "type": "meta",
+      "summary": null,
+      "rev": null,
+      "headings": []
+    },
+    {
+      "rel": "_meta/note-template.md",
+      "path": "knowledge-offers-analyzer/_meta/note-template.md",
+      "name": "note-template",
+      "title": "<concept name>",
+      "type": "business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context / What",
+          "line": 11,
+          "endLine": 14
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Details",
+          "line": 15,
+          "endLine": 18
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 19,
+          "endLine": 23
+        }
+      ]
+    },
+    {
+      "rel": "_meta/vault-protocol.md",
+      "path": "knowledge-offers-analyzer/_meta/vault-protocol.md",
+      "name": "vault-protocol",
+      "title": "Vault Protocol - how agents use and maintain the knowledge base",
+      "type": "meta",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Information hierarchy",
+          "line": 12,
+          "endLine": 26
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Executable retrieval and safety",
+          "line": 27,
+          "endLine": 46
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Read protocol",
+          "line": 47,
+          "endLine": 57
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Write protocol",
+          "line": 58,
+          "endLine": 79
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Context zone",
+          "line": 80,
+          "endLine": 94
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Decision supersession sweep",
+          "line": 95,
+          "endLine": 101
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Enforcement baseline and ownership",
+          "line": 102,
+          "endLine": 117
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Note conventions",
+          "line": 118,
+          "endLine": 128
+        },
+        {
+          "n": 9,
+          "level": 2,
+          "text": "Note types",
+          "line": 129,
+          "endLine": 133
+        }
+      ]
+    },
+    {
+      "rel": "architecture/invariants.md",
+      "path": "knowledge-offers-analyzer/architecture/invariants.md",
+      "name": "invariants",
+      "title": "Architecture and operational invariants",
+      "type": "architecture",
+      "summary": "Refactor-resistant source, budget, scoring, and evidence safety properties.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Source and boundary invariants",
+          "line": 13,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Budget and recovery invariants",
+          "line": 20,
+          "endLine": 28
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Scoring invariants",
+          "line": 29,
+          "endLine": 39
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Evidence and explainability invariants",
+          "line": 40,
+          "endLine": 46
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Authority",
+          "line": 47,
+          "endLine": 57
+        }
+      ]
+    },
+    {
+      "rel": "architecture/overview.md",
+      "path": "knowledge-offers-analyzer/architecture/overview.md",
+      "name": "overview",
+      "title": "Architecture overview",
+      "type": "architecture",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Stack",
+          "line": 11,
+          "endLine": 20
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Engineering knowledge tooling",
+          "line": 21,
+          "endLine": 28
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Module map",
+          "line": 29,
+          "endLine": 46
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Data flow",
+          "line": 47,
+          "endLine": 80
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Entities / data model",
+          "line": 81,
+          "endLine": 104
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Boundaries & integrations",
+          "line": 105,
+          "endLine": 110
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Related",
+          "line": 111,
+          "endLine": 117
+        }
+      ]
+    },
+    {
+      "rel": "architecture/persistence-surface.md",
+      "path": "knowledge-offers-analyzer/architecture/persistence-surface.md",
+      "name": "persistence-surface",
+      "title": "Persistence surface",
+      "type": "architecture",
+      "summary": "Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.",
+      "rev": "cd1eff55a902",
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Source of truth",
+          "line": 18,
+          "endLine": 25
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Review boundary",
+          "line": 26,
+          "endLine": 31
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Generated evidence",
+          "line": 32,
+          "endLine": 37
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 38,
+          "endLine": 44
+        }
+      ]
+    },
+    {
+      "rel": "business/how-it-works.md",
+      "path": "knowledge-offers-analyzer/business/how-it-works.md",
+      "name": "how-it-works",
+      "title": "Як працює система (для бізнесу) — збір даних і оцінка вигідності",
+      "type": "business",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Частина 1. Як ми працюємо (звідки й скільки даних беремо)",
+          "line": 31,
+          "endLine": 78
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Частина 2. Як ми оцінюємо «вигідність»",
+          "line": 79,
+          "endLine": 123
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Пояснюваність (чому саме такий бал)",
+          "line": 124,
+          "endLine": 129
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 130,
+          "endLine": 132
+        }
+      ]
+    },
+    {
+      "rel": "business/requirements.md",
+      "path": "knowledge-offers-analyzer/business/requirements.md",
+      "name": "requirements",
+      "title": "Product requirements",
+      "type": "business",
+      "summary": "Durable product obligations, safety guardrails, and rollout requirements.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Monitoring and coverage",
+          "line": 13,
+          "endLine": 20
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Evaluation and alerts",
+          "line": 21,
+          "endLine": 34
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Operator control and feedback",
+          "line": 35,
+          "endLine": 43
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Release and evidence requirements",
+          "line": 44,
+          "endLine": 53
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Non-requirements for v1",
+          "line": 54,
+          "endLine": 60
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Related",
+          "line": 61,
+          "endLine": 68
+        }
+      ]
+    },
+    {
+      "rel": "business/vision-and-goals.md",
+      "path": "knowledge-offers-analyzer/business/vision-and-goals.md",
+      "name": "vision-and-goals",
+      "title": "Product vision and goals",
+      "type": "business",
+      "summary": "Operator-profit product vision, v1 scope, non-goals, and operator decision test.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Product one-liner",
+          "line": 12,
+          "endLine": 17
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "User and job",
+          "line": 18,
+          "endLine": 23
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "What counts as a deal",
+          "line": 24,
+          "endLine": 35
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "v1 goals",
+          "line": 36,
+          "endLine": 44
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Scope boundaries",
+          "line": 45,
+          "endLine": 54
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Product tests",
+          "line": 55,
+          "endLine": 62
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Authority and related notes",
+          "line": 63,
+          "endLine": 69
+        }
+      ]
+    },
+    {
+      "rel": "conventions/coding-standards.md",
+      "path": "knowledge-offers-analyzer/conventions/coding-standards.md",
+      "name": "coding-standards",
+      "title": "Coding standards & conventions",
+      "type": "convention",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Principles (the \"why\")",
+          "line": 11,
+          "endLine": 24
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "NestJS structure",
+          "line": 25,
+          "endLine": 63
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Testing",
+          "line": 64,
+          "endLine": 69
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Enforcement (start pragmatic, tighten as needed)",
+          "line": 70,
+          "endLine": 79
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 80,
+          "endLine": 83
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "path": "knowledge-offers-analyzer/decisions/0001-adopt-sdd-vault-rtk.md",
+      "name": "0001-adopt-sdd-vault-rtk",
+      "title": "ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 20
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 21,
+          "endLine": 28
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 29,
+          "endLine": 34
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 35,
+          "endLine": 40
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0002-monitoring-via-official-api.md",
+      "path": "knowledge-offers-analyzer/decisions/0002-monitoring-via-official-api.md",
+      "name": "0002-monitoring-via-official-api",
+      "title": "ADR-0002 — Monitor AUTO.RIA via the official API, narrow niche on free tier",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 23
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 24,
+          "endLine": 29
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 30,
+          "endLine": 33
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0003-decoupled-context-zone.md",
+      "path": "knowledge-offers-analyzer/decisions/0003-decoupled-context-zone.md",
+      "name": "0003-decoupled-context-zone",
+      "title": "ADR-0003 — Decoupled context zone instead of a second knowledge base",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 25
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 26,
+          "endLine": 31
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 32,
+          "endLine": 35
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0004-drop-redis-bullmq.md",
+      "path": "knowledge-offers-analyzer/decisions/0004-drop-redis-bullmq.md",
+      "name": "0004-drop-redis-bullmq",
+      "title": "ADR-0004 — Drop Redis/BullMQ for v1 (Postgres-backed rate budget)",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 25
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 26,
+          "endLine": 33
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 34,
+          "endLine": 36
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0005-versioned-parameter-sets.md",
+      "path": "knowledge-offers-analyzer/decisions/0005-versioned-parameter-sets.md",
+      "name": "0005-versioned-parameter-sets",
+      "title": "ADR-0005 — Versioned ParameterSets + human-in-the-loop calibration",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 22
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 23,
+          "endLine": 39
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 40,
+          "endLine": 52
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 53,
+          "endLine": 55
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0006-operator-profit-vision.md",
+      "path": "knowledge-offers-analyzer/decisions/0006-operator-profit-vision.md",
+      "name": "0006-operator-profit-vision",
+      "title": "ADR-0006 — Vision shift: from \"below market\" to \"probability of operator profit\"",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 34
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 35,
+          "endLine": 78
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 79,
+          "endLine": 95
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 96,
+          "endLine": 100
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0007-structured-logging-nestjs-pino.md",
+      "path": "knowledge-offers-analyzer/decisions/0007-structured-logging-nestjs-pino.md",
+      "name": "0007-structured-logging-nestjs-pino",
+      "title": "ADR-0007 — Structured logging via nestjs-pino",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 20
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 21,
+          "endLine": 42
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 43,
+          "endLine": 53
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 54,
+          "endLine": 57
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0008-global-error-handling.md",
+      "path": "knowledge-offers-analyzer/decisions/0008-global-error-handling.md",
+      "name": "0008-global-error-handling",
+      "title": "ADR-0008 — Global error handling",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 34
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 35,
+          "endLine": 56
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 57,
+          "endLine": 71
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 72,
+          "endLine": 75
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0009-monthly-rate-limit-pool.md",
+      "path": "knowledge-offers-analyzer/decisions/0009-monthly-rate-limit-pool.md",
+      "name": "0009-monthly-rate-limit-pool",
+      "title": "ADR-0009 — Rate limiting: monthly pool instead of hourly window",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 29
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 30,
+          "endLine": 64
+        },
+        {
+          "n": 3,
+          "level": 3,
+          "text": "Target monthly allocation (indicative — recompute against actual active-listing counts per niche)",
+          "line": 49,
+          "endLine": 64
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Consequences",
+          "line": 65,
+          "endLine": 82
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 83,
+          "endLine": 86
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0010-defer-factor-activation-until-k.md",
+      "path": "knowledge-offers-analyzer/decisions/0010-defer-factor-activation-until-k.md",
+      "name": "0010-defer-factor-activation-until-k",
+      "title": "ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 28
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 29,
+          "endLine": 40
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 41,
+          "endLine": 55
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 56,
+          "endLine": 65
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "path": "knowledge-offers-analyzer/decisions/0011-evidence-gated-scoring-rollout.md",
+      "name": "0011-evidence-gated-scoring-rollout",
+      "title": "ADR-0011 — Evidence-gated scoring rollout",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 26
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 27,
+          "endLine": 47
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 48,
+          "endLine": 57
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 58,
+          "endLine": 62
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0012-material-repeat-alert-threshold.md",
+      "path": "knowledge-offers-analyzer/decisions/0012-material-repeat-alert-threshold.md",
+      "name": "0012-material-repeat-alert-threshold",
+      "title": "ADR-0012 — Material threshold for same-listing repeat alerts",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 20
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 21,
+          "endLine": 24
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 25,
+          "endLine": 28
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "path": "knowledge-offers-analyzer/decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "name": "0013-budget-stabilization-before-lifecycle-rechecks",
+      "title": "ADR-0013 — Stabilize budget demand before lifecycle rechecks",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 22
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 23,
+          "endLine": 28
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 29,
+          "endLine": 32
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "path": "knowledge-offers-analyzer/decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "name": "0014-conservative-benchmark-and-mileage-guard",
+      "title": "ADR-0014 - Conservative benchmark and claimed-mileage guard",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 20,
+          "endLine": 26
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 27,
+          "endLine": 34
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 35,
+          "endLine": 41
+        }
+      ]
+    },
+    {
+      "rel": "decisions/0015-hybrid-executable-vault.md",
+      "path": "knowledge-offers-analyzer/decisions/0015-hybrid-executable-vault.md",
+      "name": "0015-hybrid-executable-vault",
+      "title": "ADR-0015 — Hybrid executable vault and phased enforcement",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 30
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 31,
+          "endLine": 65
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 66,
+          "endLine": 79
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 80,
+          "endLine": 87
+        }
+      ]
+    },
+    {
+      "rel": "decisions/README.md",
+      "path": "knowledge-offers-analyzer/decisions/README.md",
+      "name": "README",
+      "title": "Decision log (ADRs)",
+      "type": "moc",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Index",
+          "line": 11,
+          "endLine": 29
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "How to add one",
+          "line": 30,
+          "endLine": 36
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 37,
+          "endLine": 40
+        }
+      ]
+    },
+    {
+      "rel": "decisions/adr-template.md",
+      "path": "knowledge-offers-analyzer/decisions/adr-template.md",
+      "name": "adr-template",
+      "title": "ADR-NNNN — <short title>",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 16
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 17,
+          "endLine": 20
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 21,
+          "endLine": 24
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 25,
+          "endLine": 28
+        }
+      ]
+    },
+    {
+      "rel": "domain/glossary.md",
+      "path": "knowledge-offers-analyzer/domain/glossary.md",
+      "name": "glossary",
+      "title": "Domain glossary",
+      "type": "domain",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Business rules",
+          "line": 45,
+          "endLine": 51
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Related",
+          "line": 52,
+          "endLine": 56
+        }
+      ]
+    },
+    {
+      "rel": "operations/environment-setup.md",
+      "path": "knowledge-offers-analyzer/operations/environment-setup.md",
+      "name": "environment-setup",
+      "title": "Environment setup & tooling",
+      "type": "operations",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "RTK (token-saving command wrapper)",
+          "line": 11,
+          "endLine": 28
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Spec Kit (SDD)",
+          "line": 29,
+          "endLine": 35
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Executable vault",
+          "line": 36,
+          "endLine": 70
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Project",
+          "line": 71,
+          "endLine": 81
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 82,
+          "endLine": 87
+        }
+      ]
+    },
+    {
+      "rel": "research/alternative-sources.md",
+      "path": "knowledge-offers-analyzer/research/alternative-sources.md",
+      "name": "alternative-sources",
+      "title": "Research — alternative listing sources beyond AUTO.RIA",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Framing — profitability has two arbitrage modes",
+          "line": 12,
+          "endLine": 18
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "The access problem (read this first)",
+          "line": 19,
+          "endLine": 24
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Mode A — Ukrainian domestic classifieds",
+          "line": 25,
+          "endLine": 32
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Mode B — import arbitrage (auctions + EU marketplaces)",
+          "line": 33,
+          "endLine": 43
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Reference / valuation data (not listings, but feed \"fair value + risk\")",
+          "line": 44,
+          "endLine": 49
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Rational sequencing (value ÷ effort)",
+          "line": 50,
+          "endLine": 55
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Open questions",
+          "line": 56,
+          "endLine": 61
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Sources",
+          "line": 62,
+          "endLine": 69
+        },
+        {
+          "n": 9,
+          "level": 2,
+          "text": "Related",
+          "line": 70,
+          "endLine": 73
+        }
+      ]
+    },
+    {
+      "rel": "research/explainability-gaps.md",
+      "path": "knowledge-offers-analyzer/research/explainability-gaps.md",
+      "name": "explainability-gaps",
+      "title": "Research — explainability gaps (arguing WHY an evaluation was made)",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "What we already have",
+          "line": 14,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "The gaps (why the current `/why` isn't enough to *argue*)",
+          "line": 20,
+          "endLine": 40
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Proposed — a persisted \"evaluation explanation\"",
+          "line": 41,
+          "endLine": 68
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Recommendation",
+          "line": 69,
+          "endLine": 75
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Implementation note (2026-07-28)",
+          "line": 76,
+          "endLine": 90
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Related",
+          "line": 91,
+          "endLine": 93
+        }
+      ]
+    },
+    {
+      "rel": "research/monitoring-approaches.md",
+      "path": "knowledge-offers-analyzer/research/monitoring-approaches.md",
+      "name": "monitoring-approaches",
+      "title": "Research — how to monitor AUTO.RIA (API vs scraping)",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Goal & constraints",
+          "line": 12,
+          "endLine": 18
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "The official AUTO.RIA API (what exists)",
+          "line": 19,
+          "endLine": 32
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Options",
+          "line": 33,
+          "endLine": 38
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Trade-offs",
+          "line": 39,
+          "endLine": 52
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Recommendation — **A. Official API-first**",
+          "line": 53,
+          "endLine": 60
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Architecture implications (feed into the spec/plan)",
+          "line": 61,
+          "endLine": 70
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Sources",
+          "line": 71,
+          "endLine": 76
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Related",
+          "line": 77,
+          "endLine": 80
+        }
+      ]
+    },
+    {
+      "rel": "research/profitability-definition.md",
+      "path": "knowledge-offers-analyzer/research/profitability-definition.md",
+      "name": "profitability-definition",
+      "title": "Research — what counts as a \"profitable\" offer",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "What \"profitable\" really means",
+          "line": 12,
+          "endLine": 26
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Data we can use",
+          "line": 27,
+          "endLine": 33
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Fair value & the opportunity score",
+          "line": 34,
+          "endLine": 49
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Deal score ∈ [−1, 1] (price core)",
+          "line": 50,
+          "endLine": 71
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Valuation guard (SPEC-011)",
+          "line": 72,
+          "endLine": 80
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Worked example (what the system actually does)",
+          "line": 81,
+          "endLine": 92
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Risk red-flags (why \"cheap\" is often not profitable)",
+          "line": 93,
+          "endLine": 101
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Known pitfalls of the average-price anchor",
+          "line": 102,
+          "endLine": 119
+        },
+        {
+          "n": 9,
+          "level": 2,
+          "text": "Options for the v1 definition",
+          "line": 120,
+          "endLine": 127
+        },
+        {
+          "n": 10,
+          "level": 2,
+          "text": "Recommendation",
+          "line": 128,
+          "endLine": 139
+        },
+        {
+          "n": 11,
+          "level": 2,
+          "text": "Sources",
+          "line": 140,
+          "endLine": 144
+        },
+        {
+          "n": 12,
+          "level": 2,
+          "text": "Related",
+          "line": 145,
+          "endLine": 149
+        }
+      ]
+    },
+    {
+      "rel": "research/profitability-methods-coverage.md",
+      "path": "knowledge-offers-analyzer/research/profitability-methods-coverage.md",
+      "name": "profitability-methods-coverage",
+      "title": "Research — \"profitability\" methods coverage (what we chose, what's built, do we need ML)",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "0. Our constraints (why \"the best method\" ≠ \"the best method for us\")",
+          "line": 16,
+          "endLine": 32
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "1. Our definition, in one place",
+          "line": 33,
+          "endLine": 61
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "2. Approaches considered",
+          "line": 62,
+          "endLine": 85
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "3. What is implemented today (code-level)",
+          "line": 86,
+          "endLine": 107
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "4. Plans, ordered by return-on-effort (re-cut 2026-07-18 per ADR-0006 → spec 003)",
+          "line": 108,
+          "endLine": 127
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "5. Do we actually need ML? — verdict: **not yet, and not for the reason it looks like**",
+          "line": 128,
+          "endLine": 197
+        },
+        {
+          "n": 7,
+          "level": 3,
+          "text": "The two example listings, analysed",
+          "line": 135,
+          "endLine": 162
+        },
+        {
+          "n": 8,
+          "level": 3,
+          "text": "Why ML is a poor fit right now (general case)",
+          "line": 163,
+          "endLine": 179
+        },
+        {
+          "n": 9,
+          "level": 3,
+          "text": "When ML *would* earn its place (the steelman + trigger conditions)",
+          "line": 180,
+          "endLine": 197
+        },
+        {
+          "n": 10,
+          "level": 2,
+          "text": "6. How to sanity-check our scores with a stronger model",
+          "line": 198,
+          "endLine": 207
+        },
+        {
+          "n": 11,
+          "level": 2,
+          "text": "Related",
+          "line": 208,
+          "endLine": 213
+        }
+      ]
+    },
+    {
+      "rel": "research/vin-real-mileage.md",
+      "path": "knowledge-offers-analyzer/research/vin-real-mileage.md",
+      "name": "vin-real-mileage",
+      "title": "Research — real (VIN-verified) mileage vs claimed mileage",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "The motivating case",
+          "line": 20,
+          "endLine": 30
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "What the AUTO.RIA API exposes (from the REST API docs)",
+          "line": 31,
+          "endLine": 41
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Options to investigate (future)",
+          "line": 42,
+          "endLine": 55
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Recommendation (when picked up)",
+          "line": 56,
+          "endLine": 62
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 63,
+          "endLine": 65
+        }
+      ]
+    },
+    {
+      "rel": "research/when-to-alert.md",
+      "path": "knowledge-offers-analyzer/research/when-to-alert.md",
+      "name": "when-to-alert",
+      "title": "Research — when is a listing \"worth alerting\" (interestingness + relist de-dup)",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "The definition — alert only when BOTH hold",
+          "line": 14,
+          "endLine": 34
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Identifying \"the same car\" across listing ids",
+          "line": 35,
+          "endLine": 45
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Tracking \"already alerted, at what price\"",
+          "line": 46,
+          "endLine": 51
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Decision flow (in `evaluateAndNotify`, once `isOpportunity`)",
+          "line": 52,
+          "endLine": 59
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Edge cases",
+          "line": 60,
+          "endLine": 69
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "Decided (operator, 2026-07-17)",
+          "line": 70,
+          "endLine": 77
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Related",
+          "line": 78,
+          "endLine": 80
+        }
+      ]
+    },
+    {
+      "rel": "research/why-no-opportunities.md",
+      "path": "knowledge-offers-analyzer/research/why-no-opportunities.md",
+      "name": "why-no-opportunities",
+      "title": "Research — why 0 opportunities, and how to reach business value",
+      "type": "research",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Root cause (from our own logs)",
+          "line": 13,
+          "endLine": 29
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Fixes, by leverage (business value = catch underpriced cars)",
+          "line": 30,
+          "endLine": 44
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "What we implemented (2026-07-16)",
+          "line": 45,
+          "endLine": 63
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Recommendation",
+          "line": 64,
+          "endLine": 68
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 69,
+          "endLine": 71
+        }
+      ]
+    },
+    {
+      "rel": "specs/README.md",
+      "path": "knowledge-offers-analyzer/specs/README.md",
+      "name": "README",
+      "title": "Feature specs index (SDD)",
+      "type": "moc",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Specs",
+          "line": 11,
+          "endLine": 26
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Backlog-level specs (pre-Spec-Kit)",
+          "line": 27,
+          "endLine": 44
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Constitution",
+          "line": 45,
+          "endLine": 49
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "How this connects",
+          "line": 50,
+          "endLine": 54
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 55,
+          "endLine": 59
+        }
+      ]
+    }
+  ]
+}

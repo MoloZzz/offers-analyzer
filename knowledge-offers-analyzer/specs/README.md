@@ -1,7 +1,7 @@
 ---
 title: Feature specs index (SDD)
 type: moc
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Feature specs index
@@ -22,6 +22,7 @@ updated: 2026-07-28
 | `../../specs/010-budget-stabilization/spec.md` | Reduce legacy rechecks and unshareable cohort requests while preserving production discovery | Implemented; observe ledger before any further budget expansion |
 
 | `../../specs/011-valuation-sanity-guards/spec.md` | Prefer median AUTO.RIA benchmarks and prevent unverified or old claimed mileage from inflating fair value | Implemented 2026-07-29; no additional API calls |
+| `../../specs/012-executable-vault/spec.md` | Preserve the curated second brain while adding generated context, bounded retrieval, source mapping, and phased vault enforcement ([[0015-hybrid-executable-vault|ADR-0015]]) | Implemented 2026-08-02; strict CI baseline is clean, source pins start narrowly, and Claude hooks remain optional |
 
 ## Backlog-level specs (pre-Spec-Kit)
 
@@ -43,7 +44,7 @@ fits the allocation; it does not auto-enable SPEC-005 or profiles.
 
 ## Constitution
 
-Project principles are ratified in `../.specify/memory/constitution.md` (v1.1.0, 2026-07-18) —
+Project principles are ratified in `../.specify/memory/constitution.md` (v1.2.0, 2026-08-02) —
 the non-negotiable rules every spec must satisfy. Amendments require an ADR + version bump.
 
 ## How this connects

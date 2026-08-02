@@ -9,8 +9,8 @@ import { ProfilesService } from '../profiles/profiles.service';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { SOFT_FLAG_CODES } from '../valuation/red-flags';
 
-import { DealsService } from './deals.service';
 import { marginStats } from './deal-margin';
+import { DealsService } from './deals.service';
 import { CalibrationRun } from './entities/calibration-run.entity';
 import { OutcomesService } from './outcomes.service';
 import { ParametersService } from './parameters.service';
@@ -49,7 +49,16 @@ export class CalibrationService {
     const economics = marginStats(await this.deals.closedDeals());
     const currentThreshold = this.config.get('defaultMinDealScore', { infer: true });
 
-    const proposal = proposeThreshold({ scores, currentThreshold, closedDealCount: economics.closed, medianMarginUsd: economics.medianMarginUsd, lossShare: economics.lossShare }, target);
+    const proposal = proposeThreshold(
+      {
+        scores,
+        currentThreshold,
+        closedDealCount: economics.closed,
+        medianMarginUsd: economics.medianMarginUsd,
+        lossShare: economics.lossShare,
+      },
+      target,
+    );
 
     const run = this.repo.create({
       capability: 'threshold',
@@ -70,12 +79,27 @@ export class CalibrationService {
       const scores = await this.listings.scoresForReport(profile.id);
       const currentThreshold = profile.minDealScore;
       const economics = marginStats(await this.deals.closedDealsForProfile(profile.id));
-      const proposal = proposeThreshold({ scores, currentThreshold, closedDealCount: economics.closed, medianMarginUsd: economics.medianMarginUsd, lossShare: economics.lossShare }, target);
+      const proposal = proposeThreshold(
+        {
+          scores,
+          currentThreshold,
+          closedDealCount: economics.closed,
+          medianMarginUsd: economics.medianMarginUsd,
+          lossShare: economics.lossShare,
+        },
+        target,
+      );
       const run = this.repo.create({
         profileId: profile.id,
         capability: 'threshold',
         mode: 'propose',
-        inputsSummary: { profileId: profile.id, scoreCount: scores.length, currentThreshold, economics, target },
+        inputsSummary: {
+          profileId: profile.id,
+          scoreCount: scores.length,
+          currentThreshold,
+          economics,
+          target,
+        },
         proposal: { ...proposal },
         applied: false,
         reason: proposal.reason,
@@ -105,7 +129,10 @@ export class CalibrationService {
   }
 
   /** Run per-profile proposals; in 'auto' mode also apply them. Returns the runs. */
-  async runCalibration(mode: 'propose' | 'auto', target?: CalibrationTarget): Promise<CalibrationRun[]> {
+  async runCalibration(
+    mode: 'propose' | 'auto',
+    target?: CalibrationTarget,
+  ): Promise<CalibrationRun[]> {
     const runs = await this.proposeAllProfiles(target ?? this.targetFromConfig());
     void mode;
     return runs;
@@ -135,7 +162,8 @@ export class CalibrationService {
     const runs = await this.runCalibration(mode);
     return runs.map((r) => {
       const proposal = r.proposal as { proposed: number | null; reason: string } | null;
-      const before = (r.inputsSummary as { currentThreshold?: number } | null)?.currentThreshold ?? null;
+      const before =
+        (r.inputsSummary as { currentThreshold?: number } | null)?.currentThreshold ?? null;
       return {
         profileName: byId.get(r.profileId ?? '') ?? '—',
         before,
@@ -149,7 +177,9 @@ export class CalibrationService {
   /** Learn the global soft-flag penalty from labeled outcomes; emit a candidate ParameterSet (propose-only). */
   async proposeWeights(): Promise<{ proposal: WeightProposal; candidateVersion: number | null }> {
     const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
-    const labeled = (await this.outcomes.manualLabeledSince(since)).filter((o) => o.opportunityId != null);
+    const labeled = (await this.outcomes.manualLabeledSince(since)).filter(
+      (o) => o.opportunityId != null,
+    );
     const samples: WeightSample[] = [];
     for (const o of labeled) {
       const op = await this.opps.findOne({ where: { id: o.opportunityId as string } });

@@ -1,7 +1,7 @@
 ---
 title: SPEC-006 - Monetary output Z and ROI
 type: spec
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # SPEC-006 - Monetary output Z and ROI
@@ -25,4 +25,4 @@ Backlog-level note for the monetary profitability output captured in `context/ba
 ## Related
 
 - [[specs/README]]
-- [[backlog]]
+- [[Roadmap & Status]]

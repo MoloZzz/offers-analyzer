@@ -16,7 +16,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run vault:check
+      - run: npm run vault:test
+      - run: npm run vault:check:strict
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test -- --runInBand

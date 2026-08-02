@@ -2,7 +2,7 @@
 title: ADR-0005 — Versioned ParameterSets + human-in-the-loop calibration
 type: decision
 status: Accepted
-updated: 2026-07-17
+updated: 2026-08-02
 ---
 
 # ADR-0005 — Versioned ParameterSets + human-in-the-loop calibration
@@ -51,4 +51,4 @@ a regression test asserting identical output at the seeded v1.
 versioned ParameterSet (fixed only at v1). Supersession sweep run when E1 lands.
 
 ## Related
-- [[decisions/README]] · spec 002 · [[profitability-definition]] · [[backlog]] · [[overview]]
+- [[decisions/README]] · spec 002 · [[profitability-definition]] · [[Roadmap & Status]] · [[overview]]

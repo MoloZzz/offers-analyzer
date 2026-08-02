@@ -2,7 +2,7 @@
 title: Research — when is a listing "worth alerting" (interestingness + relist de-dup)
 type: research
 status: Proposed
-updated: 2026-07-17
+updated: 2026-08-02
 ---
 
 # When do we alert the operator? (interestingness & relists)
@@ -76,4 +76,4 @@ Comparison is done in **USD** (the source price is USD), so relists compare clea
 profile's display currency.
 
 ## Related
-- [[profitability-definition]] · [[how-it-works]] · [[backlog]]
+- [[profitability-definition]] · [[how-it-works]] · [[Roadmap & Status]]

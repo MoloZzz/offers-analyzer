@@ -1,0 +1,4 @@
+# key	canonical owner note	restatement regex
+# A matching statement outside its owner must link to the owner in the same
+# logical Markdown block. Add rows only for durable facts with one clear owner.
+canonical_delivery_status	Roadmap & Status	canonical\s+(?:high-level\s+)?(?:delivery\s+)?status

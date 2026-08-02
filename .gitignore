@@ -27,3 +27,6 @@ lerna-debug.log*
 
 # operator's real watch niches (commit only the example)
 config/search-profiles.json
+
+# Explicit local cache written only by `npm run vault:evidence` (advisory DB observations).
+/tools/vault/.evidence.tsv

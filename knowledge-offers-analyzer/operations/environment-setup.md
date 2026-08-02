@@ -1,7 +1,7 @@
 ---
 title: Environment setup & tooling
 type: operations
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Environment setup & tooling
@@ -32,6 +32,41 @@ updated: 2026-07-28
 - Workflow: `/speckit-constitution` (once) → `/speckit-specify` → `/speckit-clarify` (optional) → `/speckit-plan` → `/speckit-tasks` → `/speckit-analyze` (optional) → `/speckit-implement`.
 - Scripts are `sh` (bash) — consistent with the Linux/WSL environment RTK requires.
 - To upgrade Spec Kit later: `uvx --from git+https://github.com/github/spec-kit.git specify init --here --force --integration claude --script sh` (needs Python ≥3.11).
+
+## Executable vault
+
+The curated vault remains authoritative. `tools/vault/` adds deterministic orientation and focused
+retrieval; it does not replace MOCs, ADRs, or the context boundary. Start a task with the
+generated brief plus `context/CURRENT.md`, then use find/show before opening broad source.
+
+```bash
+npm run vault:build
+npm run vault:brief -- "Roadmap & Status"
+npm run vault:find -- "ListingSource"
+npm run vault:show -- "Roadmap & Status#current"
+npm run vault:check:strict
+```
+
+- `vault:build` is the only normal writer and updates only `knowledge-offers-analyzer/_gen/`.
+  It is deliberate: check, find, show, brief, and map never regenerate files.
+- `vault:check` runs the executable and retained legacy checker. `vault:check:strict` makes any
+  warning (including stale generated output) fail, and is the CI gate.
+- `vault:test` tests the portable engine and advisory evidence contract without a database.
+- `vault:evidence -- --dry` validates `knowledge-offers-analyzer/_metrics.tsv` with no connection
+  or writes. A real evidence run uses `DATABASE_URL` in a PostgreSQL `READ ONLY` transaction and
+  writes only ignored `tools/vault/.evidence.tsv`; its output never changes application behavior.
+- Native Windows PowerShell may require `npm.cmd` rather than `npm`. This is a command-wrapper
+  difference, not permission to skip the gate; record the fallback in the session log.
+
+An optional non-mutating pre-commit hook is stored in `.githooks/pre-commit`. Enable it only per
+checkout after the dependencies are installed:
+
+```bash
+chmod +x .githooks/pre-commit  # Linux/macOS only
+git config core.hooksPath .githooks
+```
+
+The hook runs the same strict check as CI and never builds artifacts or accesses the database.
 
 ## Project
 

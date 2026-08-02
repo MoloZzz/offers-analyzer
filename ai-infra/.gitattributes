@@ -1,0 +1,11 @@
+# Root cause fix for core.autocrlf=true: index and worktree must agree on LF,
+# otherwise byte-comparing generated output against committed output always fails.
+* text=auto eol=lf
+
+# Generated artifacts are written LF/UTF-8/no-BOM by tools/vault and must never
+# be eol-converted — their bytes are compared and hashed.
+transaction-analytics/_gen/** -text
+
+# Binary
+*.png binary
+*.gz binary

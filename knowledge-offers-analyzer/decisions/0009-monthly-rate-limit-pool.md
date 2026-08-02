@@ -2,7 +2,7 @@
 title: ADR-0009 — Rate limiting: monthly pool instead of hourly window
 type: decision
 status: Implemented
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # ADR-0009 — Rate limiting: monthly pool instead of hourly window
@@ -23,7 +23,7 @@ What the pool unlocks that the hourly window did not:
    240 req/day went to empty poll cycles — ~7,000/mo of dead quota. A monthly pool lets that budget
    shift to daytime, ~1.5× the effective daily budget for the same monthly figure.
 2. **Bursts become possible** — e.g. a one-off calibration pull of 2,000–3,000 requests.
-3. **Priority queue replaces round-robin.** Round-robin (`B20` in [[backlog]]) existed to stop one
+3. **Priority queue replaces round-robin.** Round-robin (the historical B20 queue record) existed to stop one
    wide niche from starving the hourly window. With a monthly pool the constraint isn't equal
    sharing between niches, it's prioritizing requests by expected value.
 
@@ -81,5 +81,5 @@ additional expensive profiles are enabled: the target allocation must be reforec
 profile counts, and actual spend must be visible by profile, operation, and priority tier.
 
 ## Related
-- [[decisions/README]] · [[0004-drop-redis-bullmq|ADR-0004]] · [[0011-evidence-gated-scoring-rollout|ADR-0011]] · [[backlog]]
+- [[decisions/README]] · [[0004-drop-redis-bullmq|ADR-0004]] · [[0011-evidence-gated-scoring-rollout|ADR-0011]] · [[Roadmap & Status]]
 - Backlog items: SPEC-005 (tiered re-check, blocked by this ADR), SPEC-004, SPEC-008

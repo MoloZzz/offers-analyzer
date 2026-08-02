@@ -1,0 +1,45 @@
+# path	title	type	summary
+00-INDEX.md	Offers Analyzer - Knowledge Base Index	moc	
+Roadmap & Status.md	Roadmap & Status	roadmap	Canonical current delivery status, evidence gates, completed work, and next sequence.
+SPEC-005.md	SPEC-005 - Listing lifecycle and tiered re-check	spec	
+SPEC-006.md	SPEC-006 - Monetary output Z and ROI	spec	
+SPEC-008.md	SPEC-008 - Cohort market drift correction	spec	
+SPEC-009.md	SPEC-009 — Budget observability and rollout guardrails	spec-backlog	
+Welcome.md	Welcome	meta	
+_meta/note-template.md	<concept name>	business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log	
+_meta/vault-protocol.md	Vault Protocol - how agents use and maintain the knowledge base	meta	
+architecture/invariants.md	Architecture and operational invariants	architecture	Refactor-resistant source, budget, scoring, and evidence safety properties.
+architecture/overview.md	Architecture overview	architecture	
+architecture/persistence-surface.md	Persistence surface	architecture	Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.
+business/how-it-works.md	Як працює система (для бізнесу) — збір даних і оцінка вигідності	business	
+business/requirements.md	Product requirements	business	Durable product obligations, safety guardrails, and rollout requirements.
+business/vision-and-goals.md	Product vision and goals	business	Operator-profit product vision, v1 scope, non-goals, and operator decision test.
+conventions/coding-standards.md	Coding standards & conventions	convention	
+decisions/0001-adopt-sdd-vault-rtk.md	ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK	decision	
+decisions/0002-monitoring-via-official-api.md	ADR-0002 — Monitor AUTO.RIA via the official API, narrow niche on free tier	decision	
+decisions/0003-decoupled-context-zone.md	ADR-0003 — Decoupled context zone instead of a second knowledge base	decision	
+decisions/0004-drop-redis-bullmq.md	ADR-0004 — Drop Redis/BullMQ for v1 (Postgres-backed rate budget)	decision	
+decisions/0005-versioned-parameter-sets.md	ADR-0005 — Versioned ParameterSets + human-in-the-loop calibration	decision	
+decisions/0006-operator-profit-vision.md	ADR-0006 — Vision shift: from "below market" to "probability of operator profit"	decision	
+decisions/0007-structured-logging-nestjs-pino.md	ADR-0007 — Structured logging via nestjs-pino	decision	
+decisions/0008-global-error-handling.md	ADR-0008 — Global error handling	decision	
+decisions/0009-monthly-rate-limit-pool.md	ADR-0009 — Rate limiting: monthly pool instead of hourly window	decision	
+decisions/0010-defer-factor-activation-until-k.md	ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands	decision	
+decisions/0011-evidence-gated-scoring-rollout.md	ADR-0011 — Evidence-gated scoring rollout	decision	
+decisions/0012-material-repeat-alert-threshold.md	ADR-0012 — Material threshold for same-listing repeat alerts	decision	
+decisions/0013-budget-stabilization-before-lifecycle-rechecks.md	ADR-0013 — Stabilize budget demand before lifecycle rechecks	decision	
+decisions/0014-conservative-benchmark-and-mileage-guard.md	ADR-0014 - Conservative benchmark and claimed-mileage guard	decision	
+decisions/0015-hybrid-executable-vault.md	ADR-0015 — Hybrid executable vault and phased enforcement	decision	
+decisions/README.md	Decision log (ADRs)	moc	
+decisions/adr-template.md	ADR-NNNN — <short title>	decision	
+domain/glossary.md	Domain glossary	domain	
+operations/environment-setup.md	Environment setup & tooling	operations	
+research/alternative-sources.md	Research — alternative listing sources beyond AUTO.RIA	research	
+research/explainability-gaps.md	Research — explainability gaps (arguing WHY an evaluation was made)	research	
+research/monitoring-approaches.md	Research — how to monitor AUTO.RIA (API vs scraping)	research	
+research/profitability-definition.md	Research — what counts as a "profitable" offer	research	
+research/profitability-methods-coverage.md	Research — "profitability" methods coverage (what we chose, what's built, do we need ML)	research	
+research/vin-real-mileage.md	Research — real (VIN-verified) mileage vs claimed mileage	research	
+research/when-to-alert.md	Research — when is a listing "worth alerting" (interestingness + relist de-dup)	research	
+research/why-no-opportunities.md	Research — why 0 opportunities, and how to reach business value	research	
+specs/README.md	Feature specs index (SDD)	moc	

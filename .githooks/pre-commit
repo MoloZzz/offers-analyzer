@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Optional local hook. Enable deliberately with:
+#   git config core.hooksPath .githooks
+# It never regenerates files or accesses a database.
+set -eu
+
+npm run vault:check:strict

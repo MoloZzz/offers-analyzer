@@ -2,7 +2,7 @@
 title: Research — explainability gaps (arguing WHY an evaluation was made)
 type: research
 status: Implemented
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Explainability — what's missing to argue any evaluation
@@ -89,4 +89,4 @@ X3 (matched phrases) and X4 (richer localized business argument) remain follow-u
 behavior was deliberately unchanged.
 
 ## Related
-- [[profitability-definition]] · [[how-it-works]] · [[overview]] · [[backlog]]
+- [[profitability-definition]] · [[how-it-works]] · [[overview]] · [[Roadmap & Status]]

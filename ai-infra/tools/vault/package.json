@@ -1,0 +1,26 @@
+{
+  "name": "vault-secondbrain",
+  "version": "0.1.0",
+  "description": "Retrieval protocol, consistency check, context governor and product-evidence loop for an agent-readable knowledge base",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "vault": "./v.mjs"
+  },
+  "exports": {
+    ".": "./v.mjs",
+    "./config": "./lib/config.mjs",
+    "./adapters/*": "./adapters/*.mjs"
+  },
+  "files": [
+    "v.mjs",
+    "lib/",
+    "adapters/",
+    "synonyms.tsv",
+    "rtk.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {}
+}

@@ -1,7 +1,7 @@
 ---
 title: Decision log (ADRs)
 type: moc
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Decision log (Architecture Decision Records)
@@ -25,6 +25,7 @@ updated: 2026-07-28
 - [[0013-budget-stabilization-before-lifecycle-rechecks|ADR-0013]] — Stabilize legacy demand before any lifecycle rechecks (Accepted)
 
 - [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]] - Prefer median benchmarks and guard claimed-mileage uplifts (Accepted)
+- [[0015-hybrid-executable-vault|ADR-0015]] — Adopt a hybrid executable vault with bounded retrieval and phased enforcement (Accepted)
 
 ## How to add one
 

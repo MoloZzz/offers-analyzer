@@ -2,7 +2,7 @@
 title: Research — why 0 opportunities, and how to reach business value
 type: research
 status: Implemented
-updated: 2026-07-16
+updated: 2026-08-02
 ---
 
 # Why we find 0 opportunities — and how to fix it
@@ -67,4 +67,4 @@ Done: **(1)+(2)+(3)**. This is a refinement of ingestion + valuation, not a new 
 (cohort/threshold/newest) is updated in place.
 
 ## Related
-- [[00-INDEX]] · [[profitability-definition]] · [[backlog]]
+- [[00-INDEX]] · [[profitability-definition]] · [[Roadmap & Status]]

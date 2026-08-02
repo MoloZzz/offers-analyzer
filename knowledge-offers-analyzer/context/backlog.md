@@ -1,10 +1,15 @@
 ---
 title: Backlog — living execution queue
 type: context
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Backlog
+
+> Migration note (2026-08-02): this file is retained as the historical working queue and staging
+> area for unpromoted ideas. The canonical high-level status now lives in
+> [[Roadmap & Status|Roadmap & Status]]; active non-trivial work belongs in a formal repo-root
+> spec. Preserve backlog IDs and history until each item is deliberately promoted or archived.
 
 The single **working queue** we pull from (step 4 of our flow: plan → stages → tasks+backlog →
 execute). Ordered by priority. `tasks.md` holds the formal per-feature breakdown; this backlog
@@ -534,5 +539,5 @@ operator profit on resale**, not just discount. Full plan: `specs/003-composite-
   volume + a feature-rich stored dataset + measured evidence the rule-based baseline is losing deals.
 
 ## Related
-- [[00-INDEX]] · [[goals]] · [[monitoring-approaches]] · [[profitability-definition]]
+- [[00-INDEX]] · [[vision-and-goals]] · [[monitoring-approaches]] · [[profitability-definition]]
 - [[0009-monthly-rate-limit-pool|ADR-0009]] · [[0006-operator-profit-vision|ADR-0006]] · [[0005-versioned-parameter-sets|ADR-0005]]

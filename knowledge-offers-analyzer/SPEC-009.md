@@ -3,7 +3,7 @@ title: SPEC-009 — Budget observability and rollout guardrails
 type: spec-backlog
 status: Implemented
 priority: P0
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # SPEC-009 — Budget observability and rollout guardrails
@@ -51,4 +51,4 @@ feature, not a dashboard for its own sake.
 ## Related
 
 - [[0009-monthly-rate-limit-pool|ADR-0009]] · [[0011-evidence-gated-scoring-rollout|ADR-0011]]
-- [[backlog]] · [[SPEC-005]]
+- [[Roadmap & Status]] · [[SPEC-005]]

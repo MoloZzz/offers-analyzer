@@ -1,0 +1,1508 @@
+{
+  "version": 1,
+  "metrics": {
+    "notes": 25,
+    "linkOccurrences": 183,
+    "distinctTargets": 24,
+    "dangling": 0,
+    "caseMismatch": 0,
+    "components": 1,
+    "orphans": 1,
+    "unreachableFromIndex": 0
+  },
+  "nodes": [
+    {
+      "name": "00 — Index",
+      "rel": "00 — Index.md",
+      "type": "index",
+      "inDeg": 0,
+      "outDeg": 17
+    },
+    {
+      "name": "Analytics & Control — Backlog",
+      "rel": "Analytics & Control — Backlog.md",
+      "type": "index",
+      "inDeg": 1,
+      "outDeg": 13
+    },
+    {
+      "name": "Architecture Overview",
+      "rel": "Architecture/Architecture Overview.md",
+      "type": "architecture",
+      "inDeg": 1,
+      "outDeg": 7
+    },
+    {
+      "name": "Bank CSV",
+      "rel": "Sources/Bank CSV.md",
+      "type": "source",
+      "inDeg": 5,
+      "outDeg": 4
+    },
+    {
+      "name": "Card↔Crypto Matching",
+      "rel": "Business/Card↔Crypto Matching.md",
+      "type": "business",
+      "inDeg": 11,
+      "outDeg": 5
+    },
+    {
+      "name": "Crypto CSV",
+      "rel": "Sources/Crypto CSV.md",
+      "type": "source",
+      "inDeg": 6,
+      "outDeg": 10
+    },
+    {
+      "name": "Data Model",
+      "rel": "Architecture/Data Model.md",
+      "type": "architecture",
+      "inDeg": 11,
+      "outDeg": 8
+    },
+    {
+      "name": "Decision Log",
+      "rel": "Decisions/Decision Log.md",
+      "type": "decision",
+      "inDeg": 6,
+      "outDeg": 21
+    },
+    {
+      "name": "Events & Export",
+      "rel": "Architecture/Events & Export.md",
+      "type": "architecture",
+      "inDeg": 8,
+      "outDeg": 2
+    },
+    {
+      "name": "Glossary",
+      "rel": "Business/Glossary.md",
+      "type": "business",
+      "inDeg": 1,
+      "outDeg": 10
+    },
+    {
+      "name": "Invariants",
+      "rel": "Architecture/Invariants.md",
+      "type": "architecture",
+      "inDeg": 20,
+      "outDeg": 5
+    },
+    {
+      "name": "Monobank",
+      "rel": "Sources/Monobank.md",
+      "type": "source",
+      "inDeg": 8,
+      "outDeg": 4
+    },
+    {
+      "name": "Plan 00 — Bank CSV",
+      "rel": "Plans/Plan 00 — Bank CSV.md",
+      "type": "plan",
+      "inDeg": 1,
+      "outDeg": 3
+    },
+    {
+      "name": "Plan 01 — Categorization",
+      "rel": "Plans/Plan 01 — Categorization.md",
+      "type": "plan",
+      "inDeg": 1,
+      "outDeg": 1
+    },
+    {
+      "name": "Plan 02 — Data Hygiene",
+      "rel": "Plans/Plan 02 — Data Hygiene.md",
+      "type": "plan",
+      "inDeg": 3,
+      "outDeg": 1
+    },
+    {
+      "name": "Plan 03 — Aggregations",
+      "rel": "Plans/Plan 03 — Aggregations.md",
+      "type": "plan",
+      "inDeg": 4,
+      "outDeg": 1
+    },
+    {
+      "name": "Plan 04 — Budgets & Goals",
+      "rel": "Plans/Plan 04 — Budgets & Goals.md",
+      "type": "plan",
+      "inDeg": 2,
+      "outDeg": 2
+    },
+    {
+      "name": "Plan 05 — Alerts & Telegram",
+      "rel": "Plans/Plan 05 — Alerts & Telegram.md",
+      "type": "plan",
+      "inDeg": 2,
+      "outDeg": 4
+    },
+    {
+      "name": "Plan 06 — Insights",
+      "rel": "Plans/Plan 06 — Insights.md",
+      "type": "plan",
+      "inDeg": 1,
+      "outDeg": 2
+    },
+    {
+      "name": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "rel": "Plans/Plan 07 — Card↔Crypto Matching (step 5).md",
+      "type": "plan",
+      "inDeg": 1,
+      "outDeg": 11
+    },
+    {
+      "name": "Providers",
+      "rel": "Architecture/Providers.md",
+      "type": "architecture",
+      "inDeg": 11,
+      "outDeg": 4
+    },
+    {
+      "name": "Requirements",
+      "rel": "Business/Requirements.md",
+      "type": "business",
+      "inDeg": 1,
+      "outDeg": 19
+    },
+    {
+      "name": "Roadmap & Status",
+      "rel": "Roadmap & Status.md",
+      "type": "index",
+      "inDeg": 9,
+      "outDeg": 19
+    },
+    {
+      "name": "Sync Engine",
+      "rel": "Architecture/Sync Engine.md",
+      "type": "architecture",
+      "inDeg": 8,
+      "outDeg": 3
+    },
+    {
+      "name": "Vision & Goals",
+      "rel": "Business/Vision & Goals.md",
+      "type": "business",
+      "inDeg": 2,
+      "outDeg": 7
+    }
+  ],
+  "edges": [
+    {
+      "from": "00 — Index",
+      "to": "Analytics & Control — Backlog",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "00 — Index",
+      "to": "Architecture Overview",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "00 — Index",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "00 — Index",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "00 — Index",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "00 — Index",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "00 — Index",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "00 — Index",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "00 — Index",
+      "to": "Glossary",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "00 — Index",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "00 — Index",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "00 — Index",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "00 — Index",
+      "to": "Requirements",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "00 — Index",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "00 — Index",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "00 — Index",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "00 — Index",
+      "to": "Vision & Goals",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 00 — Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 01 — Categorization",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 01 — Categorization",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 02 — Data Hygiene",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 02 — Data Hygiene",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 02 — Data Hygiene",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 03 — Aggregations",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 04 — Budgets & Goals",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 05 — Alerts & Telegram",
+      "anchor": null,
+      "embed": false,
+      "line": 48
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 06 — Insights",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "anchor": null,
+      "embed": false,
+      "line": 57
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Analytics & Control — Backlog",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 44
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 6
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 6
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "Architecture Overview",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 43
+    },
+    {
+      "from": "Bank CSV",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Bank CSV",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "Bank CSV",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "Bank CSV",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 7
+    },
+    {
+      "from": "Card↔Crypto Matching",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Card↔Crypto Matching",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Card↔Crypto Matching",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Card↔Crypto Matching",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "Card↔Crypto Matching",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 77
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 104
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Crypto CSV",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 87
+    },
+    {
+      "from": "Data Model",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "Data Model",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 89
+    },
+    {
+      "from": "Data Model",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 117
+    },
+    {
+      "from": "Data Model",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "Data Model",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Data Model",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "Data Model",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 89
+    },
+    {
+      "from": "Data Model",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "Decision Log",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "Decision Log",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    },
+    {
+      "from": "Decision Log",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "Decision Log",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 76
+    },
+    {
+      "from": "Decision Log",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
+      "from": "Decision Log",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    },
+    {
+      "from": "Decision Log",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 63
+    },
+    {
+      "from": "Decision Log",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Decision Log",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "Decision Log",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 98
+    },
+    {
+      "from": "Decision Log",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Decision Log",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 13
+    },
+    {
+      "from": "Decision Log",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "Decision Log",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "Decision Log",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "Decision Log",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "Decision Log",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 108
+    },
+    {
+      "from": "Decision Log",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 145
+    },
+    {
+      "from": "Decision Log",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 155
+    },
+    {
+      "from": "Decision Log",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 168
+    },
+    {
+      "from": "Decision Log",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "Events & Export",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Events & Export",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "Glossary",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "Glossary",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "Glossary",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 7
+    },
+    {
+      "from": "Glossary",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "Glossary",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "Glossary",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "Glossary",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "Glossary",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Glossary",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 13
+    },
+    {
+      "from": "Glossary",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "Invariants",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "Invariants",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "Invariants",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "Invariants",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "Invariants",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "Monobank",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "Monobank",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Monobank",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "Monobank",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Plan 00 — Bank CSV",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "Plan 00 — Bank CSV",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "Plan 00 — Bank CSV",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "Plan 01 — Categorization",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "Plan 02 — Data Hygiene",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "Plan 03 — Aggregations",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Plan 04 — Budgets & Goals",
+      "to": "Plan 02 — Data Hygiene",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "Plan 04 — Budgets & Goals",
+      "to": "Plan 03 — Aggregations",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "Plan 05 — Alerts & Telegram",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "Plan 05 — Alerts & Telegram",
+      "to": "Plan 02 — Data Hygiene",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Plan 05 — Alerts & Telegram",
+      "to": "Plan 03 — Aggregations",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "Plan 05 — Alerts & Telegram",
+      "to": "Plan 04 — Budgets & Goals",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "Plan 06 — Insights",
+      "to": "Plan 03 — Aggregations",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "Plan 06 — Insights",
+      "to": "Plan 05 — Alerts & Telegram",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "Plan 07 — Card↔Crypto Matching (step 5)",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 59
+    },
+    {
+      "from": "Providers",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "Providers",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "Providers",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Providers",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "Requirements",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Requirements",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "Requirements",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "Requirements",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Requirements",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Requirements",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "Requirements",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "Requirements",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "Requirements",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "Requirements",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "Requirements",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "Requirements",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "Requirements",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "Requirements",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "Requirements",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
+      "from": "Requirements",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Requirements",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 6
+    },
+    {
+      "from": "Requirements",
+      "to": "Roadmap & Status",
+      "anchor": null,
+      "embed": false,
+      "line": 46
+    },
+    {
+      "from": "Requirements",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Bank CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Crypto CSV",
+      "anchor": null,
+      "embed": false,
+      "line": 44
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Monobank",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Sync Engine",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "Roadmap & Status",
+      "to": "Vision & Goals",
+      "anchor": null,
+      "embed": false,
+      "line": 6
+    },
+    {
+      "from": "Sync Engine",
+      "to": "Events & Export",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "Sync Engine",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "Sync Engine",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Card↔Crypto Matching",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Data Model",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Decision Log",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Invariants",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "Vision & Goals",
+      "to": "Providers",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    }
+  ],
+  "components": [
+    [
+      "00 — Index",
+      "Analytics & Control — Backlog",
+      "Architecture Overview",
+      "Bank CSV",
+      "Card↔Crypto Matching",
+      "Crypto CSV",
+      "Data Model",
+      "Decision Log",
+      "Events & Export",
+      "Glossary",
+      "Invariants",
+      "Monobank",
+      "Plan 00 — Bank CSV",
+      "Plan 01 — Categorization",
+      "Plan 02 — Data Hygiene",
+      "Plan 03 — Aggregations",
+      "Plan 04 — Budgets & Goals",
+      "Plan 05 — Alerts & Telegram",
+      "Plan 06 — Insights",
+      "Plan 07 — Card↔Crypto Matching (step 5)",
+      "Providers",
+      "Requirements",
+      "Roadmap & Status",
+      "Sync Engine",
+      "Vision & Goals"
+    ]
+  ],
+  "orphans": [
+    "00 — Index"
+  ],
+  "unreachable": [],
+  "dangling": [],
+  "caseMismatch": []
+}

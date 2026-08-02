@@ -1,0 +1,35 @@
+# Knowledge-base enforcement.
+#
+# The pre-commit hook only runs for developers who have `core.hooksPath` set,
+# which dies on a fresh clone. This is the backstop that makes the guarantee
+# real rather than local.
+#
+# No `npm ci`: tools/vault is zero-dependency plain ESM, so this job needs
+# nothing but a checkout and a node binary.
+name: vault
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `check` resolves the repo root through `git rev-parse --show-toplevel`,
+          # so it needs a real checkout — but no rule reads history.
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # --strict fails on warnings too. The vault is at 0/0; anything less than
+      # strict here would let warnings accumulate silently, which is exactly how
+      # the drift this tooling exists to prevent got started.
+      - name: vault check
+        run: node tools/vault/v.mjs check --strict

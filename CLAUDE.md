@@ -18,13 +18,26 @@ via `[[links]]`) and a **decoupled context zone** (`context/`) for goals, sessio
 logs, and drafts — deliberately kept out of the navigation graph so it never
 dilutes it. Rules: `context/README.md`.
 
+`tools/vault/` makes that navigation executable without replacing it. The generated
+`knowledge-offers-analyzer/_gen/` artifacts are reproducible navigation aids, never a second
+source of truth. `vault build` is the only normal writer and `vault check` is write-free; the
+explicit, advisory `vault evidence` command may only write its ignored local observation cache.
+
 **Read protocol — before touching code, every task:**
-1. Skim `knowledge-offers-analyzer/context/goals.md` and the latest
+1. Skim `knowledge-offers-analyzer/context/goals.md`, `context/CURRENT.md`, and the latest
    `context/log/*` for background.
-2. Open `knowledge-offers-analyzer/00-INDEX.md` and follow its Maps of Content
-   into the area you're working on.
-3. Let the notes point you to the right files. Do **not** default to broad
-   grepping the codebase — navigate via the vault's `[[links]]`.
+2. Run `npm run vault:brief -- "Roadmap & Status"` for L1 orientation. If generated artifacts
+   are absent or stale, run the explicit `npm run vault:build` first; never expect `brief` or
+   `check` to write them for you.
+3. Open `knowledge-offers-analyzer/00-INDEX.md` and follow its Maps of Content into the area
+   you're working on. Use `npm run vault:find -- "<query>"`, then
+   `npm run vault:show -- "<note>#<section>"` for L2/L3 retrieval.
+4. Let the notes point you to the right files. Read a full note or source file only at L4, when
+   implementation detail or an edit requires it; do **not** default to broad codebase grepping.
+
+When delegating, pass note references and a target question rather than pasting large note bodies.
+Every runtime, including Codex Desktop, follows this explicit L1-to-L4 protocol; Claude hooks are
+not assumed to run.
 
 **Write protocol — a task is NOT done until the vault reflects the change:**
 - Capture running context/decisions in today's `context/log/YYYY-MM-DD-*.md`.
@@ -36,6 +49,8 @@ dilutes it. Rules: `context/README.md`.
 - New convention/pattern → update `conventions/coding-standards.md`.
 - New tool/env/runbook step → update `operations/environment-setup.md`.
 - New spec → link it from `specs/README.md`.
+- Update generated artifacts with `npm run vault:build` whenever curated notes, source-fact
+  surfaces, the adapter, or vault configuration changes; then run strict validation.
 
 **Supersession sweep (REQUIRED whenever a decision changes).** A new ADR — or any
 edit that supersedes, reverses, or narrows a prior decision — is NOT done until
@@ -52,6 +67,10 @@ Full rules: `knowledge-offers-analyzer/_meta/vault-protocol.md`. If a note is
 missing or contradicts the code, fixing it is part of your task. This is a
 **second-brain** approach, deliberately chosen over vector RAG (inefficient and
 noisy at this scale).
+
+**Evidence is advisory only.** `npm run vault:evidence -- --dry` validates the metric registry
+without a database. A real `vault:evidence` run uses a read-only transaction and must be invoked
+deliberately; no evidence result authorizes scoring, profile, budget, or rollout changes.
 
 ## 2. Spec-Driven Development (SDD) — REQUIRED for non-trivial features
 
@@ -91,5 +110,6 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
 3. The **vault is updated** to reflect the change (§1 write protocol), **and the
    supersession sweep has been run** if any decision changed — no note may
    contradict an ADR (§1).
-4. `npm run vault:check` passes after a vault change.
+4. Run `npm run vault:build` when source/vault inputs affect generated artifacts, then
+   `npm run vault:check:strict`; `npm run vault:check` retains the legacy compatibility check.
 5. For features: the SDD artifacts under `.specify/` are consistent with the code.

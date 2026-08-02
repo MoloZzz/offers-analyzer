@@ -1,0 +1,2 @@
+# vault health — generated, do not edit
+errors=0 warnings=0

@@ -1,7 +1,7 @@
 ---
 title: Architecture overview
 type: architecture
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Architecture overview
@@ -17,6 +17,14 @@ updated: 2026-07-28
 - **Logging:** `nestjs-pino` — structured (JSON in prod, pretty in dev), per-service `PinoLogger` injection. See [[0007-structured-logging-nestjs-pino|ADR-0007]].
 - **Error handling:** global `AllExceptionsFilter` (`APP_FILTER`) catches everything Nest's pipeline sees (all Telegram command/action handlers via `nestjs-telegraf`), logs structured + replies gracefully; every cron job (`poll`, `weekly-calibration`, `weekly-report`, `health-monitor`) catches and logs its own failures rather than crashing; `main.ts` has last-resort `uncaughtException`/`unhandledRejection` handlers that log fatal and exit (needs a restart supervisor — see [[environment-setup]]). See [[0008-global-error-handling|ADR-0008]].
 - **Repository:** `MoloZzz/offers-analyzer` (GitHub).
+
+## Engineering knowledge tooling
+
+The application is accompanied by a configured executable vault at `tools/vault/`. It derives a
+compact context pack, graph, code map, and verified source facts from this vault plus the actual
+NestJS/TypeORM source tree. These files are generated navigation evidence, not application runtime
+dependencies and not a replacement for the MOCs/ADRs. See [[0015-hybrid-executable-vault|ADR-0015]],
+[[vault-protocol]], and [[persistence-surface]].
 
 ## Module map
 
@@ -105,3 +113,4 @@ single missed sweep never fabricates an event.
 - [[00-INDEX]]
 - [[glossary]]
 - [[decisions/README]]
+- [[persistence-surface]]

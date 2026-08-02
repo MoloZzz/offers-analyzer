@@ -1,0 +1,18 @@
+﻿# Roadmap step -> plan note -> code evidence.
+#
+# step <TAB> plan_note (or -) <TAB> evidence path (or -)
+#
+# Machine-checked three ways (rule: step-plan-drift):
+#   step [x] but evidence missing        -> the roadmap is lying
+#   step [ ] but evidence exists         -> silently implemented, roadmap stale
+#   step [x] but plan still has - [ ]    -> acceptance criteria never closed
+#
+# This is also what resolves the Plan-number vs step-number collision WITHOUT
+# renaming files: Plan 07 implements step 5, Plan 00 implements step 7.
+1	-	backend/src/modules/transactions/entities/transaction.entity.ts
+2	-	backend/src/core/normalize/normalize.ts
+3	-	backend/src/providers/monobank/monobank.provider.ts
+4	-	backend/src/providers/binance/binance-p2p.provider.ts
+5	Plans/Plan 07 — Card↔Crypto Matching (step 5).md	backend/src/matching/matching.service.ts
+6	-	-
+7	Plans/Plan 00 — Bank CSV.md	-

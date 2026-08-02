@@ -1,0 +1,42 @@
+# Metric registry — the mechanism against product priorities being pure opinion.
+#
+# key <TAB> plan <TAB> trigger <TAB> question <TAB> sql
+#
+# `vault evidence` runs each sql against the live DB and reports whether the
+# trigger fires. Semantics, one rule only:
+#
+#     TRIGGER FIRES  =>  ACT ON THE OWNING PLAN NOW
+#
+# Every trigger must be phrased so that firing argues FOR work. A metric whose
+# natural reading is "not yet" gets inverted here rather than at the call site
+# (see mcc_coverage) — one semantic is what lets `evidence` print a ranked list
+# an agent can act on without re-reading each row's intent.
+#
+# CONTRACT ON sql — enforced by lib/evidence.mjs, not by convention:
+#   - single SELECT, no semicolon, run inside a READ ONLY transaction
+#   - returns exactly ONE row with columns `value` (number) and `n` (sample size)
+#   - the privacy guard is TWO checks, and the second is the load-bearing one:
+#     any column not named value/n is refused, AND `value` must coerce to a
+#     finite number. The name check alone is bypassable by aliasing
+#     (`metadata->>'description' AS value`); the numeric check is what actually
+#     stops a merchant, a description or a date from leaving the database.
+#     Neither bounds arithmetic — `sum(amount) AS value` passes both — so keep
+#     values as shares and counts. Nothing reaches a committed file either way:
+#     output goes to tools/vault/.evidence.tsv (gitignored).
+#   - `n` is what makes a value readable: 0.5 over n=4 is noise, over n=900 is a
+#     finding. With one user, every number here is directional, never
+#     statistical — do not let an agent dress it up as significance.
+#
+# NOT EVERY PLAN CAN HAVE A METRIC. Plan 00 (Bank CSV) deliberately has no row:
+# it imports money the DB has never seen, so no query over this DB can measure
+# what is missing. That gap is the honest output, not a hole to fill with a
+# proxy — a plan with no metric is decided by judgement, and should be visibly
+# labelled as such rather than given a number that looks like evidence.
+#
+# Roadmap steps use `step N`; backlog items use their plan note name.
+unmatched_p2p_share	step 6	> 0.15	Is estimate-for-unmatched worth building, or does matching already cover the P2P legs?	SELECT count(*) FILTER (WHERE "cardTxId" IS NULL)::float8 / nullif(count(*), 0) AS value, count(*) AS n FROM crypto_purchases
+foreign_currency_share	step 6	> 0.05	Does enough non-UAH volume exist to justify the NBU rates service (shared by step 6 and Plan 02)?	SELECT count(*) FILTER (WHERE "currencyCode" <> 'UAH')::float8 / nullif(count(*), 0) AS value, count(*) AS n FROM transactions
+mcc_coverage	Plan 01	< 0.7	Inverted on purpose: LOW MCC coverage means the MCC map alone cannot categorize, so Plan 01 must ship the rules engine, not just the mapping.	SELECT count(*) FILTER (WHERE metadata->>'mcc' IS NOT NULL)::float8 / nullif(count(*), 0) AS value, count(*) AS n FROM transactions WHERE source = 'monobank' AND amount < 0
+merchant_variant_ratio	Plan 01	> 0.35	How many distinct raw labels per debit? A high ratio means merchant normalization carries the value, not the category tree.	SELECT count(DISTINCT lower(btrim(coalesce(metadata->>'description', metadata->>'counterName'))))::float8 / nullif(count(*), 0) AS value, count(*) AS n FROM transactions WHERE amount < 0 AND coalesce(metadata->>'description', metadata->>'counterName') IS NOT NULL
+self_transfer_share	Plan 02	> 0.03	How wrong are today's spend totals? Share of debits that have a mirror credit on another account within 3 days.	SELECT count(*)::float8 / nullif((SELECT count(*) FROM transactions WHERE amount < 0), 0) AS value, (SELECT count(*) FROM transactions WHERE amount < 0) AS n FROM transactions d WHERE d.amount < 0 AND EXISTS (SELECT 1 FROM transactions c WHERE c.amount = -d.amount AND c."currencyCode" = d."currencyCode" AND c."accountId" IS DISTINCT FROM d."accountId" AND c."bookedAt" BETWEEN d."bookedAt" - interval '3 days' AND d."bookedAt" + interval '3 days')
+history_months	Plan 05	>= 6	Alerts need a baseline. Below ~6 months of history a "spike vs average" rule fires noise, so Plan 05 is premature until this holds.	SELECT count(DISTINCT date_trunc('month', "bookedAt"))::float8 AS value, count(*) AS n FROM transactions

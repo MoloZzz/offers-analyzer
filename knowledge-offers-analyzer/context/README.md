@@ -1,40 +1,54 @@
 ---
-title: Context zone — decoupled inbox for goals, notes & session logs
+title: Context zone - decoupled inbox for handoff, logs, and drafts
 type: context
-updated: 2026-07-12
+updated: 2026-08-02
 ---
 
-# Context zone (decoupled)
+# Context zone
 
-This folder is a **deliberately decoupled** part of the knowledge base. It exists so that the rich context we build in chat (goals, decisions-in-progress, session notes, draft reports) lives in the knowledge base — available to every agent — **without** polluting or breaking the curated navigation vault.
+This folder is deliberately decoupled from the curated navigation graph. It preserves working
+context without turning chat history into a competing product specification.
 
-## The two layers (do not mix them)
+## The two layers
 
-- **Curated vault** (`architecture/`, `domain/`, `decisions/`, `conventions/`, `operations/`, `research/`, `specs/`) — the **source of truth**. Hand-linked with `[[wikilinks]]`, navigated from [[00-INDEX]], governed by the strict read/write protocol in [[vault-protocol]]. High signal.
-- **Context zone** (`context/`) — the **inbox / working memory**. Append-mostly, chronological, low ceremony. It is intentionally **not woven into the navigation graph**: curated notes do not link out to it, so the graph stays clean.
+- **Curated vault** - product vision, requirements, roadmap, architecture, domain, ADRs,
+  conventions, operations, research, and the feature-spec index. It is the source of truth and is
+  navigated from [[00-INDEX]].
+- **Context zone** - short orientation, current handoff, dated session logs, drafts, and retained
+  historical planning material. Curated notes do not link out here, so the graph remains
+  high-signal.
 
-## What goes here
+## What belongs here
 
-- `goals.md` — living project goals & scope.
-- `log/` — one file per working session (`YYYY-MM-DD-*.md`): what was discussed, decided, deferred, and the open questions. This is where "the chat context" is persisted.
-- Draft notes and scratch that isn't yet a durable fact.
+- goals.md - short session orientation that points to canonical product notes.
+- CURRENT.md - small, overwriteable handoff: active work, next pickup, and immediate blockers.
+- log/YYYY-MM-DD-short-topic.md - one historical session record; copy log/_TEMPLATE.md to start.
+- backlog.md - retained historical execution queue and staging area during migration. It is not the
+  canonical status or feature contract.
+- Drafts and temporary investigation material that have not yet become durable facts.
 
-## The rule that keeps the vault intact: **promote, don't accumulate**
+## Agent read and write flow
 
-The context zone is the entry point, not the destination. When something here matures into a durable fact or decision, **promote it into the curated vault** and leave the log as-is (historical record):
+At the start of a task, read goals.md, CURRENT.md, and the latest dated log. Then enter the
+curated vault through [[00-INDEX]] and use the product hierarchy or MOCs.
 
-| When a log entry becomes… | Promote it to… |
+During work, record concrete changes and open questions in a dated log. Before finishing, promote
+durable material to its curated owner:
+
+| Durable material | Curated owner |
 |---|---|
-| A locked decision | an ADR in [[decisions/README]] |
-| A domain term or rule | [[glossary]] |
-| A structural/architecture fact | [[overview]] |
-| A convention | [[coding-standards]] |
-| An investigation with a conclusion | a note in `research/` |
+| Product intent, scope, or non-goal | [[vision-and-goals]] |
+| Product requirement or release gate | [[requirements]] |
+| Priority, status, blocker, or exit evidence | [[Roadmap & Status]] |
+| System boundary or invariant | [[overview]] and [[invariants]] |
+| Decision | [[decisions/README]] |
+| Domain term | [[glossary]] |
+| Feature design | repo-root spec, indexed from [[specs/README]] |
 
-## Agent usage
+## The rule: promote, do not accumulate
 
-- **At session start:** read `context/goals.md` and the latest `context/log/*` for background — *then* navigate via [[00-INDEX]] as usual.
-- **During work:** jot session notes/decisions into today's `context/log/` file freely.
-- **Before finishing:** promote anything durable into the curated vault (per the table above). The context zone never replaces the curated notes.
+Context is the entry point and historical record, not the destination. Once a note becomes a
+durable fact, copy its substance to the appropriate curated owner and leave the context note as
+history. Do not maintain a second vision, requirements list, or roadmap here.
 
-> Decision rationale: [[0003-decoupled-context-zone|ADR-0003]].
+For the rationale behind the decoupled zone, see [[0003-decoupled-context-zone|ADR-0003]].

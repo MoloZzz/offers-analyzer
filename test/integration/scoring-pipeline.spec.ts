@@ -1,11 +1,20 @@
 import { Currency } from '../../src/common/types/money';
-import { buildSeedParams, ParametersService } from '../../src/modules/calibration/parameters.service';
+import {
+  buildSeedParams,
+  ParametersService,
+} from '../../src/modules/calibration/parameters.service';
 import { ListingDetail, ListingSource } from '../../src/modules/sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../../src/modules/valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../../src/modules/valuation/cohort';
-import { HeuristicTables, HeuristicTablesService } from '../../src/modules/valuation/factors/tables';
+import {
+  HeuristicTables,
+  HeuristicTablesService,
+} from '../../src/modules/valuation/factors/tables';
 import { MileageAdjuster } from '../../src/modules/valuation/mileage';
-import { PHASE1_FACTOR_BOUNDS, ValuationService } from '../../src/modules/valuation/valuation.service';
+import {
+  PHASE1_FACTOR_BOUNDS,
+  ValuationService,
+} from '../../src/modules/valuation/valuation.service';
 
 /**
  * End-to-end scoring pipeline (B15): composes the REAL `resolveBenchmark` + `MileageAdjuster` +
@@ -14,7 +23,9 @@ import { PHASE1_FACTOR_BOUNDS, ValuationService } from '../../src/modules/valuat
  * No DB (fake benchmark cache passes the loader straight through); deterministic.
  */
 
-const V1 = { params: () => buildSeedParams({ mileageAnnualK: 15, mileagePer10kPct: 2, mileageMaxAdjPct: 20 }) } as unknown as ParametersService;
+const V1 = {
+  params: () => buildSeedParams({ mileageAnnualK: 15, mileagePer10kPct: 2, mileageMaxAdjPct: 20 }),
+} as unknown as ParametersService;
 const noTables = { get: (): HeuristicTables => ({}) } as unknown as HeuristicTablesService;
 const mileage = new MileageAdjuster(V1);
 const valuation = new ValuationService(V1, noTables);
@@ -49,7 +60,8 @@ function detail(overrides: Partial<ListingDetail> = {}): ListingDetail {
 async function run(d: ListingDetail, avgAmount: number, sampleSize: number, minScore = 0.63) {
   const source = {
     key: 'auto-ria',
-    averagePrice: () => Promise.resolve({ value: { amount: avgAmount, currency: Currency.USD }, sampleSize }),
+    averagePrice: () =>
+      Promise.resolve({ value: { amount: avgAmount, currency: Currency.USD }, sampleSize }),
   } as unknown as ListingSource;
   const benchmarks = {
     getOrLoad: (_k: string, _c: unknown, loader: () => Promise<unknown>) => loader(),
@@ -81,21 +93,40 @@ async function run(d: ListingDetail, avgAmount: number, sampleSize: number, minS
 
 describe('scoring pipeline (integration, B15)', () => {
   it('flags a clean below-market car as an opportunity', async () => {
-    const { result, fairValue } = await run(detail({ price: { amount: 12000, currency: Currency.USD } }), 16000, 50);
-    expect(fairValue).toBe(16000); // mileage-banded cohort matched → no analytic correction
-    expect(result.discountPct).toBeCloseTo(25, 0);
-    expect(result.isOpportunity).toBe(true);
-    expect(result.score).toBeGreaterThan(0.63);
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-08-02T12:00:00.000Z'));
+    try {
+      const { result, fairValue } = await run(
+        detail({ price: { amount: 12000, currency: Currency.USD } }),
+        16000,
+        50,
+      );
+      // Reusable cohorts intentionally omit the mileage band (SPEC-010). The VIN-evidenced car is
+      // 15k km below its expected mileage, so the conservative analytic correction is +3%.
+      expect(fairValue).toBe(16480);
+      expect(result.discountPct).toBeCloseTo(27.18, 2);
+      expect(result.isOpportunity).toBe(true);
+      expect(result.score).toBeGreaterThan(0.63);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('does NOT flag an overpriced car', async () => {
-    const { result } = await run(detail({ price: { amount: 18000, currency: Currency.USD } }), 16000, 50);
+    const { result } = await run(
+      detail({ price: { amount: 18000, currency: Currency.USD } }),
+      16000,
+      50,
+    );
     expect(result.score).toBeLessThan(0);
     expect(result.isOpportunity).toBe(false);
   });
 
   it('disqualifies a cheap but damaged car (a trap, not a deal)', async () => {
-    const d = detail({ price: { amount: 12000, currency: Currency.USD }, risk: { ...detail().risk, damaged: true } });
+    const d = detail({
+      price: { amount: 12000, currency: Currency.USD },
+      risk: { ...detail().risk, damaged: true },
+    });
     const { result } = await run(d, 16000, 50);
     expect(result.redFlags.damaged).toBe(true);
     expect(result.score).toBeLessThanOrEqual(0);

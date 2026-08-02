@@ -1,0 +1,13 @@
+{
+  "vaultDir": "transaction-analytics",
+  "codeRoot": "backend",
+  "adapter": "nest-typeorm",
+  "budget": 50000,
+  "stack": [
+    "NestJS + TypeORM + Postgres; node24 CJS/ES2023; code=backend/ vault=transaction-analytics/",
+    "single-user app: no userId, no roles, no multitenancy"
+  ],
+  "exampleRef": "\"Data Model#crypto_purchases\" | \"Data Model#5\" | \"matching#2\"",
+  "migrateCmd": "cd backend && npm run migration:run",
+  "agentScripts": ["build", "test", "test:int", "lint", "migration:run", "sync", "match", "db:up"]
+}

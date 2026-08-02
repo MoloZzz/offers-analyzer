@@ -1,0 +1,12 @@
+# Advisory metric registry for `vault evidence`.
+#
+# key <TAB> roadmap target <TAB> trigger <TAB> operator question <TAB> SQL
+#
+# A trigger means "review the named roadmap target"; it never enables scoring,
+# changes a ParameterSet, changes budget policy, or substitutes for operator approval.
+# SQL is validated as one SELECT and executed in a PostgreSQL READ ONLY transaction.
+# Every query must return exactly one row with numeric `value` and integer sample size `n`.
+
+closed_deals_for_review	Roadmap & Status: Operator economics (SPEC-007)	>= 15	Has the operator recorded fifteen closed deals with actual buy and sell prices for a human calibration review?	SELECT count(*)::float8 AS value, count(*) AS n FROM deal_outcomes WHERE stage = 'sold' AND "buyPriceUsd" IS NOT NULL AND "sellPriceUsd" IS NOT NULL
+eligible_disappearances	Roadmap & Status: Realized-price calibration (SPEC-004)	-	How many non-relisted, unreappeared short-DOM disappearance events are available for cohort-quality review? This alone does not validate k.	SELECT count(*)::float8 AS value, count(*) AS n FROM listing_disappearances WHERE "isRelist" = false AND "reappearedAt" IS NULL AND "domDays" < 60
+budget_denial_share	Roadmap & Status: Budget observability (SPEC-009)	> 0.05	Are more than five percent of this month's budget admission attempts denied, requiring human allocation reconciliation?	SELECT COALESCE(count(*) FILTER (WHERE outcome = 'denied')::float8 / NULLIF(count(*), 0), 0)::float8 AS value, count(*) AS n FROM budget_activities WHERE "monthKey" = to_char(current_date, 'YYYYMM')

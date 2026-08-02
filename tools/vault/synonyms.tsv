@@ -1,0 +1,14 @@
+# One tab-delimited synonym group per line.  The engine expands each group in
+# both directions during `vault find`; keep terms small and evidence-backed.
+
+profit	прибуток	прибутковість
+operator	оператор	перекуп
+listing	оголошення
+official	офіційний
+api	апі
+score	скоринг	оцінка
+activation	активація
+budget	бюджет	ліміт
+migration	міграція	міграції
+source	джерело
+telegram	телеграм

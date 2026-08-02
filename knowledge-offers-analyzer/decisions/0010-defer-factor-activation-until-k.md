@@ -2,7 +2,7 @@
 title: ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
 type: decision
 status: Accepted
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands
@@ -55,7 +55,8 @@ do" verdict points the same way: fix the survivorship bias first, then revisit t
 
 ## Related
 
-- [[backlog#FIX-003.1]] · [[0006-operator-profit-vision|ADR-0006]] ·
+- Historical FIX-003.1 queue record in context/backlog.md · [[0006-operator-profit-vision|ADR-0006]] ·
+  [[Roadmap & Status]] ·
   [[0005-versioned-parameter-sets|ADR-0005]] · spec `004-realized-price-calibration` (Phase C)
 - [[0011-evidence-gated-scoring-rollout|ADR-0011]]
 - Verification note: `context/log/2026-07-23-session-01.md`

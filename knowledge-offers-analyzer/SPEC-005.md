@@ -1,7 +1,7 @@
 ---
 title: SPEC-005 - Listing lifecycle and tiered re-check
 type: spec
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # SPEC-005 - Listing lifecycle and tiered re-check
@@ -26,4 +26,4 @@ Curated pointer to the formal Spec Kit package at
 ## Related
 
 - [[specs/README]]
-- [[backlog]]
+- [[Roadmap & Status]]

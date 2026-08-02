@@ -1,0 +1,26 @@
+# path	type	summary
+00 — Index.md	index	Knowledge base hub: navigation through notes — business, architecture, sources, decisions, and plans.
+Analytics & Control — Backlog.md	index	
+Architecture/Architecture Overview.md	architecture	Data flow and data stream: source-agnostic core, providers outside, side effects through events.
+Architecture/Data Model.md	architecture	Entities, fields, types, indexes, ERD and migrations. Money — numeric(38,0) to BigInt.
+Architecture/Events & Export.md	architecture	transaction.created event and Google Sheets subscriber; batched flush instead of per-event write.
+Architecture/Invariants.md	architecture	Seven unbreakable rules of the project — the constitution. A violation means stop and rework.
+Architecture/Providers.md	architecture	TransactionProvider contract: fetch plus map into NormalizedTransaction, zero business logic.
+Architecture/Sync Engine.md	architecture	SyncService: incremental run, dedupe by UNIQUE source-externalId, watermark increment.
+Business/Card↔Crypto Matching.md	business	Main domain value: gross UAH cost of crypto through the link between card debit and P2P inflow.
+Business/Glossary.md	business	Terms: Transaction, Account, CryptoPurchase, provider, normalize, minor units, scale.
+Business/Requirements.md	business	Functional R1-R13 and non-functional NR1-NR4 tracker requirements.
+Business/Vision & Goals.md	business	What this is, for whom, why, principles and explicit out-of-scope.
+Decisions/Decision Log.md	decision	Key architectural decisions and why, in decision format: decision, reason, consequence.
+Plans/Plan 00 — Bank CSV.md	plan	Complete card data: import statements from other banks as a new provider, without core changes.
+Plans/Plan 01 — Categorization.md	plan	A category and normalized merchant for every transaction — the foundation for analytics, budgets, and alerts.
+Plans/Plan 02 — Data Hygiene.md	plan	Transfers, NBU rates, subscriptions: own transfers are not expenses, and everything is converted to UAH.
+Plans/Plan 03 — Aggregations.md	plan	Single source of computed metrics for reports, budgets, alerts, and insights.
+Plans/Plan 04 — Budgets & Goals.md	plan	
+Plans/Plan 05 — Alerts & Telegram.md	plan	
+Plans/Plan 06 — Insights.md	plan	
+Plans/Plan 07 — Card↔Crypto Matching (step 5).md	plan	Post-processing layer linking a card debit to a P2P crypto inflow; providers know nothing about it.
+Roadmap & Status.md	index	Single source of truth for step status, current tests, and known nuances.
+Sources/Bank CSV.md	source	Bank statement imports: encoding, date formats, and a separate parser class per bank.
+Sources/Crypto CSV.md	source	Binance P2P and deposit CSV: column formats, asset scales, and the externalId hash.
+Sources/Monobank.md	source	Monobank Personal API: limits, windowed pagination, and a cross-currency pitfall.

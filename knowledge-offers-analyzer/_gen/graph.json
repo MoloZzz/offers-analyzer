@@ -1,0 +1,2845 @@
+{
+  "version": 1,
+  "metrics": {
+    "notes": 44,
+    "links": 346,
+    "dangling": 0,
+    "ambiguous": 0,
+    "caseMismatch": 0,
+    "components": 1,
+    "orphans": 0,
+    "unreachableFromIndex": 0
+  },
+  "nodes": [
+    {
+      "rel": "00-INDEX.md",
+      "name": "00-INDEX",
+      "title": "Offers Analyzer - Knowledge Base Index",
+      "type": "moc",
+      "inDeg": 17,
+      "outDeg": 22
+    },
+    {
+      "rel": "Roadmap & Status.md",
+      "name": "Roadmap & Status",
+      "title": "Roadmap & Status",
+      "type": "roadmap",
+      "inDeg": 14,
+      "outDeg": 7
+    },
+    {
+      "rel": "SPEC-005.md",
+      "name": "SPEC-005",
+      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
+      "type": "spec",
+      "inDeg": 4,
+      "outDeg": 4
+    },
+    {
+      "rel": "SPEC-006.md",
+      "name": "SPEC-006",
+      "title": "SPEC-006 - Monetary output Z and ROI",
+      "type": "spec",
+      "inDeg": 1,
+      "outDeg": 3
+    },
+    {
+      "rel": "SPEC-008.md",
+      "name": "SPEC-008",
+      "title": "SPEC-008 - Cohort market drift correction",
+      "type": "spec",
+      "inDeg": 3,
+      "outDeg": 1
+    },
+    {
+      "rel": "SPEC-009.md",
+      "name": "SPEC-009",
+      "title": "SPEC-009 — Budget observability and rollout guardrails",
+      "type": "spec-backlog",
+      "inDeg": 2,
+      "outDeg": 5
+    },
+    {
+      "rel": "Welcome.md",
+      "name": "Welcome",
+      "title": "Welcome",
+      "type": "meta",
+      "inDeg": 1,
+      "outDeg": 1
+    },
+    {
+      "rel": "_meta/note-template.md",
+      "name": "note-template",
+      "title": "<concept name>",
+      "type": "business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log",
+      "inDeg": 1,
+      "outDeg": 1
+    },
+    {
+      "rel": "_meta/vault-protocol.md",
+      "name": "vault-protocol",
+      "title": "Vault Protocol - how agents use and maintain the knowledge base",
+      "type": "meta",
+      "inDeg": 5,
+      "outDeg": 18
+    },
+    {
+      "rel": "architecture/invariants.md",
+      "name": "invariants",
+      "title": "Architecture and operational invariants",
+      "type": "architecture",
+      "inDeg": 4,
+      "outDeg": 8
+    },
+    {
+      "rel": "architecture/overview.md",
+      "name": "overview",
+      "title": "Architecture overview",
+      "type": "architecture",
+      "inDeg": 17,
+      "outDeg": 25
+    },
+    {
+      "rel": "architecture/persistence-surface.md",
+      "name": "persistence-surface",
+      "title": "Persistence surface",
+      "type": "architecture",
+      "inDeg": 1,
+      "outDeg": 4
+    },
+    {
+      "rel": "business/how-it-works.md",
+      "name": "how-it-works",
+      "title": "Як працює система (для бізнесу) — збір даних і оцінка вигідності",
+      "type": "business",
+      "inDeg": 5,
+      "outDeg": 9
+    },
+    {
+      "rel": "business/requirements.md",
+      "name": "requirements",
+      "title": "Product requirements",
+      "type": "business",
+      "inDeg": 4,
+      "outDeg": 8
+    },
+    {
+      "rel": "business/vision-and-goals.md",
+      "name": "vision-and-goals",
+      "title": "Product vision and goals",
+      "type": "business",
+      "inDeg": 5,
+      "outDeg": 7
+    },
+    {
+      "rel": "conventions/coding-standards.md",
+      "name": "coding-standards",
+      "title": "Coding standards & conventions",
+      "type": "convention",
+      "inDeg": 9,
+      "outDeg": 8
+    },
+    {
+      "rel": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "name": "0001-adopt-sdd-vault-rtk",
+      "title": "ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK",
+      "type": "decision",
+      "inDeg": 3,
+      "outDeg": 4
+    },
+    {
+      "rel": "decisions/0002-monitoring-via-official-api.md",
+      "name": "0002-monitoring-via-official-api",
+      "title": "ADR-0002 — Monitor AUTO.RIA via the official API, narrow niche on free tier",
+      "type": "decision",
+      "inDeg": 6,
+      "outDeg": 9
+    },
+    {
+      "rel": "decisions/0003-decoupled-context-zone.md",
+      "name": "0003-decoupled-context-zone",
+      "title": "ADR-0003 — Decoupled context zone instead of a second knowledge base",
+      "type": "decision",
+      "inDeg": 2,
+      "outDeg": 8
+    },
+    {
+      "rel": "decisions/0004-drop-redis-bullmq.md",
+      "name": "0004-drop-redis-bullmq",
+      "title": "ADR-0004 — Drop Redis/BullMQ for v1 (Postgres-backed rate budget)",
+      "type": "decision",
+      "inDeg": 7,
+      "outDeg": 6
+    },
+    {
+      "rel": "decisions/0005-versioned-parameter-sets.md",
+      "name": "0005-versioned-parameter-sets",
+      "title": "ADR-0005 — Versioned ParameterSets + human-in-the-loop calibration",
+      "type": "decision",
+      "inDeg": 8,
+      "outDeg": 6
+    },
+    {
+      "rel": "decisions/0006-operator-profit-vision.md",
+      "name": "0006-operator-profit-vision",
+      "title": "ADR-0006 — Vision shift: from \"below market\" to \"probability of operator profit\"",
+      "type": "decision",
+      "inDeg": 9,
+      "outDeg": 10
+    },
+    {
+      "rel": "decisions/0007-structured-logging-nestjs-pino.md",
+      "name": "0007-structured-logging-nestjs-pino",
+      "title": "ADR-0007 — Structured logging via nestjs-pino",
+      "type": "decision",
+      "inDeg": 4,
+      "outDeg": 4
+    },
+    {
+      "rel": "decisions/0008-global-error-handling.md",
+      "name": "0008-global-error-handling",
+      "title": "ADR-0008 — Global error handling",
+      "type": "decision",
+      "inDeg": 4,
+      "outDeg": 8
+    },
+    {
+      "rel": "decisions/0009-monthly-rate-limit-pool.md",
+      "name": "0009-monthly-rate-limit-pool",
+      "title": "ADR-0009 — Rate limiting: monthly pool instead of hourly window",
+      "type": "decision",
+      "inDeg": 11,
+      "outDeg": 11
+    },
+    {
+      "rel": "decisions/0010-defer-factor-activation-until-k.md",
+      "name": "0010-defer-factor-activation-until-k",
+      "title": "ADR-0010 — Keep spec-003 factors inactive until the survivorship correction lands",
+      "type": "decision",
+      "inDeg": 8,
+      "outDeg": 6
+    },
+    {
+      "rel": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "name": "0011-evidence-gated-scoring-rollout",
+      "title": "ADR-0011 — Evidence-gated scoring rollout",
+      "type": "decision",
+      "inDeg": 14,
+      "outDeg": 5
+    },
+    {
+      "rel": "decisions/0012-material-repeat-alert-threshold.md",
+      "name": "0012-material-repeat-alert-threshold",
+      "title": "ADR-0012 — Material threshold for same-listing repeat alerts",
+      "type": "decision",
+      "inDeg": 2,
+      "outDeg": 5
+    },
+    {
+      "rel": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "name": "0013-budget-stabilization-before-lifecycle-rechecks",
+      "title": "ADR-0013 — Stabilize budget demand before lifecycle rechecks",
+      "type": "decision",
+      "inDeg": 6,
+      "outDeg": 3
+    },
+    {
+      "rel": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "name": "0014-conservative-benchmark-and-mileage-guard",
+      "title": "ADR-0014 - Conservative benchmark and claimed-mileage guard",
+      "type": "decision",
+      "inDeg": 5,
+      "outDeg": 3
+    },
+    {
+      "rel": "decisions/0015-hybrid-executable-vault.md",
+      "name": "0015-hybrid-executable-vault",
+      "title": "ADR-0015 — Hybrid executable vault and phased enforcement",
+      "type": "decision",
+      "inDeg": 4,
+      "outDeg": 4
+    },
+    {
+      "rel": "decisions/README.md",
+      "name": "README",
+      "title": "Decision log (ADRs)",
+      "type": "moc",
+      "inDeg": 21,
+      "outDeg": 19
+    },
+    {
+      "rel": "decisions/adr-template.md",
+      "name": "adr-template",
+      "title": "ADR-NNNN — <short title>",
+      "type": "decision",
+      "inDeg": 1,
+      "outDeg": 1
+    },
+    {
+      "rel": "domain/glossary.md",
+      "name": "glossary",
+      "title": "Domain glossary",
+      "type": "domain",
+      "inDeg": 9,
+      "outDeg": 13
+    },
+    {
+      "rel": "operations/environment-setup.md",
+      "name": "environment-setup",
+      "title": "Environment setup & tooling",
+      "type": "operations",
+      "inDeg": 8,
+      "outDeg": 5
+    },
+    {
+      "rel": "research/alternative-sources.md",
+      "name": "alternative-sources",
+      "title": "Research — alternative listing sources beyond AUTO.RIA",
+      "type": "research",
+      "inDeg": 3,
+      "outDeg": 10
+    },
+    {
+      "rel": "research/explainability-gaps.md",
+      "name": "explainability-gaps",
+      "title": "Research — explainability gaps (arguing WHY an evaluation was made)",
+      "type": "research",
+      "inDeg": 4,
+      "outDeg": 7
+    },
+    {
+      "rel": "research/monitoring-approaches.md",
+      "name": "monitoring-approaches",
+      "title": "Research — how to monitor AUTO.RIA (API vs scraping)",
+      "type": "research",
+      "inDeg": 7,
+      "outDeg": 11
+    },
+    {
+      "rel": "research/profitability-definition.md",
+      "name": "profitability-definition",
+      "title": "Research — what counts as a \"profitable\" offer",
+      "type": "research",
+      "inDeg": 16,
+      "outDeg": 15
+    },
+    {
+      "rel": "research/profitability-methods-coverage.md",
+      "name": "profitability-methods-coverage",
+      "title": "Research — \"profitability\" methods coverage (what we chose, what's built, do we need ML)",
+      "type": "research",
+      "inDeg": 5,
+      "outDeg": 16
+    },
+    {
+      "rel": "research/vin-real-mileage.md",
+      "name": "vin-real-mileage",
+      "title": "Research — real (VIN-verified) mileage vs claimed mileage",
+      "type": "research",
+      "inDeg": 4,
+      "outDeg": 5
+    },
+    {
+      "rel": "research/when-to-alert.md",
+      "name": "when-to-alert",
+      "title": "Research — when is a listing \"worth alerting\" (interestingness + relist de-dup)",
+      "type": "research",
+      "inDeg": 5,
+      "outDeg": 5
+    },
+    {
+      "rel": "research/why-no-opportunities.md",
+      "name": "why-no-opportunities",
+      "title": "Research — why 0 opportunities, and how to reach business value",
+      "type": "research",
+      "inDeg": 6,
+      "outDeg": 5
+    },
+    {
+      "rel": "specs/README.md",
+      "name": "README",
+      "title": "Feature specs index (SDD)",
+      "type": "moc",
+      "inDeg": 6,
+      "outDeg": 11
+    }
+  ],
+  "edges": [
+    {
+      "from": "00-INDEX.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 67
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "Welcome.md",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 13
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "architecture/invariants.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 39
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "business/requirements.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/alternative-sources.md",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "00-INDEX.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "architecture/invariants.md",
+      "anchor": null,
+      "embed": false,
+      "line": 87
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "business/requirements.md",
+      "anchor": null,
+      "embed": false,
+      "line": 86
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 85
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 89
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 88
+    },
+    {
+      "from": "SPEC-005.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "SPEC-005.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "SPEC-005.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "SPEC-005.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "SPEC-006.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "SPEC-006.md",
+      "to": "SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "SPEC-006.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "SPEC-008.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "SPEC-009.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "SPEC-009.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "SPEC-009.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "SPEC-009.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "SPEC-009.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "Welcome.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "_meta/note-template.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 85
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "_meta/note-template.md",
+      "anchor": null,
+      "embed": false,
+      "line": 122
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "architecture/invariants.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "business/requirements.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "business/requirements.md",
+      "anchor": null,
+      "embed": false,
+      "line": 63
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 62
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 69
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 67
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 71
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 113
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "architecture/persistence-surface.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "architecture/persistence-surface.md",
+      "anchor": null,
+      "embed": false,
+      "line": 116
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 107
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 97
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0007-structured-logging-nestjs-pino.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0008-global-error-handling.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 26
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 115
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 114
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 107
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 90
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 101
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "architecture/persistence-surface.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "architecture/persistence-surface.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "architecture/persistence-surface.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 42
+    },
+    {
+      "from": "architecture/persistence-surface.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 43
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 131
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 131
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 128
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 131
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 131
+    },
+    {
+      "from": "business/how-it-works.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 131
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "architecture/invariants.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 63
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 48
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 67
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "business/requirements.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 67
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "business/requirements.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "business/vision-and-goals.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 62
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "decisions/0007-structured-logging-nestjs-pino.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "decisions/0008-global-error-handling.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "conventions/coding-standards.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 39
+    },
+    {
+      "from": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "research/alternative-sources.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "decisions/0002-monitoring-via-official-api.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "decisions/0003-decoupled-context-zone.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "decisions/0004-drop-redis-bullmq.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "decisions/0005-versioned-parameter-sets.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 92
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 98
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 91
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 91
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 98
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 75
+    },
+    {
+      "from": "decisions/0006-operator-profit-vision.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 98
+    },
+    {
+      "from": "decisions/0007-structured-logging-nestjs-pino.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0007-structured-logging-nestjs-pino.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0007-structured-logging-nestjs-pino.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "decisions/0007-structured-logging-nestjs-pino.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "decisions/0007-structured-logging-nestjs-pino.md",
+      "anchor": null,
+      "embed": false,
+      "line": 43
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "decisions/0007-structured-logging-nestjs-pino.md",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "decisions/0008-global-error-handling.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 67
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 62
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 59
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 34
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 61
+    },
+    {
+      "from": "decisions/0010-defer-factor-activation-until-k.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "SPEC-009.md",
+      "anchor": null,
+      "embed": false,
+      "line": 61
+    },
+    {
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 61
+    },
+    {
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "to": "SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 39
+    },
+    {
+      "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 38
+    },
+    {
+      "from": "decisions/0015-hybrid-executable-vault.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 85
+    },
+    {
+      "from": "decisions/0015-hybrid-executable-vault.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 82
+    },
+    {
+      "from": "decisions/0015-hybrid-executable-vault.md",
+      "to": "decisions/0003-decoupled-context-zone.md",
+      "anchor": null,
+      "embed": false,
+      "line": 83
+    },
+    {
+      "from": "decisions/0015-hybrid-executable-vault.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 39
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 13
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0003-decoupled-context-zone.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0007-structured-logging-nestjs-pino.md",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0008-global-error-handling.md",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 22
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0012-material-repeat-alert-threshold.md",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/adr-template.md",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "decisions/adr-template.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 19
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 32
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 50
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 48
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 85
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 9
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 86
+    },
+    {
+      "from": "operations/environment-setup.md",
+      "to": "decisions/0008-global-error-handling.md",
+      "anchor": null,
+      "embed": false,
+      "line": 75
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 21
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 48
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "research/alternative-sources.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 72
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 92
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 92
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 92
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 74
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "research/explainability-gaps.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 92
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 69
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "decisions/0004-drop-redis-bullmq.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "research/alternative-sources.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "research/monitoring-approaches.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 148
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "business/vision-and-goals.md",
+      "anchor": null,
+      "embed": false,
+      "line": 137
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 14
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 148
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 148
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 148
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 147
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "research/profitability-definition.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 212
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "decisions/0005-versioned-parameter-sets.md",
+      "anchor": null,
+      "embed": false,
+      "line": 60
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 212
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 212
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 176
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 211
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 10
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 57
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 210
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 100
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 211
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 103
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/when-to-alert.md",
+      "anchor": null,
+      "embed": false,
+      "line": 211
+    },
+    {
+      "from": "research/profitability-methods-coverage.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 211
+    },
+    {
+      "from": "research/vin-real-mileage.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "research/vin-real-mileage.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "research/vin-real-mileage.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "research/vin-real-mileage.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 18
+    },
+    {
+      "from": "research/vin-real-mileage.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "research/when-to-alert.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/when-to-alert.md",
+      "to": "business/how-it-works.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/when-to-alert.md",
+      "to": "decisions/0012-material-repeat-alert-threshold.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "research/when-to-alert.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 12
+    },
+    {
+      "from": "research/when-to-alert.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 79
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "research/monitoring-approaches.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 70
+    },
+    {
+      "from": "specs/README.md",
+      "to": "00-INDEX.md",
+      "anchor": null,
+      "embed": false,
+      "line": 57
+    },
+    {
+      "from": "specs/README.md",
+      "to": "SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "specs/README.md",
+      "to": "SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 36
+    },
+    {
+      "from": "specs/README.md",
+      "to": "SPEC-009.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "specs/README.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "specs/README.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "specs/README.md",
+      "to": "decisions/0006-operator-profit-vision.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "specs/README.md",
+      "to": "decisions/0010-defer-factor-activation-until-k.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "specs/README.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "specs/README.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "specs/README.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 52
+    }
+  ],
+  "dangling": [],
+  "ambiguous": [],
+  "caseMismatch": [],
+  "components": [
+    [
+      "00-INDEX.md",
+      "Roadmap & Status.md",
+      "SPEC-005.md",
+      "SPEC-006.md",
+      "SPEC-008.md",
+      "SPEC-009.md",
+      "Welcome.md",
+      "_meta/note-template.md",
+      "_meta/vault-protocol.md",
+      "architecture/invariants.md",
+      "architecture/overview.md",
+      "architecture/persistence-surface.md",
+      "business/how-it-works.md",
+      "business/requirements.md",
+      "business/vision-and-goals.md",
+      "conventions/coding-standards.md",
+      "decisions/0001-adopt-sdd-vault-rtk.md",
+      "decisions/0002-monitoring-via-official-api.md",
+      "decisions/0003-decoupled-context-zone.md",
+      "decisions/0004-drop-redis-bullmq.md",
+      "decisions/0005-versioned-parameter-sets.md",
+      "decisions/0006-operator-profit-vision.md",
+      "decisions/0007-structured-logging-nestjs-pino.md",
+      "decisions/0008-global-error-handling.md",
+      "decisions/0009-monthly-rate-limit-pool.md",
+      "decisions/0010-defer-factor-activation-until-k.md",
+      "decisions/0011-evidence-gated-scoring-rollout.md",
+      "decisions/0012-material-repeat-alert-threshold.md",
+      "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "decisions/0015-hybrid-executable-vault.md",
+      "decisions/README.md",
+      "decisions/adr-template.md",
+      "domain/glossary.md",
+      "operations/environment-setup.md",
+      "research/alternative-sources.md",
+      "research/explainability-gaps.md",
+      "research/monitoring-approaches.md",
+      "research/profitability-definition.md",
+      "research/profitability-methods-coverage.md",
+      "research/vin-real-mileage.md",
+      "research/when-to-alert.md",
+      "research/why-no-opportunities.md",
+      "specs/README.md"
+    ]
+  ],
+  "orphans": [],
+  "unreachable": [],
+  "index": "00-INDEX.md"
+}

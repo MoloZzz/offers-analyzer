@@ -1,6 +1,6 @@
 ---
 title: <concept name>
-type: architecture | domain | decision | convention | operations | spec | moc | meta
+type: business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log
 updated: 2026-07-12
 ---
 

@@ -2,7 +2,7 @@
 title: ADR-0004 — Drop Redis/BullMQ for v1 (Postgres-backed rate budget)
 type: decision
 status: Accepted
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # ADR-0004 — Drop Redis/BullMQ for v1 (Postgres-backed rate budget)
@@ -32,4 +32,4 @@ The only remaining infrastructure is **PostgreSQL**, which is genuinely needed (
 Supersedes the Redis/BullMQ elements of [[0002-monitoring-via-official-api|ADR-0002]] and `plan` research R2.
 
 ## Related
-- [[decisions/README]] · [[backlog]] · [[overview]]
+- [[decisions/README]] · [[Roadmap & Status]] · [[overview]]

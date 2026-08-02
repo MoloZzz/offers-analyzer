@@ -1,0 +1,11 @@
+{
+  "vaultDir": "knowledge-offers-analyzer",
+  "codeRoot": ".",
+  "adapter": "./tools/vault/adapters/offers-nest-typeorm.mjs",
+  "indexNote": "00-INDEX",
+  "roadmapNote": "Roadmap & Status",
+  "contextDir": "context",
+  "currentContext": "context/CURRENT.md",
+  "stack": ["Node.js + NestJS", "PostgreSQL + TypeORM", "AUTO.RIA official API + Telegram"],
+  "agentScripts": ["typecheck", "lint", "test", "test:contract", "vault:check"]
+}

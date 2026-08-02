@@ -1,0 +1,21 @@
+# Local agent tooling — binaries are machine-specific, not for the repo
+tools/rtk
+tools/rtk-cli
+tools/*.tar.gz
+
+# Retrieval feedback log — local observation, not repo state. Deliberately NOT
+# under transaction-analytics/_gen/, which `vault check` compares for freshness:
+# a file that mutates on every read would make the hook flap.
+tools/vault/.log.tsv
+
+# Context governor: live per-session measurement, and the cross-session trend.
+# Same placement argument as the log above — mutates every turn, so it must stay
+# out of _gen/, and it describes this machine's sessions, not the repo.
+tools/vault/.ctx.json
+tools/vault/.ctx.tsv
+
+# Product-loop measurements (`vault evidence`). Derived from the transaction
+# data on this machine, not from the repo — so it changes when the data changes,
+# for reasons unrelated to any commit. The registry it runs
+# (transaction-analytics/_metrics.tsv) IS repo state and is tracked.
+tools/vault/.evidence.tsv

@@ -1,68 +1,132 @@
 ---
-title: Vault Protocol — how agents use and maintain the knowledge base
+title: Vault Protocol - how agents use and maintain the knowledge base
 type: meta
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
-# Vault Protocol (read + maintain)
+# Vault Protocol
 
-This vault is a **second brain**, not a passive wiki. It is the primary navigation layer for the project. These rules are enforced by `../CLAUDE.md`.
+This vault is a second brain, not passive documentation. It provides a deterministic navigation
+and memory layer for the project. Repository policy in ../CLAUDE.md is binding.
 
-## Why this instead of RAG
+## Information hierarchy
 
-On a small project, vector RAG is overkill and imprecise. A curated, hand-linked Obsidian vault gives agents a deterministic, high-signal map: fewer tokens, no retrieval noise, and human-auditable. Navigation is by explicit `[[links]]`, not similarity search.
+Use the smallest authoritative layer that answers the question:
 
-## Read protocol (every task, before touching code)
+| Level | Purpose | Typical source |
+|---|---|---|
+| L1 - orientation | Current mission and handoff | context/goals.md, context/CURRENT.md |
+| L2 - map | Locate the owning domain and current delivery stream | [[00-INDEX]], [[Roadmap & Status]] |
+| L3 - source of truth | Read the actual rule, decision, or plan | vision, requirements, ADR, architecture note, feature spec |
+| L4 - implementation evidence | Confirm exact behavior | focused source, test, migration, configuration, or external evidence |
 
-1. Open [[00-INDEX]] first.
-2. Follow the MOC into the area you're working on.
-3. Trust the notes to tell you *where* the relevant code and decisions are; use them to jump straight to the right files instead of broad grepping.
-4. If a note is missing or contradicts the code, that's a defect — fix the note as part of your task.
+Generated briefs or maps may accelerate L1/L2 when available, but they are navigation aids, not
+authority. If a brief is missing or stale, use the primary notes directly. Do not assume an agent
+runtime automatically loads any context or runs hooks.
 
-## Write protocol (every task, after changing code)
+## Executable retrieval and safety
 
-Updating the vault is part of "done." A change is not complete until the knowledge base reflects it. Specifically:
+`tools/vault/` is the project-neutral mechanism bound to this vault by `vault.config.json`.
+It never imports donor product knowledge. Use it progressively:
 
-- **New module / feature** → update [[overview|Architecture overview]] and add/adjust the relevant MOC links.
-- **New domain concept or rule** → add it to [[glossary|Domain glossary]].
-- **Non-trivial decision** (library choice, pattern, tradeoff) → add an ADR via [[decisions/README|the decision log]].
-- **New convention or pattern** → record it in [[coding-standards]].
-- **New tool / env / runbook step** → update [[environment-setup]].
-- **New feature spec** (Spec Kit) -> link the repo-root spec from [[specs/README]]. `.specify/` is the Spec Kit toolchain (constitution, templates, scripts), not the feature-spec home.
+```bash
+npm run vault:brief -- "Roadmap & Status"     # L1: generated orientation + one requested source
+npm run vault:find -- "monthly pool"          # L2: ranked curated references
+npm run vault:show -- "Roadmap & Status#current" # L3: one bounded section
+```
 
-**Supersession sweep — REQUIRED whenever a decision changes.** Writing a new ADR (or
-editing anything that supersedes, reverses, or narrows an earlier decision) is not
-finished until **every note that repeated the old fact is fixed in the same task**.
-Grep the vault for the superseded fact and update each hit. Watch the notes that
-*duplicate* decisions instead of owning them — `context/goals.md`, [[overview]], and
-[[glossary]] are the usual drift points. A note that contradicts an ADR is a **defect**
-(see the "missing or contradicts" rule above), not merely stale.
+L4 is a full Markdown or source read only when editing or verifying implementation evidence.
+`context/` remains excluded from generated graph, index, map, and ranked retrieval; the brief
+names `context/CURRENT.md` as a separately read handoff.
 
-## Context zone (`context/`) — decoupled inbox
+`npm run vault:build` is the only normal writer and updates committed `_gen/` artifacts. Both
+`vault:check` and `vault:check:strict` are read-only; the latter turns all findings into failures
+and is used by CI. The exceptional `vault:evidence` command is manual, read-only against the
+database, advisory, and may write only its ignored local cache.
 
-There are **two layers**. Keep them distinct:
+## Read protocol
 
-- **Curated vault** (all folders except `context/`) — the source of truth, governed by the read/write protocol above and navigated via `[[links]]` from [[00-INDEX]].
-- **Context zone** (`context/`) — a decoupled inbox for goals, session logs, and drafts. Intentionally **not** woven into the navigation graph (curated notes don't link out to it), so the graph stays high-signal. Full rules: `context/README.md`.
+Before touching code:
 
-How the two interact **without breaking the vault**:
+1. Skim context/goals.md, context/CURRENT.md, and the latest dated context/log/ file.
+2. Open [[00-INDEX]] and choose the relevant product or technical map.
+3. Read the smallest source of truth that owns the fact: [[vision-and-goals]], [[requirements]],
+   [[Roadmap & Status]], an ADR, an architecture note, or a feature spec.
+4. Open code only after the notes direct you to the relevant implementation. Use focused search to
+   verify an implementation detail, not broad scanning as a substitute for navigation.
 
-- **Read:** at session start, skim `context/goals.md` and the latest `context/log/*` for background — *then* navigate the curated vault as usual.
-- **Capture:** jot session notes/decisions into today's `context/log/YYYY-MM-DD-*.md` freely.
-- **Promote, don't accumulate:** when a context note matures into a durable fact/decision, move it into the curated vault (ADR / [[glossary]] / [[overview]] / [[coding-standards]] / `research/`). The log stays as a historical record. The curated notes remain the only source of truth.
+## Write protocol
+
+Updating the vault is part of done. Capture the durable change at its owner:
+
+- Product intent, users, scope, or non-goals -> [[vision-and-goals]].
+- Product obligation or acceptance guardrail -> [[requirements]].
+- Current priority, phase, blocker, or evidence exit -> [[Roadmap & Status]].
+- Module, boundary, or implementation invariant -> [[overview]] and, when enduring,
+  [[invariants]].
+- Domain term or rule -> [[glossary]].
+- Non-trivial decision -> [[decisions/README|an ADR]].
+- New convention or pattern -> [[coding-standards]].
+- New tool, environment, or runbook step -> [[environment-setup]].
+- New feature spec -> [[specs/README]].
+
+When an input to generated knowledge changes (curated note, source fact, adapter, or vault
+configuration), run `npm run vault:build`, then `npm run vault:check:strict`. The compatibility
+`vault:check` command also retains the legacy frontmatter/link checker during this migration.
+
+For every task, also record a concise dated note in context/log/. Update context/CURRENT.md only
+with the actual active handoff; it must never become a competing roadmap.
+
+## Context zone
+
+The vault has two distinct layers:
+
+- **Curated vault** (everything except context/) is the source of truth. It is hand-linked from
+  [[00-INDEX]] and contains the product hierarchy, MOCs, ADRs, architecture, conventions,
+  operations, research, and spec index.
+- **Context zone** (context/) is an append-mostly inbox for orientation, current handoff, session
+  logs, drafts, and retained history. Curated notes do not link out to it, keeping the graph
+  high-signal.
+
+Promote, do not accumulate: once a context item becomes a durable fact, move its substance into
+the appropriate curated owner and leave the log as historical evidence. During the migration,
+context/backlog.md remains preserved history and staging; it is not the canonical project status.
+
+## Decision supersession sweep
+
+Whenever a decision changes, search the vault for the old fact and update every duplicate in the
+same task. Common drift locations are vision/requirements, architecture overview, glossary,
+business explanation, roadmap, and context orientation. A note that contradicts an ADR is a defect,
+not harmless stale documentation.
+
+## Enforcement baseline and ownership
+
+The 2026-08-02 migration baseline is clean under `npm run vault:check:strict`. Rule ownership is
+deliberately narrow:
+
+| Rule group | Default severity | Owner / remediation |
+|---|---|---|
+| Frontmatter and malformed links | Error | Note author fixes the note; legacy checker remains in the same command. |
+| Entity/migration disagreement and focused tests | Error | Source owner fixes the schema registry/migration or removes focused test syntax. |
+| Generated freshness, retrieval, graph, environment, context placement, fact registry, and revision pins | Warning | Run `vault build`, correct the owner/registry/note, then use strict validation before merge. |
+
+CI and the optional hook run strict validation, so the clean baseline must remain clean. There is no
+silent environment-variable bypass and `--no-verify` is not an acceptable resolution. A temporary
+exception requires a reviewed change to the relevant rule/registry or an ADR-level decision; then
+the baseline and documentation must be updated in the same task.
 
 ## Note conventions
 
-- One concept per note. Prefer many small linked notes over few large ones.
-- Link liberally with `[[note-name]]`. A link to a not-yet-created note is a valid TODO marker.
-- Every note carries frontmatter: `title`, `type`, `updated` (ISO date). Bump `updated` when you edit.
-- Use `TODO:` inline for known gaps. Never invent facts to fill a skeleton — leave the TODO.
-- Keep prose tight. This is working memory, not documentation theater.
-- Run `npm run vault:check` after editing the vault. It enforces required frontmatter and
-  malformed-link checks; unresolved future-note links remain warnings because they are valid TODOs.
+- One concept per note; link liberally with Obsidian wikilinks.
+- Every note has title, type, and updated frontmatter. Bump updated when editing.
+- Start a new curated note from [[note-template]] and select the type that owns its fact.
+- Use TODO only for a known gap; never invent facts to fill one.
+- Keep prose tight. Link to the authoritative note instead of cloning it.
+- Run `npm run vault:build` and `npm run vault:check:strict` after a change that affects
+  generated vault input. Use `npm run vault:evidence -- --dry` only to validate the advisory
+  metric registry; never run evidence as an implicit task-start or commit action.
 
 ## Note types
 
-`moc` (map of content) · `meta` · `architecture` · `domain` · `decision` · `convention` · `operations` · `spec`.
-
-See [[note-template]] for the starting shape of a new note.
+moc, meta, business, roadmap, architecture, domain, decision, convention, operations, spec,
+context, and context-log.

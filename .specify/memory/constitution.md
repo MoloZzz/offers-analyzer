@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: (template) → 1.0.0
+- Version change: 1.1.0 → 1.2.0
 - Ratification: initial adoption
 - Principles defined: I Spec-Driven Development; II Knowledge Base is Source of Truth;
   III Clean, Simple Code; IV Ports & Adapters for External Systems;
   V Respect External Limits & Legality; VI Test What Matters (contract-test external APIs);
-  VII Token-Efficient Tooling (RTK)
+  VII Token-Efficient Tooling (RTK); VIII Executable Knowledge Hygiene
 - Added sections: Technology & External Constraints; Development Workflow & Quality Gates; Governance
 - Templates reviewed: plan-template.md ✅ | spec-template.md ✅ | tasks-template.md ✅ (generic, no changes required)
 - Deferred TODOs: none
@@ -71,6 +71,16 @@ within the request budget.
 Noisy shell commands (tests, build, lint, git, grep) MUST be run through RTK to compact
 output before it reaches agent context. Rationale: preserve context budget for real work.
 
+### VIII. Executable Knowledge Hygiene
+
+The curated vault remains the human source of truth, but contributors MUST use its progressive
+L1-to-L4 retrieval protocol when orienting work: generated brief, focused find, bounded section,
+then full note/source only when needed. Context notes remain outside curated graph/retrieval truth.
+`vault build` alone regenerates committed derived artifacts; `vault check` is write-free and strict
+validation protects the agreed clean baseline. Database evidence is explicit, read-only, locally
+cached, and advisory; it can never authorize a product change. Rationale: durable project memory
+must be precise, low-noise, reproducible, and safe in every agent runtime.
+
 ## Technology & External Constraints
 
 - Stack: NestJS · PostgreSQL · TypeORM · Telegram bot. Scheduling is a `@nestjs/schedule` cron
@@ -96,6 +106,9 @@ output before it reaches agent context. Rationale: preserve context budget for r
 5. **Operator-value test (ADR-0006):** before building any scoring/product feature, ask
    *"чи використовує це хороший перекуп при купівлі авто?"* If not, it likely does not move
    the operator toward profit and should be challenged in the spec.
+6. For a change affecting curated notes, source facts, adapter logic, or generated output, run
+   `npm run vault:build` and `npm run vault:check:strict`. The compatibility command
+   `npm run vault:check` remains part of the same gate.
 
 ## Governance
 
@@ -106,8 +119,8 @@ MAJOR for incompatible principle removals/redefinitions, MINOR for a new princip
 materially expanded guidance, PATCH for clarifications. All work — human or agent — is
 expected to comply; `CLAUDE.md` is the runtime enforcement of these rules.
 
-**Version**: 1.1.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-07-18
+**Version**: 1.2.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-08-02
 <!-- 1.0.1: PATCH — Technology stack refined to drop Redis/BullMQ from v1 (ADR-0004). -->
 <!-- 1.0.2: PATCH — Rate budget is now Postgres-backed (durable) instead of in-memory (ADR-0004, B13). -->
 <!-- 1.1.0: MINOR — Mission reframed to operator-profit ranking (composite Total Deal Score, price dominant) + operator-value workflow gate (ADR-0006). -->
-
+<!-- 1.2.0: MINOR — Executable-vault retrieval, generated-artifact safety, and advisory evidence governance (ADR-0015). -->

@@ -2,7 +2,7 @@
 title: Research — what counts as a "profitable" offer
 type: research
 status: Accepted (reframed by ADR-0006 — this note is the price core)
-updated: 2026-07-22
+updated: 2026-08-02
 ---
 
 # Research — defining a "profitable" offer
@@ -134,7 +134,7 @@ Cheap-vs-average is frequently a **scam, damaged, or high-friction** car. Filter
 
 **Configuration (user-controlled, not hardcoded):** niche (SearchProfile), threshold %,
 dealer policy (`label`/`exclude`/`ignore`), and currency (switchable + FX-normalized) are all
-config the user tunes per profile. See [[goals]]. This removes the need to commit to a niche
+config the user tunes per profile. See [[vision-and-goals]]. This removes the need to commit to a niche
 before v1.
 
 ## Sources

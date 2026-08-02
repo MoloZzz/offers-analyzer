@@ -1,0 +1,10 @@
+# query	expected reference	mode
+# The corpus is deliberately curated-only: session context must not rank here.
+operator profit	decisions/0006-operator-profit-vision.md	top
+прибуток перекуп	decisions/0006-operator-profit-vision.md	top
+official API	research/monitoring-approaches.md#2	top
+factor activation gate	decisions/0010-defer-factor-activation-until-k.md	top
+monthly pool	decisions/0009-monthly-rate-limit-pool.md	top
+TypeORM	conventions/coding-standards.md	top
+ListingSource	architecture/overview.md	top
+Telegram	architecture/overview.md	top

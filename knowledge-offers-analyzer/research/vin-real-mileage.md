@@ -2,7 +2,7 @@
 title: Research — real (VIN-verified) mileage vs claimed mileage
 type: research
 status: Partly implemented (Option 1)
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 > **Update (2026-07-17):** Option 1 shipped as **B21a** — `valuation/mileage-risk.ts` adds soft red-flags
@@ -61,4 +61,4 @@ the actual number; keep **(3)** as a fallback. Only enrich *candidates* (post-sc
 every listing, to respect the monthly API pool.
 
 ## Related
-- [[profitability-definition]] · [[why-no-opportunities]] · [[backlog]] · spec 002 (learnable weight)
+- [[profitability-definition]] · [[why-no-opportunities]] · [[Roadmap & Status]] · spec 002 (learnable weight)
