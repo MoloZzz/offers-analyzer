@@ -28,6 +28,7 @@ updated: 2026-08-02
 - [[0015-hybrid-executable-vault|ADR-0015]] — Adopt a hybrid executable vault with bounded retrieval and phased enforcement (Accepted)
 
 - [[0016-portable-ai-infra-kit|ADR-0016]] — Package reusable AI infrastructure as a portable bootstrap kit (Accepted)
+- [[0017-shadow-valuation-evidence|ADR-0017]] — Keep provider valuation evidence shadow-only (Proposed)
 
 ## How to add one
 

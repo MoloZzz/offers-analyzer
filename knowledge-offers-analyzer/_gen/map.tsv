@@ -31,6 +31,7 @@ decisions/0013-budget-stabilization-before-lifecycle-rechecks.md	ADR-0013 — St
 decisions/0014-conservative-benchmark-and-mileage-guard.md	ADR-0014 - Conservative benchmark and claimed-mileage guard	decision	
 decisions/0015-hybrid-executable-vault.md	ADR-0015 — Hybrid executable vault and phased enforcement	decision	
 decisions/0016-portable-ai-infra-kit.md	Portable AI infrastructure kit	decision	Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure.
+decisions/0017-shadow-valuation-evidence.md	ADR-0017 — Keep provider valuation evidence shadow-only	decision	Introduce auditable AUTO.RIA provider evidence in shadow mode without changing live scoring.
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	

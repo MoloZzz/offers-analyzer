@@ -11,20 +11,23 @@ updated: 2026-08-02
 
 ## Active work
 
-The portable AI infrastructure kit is implemented (SPEC-013): `ai-infra/` now contains a
-versioned copy-and-own second-brain/bootstrap kit with a generic docs-only engine, product/context
-templates, safe initializer, and opt-in integration guidance. Offers-specific knowledge, adapters,
-and evidence remain in this repository.
+SPEC-015, Defensible valuation evidence, is now specified and planned at
+`specs/015-defensible-valuation-evidence/`. It introduces an official AUTO.RIA AI provider
+evidence path for the target `active_listing_ask`, but only in disabled-by-default shadow mode.
+No application code, migration, source traffic, score, alert, threshold, ParameterSet, factor, or
+survivorship correction `k` changed while planning it.
 
-The existing scoring, lifecycle, and budget rollout gates remain unchanged: do not activate them
-without their stated evidence and operator approval.
+The existing scoring, lifecycle, and budget rollout gates remain unchanged. Any provider enablement
+needs approved credentials/retention terms, contract fixtures, feature allocation, source-parity
+audit, and a later operator-approved activation decision.
 
 ## Next pickup
 
-For the next task, read this handoff, use `npm run vault:brief -- "Roadmap & Status"`, then follow
-the relevant ADR and repo-root spec links. To adopt the kit elsewhere, start with
-`node ai-infra/bin/ai-infra.mjs init --target <path> --project-name "Name" --dry-run`; do not
-copy Offers product notes or enable optional integrations by default.
+For the next task, read this handoff, use `npm run vault:brief -- "Roadmap & Status"`, then begin
+with T001 in `specs/015-defensible-valuation-evidence/tasks.md`. Confirm official AUTO.RIA AI
+permission, allowed storage/attribution, effective pricing/allocation, and sanitized fixtures
+before enabling any provider request. Do not promote active-listing evidence to a resale model or
+change the live score without a separate approved decision.
 
 ## Verification / blockers
 

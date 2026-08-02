@@ -2,7 +2,7 @@
 title: Research — alternative listing sources beyond AUTO.RIA
 type: research
 status: Survey (no decision)
-updated: 2026-07-13
+updated: 2026-08-02
 ---
 
 # Research — alternative listing sources beyond AUTO.RIA
@@ -45,7 +45,13 @@ Access legend: ✅ legal read API · ⚠️ third-party/paid API or gray-area ·
 
 - **Carfax / AutoCheck** — VIN history (US).
 - **BidFax** — damage/auction history for imports.
-- **RIA `average_price`** — first-party local fair-value benchmark, already used (see [[monitoring-approaches]]).
+- **RIA legacy `average_price`** — first-party cohort benchmark used by the current price core. Its
+  documented median/average interface is unsupported/scheduled for closure, so it remains a
+  labelled legacy baseline rather than a new-provider fallback.
+- **RIA AI valuation** — official paid provider valuation interface with listing-ID/richer-input
+  modes, provider statistics, and similar-car evidence. SPEC-015 evaluates it in disabled-by-default
+  shadow mode as an **active-market asking-price estimate**, not a completed-sale or resale price
+  ([[0017-shadow-valuation-evidence|ADR-0017]]).
 
 ## Rational sequencing (value ÷ effort)
 

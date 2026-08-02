@@ -1,7 +1,7 @@
 ---
 title: Domain glossary
 type: domain
-updated: 2026-07-28
+updated: 2026-08-02
 ---
 
 # Domain glossary (ubiquitous language)
@@ -14,6 +14,9 @@ updated: 2026-07-28
 | **Cohort** | The set of comparable cars used to value a listing. Definitions include mileage-banded, year±1 nationwide, and make+model; the live ingestion path currently begins with reusable year±1, then make+model, while retaining analytical mileage adjustment ([[0013-budget-stabilization-before-lifecycle-rechecks|ADR-0013]]). City is never used (starves the sample). | — |
 | **Newest by market** | An ingestion mode: a search profile with **empty make/model** + region + price cap that pulls the freshest listings market-wide, using AUTO.RIA's `top` **submission-period** filter (1=last hour, 2=today, 8=last 3h…). Each is still valued against its own cohort. | Not an `order_by` sort — RIA has no "newest" sort. |
 | **Fair value (FV)** | Estimated market price for a listing's cohort; v1 uses AUTO.RIA percentile-50 (median), with interquartile/arithmetic fallbacks. Claimed low mileage raises it only with VIN evidence and is capped at 5% after 15 years ([[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]). | See [[profitability-definition]]. |
+| **Active-market asking-price estimate** | A timestamped provider estimate of what comparable listings are actively advertised for. SPEC-015 uses it only as shadow evidence; it is not a confirmed sale, likely transaction price, quick-exit price, or buy ceiling. | Do not call it “real market price” or reuse the legacy `fairValue` name. |
+| **Valuation evidence** | An immutable, redacted record of one provider valuation attempt: target, input facts/provenance, query mode, source/policy/adapter version, response summary, comparability decision, and terminal reason. | Stored so `/why` can explain history without a source re-fetch. |
+| **Valuation policy version** | An immutable rule set for a provider evidence target: required facts, allowable relaxations, freshness, sampling, and quality decisions. | Separate from a scoring `ParameterSet`; SPEC-015 starts with shadow-only `ai-shadow-v1`. |
 | **Discount** | `(FV − asking) / FV` — how far below market a listing is priced. | — |
 | **Opportunity** | A listing flagged as having a **high probability of operator profit on resale** ([[0006-operator-profit-vision|ADR-0006]]): strong price core (discount + confidence + red-flags) shaped by the factor modifiers below. | Not a guarantee of profit. |
 | **Total Deal Score** | The composite ranking signal: price core (`raw × confidence × penalty`, dominant) × bounded factor modifiers (liquidity, repair-risk, negotiation, seller, positives). Shown to the operator as 0–100 + per-factor reasons. Spec `003-composite-deal-score`; liquidity + repair-risk are implemented but **intentionally inactive until the survivorship correction `k` lands** ([[0010-defer-factor-activation-until-k|ADR-0010]]). Activation needs the evidence gates in [[0011-evidence-gated-scoring-rollout|ADR-0011]]. | Supersedes "Opportunity score = discount × confidence". |

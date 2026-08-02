@@ -17,6 +17,11 @@ and supports Telegram delivery. The current production score intentionally remai
 The next material product change is not another factor by itself; it is an evidence-backed,
 operator-approved rollout of the survivorship correction and factor activation.
 
+SPEC-015 now formalizes a separate provider-evidence stream for active-market asking prices. It is
+draft/shadow-only, disabled by default, and cannot alter the current score, alerts, threshold,
+ParameterSet, factors, or correction `k`. Its exit evidence is provider permission/contract
+readiness, budget allocation, source-parity/gold-case audit, and a future separate approval.
+
 - [ ] Complete the pre-rollout evidence gates before changing live scoring.
 
 ### Prove the next scoring rollout
@@ -27,6 +32,7 @@ operator-approved rollout of the survivorship correction and factor activation.
 | Explanation provenance (B23) | Required before changing live scoring. | A historical score and alert can be explained without source re-fetch. |
 | Budget observability (SPEC-009) | Durable ledger and read-only budget reporting exist; real spend must still be reconciled and forecast. | Ledger reconciles to the pool and supports a credible allocation forecast. |
 | Operator economics (SPEC-007) | Outcome capture foundation exists; realized-margin learning phases remain. | Sufficient closed-deal evidence for a review, not automatic deployment. |
+| Provider valuation evidence (SPEC-015) | Draft; no runtime implementation or live scoring change. | Official-provider contract/retention approval, shadow coverage/parity, budget reconciliation, and operator-approved follow-on decision. |
 
 Only after those gates pass may one ParameterSet rollout apply k, activate the approved first score
 factors, and re-validate thresholds. Operator approval remains mandatory

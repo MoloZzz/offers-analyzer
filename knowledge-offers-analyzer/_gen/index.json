@@ -77,56 +77,56 @@
           "level": 2,
           "text": "Current",
           "line": 13,
-          "endLine": 35
+          "endLine": 41
         },
         {
           "n": 2,
           "level": 3,
           "text": "Prove the next scoring rollout",
-          "line": 22,
-          "endLine": 35
+          "line": 27,
+          "endLine": 41
         },
         {
           "n": 3,
           "level": 2,
           "text": "Completed / operating",
-          "line": 36,
-          "endLine": 53
+          "line": 42,
+          "endLine": 59
         },
         {
           "n": 4,
           "level": 2,
           "text": "Blocked / paused",
-          "line": 54,
-          "endLine": 60
+          "line": 60,
+          "endLine": 66
         },
         {
           "n": 5,
           "level": 2,
           "text": "Next",
-          "line": 61,
-          "endLine": 67
+          "line": 67,
+          "endLine": 73
         },
         {
           "n": 6,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 68,
-          "endLine": 73
+          "line": 74,
+          "endLine": 79
         },
         {
           "n": 7,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 74,
-          "endLine": 83
+          "line": 80,
+          "endLine": 89
         },
         {
           "n": 8,
           "level": 2,
           "text": "Related",
-          "line": 84,
-          "endLine": 91
+          "line": 90,
+          "endLine": 97
         }
       ]
     },
@@ -1370,6 +1370,45 @@
       ]
     },
     {
+      "rel": "decisions/0017-shadow-valuation-evidence.md",
+      "path": "knowledge-offers-analyzer/decisions/0017-shadow-valuation-evidence.md",
+      "name": "0017-shadow-valuation-evidence",
+      "title": "ADR-0017 — Keep provider valuation evidence shadow-only",
+      "type": "decision",
+      "summary": "Introduce auditable AUTO.RIA provider evidence in shadow mode without changing live scoring.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 14,
+          "endLine": 30
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 31,
+          "endLine": 50
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 51,
+          "endLine": 61
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 62,
+          "endLine": 69
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1383,21 +1422,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 31
+          "endLine": 32
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 32,
-          "endLine": 38
+          "line": 33,
+          "endLine": 39
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 39,
-          "endLine": 42
+          "line": 40,
+          "endLine": 43
         }
       ]
     },
@@ -1453,15 +1492,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 45,
-          "endLine": 51
+          "line": 48,
+          "endLine": 54
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 52,
-          "endLine": 56
+          "line": 55,
+          "endLine": 59
         }
       ]
     },
@@ -1567,35 +1606,35 @@
           "level": 2,
           "text": "Reference / valuation data (not listings, but feed \"fair value + risk\")",
           "line": 44,
-          "endLine": 49
+          "endLine": 55
         },
         {
           "n": 6,
           "level": 2,
           "text": "Rational sequencing (value ÷ effort)",
-          "line": 50,
-          "endLine": 55
+          "line": 56,
+          "endLine": 61
         },
         {
           "n": 7,
           "level": 2,
           "text": "Open questions",
-          "line": 56,
-          "endLine": 61
+          "line": 62,
+          "endLine": 67
         },
         {
           "n": 8,
           "level": 2,
           "text": "Sources",
-          "line": 62,
-          "endLine": 69
+          "line": 68,
+          "endLine": 75
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 70,
-          "endLine": 73
+          "line": 76,
+          "endLine": 79
         }
       ]
     },
@@ -2068,35 +2107,35 @@
           "level": 2,
           "text": "Specs",
           "line": 11,
-          "endLine": 27
+          "endLine": 28
         },
         {
           "n": 2,
           "level": 2,
           "text": "Backlog-level specs (pre-Spec-Kit)",
-          "line": 28,
-          "endLine": 49
+          "line": 29,
+          "endLine": 50
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 50,
-          "endLine": 54
+          "line": 51,
+          "endLine": 55
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 55,
-          "endLine": 59
+          "line": 56,
+          "endLine": 60
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 60,
-          "endLine": 64
+          "line": 61,
+          "endLine": 65
         }
       ]
     }
