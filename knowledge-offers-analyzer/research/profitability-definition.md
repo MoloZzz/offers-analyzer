@@ -60,8 +60,10 @@ raw         = clamp(delta / SCALE, −1, 1)             # SCALE ≈ 0.30 → a 3
 confidence  = min(1, sampleSize / (minSamples × 2))   # cohort sample size only; low data shrinks the score toward 0
 score       = raw × confidence × flagPenalty          # flagPenalty ≈ 0.8 for soft flags (e.g. no VIN)
 if a disqualifying red-flag fires: score = min(score, 0)   # a scam/write-off bargain is not a deal
-# Accident presence alone is no longer disqualifying — see ADR-0020: severity is graded
-# (cosmetic/moderate/severe/unknown) and only `severe` + salvage stay hard.
+# Accident presence still disqualifies here **today**. ADR-0020 rules that it should not: severity is
+# graded (cosmetic/moderate/severe/unknown) and only `severe` + salvage stay hard. As of 2026-08-03
+# that verdict is recorded in shadow only; the flip is spec-018 phase 3, gated on a month of evidence
+# from `/accident_shadow` plus operator approval.
 ```
 
 Flag as an **Opportunity** when `score ≥ profile.minDealScore` and `sampleSize ≥ minSamples`. Rank by `score`. This unifies discount, confidence, and risk into one explainable number and degrades gracefully (unsure → near 0).

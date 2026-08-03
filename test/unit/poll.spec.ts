@@ -172,6 +172,7 @@ function buildFakes(): Fakes {
       total100: 50,
     }),
     activeParameterVersion: jest.fn().mockReturnValue(7),
+    heuristicTableHashes: jest.fn().mockReturnValue({}),
   } as unknown as ValuationService;
 
   const benchmarks = {

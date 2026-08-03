@@ -10,6 +10,7 @@ import { marginStats } from '../calibration/deal-margin';
 import { DealsService } from '../calibration/deals.service';
 import { DealOutcome } from '../calibration/entities/deal-outcome.entity';
 import { OutcomesService } from '../calibration/outcomes.service';
+import { DisappearancesService } from '../listings/disappearances.service';
 import { Listing } from '../listings/entities/listing.entity';
 import { ListingsService } from '../listings/listings.service';
 import type { BudgetReportDigest } from '../scheduling/budget-report';
@@ -30,6 +31,11 @@ import { ValuationEvidenceService } from '../valuation/valuation-evidence.servic
 import { ValuationShadowService } from '../valuation/valuation-shadow.service';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
 
+import {
+  AccidentShadowDigest,
+  AccidentShadowRecord,
+  buildAccidentShadowDigest,
+} from './accident-shadow-report';
 import { buildDigest, realizedPrecision, ReportDigest } from './report';
 
 export interface Assessment {
@@ -78,6 +84,7 @@ export class QueryService {
     private readonly valuation: ValuationService,
     private readonly benchmarks: BenchmarkCacheService,
     private readonly listings: ListingsService,
+    private readonly disappearances: DisappearancesService,
     private readonly mileage: MileageAdjuster,
     private readonly outcomes: OutcomesService,
     private readonly deals: DealsService,
@@ -242,6 +249,51 @@ export class QueryService {
 
   budgetReport(): Promise<BudgetReportDigest | null> {
     return this.budget.report();
+  }
+
+  /**
+   * Read-only accident-clamp rollout report (spec 018 US18.2). Reads persisted explanations and
+   * disappearance records only — no source traffic, no budget spend, no state change. It authorizes
+   * a **review**, never a flip (FR-007).
+   */
+  async accidentShadowReport(windowDays = 30): Promise<AccidentShadowDigest> {
+    const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+    const listings = await this.listings.accidentShadowEvaluations(since);
+    const disappearances = await this.disappearances.findByListingIds(listings.map((l) => l.id));
+    const byListing = new Map(disappearances.map((d) => [d.listingId, d]));
+
+    const records: AccidentShadowRecord[] = [];
+    for (const listing of listings) {
+      const explanation = listing.lastExplanation;
+      const verdict = explanation && 'accidentSeverity' in explanation
+        ? explanation.accidentSeverity
+        : null;
+      if (!explanation || !verdict) continue;
+      const d = byListing.get(listing.id);
+      records.push({
+        listingId: listing.id,
+        bucket: verdict.bucket,
+        reason: verdict.reason,
+        corroborated: verdict.corroborated,
+        disqualified: explanation.disqualified,
+        redFlags: explanation.redFlags,
+        raw: explanation.raw,
+        confidence: explanation.confidence,
+        penalty: explanation.penalty,
+        discountPct: explanation.discountPct,
+        thresholdUsed: explanation.thresholdUsed,
+        factorCount: explanation.factors.length,
+        outcome: d
+          ? {
+              disappeared: true,
+              isRelist: d.isRelist,
+              domDays: d.domDays ?? null,
+              hadPriceCut: d.hadPriceCut,
+            }
+          : null,
+      });
+    }
+    return buildAccidentShadowDigest(records);
   }
 
   /** Read-only provider-evidence audit. It never invokes AUTO.RIA or changes live policy. */

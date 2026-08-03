@@ -94,10 +94,11 @@ Two safeguards we run that the generic list omits, both serving §0's business r
 - **Score:** `valuation/valuation.service.ts::computeValuation` — `raw × confidence × penalty`, hard
   flags clamp ≤ 0, `ParameterSet`-driven tunables.
 - **Condition (negatives) from text:** `valuation/condition.ts` — uk+ru, negation-aware; feeds
-  `red-flags.ts` (`desc_not_running` disqualifying; `desc_after_accident` **no longer disqualifying
-  by itself** — replaced by the graded severity verdict of
-  [[0020-graded-accident-risk|ADR-0020]], where only `severe` and salvage stay hard; `desc_needs_repair`/
-  `desc_mechanical_issue` soft).
+  `red-flags.ts` (`desc_not_running` and `desc_after_accident` disqualifying; `desc_needs_repair`/
+  `desc_mechanical_issue` soft). [[0020-graded-accident-risk|ADR-0020]] rules that
+  `desc_after_accident` should **not** disqualify by itself and replaces it with the graded severity
+  verdict of `valuation/accident-severity.ts`, where only `severe` and salvage stay hard — recorded
+  in shadow since 2026-08-03, flip pending (spec-018 phase 3).
 - **Odometer-fraud heuristics:** `valuation/mileage-risk.ts` — `suspicious_low_mileage`,
   `unverified_bargain` (soft dampeners; the real VIN mileage is out of reach — [[vin-real-mileage]]).
 - **Price history / drops:** `PriceObservation` + poll re-observe; a drop re-evaluates and records a

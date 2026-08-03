@@ -44,7 +44,7 @@ Implemented (spec 001). One NestJS module per concern:
 | `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — liquidity + repair-risk implemented in code but **intentionally inactive in prod** per [[0010-defer-factor-activation-until-k|ADR-0010]]: activation deferred until SPEC-004's `k` lands, then one combined ParameterSet change + single threshold re-validation (spec 004 Phase C); until then `score === priceCore`; negotiation/seller/positives/segment-mileage pending). The `confidence` term here is **cohort sample size only**; the separate **assessment confidence** output ([[0018-assessment-confidence-and-monetary-output|ADR-0018]], spec 006 US6.1) is display/ordering only and MUST NOT be multiplied into `score`, `priceCore`, or any modifier | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
 | `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts`; **`DealOutcome` + `DealsService`** (spec 007: stateful post-deal record) + pure `deal-margin.ts` (realized margin/DOM, monotonic stage) | spec 002 + 007; [[0005-versioned-parameter-sets|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
-| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`, valuation audit) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/valuation_audit`, `/outcome`, `/deal`, `/deals`; the audit reads stored data only. |
+| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`, valuation audit, accident shadow report) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/valuation_audit`, `/accident_shadow`, `/outcome`, `/deal`, `/deals`; the audit and the accident report read stored data only. |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `analysis` | **Planned (spec 017)** — `AnalysisProvider` port + adapter, pure context assembly (seller description quarantined in a delimited untrusted block), strict output validation, immutable `AiAnalysis` records, content-hash cache, dedicated budget allocation. Admin-only `/analyze_ai`, disabled by default | **`valuation` MUST NOT import `analysis`** — that separation is how the advisory-only boundary is enforced ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
@@ -60,7 +60,8 @@ ids → `sources` fetch details (budgeted) → `valuation` resolves a benchmark 
 widen-and-retry** (make+model+year±1 → make+model until `sampleSize ≥ 10`), computes
 discount/confidence/red-flags → every evaluated listing records its score plus a persisted
 **EvaluationExplanation** snapshot (`ParameterSet` version, profile threshold, cohort provenance,
-fair-value base/adjustment, score breakdown, fired flags); an **Opportunity** (score ≥ threshold)
+fair-value base/adjustment, score breakdown, fired flags; from `V3` also the shadow accident verdict
+and the heuristic-table content hashes that scored it); an **Opportunity** (score ≥ threshold)
 copies that same snapshot and is stored → `notifications` sends a Telegram alert with the AUTO.RIA backlink.
 The poll only recovers a bounded number of never-scored listings while SPEC-005 is paused; it does
 not routinely re-observe scored listings for price drops. On demand, the `query`
@@ -77,7 +78,7 @@ or delays an alert. `/check` can request the same sidecar explicitly when it is 
 `/why` and admin-only `/valuation_audit` read stored evidence without source traffic. The adapter
 remains disabled by default per [[0017-shadow-valuation-evidence|ADR-0017]].
 
-**Accident severity classifier** (SPEC-018 phase 1, 2026-08-03): `valuation/accident-severity.ts` is
+**Accident severity classifier** (SPEC-018 phases 1–2, 2026-08-03): `valuation/accident-severity.ts` is
 a pure module mapping the AUTO.RIA damage bar plus the stored description to
 `cosmetic | moderate | severe | unknown` with the matched markers as evidence. Its lexicon is
 versioned config (`config/heuristics/accident-severity.json`), loaded and content-hashed by
@@ -87,9 +88,20 @@ file leaves the classifier off rather than fabricating a verdict. It is delibera
 Severity resolves as `max(bar, text)` with one asymmetry: a text verdict below `unknown` is admitted
 only when `vinChecked || hasVinReport`, implemented as an explicit **floor** rather than a scoring
 weight so no discount can out-earn it ([[0020-graded-accident-risk|ADR-0020]],
-[[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]). **Nothing consumes the verdict yet** —
-`red-flags.ts` and scoring are untouched; shadow persistence is phase 2 and the graded-penalty flip
-is phase 3, gated on a month of evidence plus operator approval.
+[[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]).
+
+Phase 2 calls it from `computeValuation` — the only site where the description, the damage bar and
+the VIN state coexist — and records the verdict in the explanation. **Nothing downstream consumes
+it**: `red-flags.ts`, `priceCore`, the composite factors, `isOpportunity` and the alert set are
+untouched, so shadow mode is observationally free by construction (asserted bit-for-bit by
+`test/integration/accident-shadow-equivalence.spec.ts`). Admin-only `/accident_shadow [days]`
+aggregates persisted explanations plus `ListingDisappearance` into a rollout report: counts by
+bucket, how many were suppressed **by the accident clamp alone** (a listing also killed by
+`suspicious_discount`, `salvage`, `confiscated`, `under_credit` or `desc_not_running` is not
+attributed to it, and `severe` never counts because grading keeps killing it), how many would have
+cleared the threshold on the reconstructed pre-clamp price core `raw × confidence × penalty`, and
+what happened to those listings afterwards. Per FR-007 the report authorizes a *review*, not a flip.
+The graded-penalty flip is phase 3, gated on a month of that evidence plus operator approval.
 
 **Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
 the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage

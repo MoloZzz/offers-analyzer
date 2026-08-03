@@ -105,35 +105,35 @@
           "level": 2,
           "text": "Next",
           "line": 68,
-          "endLine": 105
+          "endLine": 106
         },
         {
           "n": 6,
           "level": 3,
           "text": "Operator-facing work admitted 2026-08-03",
           "line": 89,
-          "endLine": 105
+          "endLine": 106
         },
         {
           "n": 7,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 106,
-          "endLine": 111
+          "line": 107,
+          "endLine": 112
         },
         {
           "n": 8,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 112,
-          "endLine": 121
+          "line": 113,
+          "endLine": 122
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 122,
-          "endLine": 129
+          "line": 123,
+          "endLine": 130
         }
       ]
     },
@@ -483,35 +483,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 111
+          "endLine": 123
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 112,
-          "endLine": 140
+          "line": 124,
+          "endLine": 152
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 141,
-          "endLine": 149
+          "line": 153,
+          "endLine": 161
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 150,
-          "endLine": 151
+          "line": 162,
+          "endLine": 163
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 152,
-          "endLine": 162
+          "line": 164,
+          "endLine": 174
         }
       ]
     },
@@ -575,21 +575,21 @@
           "level": 2,
           "text": "Частина 2. Як ми оцінюємо «вигідність»",
           "line": 79,
-          "endLine": 131
+          "endLine": 134
         },
         {
           "n": 3,
           "level": 2,
           "text": "Пояснюваність (чому саме такий бал)",
-          "line": 132,
-          "endLine": 137
+          "line": 135,
+          "endLine": 140
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 138,
-          "endLine": 140
+          "line": 141,
+          "endLine": 143
         }
       ]
     },
@@ -1637,15 +1637,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 57,
-          "endLine": 63
+          "line": 59,
+          "endLine": 65
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 64,
-          "endLine": 68
+          "line": 66,
+          "endLine": 70
         }
       ]
     },
@@ -1945,63 +1945,63 @@
           "level": 2,
           "text": "Deal score ∈ [−1, 1] (price core)",
           "line": 53,
-          "endLine": 76
+          "endLine": 78
         },
         {
           "n": 5,
           "level": 2,
           "text": "Valuation guard (SPEC-011)",
-          "line": 77,
-          "endLine": 85
+          "line": 79,
+          "endLine": 87
         },
         {
           "n": 6,
           "level": 2,
           "text": "Worked example (what the system actually does)",
-          "line": 86,
-          "endLine": 97
+          "line": 88,
+          "endLine": 99
         },
         {
           "n": 7,
           "level": 2,
           "text": "Risk red-flags (why \"cheap\" is often not profitable)",
-          "line": 98,
-          "endLine": 108
+          "line": 100,
+          "endLine": 110
         },
         {
           "n": 8,
           "level": 2,
           "text": "Known pitfalls of the average-price anchor",
-          "line": 109,
-          "endLine": 126
+          "line": 111,
+          "endLine": 128
         },
         {
           "n": 9,
           "level": 2,
           "text": "Options for the v1 definition",
-          "line": 127,
-          "endLine": 134
+          "line": 129,
+          "endLine": 136
         },
         {
           "n": 10,
           "level": 2,
           "text": "Recommendation",
-          "line": 135,
-          "endLine": 146
+          "line": 137,
+          "endLine": 148
         },
         {
           "n": 11,
           "level": 2,
           "text": "Sources",
-          "line": 147,
-          "endLine": 151
+          "line": 149,
+          "endLine": 153
         },
         {
           "n": 12,
           "level": 2,
           "text": "Related",
-          "line": 152,
-          "endLine": 156
+          "line": 154,
+          "endLine": 158
         }
       ]
     },
@@ -2040,56 +2040,56 @@
           "level": 2,
           "text": "3. What is implemented today (code-level)",
           "line": 86,
-          "endLine": 109
+          "endLine": 110
         },
         {
           "n": 5,
           "level": 2,
           "text": "4. Plans, ordered by return-on-effort (re-cut 2026-07-18 per ADR-0006 → spec 003)",
-          "line": 110,
-          "endLine": 129
+          "line": 111,
+          "endLine": 130
         },
         {
           "n": 6,
           "level": 2,
           "text": "5. Do we actually need ML? — verdict: **not yet, and not for the reason it looks like**",
-          "line": 130,
-          "endLine": 199
+          "line": 131,
+          "endLine": 200
         },
         {
           "n": 7,
           "level": 3,
           "text": "The two example listings, analysed",
-          "line": 137,
-          "endLine": 164
+          "line": 138,
+          "endLine": 165
         },
         {
           "n": 8,
           "level": 3,
           "text": "Why ML is a poor fit right now (general case)",
-          "line": 165,
-          "endLine": 181
+          "line": 166,
+          "endLine": 182
         },
         {
           "n": 9,
           "level": 3,
           "text": "When ML *would* earn its place (the steelman + trigger conditions)",
-          "line": 182,
-          "endLine": 199
+          "line": 183,
+          "endLine": 200
         },
         {
           "n": 10,
           "level": 2,
           "text": "6. How to sanity-check our scores with a stronger model",
-          "line": 200,
-          "endLine": 209
+          "line": 201,
+          "endLine": 210
         },
         {
           "n": 11,
           "level": 2,
           "text": "Related",
-          "line": 210,
-          "endLine": 215
+          "line": 211,
+          "endLine": 216
         }
       ]
     },

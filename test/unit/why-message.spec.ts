@@ -41,6 +41,7 @@ const result: ValuationResult = {
   priceCore: 0.75,
   factors: [],
   total100: 88,
+  accidentSeverity: null,
 };
 
 describe('formatWhy', () => {

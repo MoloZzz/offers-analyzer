@@ -1,6 +1,7 @@
 import { Currency } from '../../common/types/money';
 import { ListingDetail } from '../sources/ports/listing-source.port';
 
+import { AccidentSeverity } from './accident-severity';
 import { ResolvedBenchmark } from './cohort';
 import { FactorScore } from './factors/factor';
 import {
@@ -76,7 +77,31 @@ export interface EvaluationExplanationV2 extends EvaluationExplanationBase {
   providerEvidence?: ProviderEvidenceReference | null;
 }
 
-export type EvaluationExplanation = EvaluationExplanationV1 | EvaluationExplanationV2;
+/**
+ * Adds the spec-018 shadow accident verdict and the heuristic-table provenance. Both are additive
+ * and neither participates in the scoring values above — a V3 record scores identically to the V1 it
+ * would otherwise have been.
+ */
+export interface EvaluationExplanationV3 extends EvaluationExplanationBase {
+  schemaVersion: 3;
+  providerEvidence?: ProviderEvidenceReference | null;
+  /**
+   * Graded accident verdict recorded in shadow while the hard clamp stays live (spec 018 US18.2).
+   * Absent/`null` means no accident signal — not "no accident risk assessed".
+   */
+  accidentSeverity?: AccidentSeverity | null;
+  /**
+   * Content hashes of the heuristic tables that scored this listing (spec 018 T002, carried over
+   * from phase 1). Answers "which table version produced this verdict" without a ParameterSet
+   * schema change; covers liquidity, repair-risk and accident-severity together.
+   */
+  heuristicTableHashes?: Record<string, string>;
+}
+
+export type EvaluationExplanation =
+  | EvaluationExplanationV1
+  | EvaluationExplanationV2
+  | EvaluationExplanationV3;
 
 export function buildEvaluationExplanation(input: {
   detail: ListingDetail;
@@ -86,10 +111,11 @@ export function buildEvaluationExplanation(input: {
   parameterSetVersion: number;
   thresholdUsed: number;
   evaluatedAt?: Date;
-}): EvaluationExplanationV1 {
+  heuristicTableHashes?: Record<string, string>;
+}): EvaluationExplanationV3 {
   const fairValueBase = input.benchmark?.value.amount ?? 0;
   return {
-    schemaVersion: 1,
+    schemaVersion: 3,
     evaluatedAt: (input.evaluatedAt ?? new Date()).toISOString(),
     parameterSetVersion: input.parameterSetVersion,
     thresholdUsed: input.thresholdUsed,
@@ -126,6 +152,8 @@ export function buildEvaluationExplanation(input: {
     reason: input.result.reason,
     isOpportunity: input.result.isOpportunity,
     disqualified: input.result.disqualified,
+    accidentSeverity: input.result.accidentSeverity,
+    ...(input.heuristicTableHashes ? { heuristicTableHashes: input.heuristicTableHashes } : {}),
   };
 }
 
@@ -137,18 +165,24 @@ export function buildEvaluationExplanation(input: {
 export function withProviderEvidence(
   explanation: EvaluationExplanation,
   providerEvidence: ProviderEvidenceReference | null,
-): EvaluationExplanationV2 {
-  return {
-    ...explanation,
-    schemaVersion: 2,
-    providerEvidence,
-  };
+): EvaluationExplanationV2 | EvaluationExplanationV3 {
+  // Raise a legacy V1 to V2, but never *lower* a newer record — forcing `2` here would silently
+  // strip the spec-018 shadow verdict's schema guarantee off a freshly built V3.
+  if (explanation.schemaVersion >= 3) {
+    return { ...(explanation as EvaluationExplanationV3), providerEvidence };
+  }
+  return { ...explanation, schemaVersion: 2, providerEvidence };
 }
 
+/**
+ * Whether a stored explanation carries the `providerEvidence` field. Deliberately a `>=` check:
+ * every version from 2 onward has it, and an equality check silently drops provider evidence from
+ * `/why` the moment a new schema version ships.
+ */
 export function isEvaluationExplanationV2(
   explanation: EvaluationExplanation,
-): explanation is EvaluationExplanationV2 {
-  return explanation.schemaVersion === 2;
+): explanation is EvaluationExplanationV2 | EvaluationExplanationV3 {
+  return explanation.schemaVersion >= 2;
 }
 
 function flagSource(code: string): 'auto-ria' | 'description' | 'derived' {

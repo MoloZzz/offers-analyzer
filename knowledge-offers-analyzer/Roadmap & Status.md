@@ -95,10 +95,11 @@ neither is blocked by the evidence gates above.
 |---|---|---|
 | `016-full-evaluation-breakdown` | Compact alert keeps its shape; a **Деталі** button expands the full per-parameter breakdown, built once and shared with `/why` and `/check` | None — ungated. Its output is thin today and grows automatically as spec 003 activates and spec 006 lands |
 | `017-on-demand-ai-analysis` | Admin-only `/analyze_ai`: structured context to a language model, strict structured output, content-hash cache, separate budget, immutable records | Ships disabled. Provider credentials, approved terms, lawfulness of sending listing content, and an agreed monthly cap are operator gates ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
-| `018-graded-accident-risk` phases 1–2 | Severity classifier + shadow recording + a rollout report quantifying what the current clamp suppresses | None — shadow mode changes nothing observable |
+| `018-graded-accident-risk` phases 1–2 | **Implemented 2026-08-03.** Severity classifier + shadow recording in `EvaluationExplanationV3` + admin-only `/accident_shadow` rollout report quantifying what the current clamp suppresses | None — shadow mode changes nothing observable, asserted bit-for-bit by `accident-shadow-equivalence.spec.ts`. The month-long shadow window (T011) is now the gate on phase 3 |
 
 `018-graded-accident-risk` **phase 3** (the flip to graded penalties) is the exception: it changes
-the alert set, so it needs a month of shadow evidence plus operator approval, and should be
+the alert set, so it needs a month of shadow evidence — the window opens on the first production poll
+cycle after the phase-2 deploy — plus operator approval, and should be
 considered alongside the ADR-0010 combined rollout so the operator faces one before/after
 comparison rather than two. If the shadow report shows the suppressed listings were reliably bad
 deals, the correct outcome is **not to flip** — that possibility is a designed result.

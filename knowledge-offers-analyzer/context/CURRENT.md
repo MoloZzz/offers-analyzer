@@ -39,19 +39,33 @@ permanently). Both are presentation/advisory and change no score or alert set. S
 disabled; provider credentials, approved terms, lawfulness of sending listing content, and a monthly
 cap are operator gates. No code was changed by either task.
 
-## Implemented 2026-08-03 — SPEC-018 phase 1 (T001–T006)
+## Implemented 2026-08-03 — SPEC-018 phases 1 and 2 (T001–T010)
 
-The accident-severity classifier is in code: `src/modules/valuation/accident-severity.ts` (pure),
-`config/heuristics/accident-severity.json` (versioned lexicon, loaded and content-hashed by
+**Phase 1** put the accident-severity classifier in code: `src/modules/valuation/accident-severity.ts`
+(pure), `config/heuristics/accident-severity.json` (versioned lexicon, loaded and content-hashed by
 `HeuristicTablesService`), a 55-case labelled uk+ru corpus at `test/fixtures/accident-corpus.ts`,
 and 14 tests including the SC-002/SC-003 anti-gaming properties.
 
-**Nothing consumes the verdict.** `red-flags.ts`, `condition.ts`, `valuation.service.ts`, the score
-and the alert set are untouched, so this pass changes nothing observable and is outside the
-[[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. Phase 2 (shadow persistence + the rollout
-report) and phase 3 (the operator-approved flip) are open — see
-`specs/018-graded-accident-risk/tasks.md` T007 onward and
-`context/log/2026-08-03-graded-accident-risk.md` for the implementation decisions.
+**Phase 2 (T007–T010)** wired it in **shadow mode**. The verdict is computed in `computeValuation` —
+the only site where the description, the AUTO.RIA bar flags and the VIN state coexist — and persisted
+in a new `EvaluationExplanationV3` alongside `heuristicTableHashes` (which also closes phase 1's
+carried-over T002 item: `HeuristicTablesService.hashes()` finally has a consumer, for all three
+tables). Admin-only `/accident_shadow [days]` reports, read-only and with zero new requests, what the
+live clamp is suppressing and what happened to those listings afterwards.
+
+**Nothing downstream reads the verdict.** `red-flags.ts`, `condition.ts`, the score and the alert set
+are untouched, so both passes change nothing observable and sit outside the
+[[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. `test/integration/accident-shadow-equivalence.spec.ts`
+asserts that bit-for-bit (SC-001).
+
+Two latent defects in `evaluation-explanation.ts` were fixed as part of this: the V2 guard was an
+exact `=== 2` check (a V3 record would have lost provider evidence in `/why`) and
+`withProviderEvidence` hard-set `schemaVersion: 2` (it would have downgraded a V3 record).
+
+**T011 is open by design** — the shadow window must run a full month before phase 3 (the
+operator-approved flip) is considered, and per [[0010-defer-factor-activation-until-k|ADR-0010]] the
+flip should be presented alongside the combined rollout. See
+`context/log/2026-08-03-accident-shadow-recording.md` for the implementation decisions.
 
 ## Next pickup
 
@@ -68,11 +82,13 @@ evidence to a resale model or change the live score without a separate approved 
   (309 tests), contract Jest (23 tests), Nest build, `vault:build`, `vault:check:strict`, and
   `vault:test` all pass.
 - 2026-08-03 (native Windows `npm.cmd`; the RTK wrapper is Linux/musl and does not run here):
-  `typecheck`, `lint`, contract Jest (23), and Nest build pass. Full Jest is **322/323** — the one
+  `typecheck`, `lint`, contract Jest (46), and Nest build pass. Full Jest is **708/709** — the one
   failure, `single-flights concurrent calls…` in `test/unit/valuation-evidence.service.spec.ts`,
-  exceeds Jest's 5 s timeout and is **pre-existing and unrelated to SPEC-018** (it fails identically
-  with the spec-018 changes reverted, and that spec imports nothing touched by them). It is SPEC-015
-  work and still needs its own task.
+  exceeds Jest's 5 s timeout and is **pre-existing and unrelated to SPEC-018**. Root cause is now
+  identified: the test hand-drives a promise resolver assuming `maybeCapture` yields exactly one
+  microtask before calling the provider; when it yields more, `resolveProvider` is still `undefined`,
+  the optional-chained call silently no-ops, and `Promise.all` never settles. It is a defect in the
+  test, not a slow test. SPEC-015 work; still needs its own task.
 - The remaining blockers are external/operator gates only: approved provider credentials/terms and
   allocation, a development migration apply/re-generation check, pending gold-case captures, and
   the `/valuation_audit` review. Leave `AUTO_RIA_AI_ENABLED=false` until those gates are complete.

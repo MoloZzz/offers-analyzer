@@ -53,6 +53,12 @@ export class DisappearancesService {
     @InjectPinoLogger(DisappearancesService.name) private readonly logger: PinoLogger,
   ) {}
 
+  /** Read-only bulk lookup of disappearance records by listing id (spec 018 rollout report). */
+  async findByListingIds(listingIds: string[]): Promise<ListingDisappearance[]> {
+    if (listingIds.length === 0) return [];
+    return this.disappearances.find({ where: { listingId: In(listingIds) } });
+  }
+
   /**
    * One poll cycle's worth of disappearance bookkeeping: bump sightings, resurrect anything
    * that reappeared, then record disappearances for active listings that are absent beyond

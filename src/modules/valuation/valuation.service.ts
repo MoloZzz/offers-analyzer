@@ -4,6 +4,7 @@ import { DEFAULT_UPLIFT_CAP, ScoringParams } from '../calibration/entities/param
 import { ParametersService } from '../calibration/parameters.service';
 import { SellerType } from '../sources/ports/listing-source.port';
 
+import { AccidentSeverity, assessAccidentSeverity } from './accident-severity';
 import { assessCondition } from './condition';
 import { composeFactors, FactorScore, toTotal100 } from './factors/factor';
 import { liquidityFactor } from './factors/liquidity';
@@ -71,6 +72,12 @@ export interface ValuationResult {
   factors: FactorScore[];
   /** Presentation-only 0–100 "Total Deal Score" derived from `score`. */
   total100: number;
+  /**
+   * Graded accident verdict (spec 018). **Shadow only** — nothing in this function reads it, and no
+   * scoring value above depends on it. `null` when nothing indicates an accident, or when the
+   * lexicon is absent. Phase 3 is what makes it act, via a ParameterSet.
+   */
+  accidentSeverity: AccidentSeverity | null;
 }
 
 /**
@@ -103,6 +110,24 @@ export function computeValuation(
     input.minSamples > 0 ? Math.min(1, input.sampleSize / (input.minSamples * 2)) : 0;
 
   const condition = assessCondition(input.description);
+
+  // Spec 018 phase 2 — shadow only. This is the one place where the description, the AUTO.RIA bar
+  // flags and the VIN state coexist (red-flags.ts never sees the text; condition.ts never sees the
+  // bar), so the verdict is computed here and merely recorded. Nothing below reads it: the clamp
+  // stays live and behaviour is unchanged **by construction**, not by careful arithmetic (SC-001).
+  const accidentSeverity = tables.accidentSeverity
+    ? assessAccidentSeverity(
+        {
+          description: input.description,
+          damaged: input.damaged,
+          salvage: input.salvage,
+          vinChecked: input.vinChecked,
+          hasVinReport: input.hasVinReport,
+        },
+        tables.accidentSeverity,
+      )
+    : null;
+
   const mileageRisk = assessMileageRisk({
     mileageK: input.mileageK,
     year: input.year,
@@ -173,6 +198,7 @@ export function computeValuation(
     priceCore: round(priceCore),
     factors,
     total100: toTotal100(score),
+    accidentSeverity,
   };
 }
 
@@ -189,6 +215,11 @@ export class ValuationService {
 
   activeParameterVersion(): number {
     return this.parameters.getActive().version;
+  }
+
+  /** Content hashes of the heuristic tables that scored a listing — recorded in the explanation. */
+  heuristicTableHashes(): Record<string, string> {
+    return this.tables.hashes();
   }
 }
 

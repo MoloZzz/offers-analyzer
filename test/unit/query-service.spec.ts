@@ -78,6 +78,7 @@ describe('QueryService.whyById', () => {
       {} as never,
       {} as never,
       {} as never,
+      {} as never,
       config as never,
       undefined,
       evidence as never,
@@ -149,6 +150,7 @@ describe('QueryService.assessById shadow evidence', () => {
       valuation as never,
       benchmarks as never,
       listings as never,
+      {} as never,
       { fairValue: jest.fn().mockReturnValue(0) } as never,
       {} as never,
       {} as never,
@@ -180,6 +182,7 @@ describe('QueryService.valuationAudit', () => {
     };
     const config = { get: jest.fn().mockReturnValue(0.75) } as unknown as ConfigService;
     const service = new QueryService(
+      {} as never,
       {} as never,
       {} as never,
       {} as never,

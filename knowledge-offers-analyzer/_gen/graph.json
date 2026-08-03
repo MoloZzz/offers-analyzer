@@ -2,7 +2,7 @@
   "version": 1,
   "metrics": {
     "notes": 49,
-    "links": 444,
+    "links": 445,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -321,7 +321,7 @@
       "title": "Domain glossary",
       "type": "domain",
       "inDeg": 12,
-      "outDeg": 19
+      "outDeg": 20
     },
     {
       "rel": "operations/environment-setup.md",
@@ -578,21 +578,21 @@
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
-      "line": 126
+      "line": 127
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/requirements.md",
       "anchor": null,
       "embed": false,
-      "line": 125
+      "line": 126
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 124
+      "line": 125
     },
     {
       "from": "Roadmap & Status.md",
@@ -634,14 +634,14 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 128
+      "line": 129
     },
     {
       "from": "Roadmap & Status.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 127
+      "line": 128
     },
     {
       "from": "SPEC-005.md",
@@ -984,7 +984,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 158
+      "line": 170
     },
     {
       "from": "architecture/overview.md",
@@ -1012,14 +1012,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 161
+      "line": 173
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 143
+      "line": 155
     },
     {
       "from": "architecture/overview.md",
@@ -1040,7 +1040,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 133
+      "line": 145
     },
     {
       "from": "architecture/overview.md",
@@ -1075,14 +1075,14 @@
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 90
+      "line": 91
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 97
+      "line": 109
     },
     {
       "from": "architecture/overview.md",
@@ -1103,14 +1103,14 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 146
+      "line": 158
     },
     {
       "from": "architecture/overview.md",
@@ -1131,21 +1131,21 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 89
+      "line": 90
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 160
+      "line": 172
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 159
+      "line": 171
     },
     {
       "from": "architecture/overview.md",
@@ -1166,7 +1166,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 143
+      "line": 155
     },
     {
       "from": "architecture/overview.md",
@@ -1180,7 +1180,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 121
+      "line": 133
     },
     {
       "from": "architecture/overview.md",
@@ -1194,7 +1194,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 137
+      "line": 149
     },
     {
       "from": "architecture/overview.md",
@@ -1236,7 +1236,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 142
     },
     {
       "from": "business/how-it-works.md",
@@ -1250,7 +1250,7 @@
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 142
     },
     {
       "from": "business/how-it-works.md",
@@ -1271,14 +1271,14 @@
       "to": "research/explainability-gaps.md",
       "anchor": null,
       "embed": false,
-      "line": 136
+      "line": 139
     },
     {
       "from": "business/how-it-works.md",
       "to": "research/explainability-gaps.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 142
     },
     {
       "from": "business/how-it-works.md",
@@ -1292,14 +1292,14 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 142
     },
     {
       "from": "business/how-it-works.md",
       "to": "research/why-no-opportunities.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 142
     },
     {
       "from": "business/requirements.md",
@@ -2685,21 +2685,21 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 68
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 67
+      "line": 69
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 41
     },
     {
       "from": "domain/glossary.md",
@@ -2727,7 +2727,14 @@
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 38
+      "line": 31
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
     },
     {
       "from": "domain/glossary.md",
@@ -2741,7 +2748,7 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 46
+      "line": 48
     },
     {
       "from": "domain/glossary.md",
@@ -2762,21 +2769,21 @@
       "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
-      "line": 49
+      "line": 51
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 52
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 51
+      "line": 53
     },
     {
       "from": "domain/glossary.md",
@@ -2790,14 +2797,14 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 62
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 62
+      "line": 64
     },
     {
       "from": "domain/glossary.md",
@@ -2811,7 +2818,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 62
     },
     {
       "from": "operations/environment-setup.md",
@@ -3056,21 +3063,21 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 155
+      "line": 157
     },
     {
       "from": "research/profitability-definition.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 144
+      "line": 146
     },
     {
       "from": "research/profitability-definition.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 69
+      "line": 71
     },
     {
       "from": "research/profitability-definition.md",
@@ -3084,14 +3091,14 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 71
+      "line": 73
     },
     {
       "from": "research/profitability-definition.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 84
+      "line": 86
     },
     {
       "from": "research/profitability-definition.md",
@@ -3105,14 +3112,14 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 102
+      "line": 104
     },
     {
       "from": "research/profitability-definition.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 155
+      "line": 157
     },
     {
       "from": "research/profitability-definition.md",
@@ -3126,7 +3133,7 @@
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 155
+      "line": 157
     },
     {
       "from": "research/profitability-definition.md",
@@ -3140,28 +3147,21 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 155
+      "line": 157
     },
     {
       "from": "research/profitability-definition.md",
       "to": "research/profitability-methods-coverage.md",
       "anchor": null,
       "embed": false,
-      "line": 154
+      "line": 156
     },
     {
       "from": "research/profitability-definition.md",
       "to": "research/vin-real-mileage.md",
       "anchor": null,
       "embed": false,
-      "line": 75
-    },
-    {
-      "from": "research/profitability-definition.md",
-      "to": "research/why-no-opportunities.md",
-      "anchor": null,
-      "embed": false,
-      "line": 69
+      "line": 77
     },
     {
       "from": "research/profitability-definition.md",
@@ -3171,11 +3171,18 @@
       "line": 71
     },
     {
+      "from": "research/profitability-definition.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 73
+    },
+    {
       "from": "research/profitability-methods-coverage.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 214
+      "line": 215
     },
     {
       "from": "research/profitability-methods-coverage.md",
@@ -3196,21 +3203,21 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 99
+      "line": 98
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 214
+      "line": 215
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 214
+      "line": 215
     },
     {
       "from": "research/profitability-methods-coverage.md",
@@ -3224,14 +3231,14 @@
       "to": "research/explainability-gaps.md",
       "anchor": null,
       "embed": false,
-      "line": 178
+      "line": 179
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/explainability-gaps.md",
       "anchor": null,
       "embed": false,
-      "line": 213
+      "line": 214
     },
     {
       "from": "research/profitability-methods-coverage.md",
@@ -3252,42 +3259,42 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 212
+      "line": 213
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/vin-real-mileage.md",
       "anchor": null,
       "embed": false,
-      "line": 102
+      "line": 103
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/vin-real-mileage.md",
       "anchor": null,
       "embed": false,
-      "line": 213
+      "line": 214
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 105
+      "line": 106
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 213
+      "line": 214
     },
     {
       "from": "research/profitability-methods-coverage.md",
       "to": "research/why-no-opportunities.md",
       "anchor": null,
       "embed": false,
-      "line": 213
+      "line": 214
     },
     {
       "from": "research/vin-real-mileage.md",

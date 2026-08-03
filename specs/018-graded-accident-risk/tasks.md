@@ -43,17 +43,20 @@ Pure logic in `src/modules/valuation/`, lexicon in `config/heuristics/`, reporti
 
 ## Phase 2: User Story 18.2 — Shadow recording + rollout report (P1, ungated) 🎯
 
-- [ ] T007 [P] [US18.2] Bit-for-bit regression test: with shadow recording on, `score`, `priceCore`,
+- [x] T007 [P] [US18.2] Bit-for-bit regression test: with shadow recording on, `score`, `priceCore`,
       `total100`, `isOpportunity`, `disqualified`, and the alert set are identical to the
       recording-off run across the full fixture corpus (SC-001). **Exit condition for the phase.**
-- [ ] T008 [US18.2] Compute the verdict on every evaluation and persist `AccidentSeverity` in the
+      → `test/integration/accident-shadow-equivalence.spec.ts`.
+- [x] T008 [US18.2] Compute the verdict on every evaluation and persist `AccidentSeverity` in the
       evaluation explanation (additive, alongside spec 006's V3 fields). The current
-      `disqualifying: true` rules stay untouched.
-- [ ] T009 [US18.2] Admin-only rollout report in `src/modules/query/` over persisted explanations
+      `disqualifying: true` rules stay untouched. → verdict computed in `computeValuation`;
+      explanation `V3` also carries `heuristicTableHashes` (the carried-over T002 item).
+- [x] T009 [US18.2] Admin-only rollout report in `src/modules/query/` over persisted explanations
       plus `ListingDisappearance`: suppressed-listing counts by bucket, their would-be scores, and
-      subsequent relist/disappearance outcomes. Read-only, zero new requests.
-- [ ] T010 [US18.2] The report MUST state that it authorizes a review, not a flip (FR-007).
-- [ ] T011 [US18.2] Let it run for a full month before Phase 3 is considered.
+      subsequent relist/disappearance outcomes. Read-only, zero new requests. → `/accident_shadow`.
+- [x] T010 [US18.2] The report MUST state that it authorizes a review, not a flip (FR-007).
+- [ ] T011 [US18.2] Let it run for a full month before Phase 3 is considered. **Window opens on the
+      first production poll cycle after this deploys** — Phase 3 must not be opened before then.
 
 **Checkpoint:** this phase changes nothing observable and produces the evidence ADR-0011 requires.
 If it shows suppressed listings were reliably bad deals, **the correct outcome is not to flip.**

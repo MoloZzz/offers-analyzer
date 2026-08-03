@@ -14,6 +14,7 @@ import { QueryService } from '../../query/query.service';
 import { formatReport } from '../../query/report';
 import { formatBudgetReport } from '../../scheduling/budget-report';
 import { SourceControlService } from '../../scheduling/source-control.service';
+import { formatAccidentShadow } from '../format/accident-shadow-message';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
@@ -42,6 +43,7 @@ const HELP =
   '/check <посилання> — оцінити конкретне авто\n' +
   '/why <посилання> — пояснити, чому такий бал\n' +
   '/valuation_audit — admin: аудит shadow-оцінок AUTO.RIA\n' +
+  '/accident_shadow [днів] — admin: тіньовий звіт по градації ДТП\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
   '/last [N] — останні оцінки (за замовчуванням 5)\n' +
@@ -101,6 +103,15 @@ export class TelegramBotUpdate {
   async onValuationAudit(@Ctx() ctx: Context): Promise<void> {
     if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
     await ctx.reply(formatValuationAudit(await this.query.valuationAudit()));
+  }
+
+  /** Spec 018 US18.2. Read-only over persisted evaluations — no source traffic, no state change. */
+  @Command('accident_shadow')
+  async onAccidentShadow(@Ctx() ctx: Context): Promise<void> {
+    if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
+    const days = Number.parseInt(commandArg(ctx).trim(), 10);
+    const windowDays = Number.isFinite(days) && days > 0 ? Math.min(days, 365) : 30;
+    await ctx.reply(formatAccidentShadow(await this.query.accidentShadowReport(windowDays)));
   }
 
   private isAdmin(ctx: Context): boolean {

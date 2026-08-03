@@ -92,6 +92,23 @@ export class ListingsService {
       .getMany();
   }
 
+  /**
+   * Listings whose stored explanation carries a spec-018 accident verdict. Read-only, and
+   * deliberately **not** filtered to active listings: the accident rollout report is about what the
+   * clamp suppressed, and a suppressed listing that has since disappeared is the most informative
+   * case of all.
+   */
+  accidentShadowEvaluations(since: Date, limit = 2000): Promise<Listing[]> {
+    return this.listings
+      .createQueryBuilder('l')
+      .where("l.lastExplanation -> 'accidentSeverity' IS NOT NULL")
+      .andWhere("l.lastExplanation -> 'accidentSeverity' <> 'null'::jsonb")
+      .andWhere('l.lastEvaluatedAt >= :since', { since })
+      .orderBy('l.lastEvaluatedAt', 'DESC')
+      .limit(limit)
+      .getMany();
+  }
+
   async recordSeen(
     detail: ListingDetail,
     opts?: { seenInSearch?: boolean },

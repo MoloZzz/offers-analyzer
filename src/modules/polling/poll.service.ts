@@ -281,6 +281,7 @@ export class PollService {
       result,
       parameterSetVersion: this.valuation.activeParameterVersion(),
       thresholdUsed: profile.minDealScore,
+      heuristicTableHashes: this.valuation.heuristicTableHashes(),
     });
 
     await this.listings.recordEvaluation(
