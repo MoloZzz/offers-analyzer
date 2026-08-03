@@ -30,6 +30,8 @@ updated: 2026-08-02
 - [[0016-portable-ai-infra-kit|ADR-0016]] — Package reusable AI infrastructure as a portable bootstrap kit (Accepted)
 - [[0017-shadow-valuation-evidence|ADR-0017]] — Keep provider valuation evidence shadow-only (Accepted)
 
+- [[0018-assessment-confidence-and-monetary-output|ADR-0018]] — Assessment confidence as a separate, non-multiplied output; promote monetary output ahead of more factors (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

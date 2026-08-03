@@ -42,7 +42,10 @@ discount        = (FV − asking_price) / FV
 
 Flag as a **candidate** when **all** hold:
 - `discount ≥ THRESHOLD` (start ~15–20%),
-- **confidence** is sufficient — the cohort has enough comparable listings behind the average (small samples lie),
+- **confidence** is sufficient — the cohort has enough comparable listings behind the average (small samples lie).
+  This is the **cohort sample-size** term that multiplies into the score. It is deliberately distinct from
+  **assessment confidence** ([[0018-assessment-confidence-and-monetary-output|ADR-0018]]), which measures how
+  well-evidenced an individual evaluation is and is **never** multiplied into any score,
 - it passes **risk red-flags** (below).
 
 Score/rank candidates by `discount × confidence` (and later: minus expected costs).
@@ -54,7 +57,7 @@ Instead of a bare boolean, express each listing as a single signed **deal score*
 ```
 delta       = (fair_value − asking) / fair_value      # >0 below market (good), <0 above
 raw         = clamp(delta / SCALE, −1, 1)             # SCALE ≈ 0.30 → a 30% discount saturates to ~1
-confidence  = min(1, sampleSize / (minSamples × 2))   # 0..1; low data shrinks the score toward 0
+confidence  = min(1, sampleSize / (minSamples × 2))   # cohort sample size only; low data shrinks the score toward 0
 score       = raw × confidence × flagPenalty          # flagPenalty ≈ 0.8 for soft flags (e.g. no VIN)
 if a disqualifying red-flag fires: score = min(score, 0)   # a scam/damaged bargain is not a deal
 ```

@@ -200,7 +200,10 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
   - Acceptance: job stays within 50–100 req/mo; `drift` visible in `/why`; clamp ±5%/mo so a data
     artifact can't wreck the estimate.
 
-- [ ] **SPEC-006 — Money output (Z), not just a score.** P2. Problem: the 0–100 score is
+- [~] **SPEC-006 — Money output (Z), not just a score.** **Promoted and formalized 2026-08-03** at
+  `specs/006-monetary-output-z-roi/` per [[0018-assessment-confidence-and-monetary-output|ADR-0018]];
+  it now also owns the assessment-confidence output. This backlog entry is retained as the origin
+  record — the formal spec is the implementation contract. Problem: the 0–100 score is
   dimensionless; liquidity and repair-risk are genuinely *monetary* quantities (cost of capital
   tied up, expected repair spend) currently expressed as multipliers of the wrong dimension — e.g.
   a liquidity multiplier of ±10% on a $2,000 expected profit spans ±$200, when the real holding-
@@ -256,6 +259,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 
 | # | Item | Blocks | API cost |
 |---|---|---|---|
+| 0 | SPEC-006 US6.1 — assessment confidence (display-only, **ungated**: no score/threshold/ParameterSet/alert-set change) | — | 0 |
 | 1 | B23 — persisted evaluation explanation | `k` / factor activation | 0 |
 | 2 | ✅ SPEC-009 — budget observability (live evidence gate remains) | SPEC-005, expensive profiles | 0 |
 | 3 | SPEC-004 US4.1–4.2/4.1b — data collection (running) | `k` validation | ~5,400/mo for sweep |
@@ -264,7 +268,7 @@ after haggling and paperwork. This is the leading explanation for the "deals" no
 | 6 | SPEC-004 US4.3 + US4.3a — candidate `k` + readiness gate | US4.4 | 0 |
 | 7 | SPEC-004 US4.4 + Phase-1 factor activation | threshold review | 0 |
 | 8 | SPEC-008 | — | ~50/mo |
-| 9 | SPEC-006 | — | 0 |
+| 9 | SPEC-006 monetary slices (US6.2–6.5) | — | 0 |
 | 10 | CHANGE-003.2, CHANGE-003.3, CHANGE-002.1 | — | 0 |
 
 Data collection is already accruing evidence, while B23 and SPEC-009 make that evidence and the

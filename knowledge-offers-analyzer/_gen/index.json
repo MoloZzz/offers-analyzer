@@ -105,28 +105,28 @@
           "level": 2,
           "text": "Next",
           "line": 68,
-          "endLine": 74
+          "endLine": 84
         },
         {
           "n": 6,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 75,
-          "endLine": 80
+          "line": 85,
+          "endLine": 90
         },
         {
           "n": 7,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 81,
-          "endLine": 90
+          "line": 91,
+          "endLine": 100
         },
         {
           "n": 8,
           "level": 2,
           "text": "Related",
-          "line": 91,
-          "endLine": 98
+          "line": 101,
+          "endLine": 108
         }
       ]
     },
@@ -176,21 +176,28 @@
           "level": 2,
           "text": "Summary",
           "line": 11,
-          "endLine": 18
+          "endLine": 23
         },
         {
           "n": 2,
           "level": 2,
-          "text": "Dependencies",
-          "line": 19,
-          "endLine": 24
+          "text": "Why it was promoted",
+          "line": 24,
+          "endLine": 31
         },
         {
           "n": 3,
           "level": 2,
+          "text": "Dependencies",
+          "line": 32,
+          "endLine": 39
+        },
+        {
+          "n": 4,
+          "level": 2,
           "text": "Related",
-          "line": 25,
-          "endLine": 29
+          "line": 40,
+          "endLine": 45
         }
       ]
     },
@@ -416,21 +423,21 @@
           "level": 2,
           "text": "Scoring invariants",
           "line": 29,
-          "endLine": 39
+          "endLine": 45
         },
         {
           "n": 4,
           "level": 2,
           "text": "Evidence and explainability invariants",
-          "line": 40,
-          "endLine": 46
+          "line": 46,
+          "endLine": 52
         },
         {
           "n": 5,
           "level": 2,
           "text": "Authority",
-          "line": 47,
-          "endLine": 57
+          "line": 53,
+          "endLine": 63
         }
       ]
     },
@@ -1423,6 +1430,45 @@
       ]
     },
     {
+      "rel": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "path": "knowledge-offers-analyzer/decisions/0018-assessment-confidence-and-monetary-output.md",
+      "name": "0018-assessment-confidence-and-monetary-output",
+      "title": "ADR-0018 — Assessment confidence as a separate output; monetary output before more factors",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 53
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 54,
+          "endLine": 106
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 107,
+          "endLine": 125
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 126,
+          "endLine": 137
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1436,21 +1482,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 32
+          "endLine": 34
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 33,
-          "endLine": 39
+          "line": 35,
+          "endLine": 41
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 40,
-          "endLine": 43
+          "line": 42,
+          "endLine": 45
         }
       ]
     },
@@ -1506,15 +1552,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 49,
-          "endLine": 55
+          "line": 51,
+          "endLine": 57
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 56,
-          "endLine": 60
+          "line": 58,
+          "endLine": 62
         }
       ]
     },
@@ -1807,70 +1853,70 @@
           "level": 2,
           "text": "Fair value & the opportunity score",
           "line": 34,
-          "endLine": 49
+          "endLine": 52
         },
         {
           "n": 4,
           "level": 2,
           "text": "Deal score ∈ [−1, 1] (price core)",
-          "line": 50,
-          "endLine": 71
+          "line": 53,
+          "endLine": 74
         },
         {
           "n": 5,
           "level": 2,
           "text": "Valuation guard (SPEC-011)",
-          "line": 72,
-          "endLine": 80
+          "line": 75,
+          "endLine": 83
         },
         {
           "n": 6,
           "level": 2,
           "text": "Worked example (what the system actually does)",
-          "line": 81,
-          "endLine": 92
+          "line": 84,
+          "endLine": 95
         },
         {
           "n": 7,
           "level": 2,
           "text": "Risk red-flags (why \"cheap\" is often not profitable)",
-          "line": 93,
-          "endLine": 101
+          "line": 96,
+          "endLine": 104
         },
         {
           "n": 8,
           "level": 2,
           "text": "Known pitfalls of the average-price anchor",
-          "line": 102,
-          "endLine": 119
+          "line": 105,
+          "endLine": 122
         },
         {
           "n": 9,
           "level": 2,
           "text": "Options for the v1 definition",
-          "line": 120,
-          "endLine": 127
+          "line": 123,
+          "endLine": 130
         },
         {
           "n": 10,
           "level": 2,
           "text": "Recommendation",
-          "line": 128,
-          "endLine": 139
+          "line": 131,
+          "endLine": 142
         },
         {
           "n": 11,
           "level": 2,
           "text": "Sources",
-          "line": 140,
-          "endLine": 144
+          "line": 143,
+          "endLine": 147
         },
         {
           "n": 12,
           "level": 2,
           "text": "Related",
-          "line": 145,
-          "endLine": 149
+          "line": 148,
+          "endLine": 152
         }
       ]
     },
@@ -2128,35 +2174,35 @@
           "level": 2,
           "text": "Specs",
           "line": 11,
-          "endLine": 28
+          "endLine": 30
         },
         {
           "n": 2,
           "level": 2,
           "text": "Backlog-level specs (pre-Spec-Kit)",
-          "line": 29,
-          "endLine": 50
+          "line": 31,
+          "endLine": 51
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 51,
-          "endLine": 55
+          "line": 52,
+          "endLine": 56
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 56,
-          "endLine": 60
+          "line": 57,
+          "endLine": 61
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 61,
-          "endLine": 65
+          "line": 62,
+          "endLine": 66
         }
       ]
     }

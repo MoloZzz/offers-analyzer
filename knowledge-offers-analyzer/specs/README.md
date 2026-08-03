@@ -19,6 +19,8 @@ updated: 2026-08-02
 | `../../specs/005-listing-lifecycle-rechecks/spec.md` | Re-check active listings by score proximity and seller behavior so meaningful price cuts are re-scored and alerted | Paused (formalized 2026-07-28; implementation waits for demonstrated operator profit, then SPEC-009 evidence and operator approval) |
 | `../../specs/007-deal-outcomes/spec.md` | Capture real post-deal economics (bought/declined/sold + prices + costs + realized DOM) as a stateful `deal_outcomes` record, and compute realized margin (`sell - buy - costs`) - the ground truth 👍/👎 only approximates | Draft (US7.1-US7.2 implemented 2026-07-23; US7.3 (re-target auto-tuning, CHANGE-002.1) + US7.4 (`Z` calibration) pending) |
 
+| `../../specs/006-monetary-output-z-roi/spec.md` | Projected dollar profit `Z` and `ROI` beside the 0–100 score, replacing the dimensionless liquidity/repair-risk multipliers with money; plus a separate, never-multiplied **assessment confidence** output | Draft (formalized 2026-08-03, promoted ahead of the remaining spec-003 factors by [[0018-assessment-confidence-and-monetary-output|ADR-0018]]; only US6.1 assessment confidence is ungated — the monetary slices wait on SPEC-004 `k`, SPEC-007, SPEC-008) |
+
 | `../../specs/010-budget-stabilization/spec.md` | Reduce legacy rechecks and unshareable cohort requests while preserving production discovery | Implemented; observe ledger before any further budget expansion |
 
 | `../../specs/011-valuation-sanity-guards/spec.md` | Prefer median AUTO.RIA benchmarks and prevent unverified or old claimed mileage from inflating fair value | Implemented 2026-07-29; no additional API calls |
@@ -34,7 +36,6 @@ spec before implementation per SDD (§2 of `CLAUDE.md`).
 
 | Backlog item | Summary | Priority |
 |---|---|---|
-| [[SPEC-006]] | Monetary output `Z`/`ROI` alongside the 0–100 score | P2 |
 | [[SPEC-008]] | Cohort market drift correction | P2 |
 | [[SPEC-009]] | Budget observability and rollout guardrails for the monthly pool | P0 |
 | ADR-0009 | Monthly rate-limit pool + priority queue (funds SPEC-005) | — (Accepted) |

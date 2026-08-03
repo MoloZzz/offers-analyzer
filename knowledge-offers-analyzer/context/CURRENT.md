@@ -21,6 +21,15 @@ The existing scoring, lifecycle, and budget rollout gates remain unchanged. The 
 not apply its additive migration, ship credentials, make source traffic, or change fair value,
 score, alert, threshold, ParameterSet, factor, or survivorship correction `k`.
 
+## Also open (2026-08-03)
+
+[[0018-assessment-confidence-and-monetary-output|ADR-0018]] accepted the operator's scoring-proposal
+review: assessment confidence becomes a separate, **never-multiplied** output built from zero-cost
+fields, [[SPEC-006]] is promoted ahead of the remaining spec-003 factors and formalized at
+`specs/006-monetary-output-z-roi/`, and graded accident severity is closed as data-blocked. Only
+SPEC-006 US6.1 is ungated; every monetary slice still waits on SPEC-004 `k`, SPEC-007, SPEC-008 and
+the [[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. No code was changed by that task.
+
 ## Next pickup
 
 For the next task, read this handoff and `specs/015-defensible-valuation-evidence/quickstart.md`.

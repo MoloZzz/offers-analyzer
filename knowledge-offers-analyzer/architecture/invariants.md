@@ -36,6 +36,12 @@ summary: Refactor-resistant source, budget, scoring, and evidence safety propert
 - Scoring weights, bounds, and activation state are carried by versioned, reversible ParameterSets.
 - Before an evidence-gated activation, scoring stays price-core based. Applying correction k and
   activating factor bounds is one rollout, not two independent changes.
+- Assessment confidence is an output, never an input: it MUST NOT be multiplied into `score`,
+  `priceCore`, or any factor modifier. Doing so would triple-count missing evidence already
+  counted by the cohort-size confidence gate and the `unverified_bargain` dampener
+  ([[0018-assessment-confidence-and-monetary-output|ADR-0018]]).
+- Estimated costs are expected values with a stated σ, never line-item invoices, and estimated
+  selling time is a liquidity-tier bucket, never a single-day figure.
 
 ## Evidence and explainability invariants
 

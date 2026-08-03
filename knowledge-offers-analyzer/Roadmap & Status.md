@@ -67,10 +67,20 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 
 ## Next
 
+- [ ] Ship assessment confidence ([[SPEC-006]] US6.1). It is display and ordering only, uses
+  already-fetched fields, and changes no score, threshold, ParameterSet, or alert set — so it is
+  **outside** the evidence gates and is the one item that can proceed now
+  ([[0018-assessment-confidence-and-monetary-output|ADR-0018]]).
 - [ ] After the gates pass, apply one approved ParameterSet rollout for correction k, factor
   bounds, and threshold re-validation.
-- [ ] Then choose the next formal spec: remaining composite factors, monetary output, cohort
-  drift, wider coverage, additional sources, or ML only when their stated triggers are met.
+- [ ] Then the monetary slices of [[SPEC-006]], promoted ahead of the remaining composite factors
+  by ADR-0018 because they *replace* the dimensionally wrong liquidity and repair-risk multipliers
+  rather than adding more of them.
+- [ ] Then choose among: remaining composite factors, cohort drift, wider coverage, additional
+  sources, or ML only when their stated triggers are met.
+
+Closed by ADR-0018: graded accident severity (level 1/2/3) is data-blocked — the AUTO.RIA risk bar
+is boolean only. Reopening requires a separate decision establishing VIN-report data access.
 
 ## Work-entry rule
 
