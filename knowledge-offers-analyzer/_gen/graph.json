@@ -876,7 +876,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 141
+      "line": 143
     },
     {
       "from": "architecture/overview.md",
@@ -904,14 +904,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 144
+      "line": 146
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 126
+      "line": 128
     },
     {
       "from": "architecture/overview.md",
@@ -925,14 +925,14 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 43
+      "line": 45
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 116
+      "line": 118
     },
     {
       "from": "architecture/overview.md",
@@ -960,14 +960,14 @@
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 44
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 80
+      "line": 82
     },
     {
       "from": "architecture/overview.md",
@@ -981,35 +981,35 @@
       "to": "decisions/0016-portable-ai-infra-kit.md",
       "anchor": null,
       "embed": false,
-      "line": 32
+      "line": 34
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 75
+      "line": 77
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 129
+      "line": 131
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 143
+      "line": 145
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 142
+      "line": 144
     },
     {
       "from": "architecture/overview.md",
@@ -1023,49 +1023,49 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 42
     },
     {
       "from": "architecture/overview.md",
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 126
+      "line": 128
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 44
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 104
+      "line": 106
     },
     {
       "from": "architecture/overview.md",
       "to": "research/profitability-methods-coverage.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 44
     },
     {
       "from": "architecture/overview.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 120
+      "line": 122
     },
     {
       "from": "architecture/overview.md",
       "to": "research/why-no-opportunities.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 44
     },
     {
       "from": "architecture/persistence-surface.md",
@@ -1968,28 +1968,28 @@
       "to": "_meta/vault-protocol.md",
       "anchor": null,
       "embed": false,
-      "line": 56
+      "line": 74
     },
     {
       "from": "decisions/0016-portable-ai-infra-kit.md",
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 54
+      "line": 72
     },
     {
       "from": "decisions/0016-portable-ai-infra-kit.md",
       "to": "decisions/0003-decoupled-context-zone.md",
       "anchor": null,
       "embed": false,
-      "line": 55
+      "line": 73
     },
     {
       "from": "decisions/0016-portable-ai-infra-kit.md",
       "to": "decisions/0015-hybrid-executable-vault.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 71
     },
     {
       "from": "decisions/0017-shadow-valuation-evidence.md",
@@ -2276,14 +2276,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 138
+      "line": 130
     },
     {
       "from": "operations/environment-setup.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 139
+      "line": 131
     },
     {
       "from": "operations/environment-setup.md",
@@ -2297,21 +2297,21 @@
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 140
+      "line": 132
     },
     {
       "from": "operations/environment-setup.md",
       "to": "decisions/0008-global-error-handling.md",
       "anchor": null,
       "embed": false,
-      "line": 95
+      "line": 87
     },
     {
       "from": "operations/environment-setup.md",
       "to": "decisions/0016-portable-ai-infra-kit.md",
       "anchor": null,
       "embed": false,
-      "line": 88
+      "line": 81
     },
     {
       "from": "research/alternative-sources.md",

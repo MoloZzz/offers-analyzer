@@ -26,7 +26,6 @@
     "vault:map": "node tools/vault/v.mjs map",
     "vault:evidence": "node tools/vault/v.mjs evidence",
     "vault:test": "node --test tools/vault/test/core.test.mjs tools/vault/test/evidence.test.mjs tools/vault/test/offers-adapter.test.mjs",
-    "ai-infra:test": "node --test ai-infra/engine/test/core.test.mjs ai-infra/test/bootstrap.test.mjs",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate src/common/database/migrations/migration -d src/common/database/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/common/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/common/database/data-source.ts"

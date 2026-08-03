@@ -455,49 +455,49 @@
           "level": 2,
           "text": "Engineering knowledge tooling",
           "line": 21,
-          "endLine": 33
+          "endLine": 35
         },
         {
           "n": 3,
           "level": 2,
           "text": "Module map",
-          "line": 34,
-          "endLine": 51
+          "line": 36,
+          "endLine": 53
         },
         {
           "n": 4,
           "level": 2,
           "text": "Data flow",
-          "line": 52,
-          "endLine": 94
+          "line": 54,
+          "endLine": 96
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 95,
-          "endLine": 123
+          "line": 97,
+          "endLine": 125
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 124,
-          "endLine": 132
+          "line": 126,
+          "endLine": 134
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 133,
-          "endLine": 134
+          "line": 135,
+          "endLine": 136
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 135,
-          "endLine": 145
+          "line": 137,
+          "endLine": 147
         }
       ]
     },
@@ -1336,7 +1336,7 @@
       "name": "0016-portable-ai-infra-kit",
       "title": "Portable AI infrastructure kit",
       "type": "decision",
-      "summary": "Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure.",
+      "summary": "Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure; the kit now ships from its own repository.",
       "rev": null,
       "headings": [
         {
@@ -1363,9 +1363,16 @@
         {
           "n": 4,
           "level": 2,
-          "text": "Related",
+          "text": "Update — 2026-08-03: the kit moved to its own repository",
           "line": 51,
-          "endLine": 58
+          "endLine": 68
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 69,
+          "endLine": 76
         }
       ]
     },
@@ -1544,37 +1551,37 @@
         {
           "n": 4,
           "level": 2,
-          "text": "Portable AI infrastructure kit",
+          "text": "Portable AI infrastructure kit (external)",
           "line": 71,
-          "endLine": 90
+          "endLine": 82
         },
         {
           "n": 5,
           "level": 2,
           "text": "Project",
-          "line": 91,
-          "endLine": 101
+          "line": 83,
+          "endLine": 93
         },
         {
           "n": 6,
           "level": 2,
           "text": "SPEC-015 shadow valuation provider",
-          "line": 102,
-          "endLine": 127
+          "line": 94,
+          "endLine": 119
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 128,
-          "endLine": 129
+          "line": 120,
+          "endLine": 121
         },
         {
           "n": 8,
           "level": 2,
           "text": "Telegram monitoring administration",
-          "line": 130,
-          "endLine": 141
+          "line": 122,
+          "endLine": 133
         }
       ]
     },

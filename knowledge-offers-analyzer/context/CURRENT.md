@@ -1,7 +1,7 @@
 ---
 title: Current task handoff
 type: context
-updated: 2026-08-02
+updated: 2026-08-03
 ---
 
 # Current task handoff
@@ -38,8 +38,9 @@ evidence to a resale model or change the live score without a separate approved 
 - The remaining blockers are external/operator gates only: approved provider credentials/terms and
   allocation, a development migration apply/re-generation check, pending gold-case captures, and
   the `/valuation_audit` review. Leave `AUTO_RIA_AI_ENABLED=false` until those gates are complete.
-- `npm run ai-infra:test` covers a docs-only target, dry-run/apply, collision safety, installed
-  doctor, generic retrieval, and write-free strict validation.
+- 2026-08-03: `ai-infra/` and its `ai-infra:test` script/CI step were removed; the kit now ships
+  from <https://github.com/MoloZzz/ai-support-system> ([[0016-portable-ai-infra-kit|ADR-0016]]).
+  This project's instruments are unchanged — `tools/vault/` is a superset of the extracted core.
 - Claude hooks are deliberately optional; Codex and other runtimes use the explicit brief/handoff
   protocol. The optional PostgreSQL evidence extension is documentation only and did not query a
   database in this task.

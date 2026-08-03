@@ -1,8 +1,8 @@
 ---
 title: Portable AI infrastructure kit
 type: decision
-updated: 2026-08-02
-summary: Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure.
+updated: 2026-08-03
+summary: Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure; the kit now ships from its own repository.
 ---
 
 # ADR-0016 — Package reusable AI infrastructure as a portable bootstrap kit
@@ -47,6 +47,24 @@ Projects gain a consistent second-brain and context-control baseline without inh
 terminology or database requirements. The kit must maintain its own fixtures, compatibility
 contract, template safety, and migration documentation. Consumers own their installed copy and
 choose when to upgrade; this intentionally avoids automatic synchronization.
+
+## Update — 2026-08-03: the kit moved to its own repository
+
+Decision point 6 is now resolved: the kit no longer lives in this repository. `ai-infra/` was
+removed here and now ships from <https://github.com/MoloZzz/ai-support-system>.
+
+Nothing about how Offers Analyzer operates changed. The kit was always a redistribution artifact
+for *other* repositories — never an application or tooling dependency of this one. This project's
+working instruments are unaffected and remain in place:
+
+- Engine and retrieval: `tools/vault/` — a superset of what the kit packaged, since it also owns
+  `lib/evidence.mjs` and the `adapters/offers-nest-typeorm.mjs` source adapter.
+- Curated second brain, product-vision loop, and context zone: `knowledge-offers-analyzer/`.
+- Quality gates: `npm run vault:test`, `npm run vault:build`, `npm run vault:check:strict`.
+
+The `ai-infra:test` script and its CI step were removed with the directory; every remaining gate in
+`.github/workflows/quality.yml` still runs. Treat the external repository as the source of truth for
+the kit; changes there do not propagate here and require no action in this project.
 
 ## Related
 
