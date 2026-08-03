@@ -27,6 +27,8 @@ updated: 2026-08-02
 | `../../specs/012-executable-vault/spec.md` | Preserve the curated second brain while adding generated context, bounded retrieval, source mapping, and phased vault enforcement ([[0015-hybrid-executable-vault|ADR-0015]]) | Implemented 2026-08-02; strict CI baseline is clean, source pins start narrowly, and Claude hooks remain optional |
 | `../../specs/013-portable-ai-infra/spec.md` | Extract reusable second-brain, product-loop, and context-control mechanisms into a versioned bootstrap kit ([[0016-portable-ai-infra-kit|ADR-0016]]) | Implemented 2026-08-02, then **migrated out** 2026-08-03 — the kit ships from <https://github.com/MoloZzz/ai-support-system>. Spec retained as history; no `ai-infra/` code remains here and no Offers instrument depends on it |
 | `../../specs/015-defensible-valuation-evidence/spec.md` | Capture first-party AUTO.RIA provider evidence for an explicitly labelled active-market asking-price estimate, with immutable provenance, conservative review states, and source-free /why | Implemented as a shadow-only, disabled-by-default evidence path; provider traffic/audit rollout and every scoring change remain pending ([[0017-shadow-valuation-evidence|ADR-0017]]) |
+| `../../specs/016-full-evaluation-breakdown/spec.md` | One breakdown renderer over the persisted evaluation explanation, reached from a compact alert via a **Деталі** inline button and shared by `/why` and `/check` | Draft (2026-08-03; presentation-only and ungated — renders existing values, and new parameters populate automatically as spec 003 activates and spec 006 lands) |
+| `../../specs/017-on-demand-ai-analysis/spec.md` | Admin-only `/analyze_ai` — structured context to a language model, strict structured output (warnings, inspection checklist, seller questions, advisory score), content-hash cache, separate budget, immutable records | Draft (2026-08-03; advisory-only **permanently** and disabled by default per [[0019-advisory-only-ai-analysis|ADR-0019]]; provider credentials, terms, lawfulness of sending listing content, and a monthly cap are operator gates) |
 
 ## Backlog-level specs (pre-Spec-Kit)
 
@@ -51,8 +53,10 @@ the monthly pool cap.
 
 ## Constitution
 
-Project principles are ratified in `../.specify/memory/constitution.md` (v1.2.0, 2026-08-02) —
+Project principles are ratified in `../.specify/memory/constitution.md` (v1.3.0, 2026-08-03) —
 the non-negotiable rules every spec must satisfy. Amendments require an ADR + version bump.
+v1.3.0 admitted advisory AI services as a distinct external-system class under a hard
+advisory-only boundary ([[0019-advisory-only-ai-analysis|ADR-0019]]).
 
 ## How this connects
 

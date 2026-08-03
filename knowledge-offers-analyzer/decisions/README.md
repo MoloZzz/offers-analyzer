@@ -32,6 +32,8 @@ updated: 2026-08-02
 
 - [[0018-assessment-confidence-and-monetary-output|ADR-0018]] — Assessment confidence as a separate, non-multiplied output; promote monetary output ahead of more factors (Accepted)
 
+- [[0019-advisory-only-ai-analysis|ADR-0019]] — On-demand AI analysis is advisory-only, admin-triggered, cached, and never a scoring input (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

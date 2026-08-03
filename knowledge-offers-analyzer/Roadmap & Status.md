@@ -82,6 +82,16 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 Closed by ADR-0018: graded accident severity (level 1/2/3) is data-blocked — the AUTO.RIA risk bar
 is boolean only. Reopening requires a separate decision establishing VIN-report data access.
 
+### Operator-facing work admitted 2026-08-03
+
+Both are presentation/advisory and change no score, threshold, ParameterSet, or alert set, so
+neither is blocked by the evidence gates above.
+
+| Spec | What it delivers | Gate |
+|---|---|---|
+| `016-full-evaluation-breakdown` | Compact alert keeps its shape; a **Деталі** button expands the full per-parameter breakdown, built once and shared with `/why` and `/check` | None — ungated. Its output is thin today and grows automatically as spec 003 activates and spec 006 lands |
+| `017-on-demand-ai-analysis` | Admin-only `/analyze_ai`: structured context to a language model, strict structured output, content-hash cache, separate budget, immutable records | Ships disabled. Provider credentials, approved terms, lawfulness of sending listing content, and an agreed monthly cap are operator gates ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
+
 ## Work-entry rule
 
 For a non-trivial change, create or update the relevant Spec Kit package first, then update this

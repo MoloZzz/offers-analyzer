@@ -42,6 +42,14 @@ summary: Refactor-resistant source, budget, scoring, and evidence safety propert
   ([[0018-assessment-confidence-and-monetary-output|ADR-0018]]).
 - Estimated costs are expected values with a stated σ, never line-item invoices, and estimated
   selling time is a liquidity-tier bucket, never a single-day figure.
+- Advisory AI output is an output, never an input: it MUST NOT influence any score, factor,
+  confidence, threshold, ParameterSet, alert set, or correction, in either direction — it can
+  neither promote nor veto. The `valuation` module never imports the `analysis` module, so the
+  boundary is a visible import rather than a data-flow assumption
+  ([[0019-advisory-only-ai-analysis|ADR-0019]]).
+- Counterparty-authored text (a seller description) reaching a language model is passed as delimited
+  untrusted data, never as instruction; schema-invalid responses are discarded whole, never
+  repaired or partially rendered.
 
 ## Evidence and explainability invariants
 

@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 47,
-    "links": 395,
+    "notes": 48,
+    "links": 415,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -25,7 +25,7 @@
       "title": "Roadmap & Status",
       "type": "roadmap",
       "inDeg": 14,
-      "outDeg": 10
+      "outDeg": 11
     },
     {
       "rel": "SPEC-005.md",
@@ -89,7 +89,7 @@
       "title": "Architecture and operational invariants",
       "type": "architecture",
       "inDeg": 4,
-      "outDeg": 9
+      "outDeg": 10
     },
     {
       "rel": "architecture/overview.md",
@@ -97,7 +97,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 17,
-      "outDeg": 29
+      "outDeg": 30
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -152,7 +152,7 @@
       "name": "0002-monitoring-via-official-api",
       "title": "ADR-0002 — Monitor AUTO.RIA via the official API, narrow niche on free tier",
       "type": "decision",
-      "inDeg": 6,
+      "inDeg": 7,
       "outDeg": 9
     },
     {
@@ -208,7 +208,7 @@
       "name": "0009-monthly-rate-limit-pool",
       "title": "ADR-0009 — Rate limiting: monthly pool instead of hourly window",
       "type": "decision",
-      "inDeg": 11,
+      "inDeg": 12,
       "outDeg": 11
     },
     {
@@ -224,7 +224,7 @@
       "name": "0011-evidence-gated-scoring-rollout",
       "title": "ADR-0011 — Evidence-gated scoring rollout",
       "type": "decision",
-      "inDeg": 17,
+      "inDeg": 18,
       "outDeg": 5
     },
     {
@@ -272,7 +272,7 @@
       "name": "0017-shadow-valuation-evidence",
       "title": "ADR-0017 — Keep provider valuation evidence shadow-only",
       "type": "decision",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 5
     },
     {
@@ -280,16 +280,24 @@
       "name": "0018-assessment-confidence-and-monetary-output",
       "title": "ADR-0018 — Assessment confidence as a separate output; monetary output before more factors",
       "type": "decision",
-      "inDeg": 8,
+      "inDeg": 9,
       "outDeg": 20
+    },
+    {
+      "rel": "decisions/0019-advisory-only-ai-analysis.md",
+      "name": "0019-advisory-only-ai-analysis",
+      "title": "ADR-0019 — On-demand AI analysis is advisory-only, admin-triggered, and never a scoring input",
+      "type": "decision",
+      "inDeg": 6,
+      "outDeg": 13
     },
     {
       "rel": "decisions/README.md",
       "name": "README",
       "title": "Decision log (ADRs)",
       "type": "moc",
-      "inDeg": 22,
-      "outDeg": 22
+      "inDeg": 23,
+      "outDeg": 23
     },
     {
       "rel": "decisions/adr-template.md",
@@ -304,8 +312,8 @@
       "name": "glossary",
       "title": "Domain glossary",
       "type": "domain",
-      "inDeg": 10,
-      "outDeg": 15
+      "inDeg": 11,
+      "outDeg": 16
     },
     {
       "rel": "operations/environment-setup.md",
@@ -328,7 +336,7 @@
       "name": "explainability-gaps",
       "title": "Research — explainability gaps (arguing WHY an evaluation was made)",
       "type": "research",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 7
     },
     {
@@ -352,7 +360,7 @@
       "name": "profitability-methods-coverage",
       "title": "Research — \"profitability\" methods coverage (what we chose, what's built, do we need ML)",
       "type": "research",
-      "inDeg": 6,
+      "inDeg": 7,
       "outDeg": 16
     },
     {
@@ -385,7 +393,7 @@
       "title": "Feature specs index (SDD)",
       "type": "moc",
       "inDeg": 7,
-      "outDeg": 13
+      "outDeg": 15
     }
   ],
   "edges": [
@@ -562,21 +570,21 @@
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
-      "line": 105
+      "line": 115
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/requirements.md",
       "anchor": null,
       "embed": false,
-      "line": 104
+      "line": 114
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 103
+      "line": 113
     },
     {
       "from": "Roadmap & Status.md",
@@ -601,17 +609,24 @@
     },
     {
       "from": "Roadmap & Status.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 93
+    },
+    {
+      "from": "Roadmap & Status.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 107
+      "line": 117
     },
     {
       "from": "Roadmap & Status.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 106
+      "line": 116
     },
     {
       "from": "SPEC-005.md",
@@ -870,56 +885,56 @@
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 55
+      "line": 63
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0004-drop-redis-bullmq.md",
       "anchor": null,
       "embed": false,
-      "line": 56
+      "line": 64
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 57
+      "line": 65
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0006-operator-profit-vision.md",
       "anchor": null,
       "embed": false,
-      "line": 58
+      "line": 66
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0009-monthly-rate-limit-pool.md",
       "anchor": null,
       "embed": false,
-      "line": 59
+      "line": 67
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 68
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 61
+      "line": 69
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 62
+      "line": 70
     },
     {
       "from": "architecture/invariants.md",
@@ -929,11 +944,18 @@
       "line": 42
     },
     {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
       "from": "architecture/overview.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 143
+      "line": 144
     },
     {
       "from": "architecture/overview.md",
@@ -961,14 +983,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 146
+      "line": 147
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 128
+      "line": 129
     },
     {
       "from": "architecture/overview.md",
@@ -989,7 +1011,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 118
+      "line": 119
     },
     {
       "from": "architecture/overview.md",
@@ -1024,7 +1046,7 @@
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 82
+      "line": 83
     },
     {
       "from": "architecture/overview.md",
@@ -1045,14 +1067,14 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 77
+      "line": 78
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 131
+      "line": 132
     },
     {
       "from": "architecture/overview.md",
@@ -1063,17 +1085,24 @@
     },
     {
       "from": "architecture/overview.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
+      "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 145
+      "line": 146
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 144
+      "line": 145
     },
     {
       "from": "architecture/overview.md",
@@ -1094,7 +1123,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 128
+      "line": 129
     },
     {
       "from": "architecture/overview.md",
@@ -1108,7 +1137,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 106
+      "line": 107
     },
     {
       "from": "architecture/overview.md",
@@ -1122,7 +1151,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 122
+      "line": 123
     },
     {
       "from": "architecture/overview.md",
@@ -2231,25 +2260,116 @@
       "line": 134
     },
     {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0002-monitoring-via-official-api.md",
+      "anchor": null,
+      "embed": false,
+      "line": 122
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 40
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 122
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 120
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 24
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 119
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "anchor": null,
+      "embed": false,
+      "line": 121
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 119
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "domain/glossary.md",
+      "anchor": null,
+      "embed": false,
+      "line": 123
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 123
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "research/profitability-methods-coverage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 123
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 44
+      "line": 46
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 42
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 42
     },
     {
       "from": "decisions/README.md",
@@ -2379,6 +2499,13 @@
     },
     {
       "from": "decisions/README.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 35
+    },
+    {
+      "from": "decisions/README.md",
       "to": "decisions/adr-template.md",
       "anchor": null,
       "embed": false,
@@ -2396,14 +2523,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 64
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 61
+      "line": 65
     },
     {
       "from": "domain/glossary.md",
@@ -2477,10 +2604,17 @@
     },
     {
       "from": "domain/glossary.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 49
+    },
+    {
+      "from": "domain/glossary.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 56
+      "line": 60
     },
     {
       "from": "domain/glossary.md",
@@ -2494,7 +2628,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 54
+      "line": 58
     },
     {
       "from": "operations/environment-setup.md",
@@ -3068,35 +3202,35 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 68
     },
     {
       "from": "specs/README.md",
       "to": "SPEC-008.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 41
     },
     {
       "from": "specs/README.md",
       "to": "SPEC-009.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 42
     },
     {
       "from": "specs/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 64
     },
     {
       "from": "specs/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 69
     },
     {
       "from": "specs/README.md",
@@ -3142,17 +3276,31 @@
     },
     {
       "from": "specs/README.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "specs/README.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 59
+    },
+    {
+      "from": "specs/README.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 64
     },
     {
       "from": "specs/README.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 59
+      "line": 63
     }
   ],
   "dangling": [],
@@ -3194,6 +3342,7 @@
       "decisions/0016-portable-ai-infra-kit.md",
       "decisions/0017-shadow-valuation-evidence.md",
       "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "decisions/0019-advisory-only-ai-analysis.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",

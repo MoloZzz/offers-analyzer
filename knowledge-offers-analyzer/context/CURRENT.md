@@ -30,6 +30,14 @@ fields, [[SPEC-006]] is promoted ahead of the remaining spec-003 factors and for
 SPEC-006 US6.1 is ungated; every monetary slice still waits on SPEC-004 `k`, SPEC-007, SPEC-008 and
 the [[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. No code was changed by that task.
 
+Later the same day, [[0019-advisory-only-ai-analysis|ADR-0019]] admitted advisory AI services as a
+new external-system class (constitution v1.2.0 → v1.3.0) and two specs were formalized:
+`016-full-evaluation-breakdown` (compact alert + **Деталі** button over one shared renderer) and
+`017-on-demand-ai-analysis` (admin-only `/analyze_ai`, cached, separately budgeted, advisory-only
+permanently). Both are presentation/advisory and change no score or alert set. Spec 017 ships
+disabled; provider credentials, approved terms, lawfulness of sending listing content, and a monthly
+cap are operator gates. No code was changed by either task.
+
 ## Next pickup
 
 For the next task, read this handoff and `specs/015-defensible-valuation-evidence/quickstart.md`.

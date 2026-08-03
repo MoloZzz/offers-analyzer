@@ -33,6 +33,7 @@ decisions/0015-hybrid-executable-vault.md	ADR-0015 — Hybrid executable vault a
 decisions/0016-portable-ai-infra-kit.md	Portable AI infrastructure kit	decision	Adopt a versioned, copy-and-own bootstrap kit for reusable AI infrastructure; the kit now ships from its own repository.
 decisions/0017-shadow-valuation-evidence.md	ADR-0017 — Keep provider valuation evidence shadow-only	decision	Introduce auditable AUTO.RIA provider evidence in shadow mode without changing live scoring.
 decisions/0018-assessment-confidence-and-monetary-output.md	ADR-0018 — Assessment confidence as a separate output; monetary output before more factors	decision	
+decisions/0019-advisory-only-ai-analysis.md	ADR-0019 — On-demand AI analysis is advisory-only, admin-triggered, and never a scoring input	decision	Admit a third-party LLM as a human-triggered second opinion behind a hard advisory-only boundary.
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	

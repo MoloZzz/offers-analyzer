@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 1.2.0
+- Version change: 1.2.0 → 1.3.0
 - Ratification: initial adoption
 - Principles defined: I Spec-Driven Development; II Knowledge Base is Source of Truth;
   III Clean, Simple Code; IV Ports & Adapters for External Systems;
@@ -88,6 +88,14 @@ must be precise, low-noise, reproducible, and safe in every agent runtime.
 - Data source (v1): AUTO.RIA official REST API (`developers.ria.com`) — search, listing info,
   average price. Reference dictionaries are cached; the hourly budget is spent on search,
   info for new candidates, and average price per cohort.
+- **Advisory AI services** (general-purpose language models) are a distinct, admitted class of
+  external system, separate from data sources. They MUST be human-triggered, admin-only, disabled by
+  default, separately budgeted (never drawing on the source pool), cached on a content hash, and
+  recorded immutably. Their output is **advisory only**: it MUST NOT influence any score, factor,
+  confidence, threshold, `ParameterSet`, alert set, or correction — in either direction. Text
+  authored by a counterparty (a seller description) is passed only as delimited untrusted data,
+  never as instruction, and responses are validated against a strict schema and discarded whole when
+  invalid. See ADR-0019.
 - Persistence: listings and price observations are stored from day one to enable own-statistics
   valuation and price-drop detection.
 - Config & tooling: strict `tsconfig`, ESLint (typescript-eslint strict) + Prettier now;
@@ -119,8 +127,9 @@ MAJOR for incompatible principle removals/redefinitions, MINOR for a new princip
 materially expanded guidance, PATCH for clarifications. All work — human or agent — is
 expected to comply; `CLAUDE.md` is the runtime enforcement of these rules.
 
-**Version**: 1.2.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-08-02
+**Version**: 1.3.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-08-03
 <!-- 1.0.1: PATCH — Technology stack refined to drop Redis/BullMQ from v1 (ADR-0004). -->
 <!-- 1.0.2: PATCH — Rate budget is now Postgres-backed (durable) instead of in-memory (ADR-0004, B13). -->
 <!-- 1.1.0: MINOR — Mission reframed to operator-profit ranking (composite Total Deal Score, price dominant) + operator-value workflow gate (ADR-0006). -->
+<!-- 1.3.0: MINOR — Admitted advisory AI services as a distinct external-system class under a hard advisory-only boundary (ADR-0019). -->
 <!-- 1.2.0: MINOR — Executable-vault retrieval, generated-artifact safety, and advisory evidence governance (ADR-0015). -->
