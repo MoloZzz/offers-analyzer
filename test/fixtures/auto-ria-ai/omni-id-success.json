@@ -1,0 +1,40 @@
+{
+  "similarCars": [
+    {
+      "VIN": "SANITIZED-VIN-MUST-NOT-LEAK",
+      "plateNumber": "AA 0000 AA",
+      "brand": { "eng": "audi", "id": 5 },
+      "model": { "eng": "a6-allroad", "id": 74 },
+      "id": 38266770,
+      "price": {
+        "all": {
+          "UAH": { "value": "205 000" },
+          "USD": { "value": "5 000" }
+        }
+      },
+      "raceInt": 305,
+      "uri": "/auto_audi_a6_allroad_38266770.html",
+      "year": 2004
+    }
+  ],
+  "statisticData": [
+    {
+      "id": "avgPriceBlock",
+      "name": "Середня ціна",
+      "price": { "UAH": 205000, "USD": 5000 },
+      "type": "avgPrice"
+    },
+    {
+      "id": "minPriceBlock",
+      "name": "Від",
+      "price": { "UAH": 200162, "USD": 4882 },
+      "type": "minPrice"
+    },
+    {
+      "id": "maxPriceBlock",
+      "name": "До",
+      "price": { "UAH": 221195, "USD": 5395 },
+      "type": "maxPrice"
+    }
+  ]
+}

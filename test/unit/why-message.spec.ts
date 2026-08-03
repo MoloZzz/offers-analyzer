@@ -1,6 +1,7 @@
 import { Currency } from '../../src/common/types/money';
 import { formatStoredWhy, formatWhy } from '../../src/modules/notifications/format/why-message';
 import { ListingDetail } from '../../src/modules/sources/ports/listing-source.port';
+import { ValuationEvidence } from '../../src/modules/valuation/entities/valuation-evidence.entity';
 import { ValuationResult } from '../../src/modules/valuation/valuation.service';
 
 const detail: ListingDetail = {
@@ -103,12 +104,30 @@ describe('formatWhy', () => {
       reason: result.reason,
       isOpportunity: result.isOpportunity,
       disqualified: result.disqualified,
-    });
+    }, {
+      id: 'evidence-1',
+      status: 'available',
+      estimateAmount: 5000,
+      currency: Currency.USD,
+      queryMode: 'omni_id',
+      policyKey: 'ai-shadow-v1',
+      adapterVersion: 'auto-ria-ai-v1',
+      comparability: 'review',
+      comparabilityReasons: ['legacy_delta_at_least_20_pct'],
+      sourceCapturedAt: new Date('2026-08-02T03:10:15.000Z'),
+      providerStatistics: {
+        minimum: { amount: 4882, currency: Currency.USD },
+        maximum: { amount: 5395, currency: Currency.USD },
+      },
+      legacyReference: { providerDeltaPct: -26.74 },
+    } as unknown as ValuationEvidence);
 
     expect(msg).toContain('Чому такий бал');
     expect(msg).toContain('Параметри: ParameterSet v3, поріг 0.63');
     expect(msg).toContain('Поправка на пробіг: +500 USD');
     expect(msg).toContain('опис: потребує ремонту');
+    expect(msg).toContain('AUTO.RIA AI');
+    expect(msg).toContain('не підтверджена ціна продажу');
     expect(msg).not.toContain('Рџ');
   });
 });

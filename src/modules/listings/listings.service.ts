@@ -5,7 +5,12 @@ import { In, IsNull, Not, Repository } from 'typeorm';
 import { Currency } from '../../common/types/money';
 import { ExchangeRate, EXCHANGE_RATE } from '../fx/ports/exchange-rate.port';
 import { ListingDetail } from '../sources/ports/listing-source.port';
-import { EvaluationExplanation } from '../valuation/evaluation-explanation';
+import { ValuationEvidence } from '../valuation/entities/valuation-evidence.entity';
+import {
+  EvaluationExplanation,
+  ProviderEvidenceReference,
+  withProviderEvidence,
+} from '../valuation/evaluation-explanation';
 
 import { Listing } from './entities/listing.entity';
 import { PriceObservation } from './entities/price-observation.entity';
@@ -166,4 +171,66 @@ export class ListingsService {
     if (explanation !== undefined) listing.lastExplanation = explanation;
     await this.listings.save(listing);
   }
+
+  /**
+   * Attach a persisted shadow-evidence reference to the exact legacy evaluation that launched it.
+   * This intentionally uses targeted updates rather than saving the mutable Listing supplied by
+   * the detached sidecar: a late provider response must never overwrite a newer price, score, or
+   * explanation. The immutable ValuationEvidence row remains the source of truth.
+   */
+  async recordValuationEvidenceProjection(
+    listingId: string,
+    evidence: ValuationEvidence,
+    expectedEvaluationAt?: Date | null,
+  ): Promise<void> {
+    await this.listings.update({ id: listingId }, { lastValuationEvidenceId: evidence.id });
+
+    // A manual check has no persisted legacy evaluation to freeze against. It may update the
+    // pointer above, but must not attach its evidence to an unrelated historical explanation.
+    if (!expectedEvaluationAt) return;
+
+    const current = await this.listings.findOneBy({ id: listingId });
+    if (
+      !current?.lastExplanation ||
+      !current.lastEvaluatedAt ||
+      current.lastEvaluatedAt.getTime() !== expectedEvaluationAt.getTime()
+    ) {
+      return;
+    }
+
+    // The conditional criteria is the compare-and-set guard for a re-evaluation that races the
+    // detached provider completion. If it no longer matches, preserve the newer V1/V2 snapshot.
+    await this.listings.update(
+      { id: listingId, lastEvaluatedAt: expectedEvaluationAt },
+      {
+        lastExplanation: withProviderEvidence(
+          current.lastExplanation,
+          providerEvidenceReference(evidence),
+        ),
+      },
+    );
+  }
+}
+
+function providerEvidenceReference(evidence: ValuationEvidence): ProviderEvidenceReference {
+  const rangeAvailable =
+    evidence.providerStatistics != null &&
+    typeof evidence.providerStatistics === 'object' &&
+    ('minimum' in evidence.providerStatistics || 'maximum' in evidence.providerStatistics);
+  const delta = evidence.legacyReference?.providerDeltaPct;
+  return {
+    evidenceId: evidence.id,
+    target: evidence.target,
+    providerKey: evidence.providerKey,
+    policyKey: evidence.policyKey,
+    adapterVersion: evidence.adapterVersion,
+    status: evidence.status,
+    comparability: evidence.comparability,
+    sourceCapturedAt: evidence.sourceCapturedAt?.toISOString() ?? null,
+    queryMode: evidence.queryMode,
+    estimateAvailable: evidence.estimateAmount != null,
+    rangeAvailable,
+    legacyDeltaPct: typeof delta === 'number' && Number.isFinite(delta) ? delta : null,
+    reasonCodes: evidence.comparabilityReasons,
+  };
 }

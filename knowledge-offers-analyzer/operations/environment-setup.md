@@ -99,6 +99,32 @@ clean generated-artifact baseline. See [[0016-portable-ai-infra-kit|ADR-0016]] a
   Docker `restart: unless-stopped` policy — otherwise a fatal error means the bot stays down
   until someone restarts it manually.
 
+## SPEC-015 shadow valuation provider
+
+The AUTO.RIA AI valuation integration is deliberately inert in a fresh environment:
+
+```dotenv
+AUTO_RIA_AI_ENABLED=false
+AUTO_RIA_AI_SAMPLE_RATE=0
+AUTO_RIA_AI_MONTHLY_ALLOCATION=0
+```
+
+`AUTO_RIA_AI_API_KEY` and `AUTO_RIA_AI_USER_ID` belong only in the ignored environment file.
+Startup validation rejects `AUTO_RIA_AI_ENABLED=true` without both values and a positive integer
+`AUTO_RIA_AI_MONTHLY_ALLOCATION`. That allocation is atomically enforced inside the shared
+AUTO.RIA pool before every provider attempt. `AUTO_RIA_AI_SAMPLE_RATE` governs automatic polling;
+when the provider is explicitly enabled, an operator's manual `/check` may still use an available
+allocation even at a zero sample rate.
+
+Before enabling it, obtain official provider permission, pricing/entitlement, attribution, and
+retention approval; configure a small allocation; review contract/redaction tests and the
+gold-case parity audit. The additive `1785350000000-spec-015-valuation-evidence.ts` migration is
+included in the repository but was not applied as part of implementation. Apply it only to an
+operator-approved database, then verify TypeORM generation produces no follow-up schema churn.
+The provider output is labelled `active_listing_ask` evidence, never a resale or transaction
+price, and it cannot change fair value, scoring, ranking, alerts, thresholds, ParameterSets,
+factors, or `k`.
+
 ## Related
 
 ## Telegram monitoring administration

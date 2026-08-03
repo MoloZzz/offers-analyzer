@@ -44,6 +44,10 @@ export class Opportunity {
   @Column('jsonb', { nullable: true })
   explanation?: EvaluationExplanation | null;
 
+  /** Optional provider-evidence snapshot around this legacy evaluation; it never affects score fields. */
+  @Column('uuid', { nullable: true })
+  valuationEvidenceId?: string | null;
+
   @Column({ type: 'boolean', default: false })
   notified!: boolean;
 

@@ -9,10 +9,12 @@ import { AppConfig } from '../../common/config/configuration';
 import { buildBudgetReport, BudgetReportDigest } from './budget-report';
 import {
   BudgetActivity,
+  BudgetChargeStatus,
   BudgetDenialReason,
   BudgetOperation,
 } from './entities/budget-activity.entity';
 import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
+import { OperationBudgetState } from './entities/operation-budget-state.entity';
 import { RateBudgetWindow } from './entities/rate-budget-window.entity';
 import { SourceControlService } from './source-control.service';
 
@@ -24,6 +26,25 @@ export interface BudgetRequestContext {
   operation: BudgetOperation;
   profileId?: string;
   profileName?: string;
+  /** Canonical redacted provider input identity; used only by provider-backed operations. */
+  requestFingerprint?: string;
+  /** Billing observation supplied by a provider-backed caller before an outbound request. */
+  chargeStatus?: BudgetChargeStatus;
+  /**
+   * Explicit per-month cap for a provider-backed operation. Legacy operations intentionally ignore
+   * this field and retain the existing source-level monthly-pool behavior.
+   */
+  operationMonthlyAllocation?: number;
+}
+
+/**
+ * Narrow request contract for the AUTO.RIA AI shadow path. Its positive allocation is required so
+ * a call cannot consume the shared source pool merely because the provider was accidentally wired.
+ */
+export interface ValuationAiBudgetRequestContext extends BudgetRequestContext {
+  operation: 'valuation_ai';
+  requestFingerprint: string;
+  operationMonthlyAllocation: number;
 }
 
 /**
@@ -48,6 +69,8 @@ export class RateBudgetService {
     @InjectPinoLogger(RateBudgetService.name) private readonly logger: PinoLogger,
     @InjectRepository(BudgetActivity) private readonly activityRepo?: Repository<BudgetActivity>,
     private readonly sourceControl?: SourceControlService,
+    @InjectRepository(OperationBudgetState)
+    private readonly operationStateRepo?: Repository<OperationBudgetState>,
   ) {
     this.capacityPerHour = config.get('rateBudgetPerHour', { infer: true });
     this.poolPerMonth = config.get('rateBudgetPoolPerMonth', { infer: true });
@@ -90,9 +113,7 @@ export class RateBudgetService {
 
     // Check tier cutoff (if budget is tight, deny lower-priority tiers)
     const dailyUsed = state.dailyUsed ?? 0;
-    const cutoffTier = dailyLimitEnabled
-      ? this.determineCutoffTier(dailyBudget, dailyUsed)
-      : null;
+    const cutoffTier = dailyLimitEnabled ? this.determineCutoffTier(dailyBudget, dailyUsed) : null;
     if (dailyLimitEnabled && cutoffTier != null && tier > cutoffTier) {
       this.logger.warn(
         { sourceKey, tier, cutoffTier, dailyUsed, dailyBudget },
@@ -120,10 +141,55 @@ export class RateBudgetService {
     }
 
     // All checks passed — consume and record
-    const allowed = await this.recordConsumption(sourceKey, cost, tier, now);
-    if (allowed)
+    // The source pool is shared by all operations. The provider sidecar additionally needs an
+    // atomic per-operation cap so it cannot crowd out discovery merely because source capacity
+    // remains. Legacy operations deliberately take this no-op branch.
+    const allocationDenial = await this.reserveOperationAllocation(sourceKey, cost, context, now);
+    if (allocationDenial) {
+      this.logger.warn(
+        {
+          sourceKey,
+          operation: context.operation,
+          allocation: context.operationMonthlyAllocation ?? null,
+          cost,
+        },
+        'Operation allocation denied consumption',
+      );
+      await this.recordActivity(sourceKey, cost, tier, context, 'denied', allocationDenial, now);
+      return false;
+    }
+
+    const allocationReserved = context.operation === 'valuation_ai';
+    try {
+      const sourceDenial = await this.recordConsumption(
+        sourceKey,
+        cost,
+        tier,
+        dailyLimitEnabled,
+        now,
+      );
+      if (sourceDenial) {
+        this.logger.warn(
+          { sourceKey, cost, tier, reason: sourceDenial },
+          'Atomic source budget admission denied consumption',
+        );
+        if (allocationReserved) {
+          await this.releaseOperationAllocation(sourceKey, cost, context.operation, now);
+        }
+        await this.recordActivity(sourceKey, cost, tier, context, 'denied', sourceDenial, now);
+        return false;
+      }
+
       await this.recordActivity(sourceKey, cost, tier, context, 'allowed', 'allowed', now);
-    return allowed;
+      return true;
+    } catch (error) {
+      // The provider request has not been made when accounting fails. Returning the operation
+      // reservation avoids permanently consuming shadow capacity for a failed admission path.
+      if (allocationReserved) {
+        await this.releaseOperationAllocation(sourceKey, cost, context.operation, now);
+      }
+      throw error;
+    }
   }
 
   /** Read-only SPEC-009 report; it does not touch a listing source or consume budget. */
@@ -134,7 +200,10 @@ export class RateBudgetService {
     const activities = this.activityRepo
       ? await this.activityRepo.find({ where: { sourceKey, monthKey } })
       : [];
-    return buildBudgetReport(state, activities, now);
+    const operationStates = this.operationStateRepo
+      ? await this.operationStateRepo.find({ where: { sourceKey, monthKey } })
+      : [];
+    return buildBudgetReport(state, activities, now, operationStates);
   }
 
   /** Remaining calls in the current hour window (legacy hourly mode). */
@@ -201,7 +270,9 @@ export class RateBudgetService {
       return state.dailyBudget ?? 0;
     }
 
-    // Recalculate for today
+    // Recalculate for today. This conditional update is deliberately source-of-truth based rather
+    // than a full-entity save: concurrent processes can race at UTC midnight without a late reset
+    // erasing consumption already admitted for the new day.
     const monthStart = RateBudgetService.monthStart(now);
     const monthEnd = new Date(monthStart);
     monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
@@ -215,20 +286,24 @@ export class RateBudgetService {
     // Determine effective reserve (released 3 days before month end)
     const effectiveReserve = now >= state.reserveReleasesAt ? 0 : state.reserveAmount;
 
-    // Daily budget = (pool remaining - effective reserve) / days remaining
-    const availablePool = Math.max(0, state.poolSize - (state.poolUsed ?? 0) - effectiveReserve);
-    const dailyBudget = Math.floor(availablePool / daysRemaining);
-
-    // Update state: reset daily used and save new budget.
-    // Use a targeted column update (not a full-entity save) so we never clobber
-    // `poolUsed`, which may be concurrently incremented by an atomic SQL update
-    // in recordConsumption() between our read above and this write (TOCTOU).
-    await this.stateRepo.update(
-      { sourceKey, monthKey: RateBudgetService.monthKey(now) },
-      { dailyBudget, dailyUsed: 0, lastDayCalculated: todayStr },
+    await this.stateRepo.query(
+      `UPDATE monthly_budget_states
+       SET "dailyBudget" = FLOOR(
+             GREATEST(0, "poolSize" - "poolUsed" - $3)::numeric / $4
+           ),
+           "dailyUsed" = 0,
+           "lastDayCalculated" = $5,
+           "updatedAt" = now()
+       WHERE "sourceKey" = $1
+         AND "monthKey" = $2
+         AND "lastDayCalculated" IS DISTINCT FROM $5`,
+      [sourceKey, RateBudgetService.monthKey(now), effectiveReserve, daysRemaining, todayStr],
     );
 
-    return dailyBudget;
+    const refreshed = await this.stateRepo.findOne({
+      where: { sourceKey, monthKey: RateBudgetService.monthKey(now) },
+    });
+    return refreshed?.dailyBudget ?? 0;
   }
 
   /** Determine cutoff tier based on remaining daily budget (progressive denial from tier-5 to tier-2). */
@@ -250,31 +325,148 @@ export class RateBudgetService {
     return null;
   }
 
-  /** Record consumption: update both monthly pool and daily budget. */
+  /**
+   * Atomically admits one source request against the shared monthly pool and today's sub-budget.
+   * The predicate is evaluated under the UPDATE row lock, so concurrent callers cannot turn a
+   * stale preflight read into an over-cap source request.
+   */
   private async recordConsumption(
     sourceKey: string,
     cost: number,
     tier: number,
+    dailyLimitEnabled: boolean,
     now: Date,
-  ): Promise<boolean> {
+    retryAfterDailyReset = true,
+  ): Promise<BudgetDenialReason | null> {
     const monthKey = RateBudgetService.monthKey(now);
     const todayStr = RateBudgetService.todayStr(now);
 
-    // Update monthly pool consumption
-    await this.stateRepo.query(
+    const admissionResult: unknown = await this.stateRepo.query(
       `UPDATE monthly_budget_states
        SET "poolUsed" = "poolUsed" + $3,
-           "dailyUsed" = CASE WHEN "lastDayCalculated" = $4 THEN "dailyUsed" + $3 ELSE $3 END,
-           "lastDayCalculated" = CASE WHEN "lastDayCalculated" <> $4 THEN $4 ELSE "lastDayCalculated" END,
+           "dailyUsed" = "dailyUsed" + $3,
            "updatedAt" = now()
-       WHERE "sourceKey" = $1 AND "monthKey" = $2`,
-      [sourceKey, monthKey, cost, todayStr],
+       WHERE "sourceKey" = $1
+         AND "monthKey" = $2
+         AND "lastDayCalculated" = $4
+         AND "poolUsed" + $3 <= "poolSize"
+         AND (NOT $5::boolean OR "dailyUsed" + $3 <= "dailyBudget")
+         AND (
+           NOT $5::boolean
+           OR CASE
+             WHEN "dailyBudget" - "dailyUsed" <= 0 THEN $6 <= 1
+             WHEN "dailyBudget" - "dailyUsed" <= CEIL("dailyBudget" * $7 / 100.0) * 0.25
+               THEN $6 <= 2
+             WHEN "dailyBudget" - "dailyUsed" <= CEIL("dailyBudget" * $7 / 100.0) * 0.5
+               THEN $6 <= 3
+             WHEN "dailyBudget" - "dailyUsed" <= CEIL("dailyBudget" * $7 / 100.0) * 0.75
+               THEN $6 <= 4
+             ELSE TRUE
+           END
+         )
+       RETURNING "id"`,
+      [sourceKey, monthKey, cost, todayStr, dailyLimitEnabled, tier, this.cutoffThresholdPct],
     );
 
-    // Log consumption for diagnostics
-    this.logger.debug({ sourceKey, cost, tier, month: monthKey }, 'Consumed budget');
+    if (hasReturnedRows(admissionResult)) {
+      this.logger.debug({ sourceKey, cost, tier, month: monthKey }, 'Consumed budget');
+      return null;
+    }
 
-    return true;
+    const state = await this.getMonthlyBudgetState(sourceKey, now);
+    if (state.lastDayCalculated !== todayStr && retryAfterDailyReset) {
+      await this.ensureDailyBudgetCalculated(sourceKey, now);
+      return this.recordConsumption(sourceKey, cost, tier, dailyLimitEnabled, now, false);
+    }
+
+    return this.sourceAdmissionDenial(state, cost, tier, dailyLimitEnabled);
+  }
+
+  /** Mirrors the atomic UPDATE predicate so a rejected race retains the legacy denial reason. */
+  private sourceAdmissionDenial(
+    state: MonthlyBudgetState,
+    cost: number,
+    tier: number,
+    dailyLimitEnabled: boolean,
+  ): BudgetDenialReason {
+    const dailyBudget = state.dailyBudget ?? 0;
+    const dailyUsed = state.dailyUsed ?? 0;
+    if (dailyLimitEnabled) {
+      const cutoffTier = this.determineCutoffTier(dailyBudget, dailyUsed);
+      if (cutoffTier != null && tier > cutoffTier) return 'tier_cutoff';
+    }
+    if ((state.poolUsed ?? 0) + cost > state.poolSize) return 'monthly_exhausted';
+    if (dailyLimitEnabled && dailyUsed + cost > dailyBudget) return 'daily_exhausted';
+
+    return 'admission_contention';
+  }
+
+  /**
+   * Atomically reserves the dedicated valuation-provider allocation. The INSERT ... ON CONFLICT
+   * statement makes first-use and concurrent updates one admission operation, avoiding a
+   * read-modify-write race that could overrun the cap.
+   */
+  private async reserveOperationAllocation(
+    sourceKey: string,
+    cost: number,
+    context: BudgetRequestContext,
+    now: Date,
+  ): Promise<BudgetDenialReason | null> {
+    if (context.operation !== 'valuation_ai') return null;
+
+    const capacity = context.operationMonthlyAllocation;
+    if (!isPositiveInteger(capacity) || !isPositiveInteger(cost)) {
+      return 'operation_allocation_exhausted';
+    }
+    if (!this.operationStateRepo) {
+      return 'operation_allocation_unavailable';
+    }
+
+    try {
+      const admissionResult: unknown = await this.operationStateRepo.query(
+        `INSERT INTO operation_budget_states
+           ("sourceKey", "monthKey", "operation", "capacity", "used")
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT ("sourceKey", "monthKey", "operation")
+         DO UPDATE SET
+           "capacity" = EXCLUDED."capacity",
+           "used" = operation_budget_states."used" + EXCLUDED."used",
+           "updatedAt" = now()
+         WHERE operation_budget_states."used" + EXCLUDED."used" <= EXCLUDED."capacity"
+         RETURNING "id"`,
+        [sourceKey, RateBudgetService.monthKey(now), context.operation, capacity, cost],
+      );
+      return hasReturnedRows(admissionResult) ? null : 'operation_allocation_exhausted';
+    } catch (error) {
+      this.logger.error(
+        { err: error, sourceKey, operation: context.operation },
+        'Operation allocation admission unavailable',
+      );
+      return 'operation_allocation_unavailable';
+    }
+  }
+
+  /** Best-effort compensation when local accounting fails before an outbound provider request. */
+  private async releaseOperationAllocation(
+    sourceKey: string,
+    cost: number,
+    operation: BudgetOperation,
+    now: Date,
+  ): Promise<void> {
+    if (operation !== 'valuation_ai' || !this.operationStateRepo) return;
+    try {
+      await this.operationStateRepo.query(
+        `UPDATE operation_budget_states
+         SET "used" = GREATEST(0, "used" - $4), "updatedAt" = now()
+         WHERE "sourceKey" = $1 AND "monthKey" = $2 AND "operation" = $3`,
+        [sourceKey, RateBudgetService.monthKey(now), operation, cost],
+      );
+    } catch (error) {
+      this.logger.error(
+        { err: error, sourceKey, operation },
+        'Operation allocation compensation failed',
+      );
+    }
   }
 
   private async recordActivity(
@@ -298,6 +490,12 @@ export class RateBudgetService {
         cost,
         outcome,
         reason,
+        requestFingerprint: context.requestFingerprint ?? null,
+        chargeStatus:
+          context.operation === 'valuation_ai' && outcome === 'denied'
+            ? 'not_charged'
+            : (context.chargeStatus ??
+              (context.operation === 'valuation_ai' ? 'unknown' : 'not_applicable')),
       }),
     );
   }
@@ -329,4 +527,12 @@ export class RateBudgetService {
 
 function pad(n: number): string {
   return n.toString().padStart(2, '0');
+}
+
+function isPositiveInteger(value: number | undefined): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
+
+function hasReturnedRows(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
 }

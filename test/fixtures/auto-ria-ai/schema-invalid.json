@@ -1,0 +1,11 @@
+{
+  "similarCars": [],
+  "statisticData": [
+    {
+      "id": "avgPriceBlock",
+      "name": "Середня ціна",
+      "price": { "USD": "not-a-number" },
+      "type": "avgPrice"
+    }
+  ]
+}

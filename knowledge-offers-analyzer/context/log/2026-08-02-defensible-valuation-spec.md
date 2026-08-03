@@ -45,3 +45,41 @@ The package requires contract fixtures, zero-change legacy regression tests, sha
 accounting, source-free /why rendering, a gold-case parity audit, and explicit operator review before
 any future activation proposal.
 
+## Implementation delivery
+
+Implemented the SPEC-015 shadow-only evidence path without enabling the provider:
+
+- Official AUTO.RIA AI adapter behind a typed `ValuationProvider` port, default-off configuration,
+  startup validation, redacted fixtures, and no legacy-average fallback.
+- Additive policy/evidence/budget persistence plus the supplied (but unapplied)
+  `1785350000000-spec-015-valuation-evidence.ts` migration.
+- A detached poll sidecar and manual `/check` path with immutable terminal states, shared source
+  admission, dedicated `valuation_ai` allocation, bounded retry, and source-free `/why` plus
+  admin-only `/valuation_audit`.
+- Gold corpus/audit parity reporting, explicit local response-capture provenance, input-completeness
+  and comparable-count rendering, currency-safe provider/legacy comparisons, and fail-closed
+  comparability for missing material facts or insufficient comparables.
+
+The hardening pass also guards the detached sidecar against overwriting a newer Listing score, price,
+or explanation; binds evidence to the exact frozen evaluation; prevents zero source-ID/year
+sentinels from becoming provider facts; and makes shared source-pool admission atomic.
+
+No credential was added, no provider request was sent, no database migration was applied, and no
+legacy fair value, score, rank, opportunity rule, alert, threshold, ParameterSet, factor, or `k`
+changed. Provider enablement, a development migration/no-churn run, pending gold-case captures, and
+operator audit review remain deployment gates.
+
+## Validation completed
+
+On native Windows through RTK, the following passed after the implementation and hardening pass:
+
+- `npm.cmd run typecheck`
+- `npm.cmd run lint`
+- `npm.cmd test -- --runInBand` — 51 suites, 309 tests
+- `npm.cmd run test:contract -- --runInBand` — 3 suites, 23 tests
+- `npm.cmd run build`
+- `npm.cmd run vault:build`
+- `npm.cmd run vault:check:strict`
+- `npm.cmd run vault:test`
+
+`git diff --check` is clean. The unrelated local `.claude/settings.local.json` remains unmodified.

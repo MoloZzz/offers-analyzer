@@ -37,15 +37,15 @@ Implemented (spec 001). One NestJS module per concern:
 
 | Module | Responsibility | Notes |
 |--------|----------------|-------|
-| `sources` | `ListingSource` port + AUTO.RIA adapter + dictionary cache | first adapter; see [[monitoring-approaches]] |
+| `sources` | `ListingSource` and `ValuationProvider` ports + AUTO.RIA adapters + dictionary cache | The AI valuation adapter is a first-party, permissioned provider and returns no request with the default-off configuration; see [[monitoring-approaches]]. |
 | `listings` | Listing & PriceObservation entities, dedup/relist, `topByScore`; **disappearance tracking** (spec 004): pure `disappearance.ts` (eligibility/coverage/grace/relist decisions) + `DisappearancesService` (`processCycle` id-diff → `ListingDisappearance` events, `checkRelist`) — zero API cost, no source dependency | history from day one |
 | `valuation` | fair value, discount, confidence, red-flags, scoring; `cohort.ts` widen-and-retry; **composite score** `priceCore × Π(factor modifiers)` (`factors/`, spec 003 — liquidity + repair-risk implemented in code but **intentionally inactive in prod** per [[0010-defer-factor-activation-until-k|ADR-0010]]: activation deferred until SPEC-004's `k` lands, then one combined ParameterSet change + single threshold re-validation (spec 004 Phase C); until then `score === priceCore`; negotiation/seller/positives/segment-mileage pending) | see [[profitability-definition]], [[profitability-methods-coverage]], [[why-no-opportunities]] |
 | `calibration` | versioned `ParameterSet` + `ParametersService` (candidate/activate); `Outcome` + `OutcomesService`; `CalibrationService` (threshold auto-calibration + weight learning) + `CalibrationRun`; `threshold-calibration.ts`/`weight-learning.ts`; **`DealOutcome` + `DealsService`** (spec 007: stateful post-deal record) + pure `deal-margin.ts` (realized margin/DOM, monotonic stage) | spec 002 + 007; [[0005-versioned-parameter-sets|ADR-0005]] |
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
-| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/outcome`, `/deal`, `/deals` |
+| `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`, valuation audit) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/valuation_audit`, `/outcome`, `/deal`, `/deals`; the audit reads stored data only. |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007) | `Notifier` port |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
-| `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
+| `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, operation allocations, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `valuation_ai` is a separate low-priority allocation inside that cap; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
 | `polling` | cron pipeline: search profiles → fresh-listing value work plus bounded recovery of never-scored listings; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | scored-listing lifecycle rechecks are paused (SPEC-005); monthly pool + daily sub-budget; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
@@ -64,6 +64,15 @@ not routinely re-observe scored listings for price drops. On demand, the `query`
 module lets the bot check any listing (`/check`), list stored opportunities (`/top`), or list the
 best-scoring candidates even below the alert bar (`/best`). Full design:
 `specs/001-profitable-listing-alerts/` (plan, data-model, contracts, quickstart).
+
+**Shadow valuation evidence** (SPEC-015, 2026-08-02): only after the legacy evaluation and any
+notification decision completes, `polling` may launch a detached, deterministic provider sidecar.
+`ValuationShadowService` must first pass the `valuation_ai` allocation and shared source budget;
+it persists redacted immutable evidence, policy/version, quality/review state, and a convenience
+pointer on the Listing/Opportunity. This sidecar never supplies `fairValue`, changes a score/rank,
+or delays an alert. `/check` can request the same sidecar explicitly when it is configured, while
+`/why` and admin-only `/valuation_audit` read stored evidence without source traffic. The adapter
+remains disabled by default per [[0017-shadow-valuation-evidence|ADR-0017]].
 
 **Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
 the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage
@@ -93,9 +102,14 @@ single missed sweep never fabricates an event.
 - **Opportunity** — a flagged candidate deal (fair value, discount, score, red-flags) with a copied
   `explanation` snapshot so historical alerts remain reproducible even if the listing later changes
   or disappears. See [[profitability-definition]].
+- **ValuationPolicyVersion / ValuationEvidence** — append-only policy and redacted provider-attempt
+  records for the `active_listing_ask` target. They are separate from `ParameterSet` and legacy
+  valuation; Listing/Opportunity pointers are only a read convenience for stored explanations.
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
 - **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
 - **RateBudgetWindow** — durable request-budget ledger used by the monthly pool / daily sub-budget accounting.
+- **OperationBudgetState** — atomic per-operation allocation state; `valuation_ai` cannot exceed its
+  configured monthly allowance even when the shared AUTO.RIA pool has headroom.
 - **BudgetActivity** — immutable allowed/denied monthly-pool admission attempt with operation,
   profile (when applicable), priority tier, cost, and reason; the audit input to `/budget` and
   SPEC-005's rollout guardrail (SPEC-009).
@@ -110,6 +124,9 @@ single missed sweep never fabricates an event.
 ## Boundaries & integrations
 
 - **AUTO.RIA official API** behind a `ListingSource` port (first adapter). See [[monitoring-approaches]] and [[0002-monitoring-via-official-api|ADR-0002]].
+- **AUTO.RIA AI valuation API** behind `ValuationProvider`, using only its official permissioned
+  endpoint. It is default-off, has no legacy-average fallback, and stores only redacted normalized
+  evidence; it is not a resale/transaction-price integration ([[0017-shadow-valuation-evidence|ADR-0017]]).
 - **Telegram Bot API** for push notifications.
 - Future: additional listing sources implement the same port.
 

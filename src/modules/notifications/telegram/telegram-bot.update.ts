@@ -17,6 +17,7 @@ import { SourceControlService } from '../../scheduling/source-control.service';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
+import { formatValuationAudit } from '../format/valuation-audit-message';
 import { formatWeights } from '../format/weights-message';
 import { formatStoredWhy, formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
@@ -40,6 +41,7 @@ const URL_EXAMPLE = 'https://auto.ria.com/uk/auto_hyundai_sonata_40143820.html';
 const HELP =
   '/check <посилання> — оцінити конкретне авто\n' +
   '/why <посилання> — пояснити, чому такий бал\n' +
+  '/valuation_audit — admin: аудит shadow-оцінок AUTO.RIA\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
   '/last [N] — останні оцінки (за замовчуванням 5)\n' +
@@ -93,6 +95,12 @@ export class TelegramBotUpdate {
     }
     const enabled = await this.sourceControl.isDailyLimitEnabled('auto-ria');
     await ctx.reply(`AUTO.RIA daily request limit: ${enabled ? 'enabled' : 'disabled'}.`);
+  }
+
+  @Command('valuation_audit')
+  async onValuationAudit(@Ctx() ctx: Context): Promise<void> {
+    if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
+    await ctx.reply(formatValuationAudit(await this.query.valuationAudit()));
   }
 
   private isAdmin(ctx: Context): boolean {
@@ -249,7 +257,7 @@ export class TelegramBotUpdate {
     try {
       const why = await this.query.whyById(externalId);
       if (why.stored) {
-        await ctx.reply(formatStoredWhy(why.stored));
+        await ctx.reply(formatStoredWhy(why.stored, why.evidence));
         return;
       }
       const a = why.live;

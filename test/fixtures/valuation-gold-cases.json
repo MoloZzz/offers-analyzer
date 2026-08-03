@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "target": "active_listing_ask",
+  "purpose": "Predeclared shadow/provider source-parity and coverage corpus; not sale-price truth.",
+  "cases": [
+    {
+      "key": "audi-a6-allroad-2004-38266770",
+      "sourceListingId": "38266770",
+      "strata": ["old", "niche", "high_mileage", "condition_ambiguous"],
+      "status": "captured_fixture",
+      "manualParity": {
+        "capturedAt": "2026-08-02T03:10:15.000Z",
+        "publicEstimateAmount": 5000,
+        "currency": "USD",
+        "minimumAmount": 4882,
+        "maximumAmount": 5395,
+        "source": "auto_ria_public_calculator"
+      }
+    },
+    {
+      "key": "coverage-dealer-private",
+      "strata": ["dealer", "private"],
+      "status": "pending_operator_capture"
+    },
+    {
+      "key": "coverage-regional",
+      "strata": ["regional"],
+      "status": "pending_operator_capture"
+    },
+    {
+      "key": "coverage-vin-unverified",
+      "strata": ["vin_unverified"],
+      "status": "pending_operator_capture"
+    }
+  ]
+}

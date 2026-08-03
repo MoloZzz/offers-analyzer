@@ -62,6 +62,7 @@ function buildUpdate(): {
     getRecentEvaluations: jest.fn(),
     report: jest.fn(),
     budgetReport: jest.fn(),
+    valuationAudit: jest.fn(),
     dealsOverview: jest.fn(),
     findOpportunity: jest.fn(),
     findListingByExternalId: jest.fn(),
@@ -242,5 +243,20 @@ describe('TelegramBotUpdate', () => {
     await update.onBudget(ctx);
     expect((query as unknown as { budgetReport: jest.Mock }).budgetReport).toHaveBeenCalled();
     expect(ctx.reply.mock.calls[0][0]).toContain('Бюджет AUTO.RIA');
+  });
+
+  it('renders the read-only admin valuation audit without allowing non-admin access', async () => {
+    const { update, query } = buildUpdate();
+    (query as unknown as { valuationAudit: jest.Mock }).valuationAudit.mockResolvedValue(null);
+
+    const admin = buildContext('/valuation_audit');
+    await update.onValuationAudit(admin);
+    expect((query as unknown as { valuationAudit: jest.Mock }).valuationAudit).toHaveBeenCalled();
+    expect(admin.reply.mock.calls[0][0]).toContain('shadow-оцінки');
+
+    const nonAdmin = buildContext('/valuation_audit');
+    (nonAdmin.chat as { id: number }).id = 88;
+    await update.onValuationAudit(nonAdmin);
+    expect(nonAdmin.reply).toHaveBeenCalledWith('This command is available to administrators only.');
   });
 });

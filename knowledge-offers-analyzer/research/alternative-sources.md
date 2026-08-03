@@ -49,9 +49,10 @@ Access legend: ✅ legal read API · ⚠️ third-party/paid API or gray-area ·
   documented median/average interface is unsupported/scheduled for closure, so it remains a
   labelled legacy baseline rather than a new-provider fallback.
 - **RIA AI valuation** — official paid provider valuation interface with listing-ID/richer-input
-  modes, provider statistics, and similar-car evidence. SPEC-015 evaluates it in disabled-by-default
-  shadow mode as an **active-market asking-price estimate**, not a completed-sale or resale price
-  ([[0017-shadow-valuation-evidence|ADR-0017]]).
+  modes, provider statistics, and similar-car evidence. SPEC-015 implements a disabled-by-default
+  shadow path for it as an **active-market asking-price estimate**, not a completed-sale or resale
+  price. It makes no request until the operator supplies approved credentials, allocation, and
+  permission/retention terms ([[0017-shadow-valuation-evidence|ADR-0017]]).
 
 ## Rational sequencing (value ÷ effort)
 

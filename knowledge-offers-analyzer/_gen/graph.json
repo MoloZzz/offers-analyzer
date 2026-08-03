@@ -2,7 +2,7 @@
   "version": 1,
   "metrics": {
     "notes": 46,
-    "links": 361,
+    "links": 363,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -97,7 +97,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 17,
-      "outDeg": 26
+      "outDeg": 28
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -272,7 +272,7 @@
       "name": "0017-shadow-valuation-evidence",
       "title": "ADR-0017 — Keep provider valuation evidence shadow-only",
       "type": "decision",
-      "inDeg": 3,
+      "inDeg": 4,
       "outDeg": 5
     },
     {
@@ -540,49 +540,49 @@
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
-      "line": 94
+      "line": 95
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/requirements.md",
       "anchor": null,
       "embed": false,
-      "line": 93
+      "line": 94
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 92
+      "line": 93
     },
     {
       "from": "Roadmap & Status.md",
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 40
     },
     {
       "from": "Roadmap & Status.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 41
     },
     {
       "from": "Roadmap & Status.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 96
+      "line": 97
     },
     {
       "from": "Roadmap & Status.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 95
+      "line": 96
     },
     {
       "from": "SPEC-005.md",
@@ -876,7 +876,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 124
+      "line": 141
     },
     {
       "from": "architecture/overview.md",
@@ -904,14 +904,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 127
+      "line": 144
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 112
+      "line": 126
     },
     {
       "from": "architecture/overview.md",
@@ -932,7 +932,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 102
+      "line": 116
     },
     {
       "from": "architecture/overview.md",
@@ -967,7 +967,7 @@
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 71
+      "line": 80
     },
     {
       "from": "architecture/overview.md",
@@ -985,17 +985,31 @@
     },
     {
       "from": "architecture/overview.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 75
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 129
+    },
+    {
+      "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 126
+      "line": 143
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 125
+      "line": 142
     },
     {
       "from": "architecture/overview.md",
@@ -1016,7 +1030,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 112
+      "line": 126
     },
     {
       "from": "architecture/overview.md",
@@ -1030,7 +1044,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 95
+      "line": 104
     },
     {
       "from": "architecture/overview.md",
@@ -1044,7 +1058,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 106
+      "line": 120
     },
     {
       "from": "architecture/overview.md",
@@ -1058,28 +1072,28 @@
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 44
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 45
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "decisions/0015-hybrid-executable-vault.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 46
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 43
+      "line": 47
     },
     {
       "from": "business/how-it-works.md",
@@ -1982,35 +1996,35 @@
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 72
     },
     {
       "from": "decisions/0017-shadow-valuation-evidence.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 73
     },
     {
       "from": "decisions/0017-shadow-valuation-evidence.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 74
     },
     {
       "from": "decisions/0017-shadow-valuation-evidence.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 68
+      "line": 76
     },
     {
       "from": "decisions/0017-shadow-valuation-evidence.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 67
+      "line": 75
     },
     {
       "from": "decisions/README.md",
@@ -2171,49 +2185,49 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 57
+      "line": 58
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 58
+      "line": 59
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 36
+      "line": 37
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0006-operator-profit-vision.md",
       "anchor": null,
       "embed": false,
-      "line": 21
+      "line": 22
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 22
+      "line": 23
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 22
+      "line": 23
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 35
+      "line": 36
     },
     {
       "from": "domain/glossary.md",
@@ -2227,7 +2241,7 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 43
+      "line": 44
     },
     {
       "from": "domain/glossary.md",
@@ -2241,7 +2255,7 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 54
     },
     {
       "from": "domain/glossary.md",
@@ -2255,21 +2269,21 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 51
+      "line": 52
     },
     {
       "from": "operations/environment-setup.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 112
+      "line": 138
     },
     {
       "from": "operations/environment-setup.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 113
+      "line": 139
     },
     {
       "from": "operations/environment-setup.md",
@@ -2283,7 +2297,7 @@
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 114
+      "line": 140
     },
     {
       "from": "operations/environment-setup.md",
@@ -2304,14 +2318,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "research/alternative-sources.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "research/alternative-sources.md",
@@ -2332,21 +2346,21 @@
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 67
     },
     {
       "from": "research/alternative-sources.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "research/alternative-sources.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 54
+      "line": 55
     },
     {
       "from": "research/alternative-sources.md",
@@ -2360,14 +2374,14 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "research/alternative-sources.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 78
+      "line": 79
     },
     {
       "from": "research/explainability-gaps.md",

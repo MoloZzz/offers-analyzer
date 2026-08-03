@@ -3,10 +3,15 @@ import { ListingDetail } from '../sources/ports/listing-source.port';
 
 import { ResolvedBenchmark } from './cohort';
 import { FactorScore } from './factors/factor';
+import {
+  ValuationComparability,
+  ValuationEvidenceStatus,
+  ValuationEvidenceTarget,
+  ValuationQueryMode,
+} from './valuation-evidence.types';
 import { ValuationResult } from './valuation.service';
 
-export interface EvaluationExplanation {
-  schemaVersion: 1;
+export interface EvaluationExplanationBase {
   evaluatedAt: string;
   parameterSetVersion: number;
   thresholdUsed: number;
@@ -43,6 +48,36 @@ export interface EvaluationExplanation {
   disqualified: boolean;
 }
 
+/** Legacy persisted scoring snapshot. It remains byte-for-byte compatible with old /why records. */
+export interface EvaluationExplanationV1 extends EvaluationExplanationBase {
+  schemaVersion: 1;
+}
+
+/** A compact reference only; full provider evidence stays immutable in valuation_evidence. */
+export interface ProviderEvidenceReference {
+  evidenceId: string;
+  target: ValuationEvidenceTarget;
+  providerKey: string;
+  policyKey: string;
+  adapterVersion: string;
+  status: ValuationEvidenceStatus;
+  comparability: ValuationComparability;
+  sourceCapturedAt?: string | null;
+  queryMode: ValuationQueryMode;
+  estimateAvailable: boolean;
+  rangeAvailable: boolean;
+  legacyDeltaPct?: number | null;
+  reasonCodes: string[];
+}
+
+/** Additive explanation projection; it cannot replace or alter legacy score values. */
+export interface EvaluationExplanationV2 extends EvaluationExplanationBase {
+  schemaVersion: 2;
+  providerEvidence?: ProviderEvidenceReference | null;
+}
+
+export type EvaluationExplanation = EvaluationExplanationV1 | EvaluationExplanationV2;
+
 export function buildEvaluationExplanation(input: {
   detail: ListingDetail;
   benchmark: ResolvedBenchmark | null;
@@ -51,7 +86,7 @@ export function buildEvaluationExplanation(input: {
   parameterSetVersion: number;
   thresholdUsed: number;
   evaluatedAt?: Date;
-}): EvaluationExplanation {
+}): EvaluationExplanationV1 {
   const fairValueBase = input.benchmark?.value.amount ?? 0;
   return {
     schemaVersion: 1,
@@ -92,6 +127,28 @@ export function buildEvaluationExplanation(input: {
     isOpportunity: input.result.isOpportunity,
     disqualified: input.result.disqualified,
   };
+}
+
+/**
+ * Upgrade a stored explanation projection without changing its scoring provenance.  V1 still
+ * renders normally when no evidence was collected; callers use this only after a durable row is
+ * persisted and linked.
+ */
+export function withProviderEvidence(
+  explanation: EvaluationExplanation,
+  providerEvidence: ProviderEvidenceReference | null,
+): EvaluationExplanationV2 {
+  return {
+    ...explanation,
+    schemaVersion: 2,
+    providerEvidence,
+  };
+}
+
+export function isEvaluationExplanationV2(
+  explanation: EvaluationExplanation,
+): explanation is EvaluationExplanationV2 {
+  return explanation.schemaVersion === 2;
 }
 
 function flagSource(code: string): 'auto-ria' | 'description' | 'derived' {

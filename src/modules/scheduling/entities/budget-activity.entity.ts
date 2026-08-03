@@ -1,16 +1,33 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 export type BudgetOperation =
-  'search' | 'new_listing_detail' | 'recheck_detail' | 'sweep' | 'cohort_average' | 'on_demand';
+  | 'search'
+  | 'new_listing_detail'
+  | 'recheck_detail'
+  | 'sweep'
+  | 'cohort_average'
+  | 'on_demand'
+  | 'valuation_ai';
 
 export type BudgetActivityOutcome = 'allowed' | 'denied';
+/** Provider billing state at admission time; reconciled spend remains immutable audit evidence. */
+export type BudgetChargeStatus = 'charged' | 'not_charged' | 'unknown' | 'not_applicable';
 export type BudgetDenialReason =
-  'allowed' | 'tier_cutoff' | 'daily_exhausted' | 'monthly_exhausted' | 'cooldown' | 'paused';
+  | 'allowed'
+  | 'tier_cutoff'
+  | 'daily_exhausted'
+  | 'monthly_exhausted'
+  | 'admission_contention'
+  | 'operation_allocation_exhausted'
+  | 'operation_allocation_unavailable'
+  | 'cooldown'
+  | 'paused';
 
 /** Immutable audit trail for one budget admission attempt (SPEC-009). */
 @Entity('budget_activities')
 @Index('IDX_budget_activities_source_month', ['sourceKey', 'monthKey'])
 @Index('IDX_budget_activities_created_at', ['createdAt'])
+@Index('IDX_budget_activities_request_fingerprint', ['requestFingerprint'])
 export class BudgetActivity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -41,6 +58,17 @@ export class BudgetActivity {
 
   @Column({ type: 'varchar' })
   reason!: BudgetDenialReason;
+
+  /** Redacted canonical provider-request identifier; absent for legacy source operations. */
+  @Column({ type: 'varchar', nullable: true })
+  requestFingerprint?: string | null;
+
+  /**
+   * Billing observation at admission time. This is nullable for pre-SPEC-015 rows and is never
+   * retroactively rewritten as part of the immutable activity ledger.
+   */
+  @Column({ type: 'varchar', nullable: true })
+  chargeStatus?: BudgetChargeStatus | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;

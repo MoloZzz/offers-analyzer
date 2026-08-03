@@ -6,6 +6,17 @@ export interface AppConfig {
   port: number;
   databaseUrl: string;
   autoRiaApiKey: string;
+  /** SPEC-015: paid provider remains inert unless explicitly enabled with approved credentials. */
+  autoRiaAiEnabled: boolean;
+  autoRiaAiApiKey: string;
+  autoRiaAiUserId: string;
+  autoRiaAiPolicyKey: string;
+  /** Fraction in [0, 1]; default zero prevents automatic shadow traffic. */
+  autoRiaAiSampleRate: number;
+  /** Dedicated monthly allocation inside the shared AUTO.RIA pool; default zero. */
+  autoRiaAiMonthlyAllocation: number;
+  /** Bounded per-request source timeout for the AI adapter. */
+  autoRiaAiTimeoutMs: number;
   telegramBotToken: string;
   telegramAdminChatIds: string[];
   nbuRateUrl: string;
@@ -43,14 +54,25 @@ export default (): AppConfig => ({
   port: Number(process.env.PORT ?? 3000),
   databaseUrl: process.env.DATABASE_URL ?? '',
   autoRiaApiKey: process.env.AUTO_RIA_API_KEY ?? '',
+  autoRiaAiEnabled: process.env.AUTO_RIA_AI_ENABLED === 'true',
+  autoRiaAiApiKey: process.env.AUTO_RIA_AI_API_KEY ?? '',
+  autoRiaAiUserId: process.env.AUTO_RIA_AI_USER_ID ?? '',
+  autoRiaAiPolicyKey: process.env.AUTO_RIA_AI_POLICY_KEY?.trim() || 'ai-shadow-v1',
+  autoRiaAiSampleRate: boundedNumber(process.env.AUTO_RIA_AI_SAMPLE_RATE, 0, 0, 1),
+  autoRiaAiMonthlyAllocation: boundedInteger(
+    process.env.AUTO_RIA_AI_MONTHLY_ALLOCATION,
+    0,
+    0,
+    1_000_000,
+  ),
+  autoRiaAiTimeoutMs: boundedInteger(process.env.AUTO_RIA_AI_TIMEOUT_MS, 5_000, 1_000, 60_000),
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
   telegramAdminChatIds: (process.env.TELEGRAM_ADMIN_CHAT_IDS ?? '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean),
   nbuRateUrl:
-    process.env.NBU_RATE_URL ??
-    'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
+    process.env.NBU_RATE_URL ?? 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json',
   rateBudgetPerHour: Number(process.env.RATE_BUDGET_PER_HOUR ?? 30),
   rateBudgetPoolPerMonth: Number(process.env.RATE_BUDGET_POOL_PER_MONTH ?? 20000),
   rateBudgetReservePct: Number(process.env.RATE_BUDGET_RESERVE_PCT ?? 15),
@@ -68,3 +90,23 @@ export default (): AppConfig => ({
   calibrationMinPrecision: Number(process.env.CALIBRATION_MIN_PRECISION ?? 0.7),
   dealReminderDays: Number(process.env.DEAL_REMINDER_DAYS ?? 30),
 });
+
+function boundedNumber(
+  value: string | undefined,
+  fallback: number,
+  min: number,
+  max: number,
+): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : fallback;
+}
+
+function boundedInteger(
+  value: string | undefined,
+  fallback: number,
+  min: number,
+  max: number,
+): number {
+  const parsed = boundedNumber(value, fallback, min, max);
+  return Number.isInteger(parsed) ? parsed : fallback;
+}

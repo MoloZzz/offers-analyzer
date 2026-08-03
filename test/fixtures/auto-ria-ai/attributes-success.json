@@ -1,0 +1,20 @@
+{
+  "similarCars": [
+    {
+      "brand": { "eng": "volkswagen", "id": 9 },
+      "model": { "eng": "passat", "id": 96 },
+      "id": 1001,
+      "price": { "all": { "USD": { "value": "13 250" } } },
+      "raceInt": 150,
+      "year": 2017
+    }
+  ],
+  "statisticData": [
+    {
+      "id": "avgPriceBlock",
+      "name": "Середня ціна",
+      "price": { "UAH": 543250, "USD": 13250 },
+      "type": "avgPrice"
+    }
+  ]
+}

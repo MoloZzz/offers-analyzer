@@ -77,56 +77,56 @@
           "level": 2,
           "text": "Current",
           "line": 13,
-          "endLine": 41
+          "endLine": 42
         },
         {
           "n": 2,
           "level": 3,
           "text": "Prove the next scoring rollout",
-          "line": 27,
-          "endLine": 41
+          "line": 28,
+          "endLine": 42
         },
         {
           "n": 3,
           "level": 2,
           "text": "Completed / operating",
-          "line": 42,
-          "endLine": 59
+          "line": 43,
+          "endLine": 60
         },
         {
           "n": 4,
           "level": 2,
           "text": "Blocked / paused",
-          "line": 60,
-          "endLine": 66
+          "line": 61,
+          "endLine": 67
         },
         {
           "n": 5,
           "level": 2,
           "text": "Next",
-          "line": 67,
-          "endLine": 73
+          "line": 68,
+          "endLine": 74
         },
         {
           "n": 6,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 74,
-          "endLine": 79
+          "line": 75,
+          "endLine": 80
         },
         {
           "n": 7,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 80,
-          "endLine": 89
+          "line": 81,
+          "endLine": 90
         },
         {
           "n": 8,
           "level": 2,
           "text": "Related",
-          "line": 90,
-          "endLine": 97
+          "line": 91,
+          "endLine": 98
         }
       ]
     },
@@ -469,35 +469,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 52,
-          "endLine": 85
+          "endLine": 94
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 86,
-          "endLine": 109
+          "line": 95,
+          "endLine": 123
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 110,
-          "endLine": 115
+          "line": 124,
+          "endLine": 132
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 116,
-          "endLine": 117
+          "line": 133,
+          "endLine": 134
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 118,
-          "endLine": 128
+          "line": 135,
+          "endLine": 145
         }
       ]
     },
@@ -508,35 +508,35 @@
       "title": "Persistence surface",
       "type": "architecture",
       "summary": "Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.",
-      "rev": "3af0fcad03ef",
+      "rev": "d43cce47d919",
       "headings": [
         {
           "n": 1,
           "level": 2,
           "text": "Source of truth",
           "line": 18,
-          "endLine": 25
+          "endLine": 29
         },
         {
           "n": 2,
           "level": 2,
           "text": "Review boundary",
-          "line": 26,
-          "endLine": 31
+          "line": 30,
+          "endLine": 35
         },
         {
           "n": 3,
           "level": 2,
           "text": "Generated evidence",
-          "line": 32,
-          "endLine": 37
+          "line": 36,
+          "endLine": 41
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 38,
-          "endLine": 44
+          "line": 42,
+          "endLine": 48
         }
       ]
     },
@@ -1402,9 +1402,16 @@
         {
           "n": 4,
           "level": 2,
-          "text": "Related",
+          "text": "Implementation status",
           "line": 62,
           "endLine": 69
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 70,
+          "endLine": 77
         }
       ]
     },
@@ -1492,15 +1499,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 48,
-          "endLine": 54
+          "line": 49,
+          "endLine": 55
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 55,
-          "endLine": 59
+          "line": 56,
+          "endLine": 60
         }
       ]
     },
@@ -1551,16 +1558,23 @@
         {
           "n": 6,
           "level": 2,
-          "text": "Related",
+          "text": "SPEC-015 shadow valuation provider",
           "line": 102,
-          "endLine": 103
+          "endLine": 127
         },
         {
           "n": 7,
           "level": 2,
+          "text": "Related",
+          "line": 128,
+          "endLine": 129
+        },
+        {
+          "n": 8,
+          "level": 2,
           "text": "Telegram monitoring administration",
-          "line": 104,
-          "endLine": 115
+          "line": 130,
+          "endLine": 141
         }
       ]
     },
@@ -1606,35 +1620,35 @@
           "level": 2,
           "text": "Reference / valuation data (not listings, but feed \"fair value + risk\")",
           "line": 44,
-          "endLine": 55
+          "endLine": 56
         },
         {
           "n": 6,
           "level": 2,
           "text": "Rational sequencing (value ÷ effort)",
-          "line": 56,
-          "endLine": 61
+          "line": 57,
+          "endLine": 62
         },
         {
           "n": 7,
           "level": 2,
           "text": "Open questions",
-          "line": 62,
-          "endLine": 67
+          "line": 63,
+          "endLine": 68
         },
         {
           "n": 8,
           "level": 2,
           "text": "Sources",
-          "line": 68,
-          "endLine": 75
+          "line": 69,
+          "endLine": 76
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 76,
-          "endLine": 79
+          "line": 77,
+          "endLine": 80
         }
       ]
     },

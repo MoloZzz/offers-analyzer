@@ -1,6 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
@@ -17,7 +18,16 @@ import { ListingDetail, ListingSource, LISTING_SOURCE } from '../sources/ports/l
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
 import { resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
+import { ValuationEvidence } from '../valuation/entities/valuation-evidence.entity';
+import { isEvaluationExplanationV2 } from '../valuation/evaluation-explanation';
 import { MileageAdjuster } from '../valuation/mileage';
+import {
+  buildValuationAuditDigest,
+  ValuationAuditBudget,
+  ValuationAuditDigest,
+} from '../valuation/valuation-audit';
+import { ValuationEvidenceService } from '../valuation/valuation-evidence.service';
+import { ValuationShadowService } from '../valuation/valuation-shadow.service';
 import { ValuationResult, ValuationService } from '../valuation/valuation.service';
 
 import { buildDigest, realizedPrecision, ReportDigest } from './report';
@@ -34,6 +44,7 @@ export interface Assessment {
 
 export interface WhyLookup {
   stored?: Listing['lastExplanation'];
+  evidence?: ValuationEvidence | null;
   live?: Assessment;
 }
 
@@ -73,6 +84,11 @@ export class QueryService {
     private readonly budget: RateBudgetService,
     @InjectRepository(Opportunity) private readonly opportunities: Repository<Opportunity>,
     config: ConfigService<AppConfig, true>,
+    @Optional() private readonly valuationShadow?: ValuationShadowService,
+    @Optional() private readonly valuationEvidence?: ValuationEvidenceService,
+    @Optional()
+    @InjectPinoLogger(QueryService.name)
+    private readonly logger?: PinoLogger,
   ) {
     this.minScore = config.get('defaultMinDealScore', { infer: true });
     this.minSamples = config.get('defaultConfidenceMinSamples', { infer: true });
@@ -112,13 +128,55 @@ export class QueryService {
     const sampleSize = benchmark?.sampleSize ?? 0;
     const benchmarkBase = benchmark?.value.amount ?? 0;
     const mileageAware = benchmark?.mileageAware ?? false;
-    return { detail, result, fairValue, currency, sampleSize, benchmarkBase, mileageAware };
+    const assessment = { detail, result, fairValue, currency, sampleSize, benchmarkBase, mileageAware };
+    let listing = await this.findListingByExternalId(externalId);
+    if (!listing && this.valuationShadow) {
+      // Evidence must be attached to a durable local Listing even for the first pasted URL. This
+      // records ordinary listing history only; it does not persist a score or create an opportunity.
+      try {
+        listing = (await this.listings.recordSeen(detail)).listing;
+      } catch (err) {
+        // The existing manual assessment remains authoritative for this request; shadow
+        // persistence is an optional sidecar and must not make `/check` unavailable.
+        this.logger?.warn({ err, externalId }, 'Unable to persist listing for manual shadow evidence');
+      }
+    }
+    if (listing && this.valuationShadow) {
+      try {
+        await this.valuationShadow.captureManualCheck({
+          listing,
+          detail,
+          legacyReference: {
+            baseAmount: benchmarkBase,
+            adjustedAmount: fairValue,
+            currency,
+            sampleSize,
+            cohortKey: benchmark?.cohort.key,
+            parameterSetVersion: this.valuation.activeParameterVersion(),
+          },
+        });
+      } catch (err) {
+        // Manual evidence is a sidecar: its persistence/source failure must not make the existing
+        // on-demand assessment unavailable.
+        this.logger?.warn({ err, listingId: listing.id }, 'Manual shadow valuation capture failed');
+      }
+    }
+    return assessment;
   }
 
   /** Prefer the persisted B23 explanation snapshot; fall back to live assessment only when absent. */
   async whyById(externalId: string): Promise<WhyLookup> {
     const listing = await this.findListingByExternalId(externalId);
-    if (listing?.lastExplanation) return { stored: listing.lastExplanation };
+    if (listing?.lastExplanation) {
+      const referencedEvidenceId = isEvaluationExplanationV2(listing.lastExplanation)
+        ? listing.lastExplanation.providerEvidence?.evidenceId
+        : undefined;
+      const evidence =
+        this.valuationEvidence && referencedEvidenceId
+          ? await this.valuationEvidence.findByIdForListing(referencedEvidenceId, listing.id)
+          : null;
+      return { stored: listing.lastExplanation, evidence };
+    }
     return { live: await this.assessById(externalId) };
   }
 
@@ -186,6 +244,18 @@ export class QueryService {
     return this.budget.report();
   }
 
+  /** Read-only provider-evidence audit. It never invokes AUTO.RIA or changes live policy. */
+  async valuationAudit(): Promise<ValuationAuditDigest | null> {
+    if (!this.valuationEvidence) return null;
+    const [records, budgetReport] = await Promise.all([
+      this.valuationEvidence.findForAudit(),
+      this.budget.report('auto-ria'),
+    ]);
+    return buildValuationAuditDigest(records, {
+      ...(budgetReport ? { budget: valuationAiBudgetAudit(budgetReport) } : {}),
+    });
+  }
+
   /** Open (bought, unsold) + recently closed deals, each joined to its listing (for /deals). */
   async dealsOverview(
     recentClosed = 10,
@@ -225,4 +295,18 @@ export class QueryService {
   async getRecentEvaluations(limit = 10): Promise<Listing[]> {
     return this.listings.getRecentlyEvaluated(limit);
   }
+}
+
+function valuationAiBudgetAudit(report: BudgetReportDigest): ValuationAuditBudget {
+  const operation = report.operationActual.find((line) => line.operation === 'valuation_ai');
+  return {
+    allocation: operation?.allocation ?? null,
+    used: operation?.actual ?? 0,
+    forecast: operation?.forecast ?? 0,
+    deferredCount: report.deferred
+      .filter((line) => line.operation === 'valuation_ai')
+      .reduce((total, line) => total + line.count, 0),
+    poolRemaining: report.poolRemaining,
+    reconciliationDifference: report.reconciliationDifference,
+  };
 }

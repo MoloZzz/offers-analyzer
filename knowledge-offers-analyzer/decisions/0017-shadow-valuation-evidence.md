@@ -1,14 +1,14 @@
 ---
 title: ADR-0017 — Keep provider valuation evidence shadow-only
 type: decision
-status: Proposed
+status: Accepted
 updated: 2026-08-02
 summary: Introduce auditable AUTO.RIA provider evidence in shadow mode without changing live scoring.
 ---
 
 # ADR-0017 — Keep provider valuation evidence shadow-only
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-02
 
 ## Context
@@ -58,6 +58,14 @@ official-source/no-scraping boundary and a protected monthly source budget.
   discovery and alerts unchanged; it becomes visible evidence rather than a hidden fallback.
 - This deliberately does **not** fix live alerts immediately. That delay is the safety mechanism:
   active listings and source/UI parity are not enough to validate a resale model.
+
+## Implementation status
+
+SPEC-015 now implements this decision as a default-off shadow sidecar: typed official-provider
+requests, immutable redacted evidence and policy records, dedicated `valuation_ai` budget
+allocation, source-free `/why`, and admin-only `/valuation_audit`. The implementation does not
+ship a provider credential, make provider traffic, apply the migration, or change any live score,
+alert, ParameterSet, factor, threshold, or `k`. Those remain separate operator/deployment gates.
 
 ## Related
 

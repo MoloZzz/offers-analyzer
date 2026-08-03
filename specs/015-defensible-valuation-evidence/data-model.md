@@ -45,7 +45,7 @@ A terminal valuation-attempt/evidence record. It is append-only after terminal p
 | providerStatistics | JSONB, nullable | Permitted normalized statistics/range/comparable count |
 | comparableSummary | JSONB, nullable | Permitted normalized similarCars projection, bounded size |
 | legacyReference | JSONB, nullable | Legacy base/adjusted values, cohort, and delta at observation time |
-| sourceCapturedAt | timestamptz, nullable | Provider source/result time |
+| sourceCapturedAt | timestamptz, nullable | Provider as-of time when supplied; otherwise explicitly labelled adapter local response-capture time |
 | expiresAt | timestamptz, nullable | Policy freshness marker |
 | responseFingerprint | varchar, nullable | Digest of permitted normalized response |
 | chargeStatus | varchar | charged, not_charged, unknown, not_applicable |
@@ -106,4 +106,3 @@ canonical fingerprint and freshness window.
   free-text personal data, or unbounded comparable payloads.
 - Store deterministic digests of canonical redacted projections for integrity and drift detection.
 - Historical records never receive reconstructed fields; old/missing evidence is explicitly unknown.
-

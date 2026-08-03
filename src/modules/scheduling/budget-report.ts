@@ -1,5 +1,6 @@
 import { BudgetActivity, BudgetOperation } from './entities/budget-activity.entity';
 import { MonthlyBudgetState } from './entities/monthly-budget-state.entity';
+import { OperationBudgetState } from './entities/operation-budget-state.entity';
 
 export interface BudgetReportDigest {
   poolSize: number;
@@ -44,12 +45,14 @@ const ALLOCATIONS: Record<BudgetOperation, number> = {
   sweep: 0,
   cohort_average: 1500,
   on_demand: 0,
+  valuation_ai: 0,
 };
 
 export function buildBudgetReport(
   state: MonthlyBudgetState,
   activities: BudgetActivity[],
   now = new Date(),
+  operationStates: OperationBudgetState[] = [],
 ): BudgetReportDigest {
   const allowed = activities.filter((a) => a.outcome === 'allowed');
   const ledgerAllowed = allowed.reduce((sum, a) => sum + a.cost, 0);
@@ -60,13 +63,17 @@ export function buildBudgetReport(
   const byOperation = new Map<BudgetOperation, number>();
   for (const item of allowed)
     byOperation.set(item.operation, (byOperation.get(item.operation) ?? 0) + item.cost);
+  const allocationByOperation = new Map<BudgetOperation, number>();
+  for (const operationState of operationStates) {
+    allocationByOperation.set(operationState.operation, operationState.capacity);
+  }
   const operationActual = (Object.keys(ALLOCATIONS) as BudgetOperation[]).map((operation) => {
     const actual = byOperation.get(operation) ?? 0;
     return {
       operation,
       actual,
       forecast: Math.ceil((actual / daysElapsed) * daysInMonth),
-      allocation: ALLOCATIONS[operation],
+      allocation: allocationByOperation.get(operation) ?? ALLOCATIONS[operation],
     };
   });
   const profileGroups = new Map<

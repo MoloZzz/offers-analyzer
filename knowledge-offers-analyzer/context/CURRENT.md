@@ -11,28 +11,33 @@ updated: 2026-08-02
 
 ## Active work
 
-SPEC-015, Defensible valuation evidence, is now specified and planned at
-`specs/015-defensible-valuation-evidence/`. It introduces an official AUTO.RIA AI provider
-evidence path for the target `active_listing_ask`, but only in disabled-by-default shadow mode.
-No application code, migration, source traffic, score, alert, threshold, ParameterSet, factor, or
-survivorship correction `k` changed while planning it.
+SPEC-015, Defensible valuation evidence, is implemented at
+`specs/015-defensible-valuation-evidence/`. It adds an official AUTO.RIA AI provider-evidence path
+for the target `active_listing_ask`, but only as disabled-by-default shadow mode. The code includes
+typed provider/source facts, immutable redacted evidence/policy records, dedicated `valuation_ai`
+budget allocation, source-free `/why`, and admin-only `/valuation_audit`.
 
-The existing scoring, lifecycle, and budget rollout gates remain unchanged. Any provider enablement
-needs approved credentials/retention terms, contract fixtures, feature allocation, source-parity
-audit, and a later operator-approved activation decision.
+The existing scoring, lifecycle, and budget rollout gates remain unchanged. The implementation did
+not apply its additive migration, ship credentials, make source traffic, or change fair value,
+score, alert, threshold, ParameterSet, factor, or survivorship correction `k`.
 
 ## Next pickup
 
-For the next task, read this handoff, use `npm run vault:brief -- "Roadmap & Status"`, then begin
-with T001 in `specs/015-defensible-valuation-evidence/tasks.md`. Confirm official AUTO.RIA AI
-permission, allowed storage/attribution, effective pricing/allocation, and sanitized fixtures
-before enabling any provider request. Do not promote active-listing evidence to a resale model or
-change the live score without a separate approved decision.
+For the next task, read this handoff and `specs/015-defensible-valuation-evidence/quickstart.md`.
+Confirm official AUTO.RIA AI permission, allowed storage/attribution, effective pricing/allocation,
+and sanitized fixture parity before enabling any provider request. On an operator-approved
+development database, apply and regenerate the additive migration to verify no schema churn. Then
+collect the pending gold-case strata and review `/valuation_audit`. Do not promote active-listing
+evidence to a resale model or change the live score without a separate approved decision.
 
 ## Verification / blockers
 
-- `npm run vault:check:strict` and `npm run vault:test` remain clean at the implementation
-  baseline.
+- Completed on 2026-08-02 (native Windows `npm.cmd` through RTK): `typecheck`, `lint`, full Jest
+  (309 tests), contract Jest (23 tests), Nest build, `vault:build`, `vault:check:strict`, and
+  `vault:test` all pass.
+- The remaining blockers are external/operator gates only: approved provider credentials/terms and
+  allocation, a development migration apply/re-generation check, pending gold-case captures, and
+  the `/valuation_audit` review. Leave `AUTO_RIA_AI_ENABLED=false` until those gates are complete.
 - `npm run ai-infra:test` covers a docs-only target, dry-run/apply, collision safety, installed
   doctor, generic retrieval, and write-free strict validation.
 - Claude hooks are deliberately optional; Codex and other runtimes use the explicit brief/handoff

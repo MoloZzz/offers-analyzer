@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
@@ -25,10 +25,11 @@ import {
   SourceSearchQuery,
 } from '../sources/ports/listing-source.port';
 import { BenchmarkCacheService } from '../valuation/benchmark-cache.service';
-import { resolveBenchmark } from '../valuation/cohort';
+import { ResolvedBenchmark, resolveBenchmark } from '../valuation/cohort';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 import { buildEvaluationExplanation } from '../valuation/evaluation-explanation';
 import { MileageAdjuster } from '../valuation/mileage';
+import { ValuationShadowService } from '../valuation/valuation-shadow.service';
 import { ValuationService } from '../valuation/valuation.service';
 
 /** Cap new listings processed per profile per cycle so one profile can't hog the shared budget. */
@@ -68,6 +69,7 @@ export class PollService {
     private readonly alertedCars: AlertedCarsService,
     private readonly disappearances: DisappearancesService,
     @InjectPinoLogger(PollService.name) private readonly logger: PinoLogger,
+    @Optional() private readonly valuationShadow?: ValuationShadowService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_MINUTES)
@@ -288,7 +290,10 @@ export class PollService {
       profile.id,
       explanation,
     );
-    if (!result.isOpportunity) return;
+    if (!result.isOpportunity) {
+      this.captureShadowEvidence(profile, listing, detail, benchmark, fairValue);
+      return;
+    }
 
     // Relist de-dup (B12): don't re-alert the same car (by VIN) unless it's now cheaper than the
     // lowest we ever alerted. No VIN → no cross-listing de-dup (behaves as before).
@@ -321,6 +326,8 @@ export class PollService {
       }),
     );
 
+    this.captureShadowEvidence(profile, listing, detail, benchmark, fairValue, opportunity.id);
+
     if (type === 'price_drop' && previousAmount != null) {
       await this.notifications.notifyPriceDrop(
         opportunity,
@@ -332,6 +339,43 @@ export class PollService {
     }
     opportunity.notified = true;
     await this.opportunities.save(opportunity);
+  }
+
+  /**
+   * Starts shadow collection only after the complete legacy evaluation was persisted. It is
+   * deliberately detached from the poll/alert path: provider latency or failure cannot alter or
+   * delay existing opportunities and notifications.
+   */
+  private captureShadowEvidence(
+    profile: SearchProfile,
+    listing: Listing,
+    detail: ListingDetail,
+    benchmark: ResolvedBenchmark | null,
+    fairValue: number,
+    opportunityId?: string,
+  ): void {
+    if (!this.valuationShadow) return;
+    void this.valuationShadow
+      .capturePollShadow({
+        listing,
+        detail,
+        profileId: profile.id,
+        opportunityId,
+        legacyReference: {
+          baseAmount: benchmark?.value.amount,
+          adjustedAmount: fairValue,
+          currency: benchmark?.value.currency ?? Currency.USD,
+          sampleSize: benchmark?.sampleSize,
+          cohortKey: benchmark?.cohort.key,
+          parameterSetVersion: this.valuation.activeParameterVersion(),
+        },
+      })
+      .catch((err: unknown) => {
+        this.logger.warn(
+          { err, listingId: listing.id, profileId: profile.id },
+          'Shadow valuation evidence capture failed',
+        );
+      });
   }
 }
 

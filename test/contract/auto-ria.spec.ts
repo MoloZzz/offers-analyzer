@@ -3,10 +3,17 @@ import { PinoLogger } from 'nestjs-pino';
 import { MockAgent, setGlobalDispatcher } from 'undici';
 
 import { AppConfig } from '../../src/common/config/configuration';
+import { Currency } from '../../src/common/types/money';
 import { RateBudgetService } from '../../src/modules/scheduling/rate-budget.service';
 import { AutoRiaSource } from '../../src/modules/sources/auto-ria/auto-ria.source';
+import { toProviderVehicleFacts } from '../../src/modules/sources/ports/listing-source.port';
 
-const noopLogger = { warn: () => {}, error: () => {}, info: () => {}, debug: () => {} } as unknown as PinoLogger;
+const noopLogger = {
+  warn: () => {},
+  error: () => {},
+  info: () => {},
+  debug: () => {},
+} as unknown as PinoLogger;
 
 /**
  * Contract test for the AUTO.RIA adapter. Uses undici's MockAgent (nock does not intercept
@@ -14,7 +21,9 @@ const noopLogger = { warn: () => {}, error: () => {}, info: () => {}, debug: () 
  */
 function makeSource(): AutoRiaSource {
   const config = { get: (): string => 'TEST_KEY' } as unknown as ConfigService<AppConfig, true>;
-  const budget = { tryConsume: (): Promise<boolean> => Promise.resolve(true) } as unknown as RateBudgetService;
+  const budget = {
+    tryConsume: (): Promise<boolean> => Promise.resolve(true),
+  } as unknown as RateBudgetService;
   return new AutoRiaSource(config, budget, noopLogger);
 }
 
@@ -127,5 +136,128 @@ describe('AutoRiaSource (contract)', () => {
 
     const detail = await makeSource().fetch('38561317');
     expect(detail.risk.damaged).toBe(true);
+  });
+
+  it('preserves provider-compatible AUTO.RIA facts without changing legacy detail fields', async () => {
+    agent
+      .get('https://developers.ria.com')
+      .intercept({ path: (p) => p.startsWith('/auto/info'), method: 'GET' })
+      .reply(200, {
+        USD: 5000,
+        markId: 5,
+        modelId: 74,
+        markName: 'Audi',
+        modelName: 'A6 allroad',
+        haveInfotechReport: false,
+        checkedVin: { isChecked: true },
+        dealer: { id: 1 },
+        stateData: { stateId: 10, cityId: 20, stateName: 'Kyiv', cityName: 'Kyiv' },
+        autoData: {
+          categoryId: 1,
+          year: 2004,
+          raceInt: 305,
+          generationId: 100,
+          generationName: 'C5 (4B)',
+          modificationId: 200,
+          modificationName: '2.7 T quattro',
+          bodyId: 3,
+          bodyName: 'Wagon',
+          fuelId: 1,
+          fuelName: 'Бензин',
+          gearBoxId: 2,
+          gearboxName: 'Автомат',
+          driveId: 4,
+          driveName: 'Повний',
+        },
+      });
+
+    const detail = await makeSource().fetch('38266770');
+    const facts = toProviderVehicleFacts(detail);
+
+    expect(detail.engine).toBe('2.7 T quattro');
+    expect(detail.modificationId).toBe(200);
+    expect(detail.generation).toBe('C5 (4B)');
+    expect(facts).toMatchObject({
+      categoryId: { availability: 'available', value: 1 },
+      generationId: { availability: 'available', value: 100 },
+      modificationName: { availability: 'available', value: '2.7 T quattro' },
+      bodyName: { availability: 'available', value: 'Wagon' },
+      fuelId: { availability: 'available', value: 1 },
+      gearboxId: { availability: 'available', value: 2 },
+      driveId: { availability: 'available', value: 4 },
+      mileageK: { availability: 'available', value: 305 },
+      location: {
+        availability: 'available',
+        value: { stateId: 10, cityId: 20, stateName: 'Kyiv', cityName: 'Kyiv' },
+      },
+      vinEvidence: { availability: 'available', value: { hasVinReport: false, vinChecked: true } },
+    });
+  });
+
+  it('marks unavailable provider facts explicitly instead of inferring them', () => {
+    const facts = toProviderVehicleFacts({
+      externalId: '1',
+      make: 'Audi',
+      model: 'A6 allroad',
+      markId: 5,
+      modelId: 74,
+      year: 2004,
+      sellerType: 'unknown',
+      hasVinReport: false,
+      url: 'https://auto.ria.com/auto_audi_a6_allroad_1.html',
+      price: { amount: 5000, currency: Currency.USD },
+      risk: {
+        damaged: false,
+        salvage: false,
+        unclearCustoms: false,
+        confiscated: false,
+        underCredit: false,
+        abroad: false,
+        vinChecked: false,
+      },
+    });
+
+    expect(facts.generationId).toEqual({
+      availability: 'unavailable',
+      provenance: 'not_provided',
+      value: null,
+    });
+    expect(facts.mileageK.availability).toBe('unavailable');
+    expect(facts.location.availability).toBe('unavailable');
+    expect(facts.vinEvidence.availability).toBe('unavailable');
+    expect(facts.conditionEvidence.availability).toBe('unavailable');
+  });
+
+  it('does not promote legacy zero sentinels into provider facts', () => {
+    const facts = toProviderVehicleFacts({
+      externalId: '1',
+      make: 'Audi',
+      model: 'A6 allroad',
+      markId: 0,
+      modelId: 0,
+      categoryId: 0,
+      year: 0,
+      stateId: 0,
+      cityId: 0,
+      sellerType: 'unknown',
+      hasVinReport: false,
+      url: 'https://auto.ria.com/auto_audi_a6_allroad_1.html',
+      price: { amount: 5000, currency: Currency.USD },
+      risk: {
+        damaged: false,
+        salvage: false,
+        unclearCustoms: false,
+        confiscated: false,
+        underCredit: false,
+        abroad: false,
+        vinChecked: false,
+      },
+    });
+
+    expect(facts.categoryId?.availability).toBe('unavailable');
+    expect(facts.markId.availability).toBe('unavailable');
+    expect(facts.modelId.availability).toBe('unavailable');
+    expect(facts.year.availability).toBe('unavailable');
+    expect(facts.location.availability).toBe('unavailable');
   });
 });

@@ -34,7 +34,13 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
             transport: isProduction
               ? undefined
               : { target: 'pino-pretty', options: { singleLine: true, colorize: true } },
-            redact: ['req.headers.authorization', 'config.autoRiaApiKey', 'config.telegramBotToken'],
+            redact: [
+              'req.headers.authorization',
+              'config.autoRiaApiKey',
+              'config.autoRiaAiApiKey',
+              'config.autoRiaAiUserId',
+              'config.telegramBotToken',
+            ],
           },
         };
       },

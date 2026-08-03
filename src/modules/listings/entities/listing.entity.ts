@@ -91,6 +91,10 @@ export class Listing {
   @Column('jsonb', { nullable: true })
   lastExplanation?: EvaluationExplanation | null;
 
+  /** Latest provider-evidence record only; immutable history lives in valuation_evidence. */
+  @Column('uuid', { nullable: true })
+  lastValuationEvidenceId?: string | null;
+
   /** The profile that most recently surfaced/evaluated this listing (for per-profile calibration). */
   @Column({ type: 'uuid', nullable: true })
   profileId?: string | null;

@@ -85,6 +85,7 @@ export class AutoRiaSource implements ListingSource {
     const d = await this.get<AutoRiaInfo>('/info', params, tier, context);
     const bar = d.autoInfoBar ?? {};
     const ad = d.autoData ?? {};
+    const vinEvidence = mapVinEvidence(d);
 
     return {
       externalId,
@@ -92,6 +93,7 @@ export class AutoRiaSource implements ListingSource {
       model: d.modelName ?? '',
       markId: d.markId ?? 0,
       modelId: d.modelId ?? 0,
+      categoryId: ad.categoryId ?? undefined,
       year: ad.year ?? 0,
       mileage: ad.raceInt ?? undefined,
       stateId: d.stateData?.stateId ?? undefined,
@@ -114,10 +116,27 @@ export class AutoRiaSource implements ListingSource {
       },
       description: ad.description ?? undefined,
       gearbox: ad.gearboxName ?? undefined,
+      gearboxId: ad.gearBoxId ?? undefined,
       fuel: ad.fuelName ?? undefined,
+      fuelId: ad.fuelId ?? undefined,
       engine: ad.modificationName ?? undefined,
+      modification: ad.modificationName ?? undefined,
+      modificationId: ad.modificationId ?? undefined,
+      generation: ad.generationName ?? undefined,
+      generationId: ad.generationId ?? undefined,
       drive: ad.driveName ?? undefined,
+      driveId: ad.driveId ?? undefined,
       bodyId: ad.bodyId ?? undefined,
+      body:
+        ad.bodyName ??
+        ad.categoryName ??
+        ad.subCategoryName ??
+        ad.categoryNameEng ??
+        ad.subCategoryNameEng ??
+        undefined,
+      stateName: d.stateData?.stateName ?? undefined,
+      cityName: d.stateData?.cityName ?? undefined,
+      vinEvidence,
     };
   }
 
@@ -201,6 +220,14 @@ function mapSellerType(dealer?: { id?: number }): SellerType {
   return (dealer.id ?? 0) > 0 ? 'dealer' : 'private';
 }
 
+/** Keep absence distinct from a source-confirmed false value for valuation evidence. */
+function mapVinEvidence(info: AutoRiaInfo): ListingDetail['vinEvidence'] {
+  const hasVinReport = info.haveInfotechReport;
+  const vinChecked = info.checkedVin?.isChecked;
+  if (typeof hasVinReport !== 'boolean' && typeof vinChecked !== 'boolean') return undefined;
+  return { hasVinReport: hasVinReport === true, vinChecked: vinChecked === true };
+}
+
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
@@ -217,7 +244,7 @@ interface AutoRiaInfo {
   checkedVin?: { isChecked?: boolean };
   linkToView?: string;
   dealer?: { id?: number };
-  stateData?: { stateId?: number; cityId?: number };
+  stateData?: { stateId?: number; cityId?: number; stateName?: string; cityName?: string };
   autoData?: {
     year?: number;
     raceInt?: number;
@@ -228,11 +255,14 @@ interface AutoRiaInfo {
     driveName?: string;
     generationName?: string;
     categoryNameEng?: string;
+    categoryName?: string;
     categoryId?: number;
     modificationId?: number;
     custom?: number;
     gearboxName?: string;
     subCategoryNameEng?: string;
+    subCategoryName?: string;
+    bodyName?: string;
     version?: string;
     gearBoxId?: number;
     race?: string;

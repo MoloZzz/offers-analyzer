@@ -24,7 +24,7 @@ updated: 2026-08-02
 | `../../specs/011-valuation-sanity-guards/spec.md` | Prefer median AUTO.RIA benchmarks and prevent unverified or old claimed mileage from inflating fair value | Implemented 2026-07-29; no additional API calls |
 | `../../specs/012-executable-vault/spec.md` | Preserve the curated second brain while adding generated context, bounded retrieval, source mapping, and phased vault enforcement ([[0015-hybrid-executable-vault|ADR-0015]]) | Implemented 2026-08-02; strict CI baseline is clean, source pins start narrowly, and Claude hooks remain optional |
 | `../../specs/013-portable-ai-infra/spec.md` | Extract reusable second-brain, product-loop, and context-control mechanisms into a versioned bootstrap kit ([[0016-portable-ai-infra-kit|ADR-0016]]) | Implemented 2026-08-02; copy-and-own kit defaults to docs-only and keeps adapters, CI, hooks, and evidence opt-in |
-| `../../specs/015-defensible-valuation-evidence/spec.md` | Capture first-party AUTO.RIA provider evidence for an explicitly labelled active-market asking-price estimate, with immutable provenance, conservative review states, and source-free /why | Draft; shadow-only, disabled by default, and does not change the current score or alerts ([[0017-shadow-valuation-evidence|ADR-0017]]) |
+| `../../specs/015-defensible-valuation-evidence/spec.md` | Capture first-party AUTO.RIA provider evidence for an explicitly labelled active-market asking-price estimate, with immutable provenance, conservative review states, and source-free /why | Implemented as a shadow-only, disabled-by-default evidence path; provider traffic/audit rollout and every scoring change remain pending ([[0017-shadow-valuation-evidence|ADR-0017]]) |
 
 ## Backlog-level specs (pre-Spec-Kit)
 

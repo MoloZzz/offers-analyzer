@@ -7,7 +7,7 @@ code:
   - src/common/database/data-source.ts
   - src/common/database/migrations/*.ts
   - src/modules/**/entities/*.ts
-rev: 3af0fcad03ef
+rev: d43cce47d919
 ---
 
 # Persistence surface
@@ -22,6 +22,10 @@ rev: 3af0fcad03ef
 - `src/common/database/migrations/` is the append-only schema history. A new persistent table
   requires both an entity mapping and a reviewed migration; the executable-vault check compares
   those table sets.
+- SPEC-015 adds append-only `valuation_evidence` and `valuation_policy_versions`, plus
+  `operation_budget_states` for atomic `valuation_ai` allocation. Its migration also adds only
+  nullable Listing/Opportunity evidence pointers and immutable `BudgetActivity` audit fields; it
+  is additive and has not been applied by the implementation task.
 
 ## Review boundary
 
