@@ -26,7 +26,8 @@ score, alert, threshold, ParameterSet, factor, or survivorship correction `k`.
 [[0018-assessment-confidence-and-monetary-output|ADR-0018]] accepted the operator's scoring-proposal
 review: assessment confidence becomes a separate, **never-multiplied** output built from zero-cost
 fields, [[SPEC-006]] is promoted ahead of the remaining spec-003 factors and formalized at
-`specs/006-monetary-output-z-roi/`, and graded accident severity is closed as data-blocked. Only
+`specs/006-monetary-output-z-roi/`, and graded accident severity was closed as data-blocked — a
+closure **narrowed the same day by [[0020-graded-accident-risk|ADR-0020]]** (see below). Only
 SPEC-006 US6.1 is ungated; every monetary slice still waits on SPEC-004 `k`, SPEC-007, SPEC-008 and
 the [[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. No code was changed by that task.
 
@@ -37,6 +38,20 @@ new external-system class (constitution v1.2.0 → v1.3.0) and two specs were fo
 permanently). Both are presentation/advisory and change no score or alert set. Spec 017 ships
 disabled; provider credentials, approved terms, lawfulness of sending listing content, and a monthly
 cap are operator gates. No code was changed by either task.
+
+## Implemented 2026-08-03 — SPEC-018 phase 1 (T001–T006)
+
+The accident-severity classifier is in code: `src/modules/valuation/accident-severity.ts` (pure),
+`config/heuristics/accident-severity.json` (versioned lexicon, loaded and content-hashed by
+`HeuristicTablesService`), a 55-case labelled uk+ru corpus at `test/fixtures/accident-corpus.ts`,
+and 14 tests including the SC-002/SC-003 anti-gaming properties.
+
+**Nothing consumes the verdict.** `red-flags.ts`, `condition.ts`, `valuation.service.ts`, the score
+and the alert set are untouched, so this pass changes nothing observable and is outside the
+[[0011-evidence-gated-scoring-rollout|ADR-0011]] gates. Phase 2 (shadow persistence + the rollout
+report) and phase 3 (the operator-approved flip) are open — see
+`specs/018-graded-accident-risk/tasks.md` T007 onward and
+`context/log/2026-08-03-graded-accident-risk.md` for the implementation decisions.
 
 ## Next pickup
 
@@ -52,6 +67,12 @@ evidence to a resale model or change the live score without a separate approved 
 - Completed on 2026-08-02 (native Windows `npm.cmd` through RTK): `typecheck`, `lint`, full Jest
   (309 tests), contract Jest (23 tests), Nest build, `vault:build`, `vault:check:strict`, and
   `vault:test` all pass.
+- 2026-08-03 (native Windows `npm.cmd`; the RTK wrapper is Linux/musl and does not run here):
+  `typecheck`, `lint`, contract Jest (23), and Nest build pass. Full Jest is **322/323** — the one
+  failure, `single-flights concurrent calls…` in `test/unit/valuation-evidence.service.spec.ts`,
+  exceeds Jest's 5 s timeout and is **pre-existing and unrelated to SPEC-018** (it fails identically
+  with the spec-018 changes reverted, and that spec imports nothing touched by them). It is SPEC-015
+  work and still needs its own task.
 - The remaining blockers are external/operator gates only: approved provider credentials/terms and
   allocation, a development migration apply/re-generation check, pending gold-case captures, and
   the `/valuation_audit` review. Leave `AUTO_RIA_AI_ENABLED=false` until those gates are complete.

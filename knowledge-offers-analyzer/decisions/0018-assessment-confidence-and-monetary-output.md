@@ -91,6 +91,16 @@ have no data source short of the VIN-report options in [[vin-real-mileage]].
    evidence proving to expose structured condition features. Until then hard disqualifiers keep
    clamping the score to ≤ 0 per ADR-0006.
 
+   > **Narrowed 2026-08-03 by [[0020-graded-accident-risk|ADR-0020]].** This clause conflated two
+   > separable questions and closed both. Deriving *structured severity* (damage location, airbag
+   > state, frame condition) from the free API remains blocked exactly as written above. But whether
+   > accident presence should **clamp the score at all** is not a data question, and the answer here
+   > was wrong: `damaged` and `desc_after_accident` are both hard disqualifiers today, so an honest
+   > «після ДТП замінено бампер» is killed as hard as a total loss. ADR-0020 replaces the blanket
+   > clamp with lexicon-derived grading behind a shadow-measured, operator-approved flip, keeping a
+   > hard floor for write-off and structural evidence. Read §5 as scoped to structured severity data
+   > only.
+
 6. **The fixed additive weight vector is rejected.** ADR-0006 §3's invariants stand: price remains
    dominant, non-price contributions remain *bounded modifiers*, and an unknown factor contributes
    neutrally. An additive vector placing 70% of the weight on non-price factors would let an

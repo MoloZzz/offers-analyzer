@@ -34,6 +34,8 @@ updated: 2026-08-02
 
 - [[0019-advisory-only-ai-analysis|ADR-0019]] — On-demand AI analysis is advisory-only, admin-triggered, cached, and never a scoring input (Accepted)
 
+- [[0020-graded-accident-risk|ADR-0020]] — Accident presence is graded risk, not a hard disqualifier; narrows ADR-0018 §5 (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

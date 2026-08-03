@@ -59,7 +59,9 @@ delta       = (fair_value − asking) / fair_value      # >0 below market (good)
 raw         = clamp(delta / SCALE, −1, 1)             # SCALE ≈ 0.30 → a 30% discount saturates to ~1
 confidence  = min(1, sampleSize / (minSamples × 2))   # cohort sample size only; low data shrinks the score toward 0
 score       = raw × confidence × flagPenalty          # flagPenalty ≈ 0.8 for soft flags (e.g. no VIN)
-if a disqualifying red-flag fires: score = min(score, 0)   # a scam/damaged bargain is not a deal
+if a disqualifying red-flag fires: score = min(score, 0)   # a scam/write-off bargain is not a deal
+# Accident presence alone is no longer disqualifying — see ADR-0020: severity is graded
+# (cosmetic/moderate/severe/unknown) and only `severe` + salvage stay hard.
 ```
 
 Flag as an **Opportunity** when `score ≥ profile.minDealScore` and `sampleSize ≥ minSamples`. Rank by `score`. This unifies discount, confidence, and risk into one explainable number and degrades gracefully (unsure → near 0).
@@ -96,7 +98,9 @@ Plain words: **"cheaper than the market average for the same kind of car, with e
 ## Risk red-flags (why "cheap" is often not profitable)
 
 Cheap-vs-average is frequently a **scam, damaged, or high-friction** car. Filter/penalize:
-- damaged / after-accident / "на запчастини", salvage;
+- write-off / structural damage / "на запчастини", salvage — **hard**. Lesser accident damage is
+  **graded, not dropped**, per [[0020-graded-accident-risk|ADR-0020]]: a repainted wing is a penalty,
+  cut pillars are a disqualifier, and an unevidenced claim of minor damage floors at `unknown`;
 - customs status «нерозмитнена» / unclear paperwork;
 - price *drastically* below FV (e.g. `discount > 45%`) → treat as suspicious, not a jackpot;
 - dealer vs private mismatch, brand-new account, no VIN report / bad VIN report;

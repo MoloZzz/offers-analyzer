@@ -25,7 +25,9 @@ updated: 2026-08-02
 | **Repair-risk score** | Model-level expected-repair-cost heuristic (DSG/CVT/air suspension/aged premium diesels → HIGH; Corolla/Camry → LOW). Distinct from listing-level red-flags. | Bounded dampening, never a hard disqualifier by itself. |
 | **Negotiation signal** | Seller-motivation cue parsed from the description («торг», «терміново», «переїзд»…), negation-aware. Bounded uplift. | — |
 | **Positive signal** | Concrete quality evidence in the description (1 owner, service book, 2 keys, garage kept, factory LPG…). Bounded uplift + reduces `unverified_bargain` dampening (ADR-0006 §4 — supersedes "positives never inflate"). | Promotional fluff never fires (anti-gaming). |
-| **Red-flag** | A risk condition that disqualifies/penalizes a cheap listing (damaged, unclear customs, scam-cheap, etc.). Sources: AUTO.RIA `autoInfoBar` flags **and** condition signals parsed from the seller description (after-accident, non-runner, needs-repair — negation-aware). | — |
+| **Red-flag** | A risk condition that disqualifies/penalizes a cheap listing (write-off, unclear customs, scam-cheap, etc.). Sources: AUTO.RIA `autoInfoBar` flags **and** condition signals parsed from the seller description (non-runner, needs-repair — negation-aware). | Accident presence alone is no longer disqualifying — see **Accident severity** below ([[0020-graded-accident-risk|ADR-0020]]). |
+| **Accident severity** | A graded verdict — `cosmetic` / `moderate` / `severe` / `unknown` — derived from the AUTO.RIA damage bar plus a versioned uk+ru lexicon (spec `018-graded-accident-risk`). `severe` and salvage stay hard disqualifiers; the rest are bounded penalties. | Seller text may **raise** severity freely but may **lower** it below `unknown` only with VIN corroboration — the same asymmetry [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]] applies to claimed mileage. |
+| **`unknown` severity** | `damaged = true` with no lexical evidence — the expected modal case. Carries a bounded penalty **and** a verify-before-travelling marker. | Means "we do not know how bad", never "it was minor". Wording that implies minor damage is a defect. |
 | **Search profile** | A configured niche to monitor within the API budget. | — |
 | **Source adapter** | Implementation of the `ListingSource` port for one site (auto.ria = first). | — |
 | **Outcome** | The realized result of a flagged listing — `manual` (operator 👍/👎, bought/skipped/resold) or `passive` (price_dropped, disappeared). The ground truth for spec-002 precision + learning. Manual is idempotent per opportunity; passive is deduped per (listing, label). | Weak passive signals ≠ confirmed profit. |
@@ -55,7 +57,7 @@ updated: 2026-08-02
 ## Business rules
 
 _Draft — confirm during SDD:_
-- A listing becomes an **Opportunity** only when discount ≥ threshold **and** confidence is sufficient **and** no disqualifying red-flag. See [[profitability-definition]].
+- A listing becomes an **Opportunity** only when discount ≥ threshold **and** confidence is sufficient **and** no disqualifying red-flag. See [[profitability-definition]]. Accident presence is not by itself disqualifying — only `severe` severity and salvage are ([[0020-graded-accident-risk|ADR-0020]]).
 - Compare within the same **region/currency**; normalize UAH/USD via a stored FX rate.
 - Capture new rules here as decided; link contentious ones to an ADR in [[decisions/README]].
 

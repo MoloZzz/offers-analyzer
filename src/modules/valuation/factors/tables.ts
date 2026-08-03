@@ -5,6 +5,8 @@ import { join } from 'node:path';
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
+import type { AccidentSeverityLexicon } from '../accident-severity';
+
 /** Liquidity tier: A = very liquid (sells fast), D = illiquid (sits unsold). Spec 003 US1. */
 export type LiquidityTier = 'A' | 'B' | 'C' | 'D';
 
@@ -53,6 +55,8 @@ export interface RepairRiskPattern {
 export interface HeuristicTables {
   liquidity?: LiquidityTable;
   repairRisk?: RepairRiskTable;
+  /** Accident-severity marker lists (spec 018, FR-009). Absent → the classifier is not run. */
+  accidentSeverity?: AccidentSeverityLexicon;
 }
 
 const HEURISTICS_DIR = join(process.cwd(), 'config', 'heuristics');
@@ -81,6 +85,7 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
     this.tables = {
       liquidity: this.loadLiquidity(),
       repairRisk: this.loadRepairRisk(),
+      accidentSeverity: this.loadAccidentSeverity(),
     };
   }
 
@@ -160,6 +165,38 @@ export class HeuristicTablesService implements OnApplicationBootstrap {
     };
   }
 
+  /**
+   * Accident-severity lexicon (spec 018). Same tolerant contract as the other tables: a missing or
+   * malformed file leaves it undefined, which means the classifier simply does not run — it must
+   * never crash scoring and must never fabricate a severity verdict from a half-loaded lexicon.
+   */
+  private loadAccidentSeverity(): AccidentSeverityLexicon | undefined {
+    const raw = this.readJson('accident-severity.json');
+    if (!raw) return undefined;
+    const t = raw as Partial<AccidentSeverityLexicon>;
+    const lists: (keyof AccidentSeverityLexicon)[] = [
+      'severe',
+      'moderate',
+      'cosmetic',
+      'disclosure',
+    ];
+    if (typeof t.version !== 'string' || !lists.every((k) => isPhraseList(t[k]))) {
+      this.logger.warn(
+        { file: 'accident-severity.json' },
+        'Heuristic table failed validation — accident-severity classifier disabled',
+      );
+      return undefined;
+    }
+    // Markers are matched against a lowercased description, so lowercase them once at load.
+    return {
+      version: t.version,
+      severe: lowerAll(t.severe),
+      moderate: lowerAll(t.moderate),
+      cosmetic: lowerAll(t.cosmetic),
+      disclosure: lowerAll(t.disclosure),
+    };
+  }
+
   private readJson(file: string): unknown {
     const path = join(HEURISTICS_DIR, file);
     try {
@@ -181,6 +218,15 @@ function isTierMap(v: unknown): v is Record<string, LiquidityTier> {
     v !== null &&
     Object.values(v).every((x) => typeof x === 'string' && TIERS.has(x))
   );
+}
+
+/** A non-empty array of non-empty strings — the shape every accident-severity marker list must have. */
+function isPhraseList(v: unknown): v is string[] {
+  return Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === 'string' && x.trim() !== '');
+}
+
+function lowerAll(phrases: string[] | undefined): string[] {
+  return (phrases ?? []).map((p) => p.toLowerCase());
 }
 
 function lowerKeys<T>(m: Record<string, T>): Record<string, T> {

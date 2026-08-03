@@ -105,35 +105,35 @@
           "level": 2,
           "text": "Next",
           "line": 68,
-          "endLine": 94
+          "endLine": 105
         },
         {
           "n": 6,
           "level": 3,
           "text": "Operator-facing work admitted 2026-08-03",
-          "line": 85,
-          "endLine": 94
+          "line": 89,
+          "endLine": 105
         },
         {
           "n": 7,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 95,
-          "endLine": 100
+          "line": 106,
+          "endLine": 111
         },
         {
           "n": 8,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 101,
-          "endLine": 110
+          "line": 112,
+          "endLine": 121
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 111,
-          "endLine": 118
+          "line": 122,
+          "endLine": 129
         }
       ]
     },
@@ -430,21 +430,21 @@
           "level": 2,
           "text": "Scoring invariants",
           "line": 29,
-          "endLine": 53
+          "endLine": 60
         },
         {
           "n": 4,
           "level": 2,
           "text": "Evidence and explainability invariants",
-          "line": 54,
-          "endLine": 60
+          "line": 61,
+          "endLine": 67
         },
         {
           "n": 5,
           "level": 2,
           "text": "Authority",
-          "line": 61,
-          "endLine": 71
+          "line": 68,
+          "endLine": 78
         }
       ]
     },
@@ -483,35 +483,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 97
+          "endLine": 111
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 98,
-          "endLine": 126
+          "line": 112,
+          "endLine": 140
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 127,
-          "endLine": 135
+          "line": 141,
+          "endLine": 149
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 136,
-          "endLine": 137
+          "line": 150,
+          "endLine": 151
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 138,
-          "endLine": 148
+          "line": 152,
+          "endLine": 162
         }
       ]
     },
@@ -575,21 +575,21 @@
           "level": 2,
           "text": "Частина 2. Як ми оцінюємо «вигідність»",
           "line": 79,
-          "endLine": 123
+          "endLine": 131
         },
         {
           "n": 3,
           "level": 2,
           "text": "Пояснюваність (чому саме такий бал)",
-          "line": 124,
-          "endLine": 129
+          "line": 132,
+          "endLine": 137
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 130,
-          "endLine": 132
+          "line": 138,
+          "endLine": 140
         }
       ]
     },
@@ -1457,21 +1457,21 @@
           "level": 2,
           "text": "Decision",
           "line": 54,
-          "endLine": 106
+          "endLine": 116
         },
         {
           "n": 3,
           "level": 2,
           "text": "Consequences",
-          "line": 107,
-          "endLine": 125
+          "line": 117,
+          "endLine": 135
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 126,
-          "endLine": 137
+          "line": 136,
+          "endLine": 147
         }
       ]
     },
@@ -1515,6 +1515,45 @@
       ]
     },
     {
+      "rel": "decisions/0020-graded-accident-risk.md",
+      "path": "knowledge-offers-analyzer/decisions/0020-graded-accident-risk.md",
+      "name": "0020-graded-accident-risk",
+      "title": "ADR-0020 — Accident presence is graded risk, not a hard disqualifier",
+      "type": "decision",
+      "summary": "Narrows ADR-0018 §5 — severity classification stays data-blocked, but the blanket accident clamp is removed behind a shadow-measured, operator-approved flip.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 16,
+          "endLine": 43
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 44,
+          "endLine": 81
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 82,
+          "endLine": 100
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 101,
+          "endLine": 111
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1528,21 +1567,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 36
+          "endLine": 38
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 37,
-          "endLine": 43
+          "line": 39,
+          "endLine": 45
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 44,
-          "endLine": 47
+          "line": 46,
+          "endLine": 49
         }
       ]
     },
@@ -1598,15 +1637,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 55,
-          "endLine": 61
+          "line": 57,
+          "endLine": 63
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 62,
-          "endLine": 66
+          "line": 64,
+          "endLine": 68
         }
       ]
     },
@@ -1906,63 +1945,63 @@
           "level": 2,
           "text": "Deal score ∈ [−1, 1] (price core)",
           "line": 53,
-          "endLine": 74
+          "endLine": 76
         },
         {
           "n": 5,
           "level": 2,
           "text": "Valuation guard (SPEC-011)",
-          "line": 75,
-          "endLine": 83
+          "line": 77,
+          "endLine": 85
         },
         {
           "n": 6,
           "level": 2,
           "text": "Worked example (what the system actually does)",
-          "line": 84,
-          "endLine": 95
+          "line": 86,
+          "endLine": 97
         },
         {
           "n": 7,
           "level": 2,
           "text": "Risk red-flags (why \"cheap\" is often not profitable)",
-          "line": 96,
-          "endLine": 104
+          "line": 98,
+          "endLine": 108
         },
         {
           "n": 8,
           "level": 2,
           "text": "Known pitfalls of the average-price anchor",
-          "line": 105,
-          "endLine": 122
+          "line": 109,
+          "endLine": 126
         },
         {
           "n": 9,
           "level": 2,
           "text": "Options for the v1 definition",
-          "line": 123,
-          "endLine": 130
+          "line": 127,
+          "endLine": 134
         },
         {
           "n": 10,
           "level": 2,
           "text": "Recommendation",
-          "line": 131,
-          "endLine": 142
+          "line": 135,
+          "endLine": 146
         },
         {
           "n": 11,
           "level": 2,
           "text": "Sources",
-          "line": 143,
-          "endLine": 147
+          "line": 147,
+          "endLine": 151
         },
         {
           "n": 12,
           "level": 2,
           "text": "Related",
-          "line": 148,
-          "endLine": 152
+          "line": 152,
+          "endLine": 156
         }
       ]
     },
@@ -2001,56 +2040,56 @@
           "level": 2,
           "text": "3. What is implemented today (code-level)",
           "line": 86,
-          "endLine": 107
+          "endLine": 109
         },
         {
           "n": 5,
           "level": 2,
           "text": "4. Plans, ordered by return-on-effort (re-cut 2026-07-18 per ADR-0006 → spec 003)",
-          "line": 108,
-          "endLine": 127
+          "line": 110,
+          "endLine": 129
         },
         {
           "n": 6,
           "level": 2,
           "text": "5. Do we actually need ML? — verdict: **not yet, and not for the reason it looks like**",
-          "line": 128,
-          "endLine": 197
+          "line": 130,
+          "endLine": 199
         },
         {
           "n": 7,
           "level": 3,
           "text": "The two example listings, analysed",
-          "line": 135,
-          "endLine": 162
+          "line": 137,
+          "endLine": 164
         },
         {
           "n": 8,
           "level": 3,
           "text": "Why ML is a poor fit right now (general case)",
-          "line": 163,
-          "endLine": 179
+          "line": 165,
+          "endLine": 181
         },
         {
           "n": 9,
           "level": 3,
           "text": "When ML *would* earn its place (the steelman + trigger conditions)",
-          "line": 180,
-          "endLine": 197
+          "line": 182,
+          "endLine": 199
         },
         {
           "n": 10,
           "level": 2,
           "text": "6. How to sanity-check our scores with a stronger model",
-          "line": 198,
-          "endLine": 207
+          "line": 200,
+          "endLine": 209
         },
         {
           "n": 11,
           "level": 2,
           "text": "Related",
-          "line": 208,
-          "endLine": 213
+          "line": 210,
+          "endLine": 215
         }
       ]
     },
@@ -2220,35 +2259,35 @@
           "level": 2,
           "text": "Specs",
           "line": 11,
-          "endLine": 32
+          "endLine": 33
         },
         {
           "n": 2,
           "level": 2,
           "text": "Backlog-level specs (pre-Spec-Kit)",
-          "line": 33,
-          "endLine": 53
+          "line": 34,
+          "endLine": 54
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 54,
-          "endLine": 60
+          "line": 55,
+          "endLine": 61
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 61,
-          "endLine": 65
+          "line": 62,
+          "endLine": 66
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 66,
-          "endLine": 70
+          "line": 67,
+          "endLine": 71
         }
       ]
     }

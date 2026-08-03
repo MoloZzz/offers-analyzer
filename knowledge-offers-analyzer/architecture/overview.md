@@ -77,6 +77,20 @@ or delays an alert. `/check` can request the same sidecar explicitly when it is 
 `/why` and admin-only `/valuation_audit` read stored evidence without source traffic. The adapter
 remains disabled by default per [[0017-shadow-valuation-evidence|ADR-0017]].
 
+**Accident severity classifier** (SPEC-018 phase 1, 2026-08-03): `valuation/accident-severity.ts` is
+a pure module mapping the AUTO.RIA damage bar plus the stored description to
+`cosmetic | moderate | severe | unknown` with the matched markers as evidence. Its lexicon is
+versioned config (`config/heuristics/accident-severity.json`), loaded and content-hashed by
+`HeuristicTablesService` alongside the liquidity and repair-risk tables — a missing or malformed
+file leaves the classifier off rather than fabricating a verdict. It is deliberately **separate from
+`condition.ts`**, which answers "does the text mention a problem" and keeps its booleans unchanged.
+Severity resolves as `max(bar, text)` with one asymmetry: a text verdict below `unknown` is admitted
+only when `vinChecked || hasVinReport`, implemented as an explicit **floor** rather than a scoring
+weight so no discount can out-earn it ([[0020-graded-accident-risk|ADR-0020]],
+[[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]). **Nothing consumes the verdict yet** —
+`red-flags.ts` and scoring are untouched; shadow persistence is phase 2 and the graded-penalty flip
+is phase 3, gated on a month of evidence plus operator approval.
+
 **Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
 the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage
 requires AUTO.RIA VIN evidence and is capped at 5% once a car is 15 years old; this adds no API

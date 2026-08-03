@@ -79,8 +79,12 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 - [ ] Then choose among: remaining composite factors, cohort drift, wider coverage, additional
   sources, or ML only when their stated triggers are met.
 
-Closed by ADR-0018: graded accident severity (level 1/2/3) is data-blocked — the AUTO.RIA risk bar
-is boolean only. Reopening requires a separate decision establishing VIN-report data access.
+Partly reopened the same day. ADR-0018 closed graded accident handling as data-blocked;
+[[0020-graded-accident-risk|ADR-0020]] narrowed that closure. **Structured** severity (damage
+location, airbag state, frame condition) is still blocked and still needs a VIN-report data
+decision. But accident *presence* hard-disqualifying was never a data question, and the current
+behaviour — two independent clamps, one of which fires on the phrase «після ДТП» — is wrong.
+`018-graded-accident-risk` replaces it.
 
 ### Operator-facing work admitted 2026-08-03
 
@@ -91,6 +95,13 @@ neither is blocked by the evidence gates above.
 |---|---|---|
 | `016-full-evaluation-breakdown` | Compact alert keeps its shape; a **Деталі** button expands the full per-parameter breakdown, built once and shared with `/why` and `/check` | None — ungated. Its output is thin today and grows automatically as spec 003 activates and spec 006 lands |
 | `017-on-demand-ai-analysis` | Admin-only `/analyze_ai`: structured context to a language model, strict structured output, content-hash cache, separate budget, immutable records | Ships disabled. Provider credentials, approved terms, lawfulness of sending listing content, and an agreed monthly cap are operator gates ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
+| `018-graded-accident-risk` phases 1–2 | Severity classifier + shadow recording + a rollout report quantifying what the current clamp suppresses | None — shadow mode changes nothing observable |
+
+`018-graded-accident-risk` **phase 3** (the flip to graded penalties) is the exception: it changes
+the alert set, so it needs a month of shadow evidence plus operator approval, and should be
+considered alongside the ADR-0010 combined rollout so the operator faces one before/after
+comparison rather than two. If the shadow report shows the suppressed listings were reliably bad
+deals, the correct outcome is **not to flip** — that possibility is a designed result.
 
 ## Work-entry rule
 
