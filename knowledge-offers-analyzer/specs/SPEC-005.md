@@ -1,6 +1,7 @@
 ---
 title: SPEC-005 - Listing lifecycle and tiered re-check
 type: spec
+status: Paused
 updated: 2026-08-02
 ---
 

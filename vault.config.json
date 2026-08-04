@@ -5,6 +5,7 @@
   "indexNote": "00-INDEX",
   "roadmapNote": "Roadmap & Status",
   "contextDir": "context",
+  "specsDir": "specs",
   "currentContext": "context/CURRENT.md",
   "stack": ["Node.js + NestJS", "PostgreSQL + TypeORM", "AUTO.RIA official API + Telegram"],
   "agentScripts": ["typecheck", "lint", "test", "test:contract", "vault:check"]

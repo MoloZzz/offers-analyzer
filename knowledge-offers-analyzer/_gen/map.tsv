@@ -1,10 +1,6 @@
 # path	title	type	summary
 00-INDEX.md	Offers Analyzer - Knowledge Base Index	moc	
 Roadmap & Status.md	Roadmap & Status	roadmap	Canonical current delivery status, evidence gates, completed work, and next sequence.
-SPEC-005.md	SPEC-005 - Listing lifecycle and tiered re-check	spec	
-SPEC-006.md	SPEC-006 - Monetary output Z and ROI	spec	
-SPEC-008.md	SPEC-008 - Cohort market drift correction	spec	
-SPEC-009.md	SPEC-009 — Budget observability and rollout guardrails	spec-backlog	
 Welcome.md	Welcome	meta	
 _meta/note-template.md	<concept name>	business | roadmap | architecture | domain | decision | convention | operations | spec | moc | meta | context | context-log	
 _meta/vault-protocol.md	Vault Protocol - how agents use and maintain the knowledge base	meta	
@@ -35,6 +31,7 @@ decisions/0017-shadow-valuation-evidence.md	ADR-0017 — Keep provider valuation
 decisions/0018-assessment-confidence-and-monetary-output.md	ADR-0018 — Assessment confidence as a separate output; monetary output before more factors	decision	
 decisions/0019-advisory-only-ai-analysis.md	ADR-0019 — On-demand AI analysis is advisory-only, admin-triggered, and never a scoring input	decision	Admit a third-party LLM as a human-triggered second opinion behind a hard advisory-only boundary.
 decisions/0020-graded-accident-risk.md	ADR-0020 — Accident presence is graded risk, not a hard disqualifier	decision	Narrows ADR-0018 §5 — severity classification stays data-blocked, but the blanket accident clamp is removed behind a shadow-measured, operator-approved flip.
+decisions/0021-retrieval-discipline-by-default.md	ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation	decision	Planning questions are answered from maintained artifacts on a fixed path (`/status`) with a named escalation trigger; a proposed 350-word "Information Acquisition Policy" was rejected as redundant with rules that already existed and were violated.
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	
@@ -48,3 +45,7 @@ research/vin-real-mileage.md	Research — real (VIN-verified) mileage vs claimed
 research/when-to-alert.md	Research — when is a listing "worth alerting" (interestingness + relist de-dup)	research	
 research/why-no-opportunities.md	Research — why 0 opportunities, and how to reach business value	research	
 specs/README.md	Feature specs index (SDD)	moc	
+specs/SPEC-005.md	SPEC-005 - Listing lifecycle and tiered re-check	spec	
+specs/SPEC-006.md	SPEC-006 - Monetary output Z and ROI	spec	
+specs/SPEC-008.md	SPEC-008 - Cohort market drift correction	spec	
+specs/SPEC-009.md	SPEC-009 — Budget observability and rollout guardrails	spec	

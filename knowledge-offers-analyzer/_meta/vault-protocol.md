@@ -108,7 +108,14 @@ deliberately narrow:
 |---|---|---|
 | Frontmatter and malformed links | Error | Note author fixes the note; legacy checker remains in the same command. |
 | Entity/migration disagreement and focused tests | Error | Source owner fixes the schema registry/migration or removes focused test syntax. |
-| Generated freshness, retrieval, graph, environment, context placement, fact registry, and revision pins | Warning | Run `vault build`, correct the owner/registry/note, then use strict validation before merge. |
+| Generated freshness, retrieval, graph, environment, context placement, spec placement, fact registry, and revision pins | Warning | Run `vault build`, correct the owner/registry/note, then use strict validation before merge. |
+
+**Note placement is checked, not trusted.** Two directories own a note type: `contextDir` holds
+`context`/`context-log` notes and nothing else, and `specsDir` holds every `type: spec` note. A
+spec note elsewhere is a `spec-misplaced` finding. This rule was added 2026-08-04 after four spec
+notes sat at the vault root undetected — links resolve by **basename**, so a misplaced note
+dangles nothing and no other rule owned placement
+([[0021-retrieval-discipline-by-default|ADR-0021]]).
 
 CI and the optional hook run strict validation, so the clean baseline must remain clean. There is no
 silent environment-variable bypass and `--no-verify` is not an acceptable resolution. A temporary

@@ -21,7 +21,8 @@ updated: 2026-08-02
     rtk --version   # expect: rtk 0.42.4
     ```
   - If `tools/rtk` is missing after a fresh checkout, restore it: `tar -xzf tools/rtk-x86_64-unknown-linux-musl.tar.gz -C tools && chmod +x tools/rtk`.
-- Note: hooks run only under the **Claude Code CLI**. Cowork does not execute PreToolUse hooks, so there RTK is a discipline (use `rtk …` yourself) rather than automatic.
+- Note: hooks run only under the **Claude Code CLI**. Cowork does not execute PreToolUse hooks, so there RTK is a discipline (use `tools/rtk …` yourself) rather than automatic.
+- **Cowork: `rtk` is not on `PATH`.** The sandbox mounts the repo but installs nothing, so bare `rtk` fails with "command not found" — which silently degrades to raw, unfiltered output, the exact cost RTK exists to avoid. Invoke it **by path** instead: `tools/rtk grep …` (verified 2026-08-04: `./tools/rtk --version` → `rtk 0.42.4`; the static-musl binary runs fine there). Installing it on `PATH` is not possible per-call because each Cowork shell invocation is a fresh process with no environment carry-over.
 - If the runtime cannot execute the Linux/musl RTK binary, run the native command and record that
   fallback in the session log. Quality gates must still run.
 - Custom filters: `.rtk/filters.toml`.

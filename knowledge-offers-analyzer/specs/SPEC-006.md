@@ -1,6 +1,7 @@
 ---
 title: SPEC-006 - Monetary output Z and ROI
 type: spec
+status: Draft
 updated: 2026-08-03
 ---
 

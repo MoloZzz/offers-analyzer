@@ -18,6 +18,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   indexNote: '00-INDEX',
   roadmapNote: 'Roadmap & Status',
   contextDir: 'context',
+  specsDir: 'specs',
   currentContext: null,
   budget: null,
   stack: [],
@@ -63,6 +64,7 @@ export function normalizeConfig(raw, root = process.cwd()) {
   cfg.vaultDir = safeRelative(cfg.vaultDir, 'vaultDir');
   cfg.codeRoot = safeRelative(cfg.codeRoot, 'codeRoot');
   cfg.contextDir = safeRelative(cfg.contextDir, 'contextDir');
+  cfg.specsDir = safeRelative(cfg.specsDir, 'specsDir');
   if (cfg.currentContext !== null) {
     cfg.currentContext = safeRelative(cfg.currentContext, 'currentContext');
     if (

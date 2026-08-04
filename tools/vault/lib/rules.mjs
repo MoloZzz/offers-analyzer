@@ -33,6 +33,7 @@ const SEVERITY = Object.freeze({
   'test-only': 'error',
   'env-undocumented': 'warn',
   'context-misplaced': 'warn',
+  'spec-misplaced': 'warn',
   'status-owner-duplicate': 'warn',
   'fact-registry-invalid': 'warn',
   'fact-restated': 'warn',
@@ -216,6 +217,30 @@ function contextPlacementFindings(allNotes, curated, config) {
   return findings;
 }
 
+/**
+ * Spec notes belong in one place. Without this, a `type: spec` note authored at
+ * the vault root passes every other check: links resolve by basename, so nothing
+ * dangles, and no rule owns note placement outside the context zone. That gap let
+ * four spec notes sit beside the index for weeks. Placement is checkable, so it is
+ * checked rather than left to discipline.
+ */
+function specPlacementFindings(allNotes, config) {
+  const findings = [];
+  const specs = config.specsDir;
+  for (const note of allNotes) {
+    if (note.type !== 'spec') continue;
+    if (note.rel === specs || note.rel.startsWith(`${specs}/`)) continue;
+    findings.push(
+      finding(
+        'spec-misplaced',
+        note.rel,
+        `has type 'spec' but sits outside ${specs}/; move it so spec notes stay in one place`,
+      ),
+    );
+  }
+  return findings;
+}
+
 function sectionLinksToOwner(lines, at, owner, notes) {
   let start = at;
   while (start > 0 && lines[start - 1].trim() && !/^#{1,6}\s/.test(lines[start - 1])) start--;
@@ -393,6 +418,7 @@ export async function collectFindings(root, config) {
 
   findings.push(...sourceFactsFindings(ctx));
   findings.push(...contextPlacementFindings(all.notes, curated, config));
+  findings.push(...specPlacementFindings(all.notes, config));
   findings.push(...canonicalFactFindings(root, config, curated));
   findings.push(...retrievalFindings(root, config, curated));
 

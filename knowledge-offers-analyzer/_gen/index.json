@@ -138,155 +138,6 @@
       ]
     },
     {
-      "rel": "SPEC-005.md",
-      "path": "knowledge-offers-analyzer/SPEC-005.md",
-      "name": "SPEC-005",
-      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
-      "type": "spec",
-      "summary": null,
-      "rev": null,
-      "headings": [
-        {
-          "n": 1,
-          "level": 2,
-          "text": "Summary",
-          "line": 12,
-          "endLine": 19
-        },
-        {
-          "n": 2,
-          "level": 2,
-          "text": "Dependencies",
-          "line": 20,
-          "endLine": 25
-        },
-        {
-          "n": 3,
-          "level": 2,
-          "text": "Related",
-          "line": 26,
-          "endLine": 30
-        }
-      ]
-    },
-    {
-      "rel": "SPEC-006.md",
-      "path": "knowledge-offers-analyzer/SPEC-006.md",
-      "name": "SPEC-006",
-      "title": "SPEC-006 - Monetary output Z and ROI",
-      "type": "spec",
-      "summary": null,
-      "rev": null,
-      "headings": [
-        {
-          "n": 1,
-          "level": 2,
-          "text": "Summary",
-          "line": 11,
-          "endLine": 23
-        },
-        {
-          "n": 2,
-          "level": 2,
-          "text": "Why it was promoted",
-          "line": 24,
-          "endLine": 31
-        },
-        {
-          "n": 3,
-          "level": 2,
-          "text": "Dependencies",
-          "line": 32,
-          "endLine": 39
-        },
-        {
-          "n": 4,
-          "level": 2,
-          "text": "Related",
-          "line": 40,
-          "endLine": 45
-        }
-      ]
-    },
-    {
-      "rel": "SPEC-008.md",
-      "path": "knowledge-offers-analyzer/SPEC-008.md",
-      "name": "SPEC-008",
-      "title": "SPEC-008 - Cohort market drift correction",
-      "type": "spec",
-      "summary": null,
-      "rev": null,
-      "headings": [
-        {
-          "n": 1,
-          "level": 2,
-          "text": "Summary",
-          "line": 13,
-          "endLine": 18
-        },
-        {
-          "n": 2,
-          "level": 2,
-          "text": "Dependencies",
-          "line": 19,
-          "endLine": 23
-        },
-        {
-          "n": 3,
-          "level": 2,
-          "text": "Related",
-          "line": 24,
-          "endLine": 27
-        }
-      ]
-    },
-    {
-      "rel": "SPEC-009.md",
-      "path": "knowledge-offers-analyzer/SPEC-009.md",
-      "name": "SPEC-009",
-      "title": "SPEC-009 — Budget observability and rollout guardrails",
-      "type": "spec-backlog",
-      "summary": null,
-      "rev": null,
-      "headings": [
-        {
-          "n": 1,
-          "level": 2,
-          "text": "Goal",
-          "line": 14,
-          "endLine": 19
-        },
-        {
-          "n": 2,
-          "level": 2,
-          "text": "Required outcome",
-          "line": 20,
-          "endLine": 32
-        },
-        {
-          "n": 3,
-          "level": 2,
-          "text": "Acceptance criteria",
-          "line": 33,
-          "endLine": 40
-        },
-        {
-          "n": 4,
-          "level": 2,
-          "text": "Implementation record",
-          "line": 41,
-          "endLine": 50
-        },
-        {
-          "n": 5,
-          "level": 2,
-          "text": "Related",
-          "line": 51,
-          "endLine": 55
-        }
-      ]
-    },
-    {
       "rel": "Welcome.md",
       "path": "knowledge-offers-analyzer/Welcome.md",
       "name": "Welcome",
@@ -384,21 +235,21 @@
           "level": 2,
           "text": "Enforcement baseline and ownership",
           "line": 102,
-          "endLine": 117
+          "endLine": 124
         },
         {
           "n": 8,
           "level": 2,
           "text": "Note conventions",
-          "line": 118,
-          "endLine": 128
+          "line": 125,
+          "endLine": 135
         },
         {
           "n": 9,
           "level": 2,
           "text": "Note types",
-          "line": 129,
-          "endLine": 133
+          "line": 136,
+          "endLine": 140
         }
       ]
     },
@@ -1554,6 +1405,45 @@
       ]
     },
     {
+      "rel": "decisions/0021-retrieval-discipline-by-default.md",
+      "path": "knowledge-offers-analyzer/decisions/0021-retrieval-discipline-by-default.md",
+      "name": "0021-retrieval-discipline-by-default",
+      "title": "ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation",
+      "type": "decision",
+      "summary": "Planning questions are answered from maintained artifacts on a fixed path (`/status`) with a named escalation trigger; a proposed 350-word \"Information Acquisition Policy\" was rejected as redundant with rules that already existed and were violated.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 14,
+          "endLine": 57
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 58,
+          "endLine": 84
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 85,
+          "endLine": 106
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 107,
+          "endLine": 115
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1567,21 +1457,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 38
+          "endLine": 40
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 39,
-          "endLine": 45
+          "line": 41,
+          "endLine": 47
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 46,
-          "endLine": 49
+          "line": 48,
+          "endLine": 51
         }
       ]
     },
@@ -1663,56 +1553,56 @@
           "level": 2,
           "text": "RTK (token-saving command wrapper)",
           "line": 11,
-          "endLine": 28
+          "endLine": 29
         },
         {
           "n": 2,
           "level": 2,
           "text": "Spec Kit (SDD)",
-          "line": 29,
-          "endLine": 35
+          "line": 30,
+          "endLine": 36
         },
         {
           "n": 3,
           "level": 2,
           "text": "Executable vault",
-          "line": 36,
-          "endLine": 70
+          "line": 37,
+          "endLine": 71
         },
         {
           "n": 4,
           "level": 2,
           "text": "Portable AI infrastructure kit (external)",
-          "line": 71,
-          "endLine": 82
+          "line": 72,
+          "endLine": 83
         },
         {
           "n": 5,
           "level": 2,
           "text": "Project",
-          "line": 83,
-          "endLine": 93
+          "line": 84,
+          "endLine": 94
         },
         {
           "n": 6,
           "level": 2,
           "text": "SPEC-015 shadow valuation provider",
-          "line": 94,
-          "endLine": 119
+          "line": 95,
+          "endLine": 120
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 120,
-          "endLine": 121
+          "line": 121,
+          "endLine": 122
         },
         {
           "n": 8,
           "level": 2,
           "text": "Telegram monitoring administration",
-          "line": 122,
-          "endLine": 133
+          "line": 123,
+          "endLine": 134
         }
       ]
     },
@@ -2264,30 +2154,179 @@
         {
           "n": 2,
           "level": 2,
-          "text": "Backlog-level specs (pre-Spec-Kit)",
+          "text": "Vault-side spec notes",
           "line": 34,
-          "endLine": 54
+          "endLine": 65
         },
         {
           "n": 3,
           "level": 2,
           "text": "Constitution",
-          "line": 55,
-          "endLine": 61
+          "line": 66,
+          "endLine": 72
         },
         {
           "n": 4,
           "level": 2,
           "text": "How this connects",
-          "line": 62,
-          "endLine": 66
+          "line": 73,
+          "endLine": 77
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 67,
-          "endLine": 71
+          "line": 78,
+          "endLine": 82
+        }
+      ]
+    },
+    {
+      "rel": "specs/SPEC-005.md",
+      "path": "knowledge-offers-analyzer/specs/SPEC-005.md",
+      "name": "SPEC-005",
+      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 13,
+          "endLine": 20
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 21,
+          "endLine": 26
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 27,
+          "endLine": 31
+        }
+      ]
+    },
+    {
+      "rel": "specs/SPEC-006.md",
+      "path": "knowledge-offers-analyzer/specs/SPEC-006.md",
+      "name": "SPEC-006",
+      "title": "SPEC-006 - Monetary output Z and ROI",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 12,
+          "endLine": 24
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Why it was promoted",
+          "line": 25,
+          "endLine": 32
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 33,
+          "endLine": 40
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 41,
+          "endLine": 46
+        }
+      ]
+    },
+    {
+      "rel": "specs/SPEC-008.md",
+      "path": "knowledge-offers-analyzer/specs/SPEC-008.md",
+      "name": "SPEC-008",
+      "title": "SPEC-008 - Cohort market drift correction",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Summary",
+          "line": 14,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Dependencies",
+          "line": 20,
+          "endLine": 24
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Related",
+          "line": 25,
+          "endLine": 28
+        }
+      ]
+    },
+    {
+      "rel": "specs/SPEC-009.md",
+      "path": "knowledge-offers-analyzer/specs/SPEC-009.md",
+      "name": "SPEC-009",
+      "title": "SPEC-009 — Budget observability and rollout guardrails",
+      "type": "spec",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Goal",
+          "line": 14,
+          "endLine": 19
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Required outcome",
+          "line": 20,
+          "endLine": 32
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Acceptance criteria",
+          "line": 33,
+          "endLine": 40
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Implementation record",
+          "line": 41,
+          "endLine": 50
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Related",
+          "line": 51,
+          "endLine": 55
         }
       ]
     }

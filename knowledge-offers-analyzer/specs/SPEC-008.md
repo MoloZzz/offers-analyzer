@@ -1,12 +1,13 @@
 ---
 title: SPEC-008 - Cohort market drift correction
 type: spec
+status: Backlog
 updated: 2026-07-27
 ---
 
 # SPEC-008 - Cohort market drift correction
 
-Backlog-level note for the cohort drift idea captured in `context/backlog.md` (2026-07-22).
+Backlog-level note for the cohort drift idea captured in `../context/backlog.md` (2026-07-22).
 The goal is to project fair value forward to the expected sale date so slowly changing cohorts do
 not get underpriced by a stale snapshot.
 

@@ -36,6 +36,8 @@ updated: 2026-08-02
 
 - [[0020-graded-accident-risk|ADR-0020]] — Accident presence is graded risk, not a hard disqualifier; narrows ADR-0018 §5 (Accepted)
 
+- [[0021-retrieval-discipline-by-default|ADR-0021]] — Enforce retrieval discipline with defaults and triggers (`/status`, stated escalation), not added exhortation (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

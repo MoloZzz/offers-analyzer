@@ -31,17 +31,28 @@ updated: 2026-08-02
 | `../../specs/017-on-demand-ai-analysis/spec.md` | Admin-only `/analyze_ai` — structured context to a language model, strict structured output (warnings, inspection checklist, seller questions, advisory score), content-hash cache, separate budget, immutable records | Draft (2026-08-03; advisory-only **permanently** and disabled by default per [[0019-advisory-only-ai-analysis|ADR-0019]]; provider credentials, terms, lawfulness of sending listing content, and a monthly cap are operator gates) |
 | `../../specs/018-graded-accident-risk/spec.md` | Replace the blanket accident clamp with a lexicon-derived severity verdict (`cosmetic`/`moderate`/`severe`/`unknown`); hard floor kept for write-off and structural evidence; seller text may raise severity but may lower it only with VIN corroboration | Phases 1–2 **implemented 2026-08-03** ([[0020-graded-accident-risk|ADR-0020]]): classifier, shadow recording in `EvaluationExplanationV3`, and the admin-only `/accident_shadow` rollout report — all ungated and observationally free. **The flip to graded penalties changes the alert set and requires a month of shadow evidence plus operator approval** per [[0011-evidence-gated-scoring-rollout|ADR-0011]] |
 
-## Backlog-level specs (pre-Spec-Kit)
+## Vault-side spec notes
 
-Not yet run through `/speckit-specify` — captured directly in `context/backlog.md` (2026-07-22) as
-an addendum to ADR-0006/spec 003 and spec 002. Promote to a formal repo-root `specs/<id>/spec.md`
-spec before implementation per SDD (§2 of `CLAUDE.md`).
+Four short notes sit beside this index. They are the vault's navigable handles for specs, so
+`[[SPEC-005]]` resolves in Obsidian and an ADR can link a spec without reaching into the repo-root
+Spec Kit package. They are **not** a second source of truth — where a formal spec exists, it wins.
 
-| Backlog item | Summary | Priority |
-|---|---|---|
-| [[SPEC-008]] | Cohort market drift correction | P2 |
-| [[SPEC-009]] | Budget observability and rollout guardrails for the monthly pool | P0 |
-| ADR-0009 | Monthly rate-limit pool + priority queue (funds SPEC-005) | — (Accepted) |
+All spec notes live in this directory. That is enforced: a `type: spec` note outside
+`specsDir` is a `spec-misplaced` finding in `vault check` ([[0021-retrieval-discipline-by-default|ADR-0021]]).
+
+| Note | Kind | Summary | State |
+|---|---|---|---|
+| [[SPEC-005]] | Pointer → `../../specs/005-listing-lifecycle-rechecks/` | Listing lifecycle and tiered re-check | Paused |
+| [[SPEC-006]] | Pointer → `../../specs/006-monetary-output-z-roi/` | Monetary output `Z` and ROI | Draft |
+| [[SPEC-008]] | **Backlog only — no formal spec** | Cohort market drift correction | P2, captured in `../context/backlog.md` (2026-07-22) |
+| [[SPEC-009]] | Pointer → `../../specs/009-budget-observability/` | Budget observability and rollout guardrails | Implemented, P0 |
+
+`SPEC-008` is the only one not yet run through `/speckit-specify` — an addendum to ADR-0006/spec 003
+and spec 002. Promote it to a formal repo-root `specs/<id>/spec.md` before implementation per SDD
+(§2 of `CLAUDE.md`); when you do, **rewrite the note into a pointer in the same task** rather than
+leaving a stub and a spec that both claim to describe it.
+
+`ADR-0009` (monthly rate-limit pool + priority queue) funds SPEC-005 and is Accepted.
 
 `SPEC-009` is formalized at `../../specs/009-budget-observability/`: it is implemented with a
 durable allowed/denied budget ledger and read-only `/budget` report. The rollout gate becomes

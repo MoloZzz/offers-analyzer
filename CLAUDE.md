@@ -35,6 +35,13 @@ explicit, advisory `vault evidence` command may only write its ignored local obs
 4. Let the notes point you to the right files. Read a full note or source file only at L4, when
    implementation detail or an edit requires it; do **not** default to broad codebase grepping.
 
+**Planning questions stop at L3.** For status, roadmap, prioritization, backlog, or "what should
+I do next" questions, `Roadmap & Status`, `context/CURRENT.md`, and `_gen/code-map.txt` are
+**authoritative** — do not re-derive project state from source. Escalate to L4 only if the user
+asked for verification against the implementation, or you hit concrete evidence a note is stale;
+**state which of the two applies, and why, before opening the first source file.** `/status` is
+the standard path for this class of question — prefer it over ad-hoc exploration.
+
 When delegating, pass note references and a target question rather than pasting large note bodies.
 Every runtime, including Codex Desktop, follows this explicit L1-to-L4 protocol; Claude hooks are
 not assumed to run.
@@ -94,8 +101,11 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
   rewrites Bash commands to `rtk …` automatically. Requires a **Linux/WSL**
   environment with `rtk` on `PATH` (the binary is Linux/musl; setup:
   `operations/environment-setup.md`).
-- Where hooks do not run (e.g. Cowork), **prefix commands with `rtk` yourself**:
-  `rtk npm test`, `rtk git diff`, `rtk tsc`, `rtk grep …`.
+- Where hooks do not run (e.g. Cowork), **prefix commands with `tools/rtk` yourself**:
+  `tools/rtk npm test`, `tools/rtk git diff`, `tools/rtk tsc`, `tools/rtk grep …`. Use the
+  **path, not bare `rtk`** — outside a Linux/WSL shell where it was installed on `PATH`, bare
+  `rtk` is "command not found", which silently degrades to raw, unfiltered output. The binary
+  itself runs fine in Cowork (`./tools/rtk --version` → `rtk 0.42.4`).
 - Where RTK itself is unavailable (for example, a Windows-only agent runtime), run the
   native equivalent and state the fallback in the task record. Do not block a quality
   gate solely because the Linux/musl wrapper cannot run.

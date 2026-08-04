@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 49,
-    "links": 445,
+    "notes": 50,
+    "links": 456,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -28,38 +28,6 @@
       "outDeg": 12
     },
     {
-      "rel": "SPEC-005.md",
-      "name": "SPEC-005",
-      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
-      "type": "spec",
-      "inDeg": 4,
-      "outDeg": 4
-    },
-    {
-      "rel": "SPEC-006.md",
-      "name": "SPEC-006",
-      "title": "SPEC-006 - Monetary output Z and ROI",
-      "type": "spec",
-      "inDeg": 3,
-      "outDeg": 6
-    },
-    {
-      "rel": "SPEC-008.md",
-      "name": "SPEC-008",
-      "title": "SPEC-008 - Cohort market drift correction",
-      "type": "spec",
-      "inDeg": 3,
-      "outDeg": 1
-    },
-    {
-      "rel": "SPEC-009.md",
-      "name": "SPEC-009",
-      "title": "SPEC-009 — Budget observability and rollout guardrails",
-      "type": "spec-backlog",
-      "inDeg": 2,
-      "outDeg": 5
-    },
-    {
       "rel": "Welcome.md",
       "name": "Welcome",
       "title": "Welcome",
@@ -80,8 +48,8 @@
       "name": "vault-protocol",
       "title": "Vault Protocol - how agents use and maintain the knowledge base",
       "type": "meta",
-      "inDeg": 6,
-      "outDeg": 18
+      "inDeg": 7,
+      "outDeg": 19
     },
     {
       "rel": "architecture/invariants.md",
@@ -144,7 +112,7 @@
       "name": "0001-adopt-sdd-vault-rtk",
       "title": "ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK",
       "type": "decision",
-      "inDeg": 4,
+      "inDeg": 5,
       "outDeg": 4
     },
     {
@@ -160,7 +128,7 @@
       "name": "0003-decoupled-context-zone",
       "title": "ADR-0003 — Decoupled context zone instead of a second knowledge base",
       "type": "decision",
-      "inDeg": 3,
+      "inDeg": 4,
       "outDeg": 8
     },
     {
@@ -256,7 +224,7 @@
       "name": "0015-hybrid-executable-vault",
       "title": "ADR-0015 — Hybrid executable vault and phased enforcement",
       "type": "decision",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 4
     },
     {
@@ -300,12 +268,20 @@
       "outDeg": 14
     },
     {
+      "rel": "decisions/0021-retrieval-discipline-by-default.md",
+      "name": "0021-retrieval-discipline-by-default",
+      "title": "ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation",
+      "type": "decision",
+      "inDeg": 3,
+      "outDeg": 6
+    },
+    {
       "rel": "decisions/README.md",
       "name": "README",
       "title": "Decision log (ADRs)",
       "type": "moc",
-      "inDeg": 24,
-      "outDeg": 24
+      "inDeg": 25,
+      "outDeg": 25
     },
     {
       "rel": "decisions/adr-template.md",
@@ -328,7 +304,7 @@
       "name": "environment-setup",
       "title": "Environment setup & tooling",
       "type": "operations",
-      "inDeg": 8,
+      "inDeg": 9,
       "outDeg": 6
     },
     {
@@ -401,7 +377,39 @@
       "title": "Feature specs index (SDD)",
       "type": "moc",
       "inDeg": 7,
-      "outDeg": 17
+      "outDeg": 20
+    },
+    {
+      "rel": "specs/SPEC-005.md",
+      "name": "SPEC-005",
+      "title": "SPEC-005 - Listing lifecycle and tiered re-check",
+      "type": "spec",
+      "inDeg": 5,
+      "outDeg": 4
+    },
+    {
+      "rel": "specs/SPEC-006.md",
+      "name": "SPEC-006",
+      "title": "SPEC-006 - Monetary output Z and ROI",
+      "type": "spec",
+      "inDeg": 4,
+      "outDeg": 6
+    },
+    {
+      "rel": "specs/SPEC-008.md",
+      "name": "SPEC-008",
+      "title": "SPEC-008 - Cohort market drift correction",
+      "type": "spec",
+      "inDeg": 3,
+      "outDeg": 1
+    },
+    {
+      "rel": "specs/SPEC-009.md",
+      "name": "SPEC-009",
+      "title": "SPEC-009 — Budget observability and rollout guardrails",
+      "type": "spec",
+      "inDeg": 2,
+      "outDeg": 5
     }
   ],
   "edges": [
@@ -561,20 +569,6 @@
     },
     {
       "from": "Roadmap & Status.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 70
-    },
-    {
-      "from": "Roadmap & Status.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 76
-    },
-    {
-      "from": "Roadmap & Status.md",
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
@@ -644,116 +638,18 @@
       "line": 128
     },
     {
-      "from": "SPEC-005.md",
-      "to": "Roadmap & Status.md",
+      "from": "Roadmap & Status.md",
+      "to": "specs/SPEC-006.md",
       "anchor": null,
       "embed": false,
-      "line": 29
+      "line": 70
     },
     {
-      "from": "SPEC-005.md",
-      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "from": "Roadmap & Status.md",
+      "to": "specs/SPEC-006.md",
       "anchor": null,
       "embed": false,
-      "line": 22
-    },
-    {
-      "from": "SPEC-005.md",
-      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
-      "anchor": null,
-      "embed": false,
-      "line": 24
-    },
-    {
-      "from": "SPEC-005.md",
-      "to": "specs/README.md",
-      "anchor": null,
-      "embed": false,
-      "line": 28
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "Roadmap & Status.md",
-      "anchor": null,
-      "embed": false,
-      "line": 43
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "SPEC-008.md",
-      "anchor": null,
-      "embed": false,
-      "line": 36
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
-      "anchor": null,
-      "embed": false,
-      "line": 22
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
-      "anchor": null,
-      "embed": false,
-      "line": 19
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
-      "anchor": null,
-      "embed": false,
-      "line": 44
-    },
-    {
-      "from": "SPEC-006.md",
-      "to": "specs/README.md",
-      "anchor": null,
-      "embed": false,
-      "line": 42
-    },
-    {
-      "from": "SPEC-008.md",
-      "to": "specs/README.md",
-      "anchor": null,
-      "embed": false,
-      "line": 26
-    },
-    {
-      "from": "SPEC-009.md",
-      "to": "Roadmap & Status.md",
-      "anchor": null,
-      "embed": false,
-      "line": 54
-    },
-    {
-      "from": "SPEC-009.md",
-      "to": "SPEC-005.md",
-      "anchor": null,
-      "embed": false,
-      "line": 54
-    },
-    {
-      "from": "SPEC-009.md",
-      "to": "decisions/0009-monthly-rate-limit-pool.md",
-      "anchor": null,
-      "embed": false,
-      "line": 11
-    },
-    {
-      "from": "SPEC-009.md",
-      "to": "decisions/0009-monthly-rate-limit-pool.md",
-      "anchor": null,
-      "embed": false,
-      "line": 53
-    },
-    {
-      "from": "SPEC-009.md",
-      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
-      "anchor": null,
-      "embed": false,
-      "line": 53
+      "line": 76
     },
     {
       "from": "Welcome.md",
@@ -816,7 +712,7 @@
       "to": "_meta/note-template.md",
       "anchor": null,
       "embed": false,
-      "line": 122
+      "line": 129
     },
     {
       "from": "_meta/vault-protocol.md",
@@ -866,6 +762,13 @@
       "anchor": null,
       "embed": false,
       "line": 69
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 118
     },
     {
       "from": "_meta/vault-protocol.md",
@@ -1856,41 +1759,6 @@
     },
     {
       "from": "decisions/0009-monthly-rate-limit-pool.md",
-      "to": "SPEC-005.md",
-      "anchor": null,
-      "embed": false,
-      "line": 55
-    },
-    {
-      "from": "decisions/0009-monthly-rate-limit-pool.md",
-      "to": "SPEC-005.md",
-      "anchor": null,
-      "embed": false,
-      "line": 56
-    },
-    {
-      "from": "decisions/0009-monthly-rate-limit-pool.md",
-      "to": "SPEC-005.md",
-      "anchor": null,
-      "embed": false,
-      "line": 62
-    },
-    {
-      "from": "decisions/0009-monthly-rate-limit-pool.md",
-      "to": "SPEC-005.md",
-      "anchor": null,
-      "embed": false,
-      "line": 68
-    },
-    {
-      "from": "decisions/0009-monthly-rate-limit-pool.md",
-      "to": "SPEC-008.md",
-      "anchor": null,
-      "embed": false,
-      "line": 58
-    },
-    {
-      "from": "decisions/0009-monthly-rate-limit-pool.md",
       "to": "decisions/0004-drop-redis-bullmq.md",
       "anchor": null,
       "embed": false,
@@ -1923,6 +1791,41 @@
       "anchor": null,
       "embed": false,
       "line": 84
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 55
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 56
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 62
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 68
+    },
+    {
+      "from": "decisions/0009-monthly-rate-limit-pool.md",
+      "to": "specs/SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 58
     },
     {
       "from": "decisions/0010-defer-factor-activation-until-k.md",
@@ -1968,13 +1871,6 @@
     },
     {
       "from": "decisions/0011-evidence-gated-scoring-rollout.md",
-      "to": "SPEC-009.md",
-      "anchor": null,
-      "embed": false,
-      "line": 61
-    },
-    {
-      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
       "to": "decisions/0009-monthly-rate-limit-pool.md",
       "anchor": null,
       "embed": false,
@@ -2002,11 +1898,11 @@
       "line": 61
     },
     {
-      "from": "decisions/0012-material-repeat-alert-threshold.md",
-      "to": "SPEC-005.md",
+      "from": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "to": "specs/SPEC-009.md",
       "anchor": null,
       "embed": false,
-      "line": 27
+      "line": 61
     },
     {
       "from": "decisions/0012-material-repeat-alert-threshold.md",
@@ -2037,11 +1933,11 @@
       "line": 27
     },
     {
-      "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
-      "to": "SPEC-005.md",
+      "from": "decisions/0012-material-repeat-alert-threshold.md",
+      "to": "specs/SPEC-005.md",
       "anchor": null,
       "embed": false,
-      "line": 31
+      "line": 27
     },
     {
       "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
@@ -2053,6 +1949,13 @@
     {
       "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 31
+    },
+    {
+      "from": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "to": "specs/SPEC-005.md",
       "anchor": null,
       "embed": false,
       "line": 31
@@ -2168,27 +2071,6 @@
       "anchor": null,
       "embed": false,
       "line": 75
-    },
-    {
-      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 28
-    },
-    {
-      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 80
-    },
-    {
-      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 143
     },
     {
       "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
@@ -2317,6 +2199,27 @@
       "line": 144
     },
     {
+      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "to": "specs/SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "to": "specs/SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 80
+    },
+    {
+      "from": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "to": "specs/SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 143
+    },
+    {
       "from": "decisions/0019-advisory-only-ai-analysis.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
@@ -2406,13 +2309,6 @@
       "anchor": null,
       "embed": false,
       "line": 123
-    },
-    {
-      "from": "decisions/0020-graded-accident-risk.md",
-      "to": "SPEC-006.md",
-      "anchor": null,
-      "embed": false,
-      "line": 87
     },
     {
       "from": "decisions/0020-graded-accident-risk.md",
@@ -2506,25 +2402,74 @@
       "line": 109
     },
     {
+      "from": "decisions/0020-graded-accident-risk.md",
+      "to": "specs/SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 87
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 112
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 109
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "decisions/0003-decoupled-context-zone.md",
+      "anchor": null,
+      "embed": false,
+      "line": 111
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "decisions/0015-hybrid-executable-vault.md",
+      "anchor": null,
+      "embed": false,
+      "line": 110
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 109
+    },
+    {
+      "from": "decisions/0021-retrieval-discipline-by-default.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 112
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 48
+      "line": 50
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 44
+      "line": 46
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 44
+      "line": 46
     },
     {
       "from": "decisions/README.md",
@@ -2665,6 +2610,13 @@
       "anchor": null,
       "embed": false,
       "line": 37
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 39
     },
     {
       "from": "decisions/README.md",
@@ -2825,14 +2777,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 130
+      "line": 131
     },
     {
       "from": "operations/environment-setup.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 131
+      "line": 132
     },
     {
       "from": "operations/environment-setup.md",
@@ -2846,21 +2798,21 @@
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 132
+      "line": 133
     },
     {
       "from": "operations/environment-setup.md",
       "to": "decisions/0008-global-error-handling.md",
       "anchor": null,
       "embed": false,
-      "line": 87
+      "line": 88
     },
     {
       "from": "operations/environment-setup.md",
       "to": "decisions/0016-portable-ai-infra-kit.md",
       "anchor": null,
       "embed": false,
-      "line": 81
+      "line": 82
     },
     {
       "from": "research/alternative-sources.md",
@@ -3406,35 +3358,21 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 69
-    },
-    {
-      "from": "specs/README.md",
-      "to": "SPEC-008.md",
-      "anchor": null,
-      "embed": false,
-      "line": 42
-    },
-    {
-      "from": "specs/README.md",
-      "to": "SPEC-009.md",
-      "anchor": null,
-      "embed": false,
-      "line": 43
+      "line": 80
     },
     {
       "from": "specs/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 76
     },
     {
       "from": "specs/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 81
     },
     {
       "from": "specs/README.md",
@@ -3497,7 +3435,7 @@
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 60
+      "line": 71
     },
     {
       "from": "specs/README.md",
@@ -3508,17 +3446,164 @@
     },
     {
       "from": "specs/README.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
+    },
+    {
+      "from": "specs/README.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 76
     },
     {
       "from": "specs/README.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 75
+    },
+    {
+      "from": "specs/README.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
+      "from": "specs/README.md",
+      "to": "specs/SPEC-006.md",
+      "anchor": null,
+      "embed": false,
+      "line": 46
+    },
+    {
+      "from": "specs/README.md",
+      "to": "specs/SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 47
+    },
+    {
+      "from": "specs/README.md",
+      "to": "specs/SPEC-009.md",
+      "anchor": null,
+      "embed": false,
+      "line": 48
+    },
+    {
+      "from": "specs/SPEC-005.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "specs/SPEC-005.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "specs/SPEC-005.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 25
+    },
+    {
+      "from": "specs/SPEC-005.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 44
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 23
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "anchor": null,
+      "embed": false,
+      "line": 20
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 43
+    },
+    {
+      "from": "specs/SPEC-006.md",
+      "to": "specs/SPEC-008.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "specs/SPEC-008.md",
+      "to": "specs/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "specs/SPEC-009.md",
+      "to": "Roadmap & Status.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
+    },
+    {
+      "from": "specs/SPEC-009.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "specs/SPEC-009.md",
+      "to": "decisions/0009-monthly-rate-limit-pool.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "specs/SPEC-009.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "specs/SPEC-009.md",
+      "to": "specs/SPEC-005.md",
+      "anchor": null,
+      "embed": false,
+      "line": 54
     }
   ],
   "dangling": [],
@@ -3528,10 +3613,6 @@
     [
       "00-INDEX.md",
       "Roadmap & Status.md",
-      "SPEC-005.md",
-      "SPEC-006.md",
-      "SPEC-008.md",
-      "SPEC-009.md",
       "Welcome.md",
       "_meta/note-template.md",
       "_meta/vault-protocol.md",
@@ -3562,6 +3643,7 @@
       "decisions/0018-assessment-confidence-and-monetary-output.md",
       "decisions/0019-advisory-only-ai-analysis.md",
       "decisions/0020-graded-accident-risk.md",
+      "decisions/0021-retrieval-discipline-by-default.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",
@@ -3574,7 +3656,11 @@
       "research/vin-real-mileage.md",
       "research/when-to-alert.md",
       "research/why-no-opportunities.md",
-      "specs/README.md"
+      "specs/README.md",
+      "specs/SPEC-005.md",
+      "specs/SPEC-006.md",
+      "specs/SPEC-008.md",
+      "specs/SPEC-009.md"
     ]
   ],
   "orphans": [],

@@ -1,6 +1,6 @@
 ---
 title: SPEC-009 — Budget observability and rollout guardrails
-type: spec-backlog
+type: spec
 status: Implemented
 priority: P0
 updated: 2026-08-02
@@ -9,7 +9,7 @@ updated: 2026-08-02
 # SPEC-009 — Budget observability and rollout guardrails
 
 Backlog-level specification for the verification debt in [[0009-monthly-rate-limit-pool|ADR-0009]].
-Formalized and implemented at `../specs/009-budget-observability/` on 2026-07-28.
+Formalized and implemented at `../../specs/009-budget-observability/` on 2026-07-28.
 
 ## Goal
 
