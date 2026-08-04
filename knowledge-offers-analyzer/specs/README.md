@@ -19,7 +19,7 @@ updated: 2026-08-02
 | `../../specs/005-listing-lifecycle-rechecks/spec.md` | Re-check active listings by score proximity and seller behavior so meaningful price cuts are re-scored and alerted | Paused (formalized 2026-07-28; implementation waits for demonstrated operator profit, then SPEC-009 evidence and operator approval) |
 | `../../specs/007-deal-outcomes/spec.md` | Capture real post-deal economics (bought/declined/sold + prices + costs + realized DOM) as a stateful `deal_outcomes` record, and compute realized margin (`sell - buy - costs`) - the ground truth 👍/👎 only approximates | Draft (US7.1-US7.2 implemented 2026-07-23; US7.3 (re-target auto-tuning, CHANGE-002.1) + US7.4 (`Z` calibration) pending) |
 
-| `../../specs/006-monetary-output-z-roi/spec.md` | Projected dollar profit `Z` and `ROI` beside the 0–100 score, replacing the dimensionless liquidity/repair-risk multipliers with money; plus a separate, never-multiplied **assessment confidence** output | Draft (formalized 2026-08-03, promoted ahead of the remaining spec-003 factors by [[0018-assessment-confidence-and-monetary-output|ADR-0018]]; only US6.1 assessment confidence is ungated — the monetary slices wait on SPEC-004 `k`, SPEC-007, SPEC-008) |
+| `../../specs/006-monetary-output-z-roi/spec.md` | Projected dollar profit `Z` and `ROI` beside the 0–100 score, replacing the dimensionless liquidity/repair-risk multipliers with money; plus a separate, never-multiplied **assessment confidence** output | **US6.1 implemented 2026-08-04** (T001–T013: assessment confidence, its non-multiplication guard, alert and `/why` rendering); phases 4–7 remain Draft. Promoted ahead of the remaining spec-003 factors by [[0018-assessment-confidence-and-monetary-output|ADR-0018]]; the monetary slices wait on SPEC-004 `k`, SPEC-007, SPEC-008 |
 
 | `../../specs/010-budget-stabilization/spec.md` | Reduce legacy rechecks and unshareable cohort requests while preserving production discovery | Implemented; observe ledger before any further budget expansion |
 
@@ -43,7 +43,7 @@ All spec notes live in this directory. That is enforced: a `type: spec` note out
 | Note | Kind | Summary | State |
 |---|---|---|---|
 | [[SPEC-005]] | Pointer → `../../specs/005-listing-lifecycle-rechecks/` | Listing lifecycle and tiered re-check | Paused |
-| [[SPEC-006]] | Pointer → `../../specs/006-monetary-output-z-roi/` | Monetary output `Z` and ROI | Draft |
+| [[SPEC-006]] | Pointer → `../../specs/006-monetary-output-z-roi/` | Monetary output `Z` and ROI | US6.1 implemented; monetary slices Draft |
 | [[SPEC-008]] | **Backlog only — no formal spec** | Cohort market drift correction | P2, captured in `../context/backlog.md` (2026-07-22) |
 | [[SPEC-009]] | Pointer → `../../specs/009-budget-observability/` | Budget observability and rollout guardrails | Implemented, P0 |
 

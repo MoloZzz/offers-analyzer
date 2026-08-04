@@ -26,6 +26,27 @@ export interface ScoringParams {
   upliftCap?: number;
   /** Content hashes of the heuristic tables that scored a listing (audit trail; spec 003). */
   heuristicTableHashes?: Record<string, string>;
+
+  // --- Spec 006 (ADR-0018). All optional, and all governed by one rule: an absent entry means the
+  // corresponding output is **omitted**, never defaulted to a fabricated value. A missing cost table
+  // must produce no `C_rec`, not a plausible-looking $0 — the system omits rather than invents.
+  // None of these is read by any scoring value; they configure projections beside the score.
+
+  /**
+   * Per-input weight overrides for assessment confidence, keyed by `ConfidenceInputKey`. Present
+   * (even empty) enables the output with the code defaults; absent omits it entirely (US6.1, FR-007).
+   */
+  confidenceWeights?: Record<string, number>;
+  /** Version of `config/heuristics/cost-estimates.json` that produced `C_rec` (spec 006 US6.2). */
+  costTableVersion?: string;
+  /** Negotiation ladder for the buy-side estimate `B` (spec 006 US6.3). */
+  torgLadder?: Record<string, number>;
+  /** Expected days-on-market per liquidity tier, e.g. `{ A: 25, B: 45, C: 70, D: 120 }` (US6.2). */
+  domExpectedByTier?: Record<string, number>;
+  /** The operator's annual cost of capital `r`, used by `C_hold` (US6.2). */
+  costOfCapital?: number;
+  /** `C_fix` — paperwork, inspection and transfer fees, in USD (US6.2). */
+  cFix?: number;
 }
 
 /** Default price-dominance cap when a ParameterSet predates spec 003. */

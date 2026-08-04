@@ -2,9 +2,14 @@ import { Currency } from '../../../common/types/money';
 import { ListingDetail } from '../../sources/ports/listing-source.port';
 import { valuationReasonLabel } from '../../valuation/comparability';
 import { ValuationEvidence } from '../../valuation/entities/valuation-evidence.entity';
-import { EvaluationExplanation } from '../../valuation/evaluation-explanation';
+import {
+  EvaluationExplanation,
+  EvaluationExplanationV3,
+} from '../../valuation/evaluation-explanation';
 import { ValuationResult } from '../../valuation/valuation.service';
+import { AssessmentConfidence, ConfidenceInput } from '../../valuation/valuation.types';
 
+import { confidenceInputLabel } from './confidence-labels';
 import { FLAG_LABELS } from './opportunity-message';
 
 export interface WhyContext {
@@ -96,6 +101,7 @@ export function formatStoredWhy(
   for (const f of explanation.factors) {
     lines.push(`• ${f.factor}: ${f.subScore100}/100 — ${f.reasons.join(', ')}`);
   }
+  lines.push(...formatAssessmentConfidence(explanation));
   const risks = [
     ...(firedFromData.length ? [`дані AUTO.RIA: ${firedFromData.join(', ')}`] : []),
     ...(firedFromDesc.length ? [`опис: ${firedFromDesc.join(', ')}`] : []),
@@ -105,6 +111,73 @@ export function formatStoredWhy(
   lines.push(`Вердикт: ${verdict}`);
   lines.push(`🔗 ${explanation.listing.url}`);
   return lines.join('\n');
+}
+
+/**
+ * The **full** assessment-confidence reason list (spec 006 US6.1, SC-005) — this is what separates
+ * `/why` from the one-line alert, which shows only the percent and the top reasons.
+ *
+ * Rendered from the persisted explanation and nothing else: no re-fetch, no recomputation, no call
+ * into the valuation service. A record that carries no confidence says so plainly rather than
+ * growing one at render time.
+ *
+ * The percent is **evidence coverage**, not a score input. It is never multiplied into `score`,
+ * `total100`, the threshold, or the alert decision (ADR-0018 §1), and the copy says so on the
+ * header line so an operator cannot read the two as the same number.
+ */
+function formatAssessmentConfidence(explanation: EvaluationExplanation): string[] {
+  // Three genuinely different absences, and the record itself is what distinguishes them. V1/V2
+  // predate the measure entirely — that is an old snapshot, not a fault, and must not read as one.
+  if (!carriesAssessmentConfidence(explanation)) {
+    return [
+      `🧭 Впевненість оцінки: не рахувалася — знімок зроблено до появи цієї метрики (схема v${explanation.schemaVersion}).`,
+    ];
+  }
+
+  const confidence = explanation.assessmentConfidence;
+  if (!confidence) {
+    // A V3 record with no confidence: either the active ParameterSet carried no `confidenceWeights`,
+    // or the guard swallowed a computation error (US6.1 AS-4). The persisted record cannot tell the
+    // two apart — inventing a specific cause here would be a claim the data does not support.
+    return [
+      '🧭 Впевненість оцінки: не вимірювалася для цього знімка — активний набір параметрів не мав ваг або розрахунок не вдався. На бал і поріг це не впливає.',
+    ];
+  }
+
+  return [
+    `🧭 Впевненість оцінки: ${confidence.percent}% — це охоплення доказів, а не частина балу: на бал, поріг і рішення про сповіщення вона не впливає.`,
+    ...(confidence.floored
+      ? ['Доказів практично немає — показано нижню межу шкали, а не розрахований відсоток.']
+      : []),
+    ...formatConfidenceReasons(confidence),
+  ];
+}
+
+/**
+ * Whether the record's schema is new enough to carry the field at all. `>=` for the same reason
+ * `isEvaluationExplanationV2` uses it: an equality check would silently drop confidence from `/why`
+ * the day a V4 ships.
+ */
+function carriesAssessmentConfidence(
+  explanation: EvaluationExplanation,
+): explanation is EvaluationExplanationV3 {
+  return explanation.schemaVersion >= 3;
+}
+
+/** One line per input, always — a percent may never contain an unexplained deduction (SC-002). */
+function formatConfidenceReasons(confidence: AssessmentConfidence): string[] {
+  if (confidence.reasons.length === 0) {
+    return ['Перелік підстав у знімку відсутній.'];
+  }
+  // Reasons and inputs are one-to-one and same-ordered by construction, but pairing by key keeps a
+  // reason attached to *its* input even if a record was written with a different ordering.
+  const byKey = new Map<string, ConfidenceInput>(confidence.inputs.map((i) => [i.key, i]));
+  return confidence.reasons.map((reason) => {
+    const label = confidenceInputLabel(reason.key);
+    const input = byKey.get(reason.key);
+    const weightNote = input ? ` (внесок ${input.contribution} з ${input.weight})` : '';
+    return `${reason.sign} ${label}: ${reason.text}${weightNote}`;
+  });
 }
 
 /** Stored provider evidence only: this formatter must never trigger a source request. */

@@ -1,7 +1,7 @@
 ---
 title: Current task handoff
 type: context
-updated: 2026-08-03
+updated: 2026-08-04
 ---
 
 # Current task handoff
@@ -10,6 +10,27 @@ updated: 2026-08-03
 > file as a second roadmap.
 
 ## Active work
+
+**SPEC-006 US6.1, assessment confidence — implemented 2026-08-04 (T001–T013).** A separate,
+never-multiplied evidence-coverage output over already-fetched fields, rendered as one
+`Доказова база` line in the alert and as the full signed reason list in `/why`. It changes no
+score, threshold, ParameterSet activation, or alert set — asserted at unit level across three
+weight configurations (`test/unit/valuation-additivity.spec.ts`) and at alert-set level
+(`test/integration/assessment-confidence-equivalence.spec.ts`) — so it sits outside the ADR-0011
+gates. Details and the decisions behind the weight table:
+`context/log/2026-08-04-assessment-confidence.md`.
+
+**One operator step before it is visible on an existing deployment:** `confidenceWeights` is seeded
+into new ParameterSets but deliberately not backfilled, so a deployment whose active set predates
+spec 006 renders no confidence line until one `createCandidate` + `activate`. Absent weights omit
+the output rather than fabricate a default (T003).
+
+The pre-existing `single-flights concurrent calls…` failure in
+`test/unit/valuation-evidence.service.spec.ts` is **fixed** — two defects in the test itself
+(a fixed-tick microtask drain, and an unpinned `now` whose fixture had since expired against the
+real clock). The suite is 492/492.
+
+## Previously (still current)
 
 SPEC-015, Defensible valuation evidence, is implemented at
 `specs/015-defensible-valuation-evidence/`. It adds an official AUTO.RIA AI provider-evidence path
@@ -69,7 +90,13 @@ flip should be presented alongside the combined rollout. See
 
 ## Next pickup
 
-For the next task, read this handoff and `specs/015-defensible-valuation-evidence/quickstart.md`.
+With US6.1 shipped, the remaining **ungated** engineering work is `016-full-evaluation-breakdown`
+and `017-on-demand-ai-analysis` (the latter ships disabled behind operator gates). Everything else
+— the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence gates or the
+month-long accident shadow window, not on code.
+
+If the pickup is instead SPEC-015, read this handoff and
+`specs/015-defensible-valuation-evidence/quickstart.md`.
 Confirm official AUTO.RIA AI permission, allowed storage/attribution, effective pricing/allocation,
 and sanitized fixture parity before enabling any provider request. On an operator-approved
 development database, apply and regenerate the additive migration to verify no schema churn. Then
@@ -81,14 +108,16 @@ evidence to a resale model or change the live score without a separate approved 
 - Completed on 2026-08-02 (native Windows `npm.cmd` through RTK): `typecheck`, `lint`, full Jest
   (309 tests), contract Jest (23 tests), Nest build, `vault:build`, `vault:check:strict`, and
   `vault:test` all pass.
-- 2026-08-03 (native Windows `npm.cmd`; the RTK wrapper is Linux/musl and does not run here):
-  `typecheck`, `lint`, contract Jest (46), and Nest build pass. Full Jest is **708/709** — the one
-  failure, `single-flights concurrent calls…` in `test/unit/valuation-evidence.service.spec.ts`,
-  exceeds Jest's 5 s timeout and is **pre-existing and unrelated to SPEC-018**. Root cause is now
-  identified: the test hand-drives a promise resolver assuming `maybeCapture` yields exactly one
-  microtask before calling the provider; when it yields more, `resolveProvider` is still `undefined`,
-  the optional-chained call silently no-ops, and `Promise.all` never settles. It is a defect in the
-  test, not a slow test. SPEC-015 work; still needs its own task.
+- 2026-08-04 (native Windows `npm.cmd`; the RTK wrapper is Linux/musl and does not run here):
+  `typecheck`, `lint`, unit Jest **492/492**, contract Jest **46/46**, and Nest build all pass.
+  The `single-flights concurrent calls…` failure carried since 2026-08-03 is **resolved** — it was
+  two defects in the test, not in the code: a fixed-tick microtask drain that assumed
+  `maybeCapture` reaches the provider after exactly one tick (it awaits the freshness lookup
+  first, leaving `resolveProvider` undefined so `Promise.all` never settled), and an unpinned
+  `now` that let its 2026-08-02 fixture expire against the real clock.
+- Jest also scans a stale git worktree at `.claude/worktrees/eager-easley-3aaaf6`, which
+  double-counts suites; runs used `--testPathIgnorePatterns worktrees`. The worktree should be
+  removed — it belongs to no active task.
 - The remaining blockers are external/operator gates only: approved provider credentials/terms and
   allocation, a development migration apply/re-generation check, pending gold-case captures, and
   the `/valuation_audit` review. Leave `AUTO_RIA_AI_ENABLED=false` until those gates are complete.

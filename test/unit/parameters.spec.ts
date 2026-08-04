@@ -17,6 +17,9 @@ describe('buildSeedParams', () => {
       factorBounds: {},
       heuristicTableHashes: {},
       upliftCap: 1.25,
+      // spec 006 US6.1 — enables assessment confidence with the code default weights. It gates
+      // nothing, so seeding it changes no score (asserted by `valuation-additivity.spec.ts`).
+      confidenceWeights: {},
     });
   });
 });

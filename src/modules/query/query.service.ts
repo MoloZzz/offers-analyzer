@@ -131,6 +131,10 @@ export class QueryService {
       mileageK: detail.mileage,
       year: detail.year,
       vinChecked: detail.risk.vinChecked,
+      // Assessment-confidence evidence inputs only (spec 006 US6.1); already fetched, no extra call.
+      body: detail.body,
+      generation: detail.generation,
+      cohortTier: benchmark?.cohort.tier,
     });
     const sampleSize = benchmark?.sampleSize ?? 0;
     const benchmarkBase = benchmark?.value.amount ?? 0;

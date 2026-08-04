@@ -13,14 +13,14 @@ PostgreSQL + TypeORM
 AUTO.RIA official API + Telegram
 
 ## STATUS (canon Roadmap & Status.md)
-checkboxes  done=5 open=7
+checkboxes  done=7 open=6
 
 ## CODE (derived from .)
 entities    21
 migrations  21
 providers   AutoRiaSource(auto-ria)
-tests       unit 328/52 files
-            integration 13/2 files
+tests       unit 372/54 files
+            integration 18/3 files
 map         knowledge-offers-analyzer/_gen/code-map.txt (read before source edits)
 facts       knowledge-offers-analyzer/_gen/facts.txt (verified adapter facts)
 

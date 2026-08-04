@@ -5,6 +5,7 @@ import { ParametersService } from '../calibration/parameters.service';
 import { SellerType } from '../sources/ports/listing-source.port';
 
 import { AccidentSeverity, assessAccidentSeverity } from './accident-severity';
+import { computeAssessmentConfidence } from './assessment-confidence';
 import { assessCondition } from './condition';
 import { composeFactors, FactorScore, toTotal100 } from './factors/factor';
 import { liquidityFactor } from './factors/liquidity';
@@ -12,6 +13,7 @@ import { repairRiskFactor } from './factors/repair-risk';
 import { HeuristicTables, HeuristicTablesService } from './factors/tables';
 import { assessMileageRisk } from './mileage-risk';
 import { evaluateRedFlags } from './red-flags';
+import { AssessmentConfidence } from './valuation.types';
 
 export interface ValuationInput {
   asking: number;
@@ -45,6 +47,15 @@ export interface ValuationInput {
   fuel?: string;
   /** Engine/modification info — feeds repair-risk factor (spec 003 US2). */
   engine?: string;
+  // --- Assessment-confidence inputs only (spec 006 US6.1). Already-fetched fields, added here so
+  // the measure can be computed at the one site that already holds the rest of the evaluation. No
+  // scoring value reads them, and none of them causes a new source request (SC-004).
+  /** Body type — evidence-coverage input. */
+  body?: string;
+  /** Generation name — evidence-coverage input. */
+  generation?: string;
+  /** `ResolvedBenchmark.cohort.tier` — how like-for-like the comparables were. */
+  cohortTier?: string;
 }
 
 export interface ValuationResult {
@@ -78,6 +89,14 @@ export interface ValuationResult {
    * lexicon is absent. Phase 3 is what makes it act, via a ParameterSet.
    */
   accidentSeverity: AccidentSeverity | null;
+  /**
+   * How well-evidenced this evaluation is (spec 006 US6.1). **A separate output, never a
+   * multiplier** — nothing in this function reads it and no scoring value above depends on it
+   * (ADR-0018 §1, FR-002). `null` when the active ParameterSet carries no `confidenceWeights`, or
+   * when the computation threw: absent means "not measured", and evaluation completes either way
+   * (US6.1 AS-4).
+   */
+  assessmentConfidence: AssessmentConfidence | null;
 }
 
 /**
@@ -185,6 +204,11 @@ export function computeValuation(
   const isOpportunity =
     score >= input.minScore && hasEnoughData && !disqualified && priceCore > 0;
 
+  // Spec 006 US6.1. Computed **last, deliberately**: every scoring value above is already final by
+  // the time it exists, so the non-multiplication invariant holds by position and not by discipline.
+  // Absent weights → absent output; a throw → absent output and a completed evaluation (AS-4).
+  const assessmentConfidence = safeAssessmentConfidence(input, params);
+
   return {
     isOpportunity,
     discountPct: round(discountPct),
@@ -199,7 +223,47 @@ export function computeValuation(
     factors,
     total100: toTotal100(score),
     accidentSeverity,
+    assessmentConfidence,
   };
+}
+
+/**
+ * The AS-4 guard. Assessment confidence is a display projection, so a defect in it must degrade to
+ * "not measured" rather than take the evaluation down with it — losing an alert costs the operator a
+ * car, losing a percentage costs them a line of text. A bare `catch` is justified precisely because
+ * there is no recovery to attempt and nothing downstream depends on the value; the alternative is a
+ * scoring outage caused by a cosmetic field.
+ */
+function safeAssessmentConfidence(
+  input: ValuationInput,
+  params: ScoringParams,
+): AssessmentConfidence | null {
+  // Absent weights means "this ParameterSet predates the measure" — omit it rather than invent a
+  // percent from defaults the operator never approved (spec 006 T003).
+  if (!params.confidenceWeights) return null;
+  try {
+    return computeAssessmentConfidence(
+      {
+        vinChecked: input.vinChecked,
+        hasVinReport: input.hasVinReport,
+        sampleSize: input.sampleSize,
+        minSamples: input.minSamples,
+        cohortTier: input.cohortTier,
+        gearbox: input.gearbox,
+        engine: input.engine,
+        body: input.body,
+        fuel: input.fuel,
+        generation: input.generation,
+        description: input.description,
+        mileageK: input.mileageK,
+        year: input.year,
+        mileageAnnualK: params.mileageAnnualK,
+      },
+      params.confidenceWeights,
+    );
+  } catch {
+    return null;
+  }
 }
 
 @Injectable()

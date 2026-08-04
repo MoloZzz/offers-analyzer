@@ -11,6 +11,7 @@ import {
   ValuationQueryMode,
 } from './valuation-evidence.types';
 import { ValuationResult } from './valuation.service';
+import { AssessmentConfidence, MonetaryOutput } from './valuation.types';
 
 export interface EvaluationExplanationBase {
   evaluatedAt: string;
@@ -78,9 +79,14 @@ export interface EvaluationExplanationV2 extends EvaluationExplanationBase {
 }
 
 /**
- * Adds the spec-018 shadow accident verdict and the heuristic-table provenance. Both are additive
- * and neither participates in the scoring values above — a V3 record scores identically to the V1 it
- * would otherwise have been.
+ * Adds the spec-018 shadow accident verdict, the heuristic-table provenance, and the spec-006
+ * projections. All are additive and none participates in the scoring values above — a V3 record
+ * scores identically to the V1 it would otherwise have been.
+ *
+ * V3 is deliberately **one** version that grows by adding optional fields rather than a version per
+ * spec: every field here is independently optional, so a record written before a given field shipped
+ * is still a valid V3 and `/why` renders what a record actually carries. Bumping to V4 for an
+ * additive field would only buy a number that no reader can act on.
  */
 export interface EvaluationExplanationV3 extends EvaluationExplanationBase {
   schemaVersion: 3;
@@ -96,6 +102,21 @@ export interface EvaluationExplanationV3 extends EvaluationExplanationBase {
    * schema change; covers liquidity, repair-risk and accident-severity together.
    */
   heuristicTableHashes?: Record<string, string>;
+  /**
+   * How well-evidenced this evaluation was (spec 006 US6.1). `null` when the active ParameterSet
+   * carries no `confidenceWeights`, or when the computation failed — absent means "not measured",
+   * never "poorly evidenced". `/why` renders the full reason list from here with zero source calls
+   * (SC-005), which is why the inputs and their weights are persisted and not just the percent.
+   *
+   * It is **not** the `confidence` field above. That one is cohort sample size and multiplies into
+   * the score; this one is never multiplied into anything (ADR-0018 §1).
+   */
+  assessmentConfidence?: AssessmentConfidence | null;
+  /**
+   * The `Z`/`ROI` decomposition (spec 006 US6.4), persisted whole so a historical `Z` is
+   * reproducible. Not populated yet — US6.4 is blocked on SPEC-004's `k`.
+   */
+  monetary?: MonetaryOutput | null;
 }
 
 export type EvaluationExplanation =
@@ -153,6 +174,7 @@ export function buildEvaluationExplanation(input: {
     isOpportunity: input.result.isOpportunity,
     disqualified: input.result.disqualified,
     accidentSeverity: input.result.accidentSeverity,
+    assessmentConfidence: input.result.assessmentConfidence,
     ...(input.heuristicTableHashes ? { heuristicTableHashes: input.heuristicTableHashes } : {}),
   };
 }

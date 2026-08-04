@@ -36,6 +36,19 @@ function completeFacts(): ProviderVehicleFacts {
   };
 }
 
+/**
+ * Yield the microtask queue until `until` holds (default: a fixed drain). Nothing under test uses
+ * timers, so microtasks alone are enough; the bound only exists so a never-satisfied condition
+ * fails loudly here instead of hanging until Jest's timeout.
+ */
+async function drainMicrotasks(until?: () => boolean, ticks = 100): Promise<void> {
+  for (let i = 0; i < ticks; i += 1) {
+    if (until?.()) return;
+    await Promise.resolve();
+  }
+  if (until && !until()) throw new Error(`condition not satisfied after ${ticks} microtask ticks`);
+}
+
 function request(overrides: Partial<ProviderValuationRequest> = {}): ProviderValuationRequest {
   return {
     providerKey: 'auto-ria-ai',
@@ -228,25 +241,32 @@ describe('ValuationEvidenceService', () => {
 
   it('single-flights concurrent calls and reuses a fresh stored answer instead of mutating it', async () => {
     const evidence = evidenceRepository();
-    let resolveProvider: ((outcome: ProviderValuationOutcome) => void) | undefined;
-    const provider = {
-      valuate: jest.fn(
-        () =>
-          new Promise<ProviderValuationOutcome>((resolve) => {
-            resolveProvider = resolve;
-          }),
-      ),
-    };
+    // The deferred is built up front: `maybeCapture` awaits the freshness lookup before it reaches
+    // the provider, so a resolver assigned inside `valuate` is not yet visible after a fixed number
+    // of microtask ticks. Draining until the call actually lands keeps the test independent of how
+    // many awaits precede it.
+    let resolveProvider!: (outcome: ProviderValuationOutcome) => void;
+    const providerCall = new Promise<ProviderValuationOutcome>((resolve) => {
+      resolveProvider = resolve;
+    });
+    const provider = { valuate: jest.fn(() => providerCall) };
     const service = new ValuationEvidenceService(evidence.repo as never, undefined, undefined, provider as never);
-    const input = { listing: { id: 'listing-1', externalId: '38266770' }, request: request() };
+    // `now` is pinned to the fixture's capture instant: freshness is measured against
+    // `sourceCapturedAt`, so with the real clock the stored answer expires and the reuse leg of
+    // this test silently becomes a second provider call.
+    const input = {
+      listing: { id: 'listing-1', externalId: '38266770' },
+      request: request(),
+      now: new Date('2026-08-02T03:10:15.000Z'),
+    };
 
     const first = service.maybeCapture(input);
-    await Promise.resolve();
+    await drainMicrotasks(() => provider.valuate.mock.calls.length === 1);
     const second = service.maybeCapture(input);
-    await Promise.resolve();
+    await drainMicrotasks();
     expect(provider.valuate).toHaveBeenCalledTimes(1);
 
-    resolveProvider?.(availableOutcome());
+    resolveProvider(availableOutcome());
     const [firstResult, secondResult] = await Promise.all([first, second]);
     expect(firstResult.id).toBe(secondResult.id);
     expect(evidence.rows).toHaveLength(1);

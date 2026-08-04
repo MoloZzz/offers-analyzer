@@ -49,6 +49,7 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 | Composite score foundation (SPEC-003) | Score presentation, liquidity, and repair-risk foundations exist but are intentionally inactive in production. Seller, positives, and segment-mileage factors remain later work. |
 | Budget stabilization (SPEC-010) | Implemented to protect fresh-listing discovery and make cohorts reusable. |
 | Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. |
+| Assessment confidence (SPEC-006 US6.1) | Implemented 2026-08-04: a separate, never-multiplied evidence-coverage output over zero-cost fields, rendered in the alert and `/why`. The non-multiplication property is asserted at both unit and alert-set level. The remaining SPEC-006 monetary slices stay gated. |
 | Executable hybrid vault (SPEC-012) | Implemented: generated L1 context, bounded retrieval, verified Offers source facts, strict CI validation, and advisory-only evidence. |
 | Portable AI infrastructure kit (SPEC-013) | Implemented: clean-room, copy-and-own second-brain/bootstrap kit with safe docs-only defaults and opt-in extensions. |
 
@@ -57,6 +58,7 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 - [x] Composite score foundation and its intentionally inactive first factors are implemented.
 - [x] Budget stabilization is implemented.
 - [x] Median-first valuation sanity guards are implemented.
+- [x] Assessment confidence is implemented as a never-multiplied, ungated display output.
 
 ## Blocked / paused
 
@@ -67,10 +69,11 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 
 ## Next
 
-- [ ] Ship assessment confidence ([[SPEC-006]] US6.1). It is display and ordering only, uses
-  already-fetched fields, and changes no score, threshold, ParameterSet, or alert set — so it is
-  **outside** the evidence gates and is the one item that can proceed now
-  ([[0018-assessment-confidence-and-monetary-output|ADR-0018]]).
+- [x] Ship assessment confidence ([[SPEC-006]] US6.1). **Implemented 2026-08-04** (T001–T013). One
+  operator step remains before it is visible on an existing deployment: `confidenceWeights` is
+  seeded into new ParameterSets but not backfilled, so a deployment whose active set predates spec
+  006 renders no confidence until one `createCandidate` + `activate`. Deliberate — absent weights
+  omit the output rather than fabricate a default.
 - [ ] After the gates pass, apply one approved ParameterSet rollout for correction k, factor
   bounds, and threshold re-validation.
 - [ ] Then the monetary slices of [[SPEC-006]], promoted ahead of the remaining composite factors

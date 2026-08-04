@@ -1,13 +1,13 @@
 ---
 title: Persistence surface
 type: architecture
-updated: 2026-08-02
+updated: 2026-08-04
 summary: Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.
 code:
   - src/common/database/data-source.ts
   - src/common/database/migrations/*.ts
   - src/modules/**/entities/*.ts
-rev: d43cce47d919
+rev: caea24b768ba
 ---
 
 # Persistence surface
@@ -26,6 +26,11 @@ rev: d43cce47d919
   `operation_budget_states` for atomic `valuation_ai` allocation. Its migration also adds only
   nullable Listing/Opportunity evidence pointers and immutable `BudgetActivity` audit fields; it
   is additive and has not been applied by the implementation task.
+- SPEC-006 US6.1 (2026-08-04) added **no table and no column**. `ParameterSet` gained six optional
+  fields *inside its existing JSON `params`* and the explanation gained fields inside the existing
+  JSON explanation column, so both are typing changes over data the schema already holds — no
+  migration, and older rows stay readable. Worth stating because "the entity file changed" and
+  "the schema changed" come apart here, and only the second requires a migration review.
 
 ## Review boundary
 

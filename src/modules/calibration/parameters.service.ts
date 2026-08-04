@@ -28,6 +28,12 @@ export function buildSeedParams(cfg: MileageSeedConfig): ScoringParams {
     factorBounds: {},
     upliftCap: DEFAULT_UPLIFT_CAP,
     heuristicTableHashes: {},
+    // spec 006 US6.1 — enables assessment confidence with the code defaults. Empty rather than a
+    // copy of the weight table: duplicating the numbers here would let the seed and the table drift,
+    // and an operator override is a *delta*, not a replacement. No activation ceremony is needed —
+    // this gates nothing (ADR-0018 §3), so it sits outside the ADR-0011 evidence gates. A
+    // ParameterSet created before spec 006 simply lacks the key and reports no confidence.
+    confidenceWeights: {},
   };
 }
 

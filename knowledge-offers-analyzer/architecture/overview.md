@@ -103,6 +103,26 @@ cleared the threshold on the reconstructed pre-clamp price core `raw × confiden
 what happened to those listings afterwards. Per FR-007 the report authorizes a *review*, not a flip.
 The graded-penalty flip is phase 3, gated on a month of that evidence plus operator approval.
 
+**Assessment confidence** (SPEC-006 US6.1, 2026-08-04): `valuation/assessment-confidence.ts` is a
+pure weighted-coverage measure over already-fetched fields only — VIN check and VIN report, cohort
+sample size and resolved tier, presence of gearbox/engine/body/fuel/generation, description
+specificity, and mileage plausibility — normalized 0–100 with a floor. It is a **separate output,
+never a multiplier**: it does not enter `score`, `priceCore`, `total100`, `discountPct`,
+`isOpportunity` or `disqualified` by any path, which is asserted across three weight configurations
+(absent / default / re-skewed) by `test/unit/valuation-additivity.spec.ts` and at the alert-set
+level by `test/integration/assessment-confidence-equivalence.spec.ts`. That property — not the
+number — is what makes it ungated by [[0011-evidence-gated-scoring-rollout|ADR-0011]].
+
+Reasons are emitted from the **same table walk** as the weights, so a weight change cannot desync
+from its explanation, and the text is stored in Ukrainian because `/why` renders it verbatim.
+`computeValuation` calls it behind a guard that yields an absent output rather than failing the
+evaluation. Weights live in `ParameterSet.params.confidenceWeights`; absent weights omit the output
+instead of defaulting to a fabricated one — so an existing deployment shows nothing until a new
+ParameterSet version is activated. Persisted on the shared `EvaluationExplanationV3`, rendered as
+one `Доказова база` line in the alert (`format/opportunity-message.ts`) and as the full signed
+reason list in `/why` (`format/why-message.ts`) from stored data only, with zero source calls.
+Input names are shared via `format/confidence-labels.ts` so the two surfaces cannot drift apart.
+
 **Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
 the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage
 requires AUTO.RIA VIN evidence and is capped at 5% once a car is 15 years old; this adds no API

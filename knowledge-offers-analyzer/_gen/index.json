@@ -91,49 +91,49 @@
           "level": 2,
           "text": "Completed / operating",
           "line": 43,
-          "endLine": 60
+          "endLine": 62
         },
         {
           "n": 4,
           "level": 2,
           "text": "Blocked / paused",
-          "line": 61,
-          "endLine": 67
+          "line": 63,
+          "endLine": 69
         },
         {
           "n": 5,
           "level": 2,
           "text": "Next",
-          "line": 68,
-          "endLine": 106
+          "line": 70,
+          "endLine": 109
         },
         {
           "n": 6,
           "level": 3,
           "text": "Operator-facing work admitted 2026-08-03",
-          "line": 89,
-          "endLine": 106
+          "line": 92,
+          "endLine": 109
         },
         {
           "n": 7,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 107,
-          "endLine": 112
+          "line": 110,
+          "endLine": 115
         },
         {
           "n": 8,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 113,
-          "endLine": 122
+          "line": 116,
+          "endLine": 125
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 123,
-          "endLine": 130
+          "line": 126,
+          "endLine": 133
         }
       ]
     },
@@ -334,35 +334,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 123
+          "endLine": 143
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 124,
-          "endLine": 152
+          "line": 144,
+          "endLine": 172
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 153,
-          "endLine": 161
+          "line": 173,
+          "endLine": 181
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 162,
-          "endLine": 163
+          "line": 182,
+          "endLine": 183
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 164,
-          "endLine": 174
+          "line": 184,
+          "endLine": 194
         }
       ]
     },
@@ -373,35 +373,35 @@
       "title": "Persistence surface",
       "type": "architecture",
       "summary": "Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.",
-      "rev": "d43cce47d919",
+      "rev": "caea24b768ba",
       "headings": [
         {
           "n": 1,
           "level": 2,
           "text": "Source of truth",
           "line": 18,
-          "endLine": 29
+          "endLine": 34
         },
         {
           "n": 2,
           "level": 2,
           "text": "Review boundary",
-          "line": 30,
-          "endLine": 35
+          "line": 35,
+          "endLine": 40
         },
         {
           "n": 3,
           "level": 2,
           "text": "Generated evidence",
-          "line": 36,
-          "endLine": 41
+          "line": 41,
+          "endLine": 46
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 42,
-          "endLine": 48
+          "line": 47,
+          "endLine": 53
         }
       ]
     },

@@ -15,13 +15,13 @@ tests in `test/unit/` and `test/integration/`.
 
 ## Phase 1: Setup (shared)
 
-- [ ] T001 Add `AssessmentConfidence`, `CostEstimate`, and `MonetaryOutput` value-object types to
+- [x] T001 Add `AssessmentConfidence`, `CostEstimate`, and `MonetaryOutput` value-object types to
       `src/modules/valuation/valuation.types.ts` (or alongside `factor.ts` if that fits the module
       layout better). Types only — no behaviour.
-- [ ] T002 Extend `EvaluationExplanation` with an additive `EvaluationExplanationV3` carrying
+- [x] T002 Extend `EvaluationExplanation` with an additive `EvaluationExplanationV3` carrying
       `assessmentConfidence` and optional `monetary`, in
       `src/modules/valuation/evaluation-explanation.ts`. V1/V2 must remain readable.
-- [ ] T003 [P] Extend `ParameterSet.params` typing with `confidenceWeights`, `costTableVersion`,
+- [x] T003 [P] Extend `ParameterSet.params` typing with `confidenceWeights`, `costTableVersion`,
       `torgLadder`, `domExpectedByTier`, `costOfCapital`, `cFix`. All optional; absent means the
       corresponding output is omitted, never defaulted to a fabricated value.
 
@@ -32,11 +32,11 @@ tests in `test/unit/` and `test/integration/`.
 **This phase must complete before any output is wired in.** It is the safety property the whole
 spec rests on.
 
-- [ ] T004 Write the bit-for-bit regression test in `test/unit/valuation-additivity.spec.ts`:
+- [x] T004 Write the bit-for-bit regression test in `test/unit/valuation-additivity.spec.ts`:
       across the full fixture corpus, assert `score`, `priceCore`, `total100`, `discountPct`,
       `isOpportunity`, and `disqualified` are identical with the new outputs enabled and disabled.
       **This test must exist and pass before T007.**
-- [ ] T005 Add an integration assertion in `test/integration/` that the set of listings producing
+- [x] T005 Add an integration assertion in `test/integration/` that the set of listings producing
       an alert is unchanged with the new outputs enabled.
 
 ---
@@ -45,31 +45,31 @@ spec rests on.
 
 ### Tests
 
-- [ ] T006 [P] [US6.1] Unit tests for `assessment-confidence.ts` in
+- [x] T006 [P] [US6.1] Unit tests for `assessment-confidence.ts` in
       `test/unit/assessment-confidence.spec.ts`: full-evidence listing → high percent with `✓`
       reasons; zero-evidence listing → floor with a `⚠` reason naming every missing input; the
       ≥30-point gap case (SC-003); every reason traceable to exactly one input.
 
 ### Implementation
 
-- [ ] T007 [US6.1] Pure `src/modules/valuation/assessment-confidence.ts` — weighted coverage over
+- [x] T007 [US6.1] Pure `src/modules/valuation/assessment-confidence.ts` — weighted coverage over
       `risk.vinChecked`, `hasVinReport`, cohort `sampleSize` + resolved tier, presence of
       `gearbox` / `engine` / `body` / `fuel` / `generation`, description presence and specificity,
       and mileage plausibility versus the segment expectation. Normalized 0–100 with a floor.
       Reasons generated from the same weight table, so a weight change cannot desync from its
       explanation. **Returns a value; touches no score.**
-- [ ] T008 [US6.1] Seed `confidenceWeights` into the `ParameterSet` params (candidate, not
+- [x] T008 [US6.1] Seed `confidenceWeights` into the `ParameterSet` params (candidate, not
       activated — no live activation is needed since nothing gates on it).
-- [ ] T009 [US6.1] Wire into `computeValuation` as an additive `ValuationResult` field. Wrap in a
+- [x] T009 [US6.1] Wire into `computeValuation` as an additive `ValuationResult` field. Wrap in a
       guard so a computation error yields an absent output and never fails the evaluation (spec
       US6.1 AS-4).
-- [ ] T010 [US6.1] Persist into the V3 explanation on `Listing.lastExplanation` and
+- [x] T010 [US6.1] Persist into the V3 explanation on `Listing.lastExplanation` and
       `Opportunity.explanation`.
-- [ ] T011 [P] [US6.1] Render in the alert formatter — one line, percent + top reasons —
+- [x] T011 [P] [US6.1] Render in the alert formatter — one line, percent + top reasons —
       `src/modules/notifications/format/`.
-- [ ] T012 [P] [US6.1] Render the full reason list in `/why` from persisted data only, zero source
+- [x] T012 [P] [US6.1] Render the full reason list in `/why` from persisted data only, zero source
       calls (SC-005).
-- [ ] T013 [US6.1] Re-run T004/T005. Exit condition for the phase.
+- [x] T013 [US6.1] Re-run T004/T005. Exit condition for the phase.
 
 **Checkpoint:** US6.1 is independently shippable here. Everything below is blocked on a dependency
 that does not exist yet.

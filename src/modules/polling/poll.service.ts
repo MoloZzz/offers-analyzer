@@ -272,6 +272,11 @@ export class PollService {
       mileageK: detail.mileage,
       year: detail.year,
       vinChecked: detail.risk.vinChecked,
+      // Assessment-confidence evidence inputs only (spec 006 US6.1) — all already on the fetched
+      // detail and the resolved benchmark, so no extra request is made (SC-004).
+      body: detail.body,
+      generation: detail.generation,
+      cohortTier: benchmark?.cohort.tier,
     });
 
     const explanation = buildEvaluationExplanation({
