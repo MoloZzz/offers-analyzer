@@ -19,7 +19,7 @@ checkboxes  done=7 open=6
 entities    21
 migrations  21
 providers   AutoRiaSource(auto-ria)
-tests       unit 401/56 files
+tests       unit 412/58 files
             integration 23/4 files
 map         knowledge-offers-analyzer/_gen/code-map.txt (read before source edits)
 facts       knowledge-offers-analyzer/_gen/facts.txt (verified adapter facts)

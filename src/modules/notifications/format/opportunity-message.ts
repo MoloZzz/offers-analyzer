@@ -1,4 +1,3 @@
-import { Currency } from '../../../common/types/money';
 import { Listing } from '../../listings/entities/listing.entity';
 import { ListingDetail, SellerType } from '../../sources/ports/listing-source.port';
 import { Opportunity } from '../../valuation/entities/opportunity.entity';
@@ -6,8 +5,7 @@ import { EvaluationExplanation, EvaluationExplanationV3 } from '../../valuation/
 import { ValuationResult } from '../../valuation/valuation.service';
 import { AssessmentConfidence } from '../../valuation/valuation.types';
 
-import { buildLiveBreakdown, findLine, LiveBreakdownContext, renderLine } from './breakdown';
-import { Breakdown, BreakdownSectionKey } from './breakdown.types';
+import { buildLiveBreakdown, LiveBreakdownContext, renderBreakdownSections } from './breakdown';
 import { confidenceInputLabel } from './confidence-labels';
 import { FLAG_LABELS } from './flag-labels';
 
@@ -115,52 +113,37 @@ export function formatPriceDrop(op: Opportunity, listing: Listing, oldAmount: nu
 }
 
 /**
- * On-demand `/check` reply: assessment of a single listing the user asked about.
+ * `/check` is the one breakdown surface allowed to spend a source request (FR-002), so it says so.
  *
- * The score total and the risk line come from the shared breakdown builder rather than being
- * assembled here — `/check` is one of the four formatters spec 016 exists to stop from drifting, and
- * a parameter added to the builder must not need a second edit in this file. The reply stays
- * compact by design; the full section layout is `/check`'s Phase-3 adoption (T016), not this.
+ * The other two — the `Деталі` button and `/why` — read a persisted snapshot and cost nothing.
+ * Stating that here is US16.3 AS-2: the operator must be able to tell which entry point is free.
+ */
+const CHECK_SOURCE_NOTE =
+  'ℹ️ /check рахує оцінку наново і витрачає запит до джерела — це єдина з трьох команд, яка щось ' +
+  'коштує. Кнопка «Деталі» під сповіщенням і /why читають збережений знімок безкоштовно.';
+
+/**
+ * On-demand `/check` reply: the shared section layout over a freshly computed result (US16.3, T016).
+ *
+ * A **thin adapter** — it chooses no parameter, formats no value, and groups no flag. Everything it
+ * renders comes from the one builder, which is what makes SC-004 structurally true: `/check`, `/why`
+ * and the `Деталі` button emit the same sections in the same order with the same labels, and a
+ * parameter added to the builder reaches all three without a second edit here.
+ *
+ * Seller type and the odometer reading are deliberately **not** re-added on top: the shared
+ * breakdown carries neither for any surface (a persisted `EvaluationExplanation` never captured
+ * them), and re-introducing them for `/check` alone would recreate exactly the per-surface
+ * divergence this spec exists to remove. Both remain on the pushed alert, which is not a breakdown
+ * surface.
  */
 export function formatAssessment(
   detail: ListingDetail,
   result: ValuationResult,
-  fairValue: number,
-  currency: Currency,
-  ctx?: Partial<LiveBreakdownContext>,
+  ctx: LiveBreakdownContext,
 ): string {
-  const breakdown = buildLiveBreakdown(detail, result, {
-    fairValue,
-    currency,
-    sampleSize: ctx?.sampleSize ?? 0,
-    benchmarkBase: ctx?.benchmarkBase ?? fairValue,
-    mileageAware: ctx?.mileageAware ?? true,
-  });
-  const verdict = result.isOpportunity ? '✅ Вигідна пропозиція' : `ℹ️ ${result.reason}`;
-  return [
-    `${scoreEmoji(result.score)} ${detail.make} ${detail.model}, ${detail.year}, ${mileageLabel(detail.mileage)}`,
-    breakdownLine(breakdown, 'score', '📊 Загальний бал'),
-    `💰 Вигідність: ${signed(result.score)} (-1...+1)`,
-    `Ціна: ${fmt(detail.price.amount)} ${currency}  ·  Ринкова: ${fmt(fairValue)} ${currency}  ·  -${result.discountPct}%`,
-    `Впевненість: ${result.confidence}`,
-    `Продавець: ${sellerLabel(detail.sellerType)}`,
-    breakdownLine(breakdown, 'flags', '⚠️ Ризики'),
-    confidenceLine(result.assessmentConfidence),
-    verdict,
-    `🔗 ${detail.url}`,
-  ]
-    .filter((line): line is string => line !== null)
-    .join('\n');
-}
-
-/** One rendered parameter from the shared builder, or `null` when this record does not carry it. */
-function breakdownLine(
-  breakdown: Breakdown,
-  key: BreakdownSectionKey,
-  label: string,
-): string | null {
-  const line = findLine(breakdown, key, label);
-  return line ? renderLine(line) : null;
+  return [...renderBreakdownSections(buildLiveBreakdown(detail, result, ctx)), CHECK_SOURCE_NOTE].join(
+    '\n\n',
+  );
 }
 
 function signed(n: number): string {

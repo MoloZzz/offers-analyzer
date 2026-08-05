@@ -252,7 +252,17 @@ export class TelegramBotUpdate {
     }
     try {
       const a = await this.query.assessById(externalId);
-      await ctx.reply(formatAssessment(a.detail, a.result, a.fairValue, a.currency));
+      // The real cohort context, not a default: `/check` now renders the cohort and mileage sections,
+      // and a fabricated sample size or `mileageAware` there would be an invented value (SC-005).
+      await ctx.reply(
+        formatAssessment(a.detail, a.result, {
+          fairValue: a.fairValue,
+          currency: a.currency,
+          sampleSize: a.sampleSize,
+          benchmarkBase: a.benchmarkBase,
+          mileageAware: a.mileageAware,
+        }),
+      );
     } catch {
       await ctx.reply(
         'Не вдалося перевірити (ліміт запитів або оголошення недоступне). Спробуйте пізніше.',

@@ -1,7 +1,7 @@
 # Implementation Plan: Full evaluation breakdown
 
-**Spec**: `spec.md` · **Created**: 2026-08-03 · **Status**: Phases F and 1 implemented 2026-08-05;
-Phases 2–3 open
+**Spec**: `spec.md` · **Created**: 2026-08-03 · **Status**: **All phases implemented 2026-08-05**
+(F, 1, 2 and 3 — the plan's phase numbering runs one behind `tasks.md`, where they are phases 1–4)
 
 ## Summary
 

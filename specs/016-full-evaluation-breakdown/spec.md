@@ -4,7 +4,10 @@
 
 **Created**: 2026-08-03
 
-**Status**: Phases 1–2 implemented 2026-08-05 (US16.1 + US16.2, T001–T014); US16.3 and US16.4 open
+**Status**: **Fully implemented 2026-08-05** — all four user stories (US16.1–US16.4, T001–T022).
+Phases 1–2 (shared builder + **Деталі** button) and phases 3–4 (`/check` surface adoption +
+forward-compatibility proof) all landed the same day. Presentation-only throughout, so the feature
+sits outside the ADR-0011 evidence gates.
 
 **Input**: Operator request 2026-08-03 — "I also want to receive a full (separate parameters)
 description of the calculated listings in alerts." Delivery shape chosen by the operator: keep the

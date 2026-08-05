@@ -218,12 +218,9 @@ describe('buildBreakdown — fields render the moment records carry them (US16.4
     expect(msg).toContain('ROI: 18%');
   });
 
-  it('keeps the monetary section subordinate to the score sections', () => {
-    const keys = buildBreakdown(v3({ monetary })).sections.map((s) => s.key);
-
-    expect(keys.indexOf('monetary')).toBeGreaterThan(keys.indexOf('score'));
-    expect(keys.indexOf('monetary')).toBeGreaterThan(keys.indexOf('factors'));
-  });
+  // Monetary subordination (T019) is owned by `breakdown-forward-compat.spec.ts`, which asserts it
+  // against `score`, `factors` **and** `confidence` on a fully populated fixture. Duplicating the
+  // weaker two-way version here would mean two tests failing for one cause.
 
   it('does not render the spec-018 shadow accident verdict — it is admin-only until phase 3', () => {
     const msg = text(

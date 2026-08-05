@@ -593,7 +593,13 @@ export function renderBreakdownSections(breakdown: Breakdown): string[] {
     .map((s) => [s.title, ...s.lines.map(renderLine)].join('\n'));
 }
 
-/** Look one parameter up by section and label. Used by the compact surfaces (`/check`). */
+/**
+ * Look one parameter up by section and label.
+ *
+ * No operator-facing surface calls this any more — since US16.3 all three render whole sections. It
+ * survives as the value object's query accessor, which is how the tests assert one parameter's
+ * availability and reason without matching against rendered text.
+ */
 export function findLine(
   breakdown: Breakdown,
   key: BreakdownSectionKey,

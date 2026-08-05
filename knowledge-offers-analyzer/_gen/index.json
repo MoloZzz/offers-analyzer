@@ -1835,14 +1835,14 @@
           "level": 2,
           "text": "Implementation note (2026-08-05) — spec 016 phases 1–2: reach, and one renderer",
           "line": 91,
-          "endLine": 121
+          "endLine": 131
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 122,
-          "endLine": 124
+          "line": 132,
+          "endLine": 134
         }
       ]
     },

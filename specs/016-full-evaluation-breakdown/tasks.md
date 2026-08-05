@@ -81,22 +81,46 @@ future-proofing.
 
 ## Phase 3: User Story 16.3 — Surface adoption (P2)
 
-- [ ] T015 [P] [US16.3] Test: one listing rendered through button, `/why`, and `/check` produces
+- [X] T015 [P] [US16.3] Test: one listing rendered through button, `/why`, and `/check` produces
       an identical section order and identical parameter labels (SC-004).
-- [ ] T016 [US16.3] `/check` renders the shared section layout from a live `ValuationResult`, and
+      `test/unit/breakdown-surface-parity.spec.ts` — 5 tests. The strongest is structural: stripping
+      each section block's title line reassembles `renderBreakdownFlat` **exactly**, so the two
+      renderers provably diverge by the title and by nothing else.
+- [X] T016 [US16.3] `/check` renders the shared section layout from a live `ValuationResult`, and
       states that it is the only surface that may spend a source request.
-- [ ] T017 [US16.3] Reduce `formatAssessment` and `formatStoredWhy` to thin adapters over the
+      *Two deliberate consequences.* (a) **Seller type and the odometer reading leave `/check`**: the
+      shared breakdown carries neither for any surface — a persisted `EvaluationExplanation` never
+      captured them — and re-adding them for `/check` alone would recreate the per-surface divergence
+      this spec exists to remove. Both remain on the pushed alert, which is not a breakdown surface.
+      (b) The call site now passes the **real** cohort context (`sampleSize`, `benchmarkBase`,
+      `mileageAware` off `Assessment`) instead of the previous `0` / `fairValue` / `true` defaults —
+      those were harmless while `/check` read only two lines out of the builder, but would have
+      rendered an invented cohort and mileage correction under the full layout (SC-005).
+- [X] T017 [US16.3] Reduce `formatAssessment` and `formatStoredWhy` to thin adapters over the
       builder; delete any duplicated label or flag-grouping logic left behind.
+      *`formatStoredWhy` was already one line from T004.* `formatAssessment` is now one expression
+      and its private `breakdownLine` lookup helper is gone. `risksLabel`, `sellerLabel`,
+      `mileageLabel`, `scoreEmoji`, `confidenceLine`, `signed` and `fmt` **stay** — they are the
+      *alert's* formatting, still reached from `formatOpportunity` / `formatPriceDrop`, and the alert
+      is frozen by SC-001. `findLine` keeps its export but lost its last production caller; it is now
+      documented as the value object's test-facing query accessor.
 
 ---
 
 ## Phase 4: User Story 16.4 — Forward compatibility (P2, test-only)
 
-- [ ] T018 [P] [US16.4] Fixture carrying `factors`, `assessmentConfidence`, and `monetary`; assert
+- [X] T018 [P] [US16.4] Fixture carrying `factors`, `assessmentConfidence`, and `monetary`; assert
       all three sections render with **no renderer code change** relative to the fixture that lacks
-      them (SC-006).
-- [ ] T019 [US16.4] Assert the monetary section renders subordinate to the score sections, and that
+      them (SC-006). `test/unit/breakdown-forward-compat.spec.ts` — the proof is *differential*: a
+      bare V3 and a populated V3 that differ only in those three fields emit byte-identical section
+      keys and identical section titles in identical order, so the populated record adds no section
+      and removes none. Both fixtures are V3 with explicit `null`s, exercising the
+      carried-but-not-measured branch rather than the pre-schema `undefined` one.
+- [X] T019 [US16.4] Assert the monetary section renders subordinate to the score sections, and that
       the AI section (spec 017) is absent — it is rendered separately per ADR-0019 §8.
+      *Subordination is asserted against `score`, `factors` **and** `confidence`.* AI-absence is a
+      closed allow-list over the section keys plus a length check, so a future section added to
+      `assemble()` fails the test rather than slipping through a `not.toContain`.
 
 ---
 
@@ -111,6 +135,14 @@ future-proofing.
 - [X] T022 Verification gate: `typecheck`, `lint`, full Jest (526/526, 63 suites incl. contract),
       Nest build — all pass. **Fallback stated:** run natively with `npm.cmd`; the bundled RTK
       wrapper is a Linux/musl binary and does not execute on this Windows runtime.
+
+**Phase 5 re-run for phases 3–4 (2026-08-05).** T020–T022 were repeated after T015–T019, since the
+definition of done binds each slice, not each spec: `Roadmap & Status.md`, `specs/README.md`,
+`architecture/overview.md`, `research/explainability-gaps.md` and `context/CURRENT.md` updated (the
+supersession sweep found five notes still saying "phases 3–4 remain open"); `vault:build` +
+`vault:check:strict` → 0 errors, 0 warnings; `typecheck`, `lint`, Jest **537/537 (65 suites)** and
+`nest build` all pass. The count fell from 539 because `oa-verifier` found two duplicate tests and
+each property was given a single owner.
 
 ---
 

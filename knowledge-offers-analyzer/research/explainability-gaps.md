@@ -108,16 +108,26 @@ formatters that render it from drifting apart.
 - **Zero budget by construction.** `details-callback.ts` has *no imports at all*, so it cannot reach
   a source; the reply resolves through `QueryService.storedBreakdownById`, a pure storage read. A
   source-text test and an integration test with live source/budget mocks assert both.
-- **Growth without edits.** `factors`, `assessmentConfidence` and `monetary` sections already exist
-  and populate the moment records start carrying them — no renderer change when the ADR-0010
-  rollout or SPEC-006's monetary slices land. Today all three render as stated gaps, which is the
-  honest picture of an inactive-factor, pre-`k` system.
+- **Growth without edits — now proved, not assumed.** `factors`, `assessmentConfidence` and
+  `monetary` sections already exist and populate the moment records start carrying them, with no
+  renderer change when the ADR-0010 rollout or SPEC-006's monetary slices land. Today all three
+  render as stated gaps, which is the honest picture of an inactive-factor, pre-`k` system. Phase 4
+  makes this a **differential** assertion: a bare record and one carrying all three fields emit
+  byte-identical section keys and identical titles in identical order, so the populated record adds
+  no section and removes none.
+- **One layout, three surfaces.** Since phase 3, `/check` renders the same sections as the button
+  and `/why` rather than its own compact header, and states that it is the only one of the three
+  that spends a source request. The cost of that consistency: `/check` no longer shows seller type
+  or the odometer reading, because the shared breakdown carries neither for *any* surface — a
+  persisted `EvaluationExplanation` records `{externalId, make, model, year, url, askingAmount,
+  currency}` and never captured them. Both remain on the pushed alert.
 - **Not rendered:** the spec-018 `accidentSeverity` shadow verdict. It stays behind admin-only
   `/accident_shadow` until phase 3 is approved ([[0020-graded-accident-risk|ADR-0020]]).
 
-Phases 3–4 (the `/check` full-section layout, and the test-only forward-compatibility proof) remain
-open. X3 and X4 above are still untouched: the breakdown surfaces the flag *codes*, not the matched
-phrases, and the `reason` string is still the terse English one.
+SPEC-016 is complete as of 2026-08-05. **X3 and X4 above remain untouched**: the breakdown surfaces
+the flag *codes*, not the matched phrases, and the `reason` string is still the terse English one.
+Those are this note's live gaps — they were never in spec 016's scope, and closing that spec did not
+close them.
 
 ## Related
 - [[profitability-definition]] · [[how-it-works]] · [[overview]] · [[Roadmap & Status]]

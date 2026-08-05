@@ -3059,14 +3059,14 @@
       "to": "Roadmap & Status.md",
       "anchor": null,
       "embed": false,
-      "line": 123
+      "line": 133
     },
     {
       "from": "research/explainability-gaps.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 123
+      "line": 133
     },
     {
       "from": "research/explainability-gaps.md",
@@ -3080,7 +3080,7 @@
       "to": "business/how-it-works.md",
       "anchor": null,
       "embed": false,
-      "line": 123
+      "line": 133
     },
     {
       "from": "research/explainability-gaps.md",
@@ -3094,7 +3094,7 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 116
+      "line": 125
     },
     {
       "from": "research/explainability-gaps.md",
@@ -3108,7 +3108,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 123
+      "line": 133
     },
     {
       "from": "research/monitoring-approaches.md",

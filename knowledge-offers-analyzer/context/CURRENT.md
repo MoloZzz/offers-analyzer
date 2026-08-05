@@ -11,7 +11,29 @@ updated: 2026-08-05
 
 ## Active work
 
-**SPEC-016 phases 1–2 — implemented 2026-08-05 (T001–T014).** One pure breakdown builder
+**SPEC-016 — fully implemented 2026-08-05 (T001–T022, all four user stories).**
+
+**Phases 3–4 (T015–T019)** closed the spec. `/check` now renders the shared section layout instead
+of its own compact header, so all three breakdown surfaces — the 📋 **Деталі** button, `/why` and
+`/check` — go through the one builder; `formatAssessment` is a single expression and
+`opportunity-message.ts` lost 35 net lines. Two operator-visible consequences, both deliberate:
+`/check` **no longer prints seller type or the odometer reading** (the shared breakdown carries
+neither for any surface, because a persisted `EvaluationExplanation` never captured them — re-adding
+them for `/check` alone would recreate the per-surface divergence this spec exists to remove; both
+remain on the pushed alert), and `/check` now **states that it is the only one of the three that
+spends a source request**. A latent fabrication was fixed on the way: the `/check` call site was
+passing defaulted cohort context (`sampleSize: 0`, `mileageAware: true`), harmless while `/check`
+read two lines out of the builder but an invented cohort under the full layout. Phase 4 is a
+test-only differential proof that a record carrying `factors` / `assessmentConfidence` / `monetary`
+emits byte-identical section keys and titles to one that does not — which is what lets the ADR-0010
+rollout and SPEC-006's monetary slices land without touching a formatter. Decisions:
+`context/log/2026-08-05-breakdown-surface-adoption.md`.
+
+Verification (native Windows `npm.cmd`): `typecheck`, `lint`, Jest **537/537** (65 suites),
+`nest build` — all pass. `oa-verifier` returned PASS WITH FINDINGS; both findings were duplicate
+tests, resolved by giving each property one owner (that is why the count is 537, not 539).
+
+**Phases 1–2 — implemented 2026-08-05 (T001–T014).** One pure breakdown builder
 (`src/modules/notifications/format/breakdown.ts`) over the persisted `EvaluationExplanation`, with
 `formatWhy`, `formatStoredWhy` and `/check` refactored onto it, plus the 📋 **Деталі** inline button
 that replies with the full per-parameter breakdown from storage. The pushed alert body is unchanged
@@ -23,9 +45,7 @@ unused. Presentation-only, so it sits outside the ADR-0011 gates. Decisions and 
 Verification (native Windows `npm.cmd`; RTK's wrapper is Linux/musl and does not run here):
 `typecheck`, `lint`, Jest **526/526** (63 suites), `nest build` — all pass.
 
-**Phases 3–4 of the same spec remain open and unblocked**: T015–T017 (`/check` adopts the full
-section layout; formatters reduced to thin adapters) and T018–T019 (test-only forward-compatibility
-proof that factors / `assessmentConfidence` / `monetary` render with no renderer change).
+Phases 3–4 of the same spec closed later the same day — see the active-work section above.
 
 ## Previously (still current)
 
@@ -106,10 +126,12 @@ flip should be presented alongside the combined rollout. See
 
 ## Next pickup
 
-With SPEC-016 phases 1–2 shipped, the remaining **ungated** engineering work is SPEC-016 phases 3–4
-(T015–T019) and `017-on-demand-ai-analysis` (the latter ships disabled behind operator gates).
-Everything else — the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence
-gates or the month-long accident shadow window, not on code.
+With SPEC-016 closed, the only remaining **ungated** engineering work is
+`017-on-demand-ai-analysis`, and even that ships disabled behind operator gates (provider
+credentials, approved terms, lawfulness of sending listing content, an agreed monthly cap —
+[[0019-advisory-only-ai-analysis|ADR-0019]]). Everything else — the `k` rollout, SPEC-006's monetary
+slices, SPEC-018 phase 3 — waits on evidence gates or the month-long accident shadow window, not on
+code. **The next material step is operator/evidence work, not engineering.**
 
 If the pickup is instead SPEC-015, read this handoff and
 `specs/015-defensible-valuation-evidence/quickstart.md`.
