@@ -35,6 +35,16 @@ describe('formatOpportunity', () => {
     expect(msg).toContain('https://auto.ria.com/auto_x.html');
   });
 
+  it('rounds rendered prices to whole units for the operator-facing message', () => {
+    const rounded = formatOpportunity(
+      { ...opportunity, askingValue: 12000.6, fairValue: 15999.4 },
+      listing,
+    );
+
+    expect(rounded).toMatch(/Ціна: 12\s*001 USD/);
+    expect(rounded).toMatch(/Ринкова \(сер\.\): 15\s*999 USD/);
+  });
+
   it('translates fired red-flags and omits non-fired ones', () => {
     expect(msg).toContain('VIN');
   });

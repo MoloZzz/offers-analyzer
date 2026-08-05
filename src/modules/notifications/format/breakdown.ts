@@ -241,7 +241,7 @@ function priceLines(facts: BreakdownFacts): BreakdownLine[] {
   return [
     availableLine(
       'Ціна',
-      `${facts.listing.askingAmount} vs Ринкова: ${facts.fairValueAdjusted} ${facts.listing.currency} → знижка ${facts.discountPct}%`,
+      `${moneyAmount(facts.listing.askingAmount)} vs Ринкова: ${moneyAmount(facts.fairValueAdjusted)} ${facts.listing.currency} → знижка ${facts.discountPct}%`,
     ),
   ];
 }
@@ -250,7 +250,7 @@ function cohortLines(facts: BreakdownFacts): BreakdownLine[] {
   const lines: BreakdownLine[] = [
     availableLine(
       'Ринкова база',
-      `${facts.fairValueBase} ${facts.listing.currency} (${facts.cohort.mileageAware ? 'когорта з урахуванням пробігу' : 'когорта без пробігу'}, вибірка ${facts.cohort.sampleSize})`,
+      `${moneyAmount(facts.fairValueBase)} ${facts.listing.currency} (${facts.cohort.mileageAware ? 'когорта з урахуванням пробігу' : 'когорта без пробігу'}, вибірка ${facts.cohort.sampleSize})`,
     ),
   ];
   lines.push(
@@ -280,7 +280,7 @@ function mileageLines(facts: BreakdownFacts): BreakdownLine[] {
       'Поправка на пробіг',
       adjustment === 0
         ? `без поправки (0 ${facts.listing.currency})`
-        : `${adjustment > 0 ? '+' : ''}${adjustment} ${facts.listing.currency}`,
+        : `${adjustment > 0 ? '+' : ''}${moneyAmount(adjustment)} ${facts.listing.currency}`,
     ),
   ];
 }
@@ -418,22 +418,22 @@ function monetaryLines(facts: BreakdownFacts): BreakdownLine[] {
   const lines: BreakdownLine[] = [
     monetary.z == null
       ? unavailableLine('💰 Очікуваний прибуток (Z)', 'не показано для дискваліфікованого авто', 'suppressed')
-      : availableLine('💰 Очікуваний прибуток (Z)', `${monetary.z} ${currency}`),
+      : availableLine('💰 Очікуваний прибуток (Z)', `${moneyAmount(monetary.z)} ${currency}`),
     monetary.roi == null
       ? unavailableLine('ROI', 'знаменник близький до нуля — відсоток не показуємо', 'suppressed')
       : availableLine('ROI', `${monetary.roi}%`),
-    availableLine('Продаж (X)', `${monetary.x} ${currency}`),
-    availableLine('Купівля (B)', `${monetary.b} ${currency} (торг ${monetary.torg})`),
+    availableLine('Продаж (X)', `${moneyAmount(monetary.x)} ${currency}`),
+    availableLine('Купівля (B)', `${moneyAmount(monetary.b)} ${currency} (торг ${monetary.torg})`),
     availableLine(
       'Витрати',
-      `оформлення ${monetary.cFix} + ремонт ${monetary.cRec} + утримання ${monetary.cHold} ${currency}`,
+      `оформлення ${moneyAmount(monetary.cFix)} + ремонт ${moneyAmount(monetary.cRec)} + утримання ${moneyAmount(monetary.cHold)} ${currency}`,
     ),
     monetary.kApplied == null
       ? unavailableLine('Корекція k', 'ще не застосовується', 'unshipped')
-      : availableLine('Корекція k', `${monetary.kApplied}`),
+      : availableLine('Корекція k', `${moneyAmount(monetary.kApplied)}`),
   ];
   for (const cost of monetary.costs) {
-    lines.push(proseLine(`• ${cost.code}: ${cost.probability} × ${cost.cost} ${currency}`));
+    lines.push(proseLine(`• ${cost.code}: ${cost.probability} × ${moneyAmount(cost.cost)} ${currency}`));
   }
   return lines;
 }
@@ -479,7 +479,7 @@ function providerLines(facts: BreakdownFacts): BreakdownLine[] {
   const lines: BreakdownLine[] = [
     evidence.status === 'available' && evidence.estimateAmount != null && evidence.currency
       ? proseLine(
-          `📈 AUTO.RIA AI — оцінка активного ринку: ${Math.round(evidence.estimateAmount)} ${evidence.currency}.`,
+          `📈 AUTO.RIA AI — оцінка активного ринку: ${moneyAmount(evidence.estimateAmount)} ${evidence.currency}.`,
         )
       : proseLine(
           `📈 AUTO.RIA AI — shadow-оцінка недоступна: ${evidence.status}${evidence.failureCode ? ` (${evidence.failureCode})` : ''}.`,
@@ -518,7 +518,11 @@ function providerRange(evidence: ValuationEvidence): string | null {
   const minimum = moneyFromProjection(stats.minimum);
   const maximum = moneyFromProjection(stats.maximum);
   if (!minimum || !maximum) return null;
-  return `від ${Math.round(minimum.amount)} ${minimum.currency} до ${Math.round(maximum.amount)} ${maximum.currency}`;
+  return `від ${moneyAmount(minimum.amount)} ${minimum.currency} до ${moneyAmount(maximum.amount)} ${maximum.currency}`;
+}
+
+function moneyAmount(amount: number): string {
+  return Math.round(amount).toLocaleString('uk-UA');
 }
 
 function providerComparableSummary(evidence: ValuationEvidence): string {

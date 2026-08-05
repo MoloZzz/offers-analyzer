@@ -114,10 +114,26 @@ describe('buildBreakdown — every parameter traces to a record field (SC-005)',
 
     expect(msg).toContain('📊 Загальний бал: 88/100');
     expect(msg).toContain('Розклад балу: знижка → raw 0.83 × впевненість 0.9 × штраф 0.9 = 0.75');
-    expect(msg).toContain('Ціна: 12000 vs Ринкова: 16000 USD → знижка 25%');
-    expect(msg).toContain('Ринкова база: 15500 USD (когорта без пробігу, вибірка 12)');
+    expect(msg).toMatch(/Ціна: 12\s*000 vs Ринкова: 16\s*000 USD → знижка 25%/);
+    expect(msg).toMatch(/Ринкова база: 15\s*500 USD \(когорта без пробігу, вибірка 12\)/);
     expect(msg).toContain('Параметри: ParameterSet v3, поріг 0.63');
-    expect(msg).toContain('Поправка на пробіг: +500 USD');
+    expect(msg).toMatch(/Поправка на пробіг: \+500 USD/);
+  });
+
+  it('rounds all shown price values in the breakdown to whole units', () => {
+    const msg = text(
+      buildBreakdown({
+        ...v1,
+        listing: { ...v1.listing, askingAmount: 12000.6 },
+        fairValueBase: 15500.4,
+        fairValueAdjusted: 15999.6,
+        mileageAdjustment: 500.4,
+      }),
+    );
+
+    expect(msg).toMatch(/Ціна: 12\s*001 vs Ринкова: 16\s*000 USD → знижка 25%/);
+    expect(msg).toMatch(/Ринкова база: 15\s*500 USD/);
+    expect(msg).toMatch(/Поправка на пробіг: \+500 USD/);
   });
 
   it('carries the evaluation timestamp and ParameterSet version it reflects (FR-008)', () => {
@@ -198,7 +214,7 @@ describe('buildBreakdown — fields render the moment records carry them (US16.4
     expect(msg).toContain('• liquidity: 72/100 — + швидкий сегмент');
     expect(msg).toContain('🧭 Впевненість оцінки: 60%');
     expect(msg).toContain('⚠ перевірка VIN джерелом: no independent VIN check (внесок 0 з 20)');
-    expect(msg).toContain('💰 Очікуваний прибуток (Z): 2250 USD');
+    expect(msg).toMatch(/💰 Очікуваний прибуток \(Z\): 2\s*250 USD/);
     expect(msg).toContain('ROI: 18%');
   });
 
@@ -280,7 +296,7 @@ describe('buildBreakdown — stored provider evidence only (FR-002)', () => {
       } as unknown as ValuationEvidence),
     );
 
-    expect(msg).toContain('📈 AUTO.RIA AI — оцінка активного ринку: 5000 USD.');
+    expect(msg).toMatch(/📈 AUTO\.RIA AI — оцінка активного ринку: 5\s*000 USD\./);
     expect(msg).toContain('не підтверджена ціна продажу');
   });
 });

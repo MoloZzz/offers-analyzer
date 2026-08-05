@@ -168,5 +168,5 @@ function signed(n: number): string {
 }
 
 function fmt(n: number): string {
-  return n.toLocaleString('uk-UA');
+  return Math.round(n).toLocaleString('uk-UA');
 }
