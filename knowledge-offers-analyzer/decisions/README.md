@@ -40,6 +40,8 @@ updated: 2026-08-05
 
 - [[0022-delegate-independent-work-to-tiered-subagents|ADR-0022]] — Delegate independent, already-specified work to named subagents with pinned model tiers; reads parallel, writes serialized (Accepted)
 
+- [[0023-one-sided-mileage-adjustment|ADR-0023]] — A claimed odometer may only lower fair value, never raise it; narrows the mileage clause of ADR-0014 (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

@@ -48,7 +48,7 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 | Outcome feedback and bounded calibration (SPEC-002) | Initial outcome, threshold-calibration, and bounded weight-learning slices are implemented; later optimization remains gated. |
 | Composite score foundation (SPEC-003) | Score presentation, liquidity, and repair-risk foundations exist but are intentionally inactive in production. Seller, positives, and segment-mileage factors remain later work. |
 | Budget stabilization (SPEC-010) | Implemented to protect fresh-listing discovery and make cohorts reusable. |
-| Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. |
+| Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. Tightened 2026-08-06 — the mileage correction is now **one-sided** (downward only, no VIN-evidenced uplift), [[0023-one-sided-mileage-adjustment|ADR-0023]]. |
 | Assessment confidence (SPEC-006 US6.1) | Implemented 2026-08-04: a separate, never-multiplied evidence-coverage output over zero-cost fields, rendered in the alert and `/why`. The non-multiplication property is asserted at both unit and alert-set level. The remaining SPEC-006 monetary slices stay gated. |
 | Executable hybrid vault (SPEC-012) | Implemented: generated L1 context, bounded retrieval, verified Offers source facts, strict CI validation, and advisory-only evidence. |
 | Portable AI infrastructure kit (SPEC-013) | Implemented: clean-room, copy-and-own second-brain/bootstrap kit with safe docs-only defaults and opt-in extensions. |

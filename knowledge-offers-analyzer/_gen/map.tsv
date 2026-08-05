@@ -34,6 +34,7 @@ decisions/0019-advisory-only-ai-analysis.md	ADR-0019 — On-demand AI analysis i
 decisions/0020-graded-accident-risk.md	ADR-0020 — Accident presence is graded risk, not a hard disqualifier	decision	Narrows ADR-0018 §5 — severity classification stays data-blocked, but the blanket accident clamp is removed behind a shadow-measured, operator-approved flip.
 decisions/0021-retrieval-discipline-by-default.md	ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation	decision	Planning questions are answered from maintained artifacts on a fixed path (`/status`) with a named escalation trigger; a proposed 350-word "Information Acquisition Policy" was rejected as redundant with rules that already existed and were violated.
 decisions/0022-delegate-independent-work-to-tiered-subagents.md	ADR-0022 — Delegate independent work to named subagents with pinned model tiers	decision	Independent, already-specified work is dispatched to four named agents in `.claude/agents/` whose model tier is pinned in frontmatter (haiku for retrieval, sonnet for build and verify); reads fan out in parallel, writes serialize on the shared tree, and the vault write protocol is never delegated.
+decisions/0023-one-sided-mileage-adjustment.md	ADR-0023 - One-sided mileage adjustment	decision	
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	

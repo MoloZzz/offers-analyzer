@@ -22,9 +22,10 @@ summary: Durable product obligations, safety guardrails, and rollout requirement
 
 1. A listing may alert only when it is meaningfully below a defensible fair-value benchmark,
    has sufficient confidence, and has no hard disqualifier.
-2. Fair value uses the AUTO.RIA median when available. A claimed low mileage may not increase
-   fair value without AUTO.RIA VIN evidence; an older VIN-evidenced vehicle has a capped positive
-   mileage adjustment. See [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]].
+2. Fair value uses the AUTO.RIA median when available. A claimed low mileage may **never** increase
+   fair value — the mileage correction is one-sided and applies downward only, regardless of VIN
+   evidence. See [[0014-conservative-benchmark-and-mileage-guard|ADR-0014]] and
+   [[0023-one-sided-mileage-adjustment|ADR-0023]].
 3. The initial alert decision is price-core based. Future factors may refine ranking but may not
    turn an at- or above-market listing into an alert.
 4. Alerts and the Telegram explanation must state the practical reasons behind the decision, not

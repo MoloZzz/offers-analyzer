@@ -101,10 +101,11 @@ describe('scoring pipeline (integration, B15)', () => {
         16000,
         50,
       );
-      // Reusable cohorts intentionally omit the mileage band (SPEC-010). The VIN-evidenced car is
-      // 15k km below its expected mileage, so the conservative analytic correction is +3%.
-      expect(fairValue).toBe(16480);
-      expect(result.discountPct).toBeCloseTo(27.18, 2);
+      // Reusable cohorts intentionally omit the mileage band (SPEC-010). The car is 15k km *below*
+      // its expected mileage, and the correction is one-sided, so the benchmark passes through
+      // unchanged — VIN evidence no longer buys an uplift either (ADR-0023).
+      expect(fairValue).toBe(16000);
+      expect(result.discountPct).toBeCloseTo(25, 2);
       expect(result.isOpportunity).toBe(true);
       expect(result.score).toBeGreaterThan(0.63);
     } finally {

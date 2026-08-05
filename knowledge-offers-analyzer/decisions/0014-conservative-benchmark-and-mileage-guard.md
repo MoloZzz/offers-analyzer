@@ -24,6 +24,10 @@ means only as fallbacks. Do not apply a positive analytical mileage adjustment u
 exposes VIN-report or VIN-check evidence. For a car aged 15 years or more, cap a positive
 VIN-evidenced mileage adjustment at 5%. Negative mileage adjustments remain available.
 
+> **Narrowed by [[0023-one-sided-mileage-adjustment|ADR-0023]] (2026-08-06).** The VIN-evidence
+> exception and the 15-year 5% cap are **gone**: the mileage adjustment is now one-sided and may
+> never raise fair value, whatever the VIN state. The median-first base below is unchanged.
+
 ## Consequences
 
 False high-discount alerts from unverified low odometers are reduced with no new request type.
@@ -34,6 +38,7 @@ cohorts are still a separate future improvement.
 
 ## Related
 
+- [[0023-one-sided-mileage-adjustment|ADR-0023]] (narrows the mileage clause of this decision)
 - [[0013-budget-stabilization-before-lifecycle-rechecks|ADR-0013]]
 - [[vin-real-mileage]]
 - [[profitability-definition]]

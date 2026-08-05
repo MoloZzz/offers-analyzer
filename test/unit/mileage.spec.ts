@@ -34,27 +34,19 @@ describe('mileage correction (percentage model, M2)', () => {
     expect(adjustFairForMileage(10000, 200, 2016, opts)).toBeCloseTo(9000, 5);
   });
 
-  it('raises fair value for a lower-than-typical mileage', () => {
-    // expected 150k, actual 50k → +100k dev → +20% (capped)
-    expect(mileageAdjustmentPct(50, 2016, opts)).toBe(20);
-    expect(adjustFairForMileage(10000, 50, 2016, opts)).toBeCloseTo(12000, 5);
+  it('never raises fair value for a lower-than-typical claimed mileage', () => {
+    // expected 150k, actual 50k → would have been +20%; a claimed odometer buys nothing
+    expect(mileageAdjustmentPct(50, 2016, opts)).toBe(0);
+    expect(adjustFairForMileage(10000, 50, 2016, opts)).toBe(10000);
   });
 
-  it('clamps extreme deviations to ±maxAdjPct', () => {
+  it('never raises fair value even for an absurdly low claimed mileage', () => {
+    expect(mileageAdjustmentPct(1, 2004, opts)).toBe(0);
+    expect(mileageAdjustmentPct(0.1, 1998, opts)).toBe(0);
+  });
+
+  it('clamps extreme deviations to −maxAdjPct', () => {
     expect(mileageAdjustmentPct(400, 2016, opts)).toBe(-20); // would be −50%
-  });
-
-  it('does not raise value for an unverified claimed odometer', () => {
-    expect(mileageAdjustmentPct(50, 2016, { ...opts, allowPositiveAdjustment: false })).toBe(0);
-    expect(adjustFairForMileage(10000, 50, 2016, { ...opts, allowPositiveAdjustment: false })).toBe(10000);
-  });
-
-  it('can still lower value for a high claimed odometer without VIN evidence', () => {
-    expect(mileageAdjustmentPct(200, 2016, { ...opts, allowPositiveAdjustment: false })).toBe(-10);
-  });
-
-  it('caps an old verified car positive uplift at 5%', () => {
-    expect(mileageAdjustmentPct(168, 2004, { ...opts, maxPositiveAdjPct: 5 })).toBe(5);
   });
 
   it('is a no-op when mileage, fair, or year is unusable', () => {
@@ -84,11 +76,26 @@ describe('MileageAdjuster claimed-mileage guard', () => {
     ...overrides,
   });
 
-  it('does not inflate fair value from an unverified low claimed mileage', () => {
+  it('does not inflate fair value from a low claimed mileage', () => {
     expect(adjuster.fairValue(benchmark, detail())).toBe(4056);
   });
 
-  it('limits an old VIN-evidenced car to a 5% uplift', () => {
-    expect(adjuster.fairValue(benchmark, detail({ hasVinReport: true }))).toBeCloseTo(4258.8, 5);
+  it('does not inflate fair value even with VIN evidence — a VIN check does not attest the reading', () => {
+    expect(adjuster.fairValue(benchmark, detail({ hasVinReport: true }))).toBe(4056);
+    expect(
+      adjuster.fairValue(
+        benchmark,
+        detail({ risk: { ...detail().risk, vinChecked: true } }),
+      ),
+    ).toBe(4056);
+  });
+
+  it('still lowers fair value for a higher-than-typical mileage', () => {
+    // Far past any plausible expectation for a 2004 car, so the cap binds regardless of "now".
+    expect(adjuster.fairValue(benchmark, detail({ mileage: 900 }))).toBeCloseTo(4056 * 0.8, 5);
+  });
+
+  it('leaves a mileage-aware cohort benchmark untouched', () => {
+    expect(adjuster.fairValue({ ...benchmark, mileageAware: true }, detail())).toBe(4056);
   });
 });

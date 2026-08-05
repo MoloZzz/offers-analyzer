@@ -124,9 +124,13 @@ reason list in `/why` (`format/why-message.ts`) from stored data only, with zero
 Input names are shared via `format/confidence-labels.ts` so the two surfaces cannot drift apart.
 
 **Valuation guard** (SPEC-011, 2026-07-29): the AUTO.RIA adapter uses percentile-50 (median) as
-the fair-value base before compatibility fallbacks. An analytical uplift for claimed low mileage
-requires AUTO.RIA VIN evidence and is capped at 5% once a car is 15 years old; this adds no API
-calls beyond one post-deployment refresh per active cohort and protects the reusable-cohort hot path ([[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]).
+the fair-value base before compatibility fallbacks; this adds no API calls beyond one
+post-deployment refresh per active cohort and protects the reusable-cohort hot path
+([[0014-conservative-benchmark-and-mileage-guard|ADR-0014]]). Since 2026-08-06 the analytical
+mileage correction (`valuation/mileage.ts`) is **one-sided**: a claimed odometer may lower fair
+value, never raise it, whatever the VIN state — the VIN-evidenced uplift and its 15-year 5% cap
+are removed, and the constraint lives in `mileageAdjustmentPct` itself so no call site can
+reintroduce one ([[0023-one-sided-mileage-adjustment|ADR-0023]]).
 
 **Disappearance detection** (spec 004, 2026-07-23): after Phase 1 of each poll, every sighted id
 bulk-bumps `Listing.lastSeenInSearchAt`; active listings absent > 24h that a *detection-eligible*

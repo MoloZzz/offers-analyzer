@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 52,
-    "links": 479,
+    "notes": 53,
+    "links": 496,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -25,7 +25,7 @@
       "title": "Roadmap & Status",
       "type": "roadmap",
       "inDeg": 14,
-      "outDeg": 11
+      "outDeg": 12
     },
     {
       "rel": "Welcome.md",
@@ -57,7 +57,7 @@
       "title": "Architecture and operational invariants",
       "type": "architecture",
       "inDeg": 4,
-      "outDeg": 12
+      "outDeg": 13
     },
     {
       "rel": "architecture/overview.md",
@@ -65,7 +65,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 17,
-      "outDeg": 34
+      "outDeg": 35
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -89,7 +89,7 @@
       "title": "Product requirements",
       "type": "business",
       "inDeg": 4,
-      "outDeg": 8
+      "outDeg": 9
     },
     {
       "rel": "business/vision-and-goals.md",
@@ -200,7 +200,7 @@
       "name": "0011-evidence-gated-scoring-rollout",
       "title": "ADR-0011 — Evidence-gated scoring rollout",
       "type": "decision",
-      "inDeg": 23,
+      "inDeg": 24,
       "outDeg": 5
     },
     {
@@ -224,8 +224,8 @@
       "name": "0014-conservative-benchmark-and-mileage-guard",
       "title": "ADR-0014 - Conservative benchmark and claimed-mileage guard",
       "type": "decision",
-      "inDeg": 9,
-      "outDeg": 3
+      "inDeg": 10,
+      "outDeg": 5
     },
     {
       "rel": "decisions/0015-hybrid-executable-vault.md",
@@ -272,7 +272,7 @@
       "name": "0020-graded-accident-risk",
       "title": "ADR-0020 — Accident presence is graded risk, not a hard disqualifier",
       "type": "decision",
-      "inDeg": 11,
+      "inDeg": 12,
       "outDeg": 14
     },
     {
@@ -292,12 +292,20 @@
       "outDeg": 9
     },
     {
+      "rel": "decisions/0023-one-sided-mileage-adjustment.md",
+      "name": "0023-one-sided-mileage-adjustment",
+      "title": "ADR-0023 - One-sided mileage adjustment",
+      "type": "decision",
+      "inDeg": 7,
+      "outDeg": 8
+    },
+    {
       "rel": "decisions/README.md",
       "name": "README",
       "title": "Decision log (ADRs)",
       "type": "moc",
       "inDeg": 26,
-      "outDeg": 26
+      "outDeg": 27
     },
     {
       "rel": "decisions/adr-template.md",
@@ -313,7 +321,7 @@
       "title": "Domain glossary",
       "type": "domain",
       "inDeg": 12,
-      "outDeg": 20
+      "outDeg": 22
     },
     {
       "rel": "operations/environment-setup.md",
@@ -352,7 +360,7 @@
       "name": "profitability-definition",
       "title": "Research — what counts as a \"profitable\" offer",
       "type": "research",
-      "inDeg": 19,
+      "inDeg": 20,
       "outDeg": 17
     },
     {
@@ -368,7 +376,7 @@
       "name": "vin-real-mileage",
       "title": "Research — real (VIN-verified) mileage vs claimed mileage",
       "type": "research",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 5
     },
     {
@@ -641,6 +649,13 @@
     },
     {
       "from": "Roadmap & Status.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Roadmap & Status.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
@@ -840,77 +855,77 @@
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 74
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0004-drop-redis-bullmq.md",
       "anchor": null,
       "embed": false,
-      "line": 71
+      "line": 75
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 72
+      "line": 76
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0006-operator-profit-vision.md",
       "anchor": null,
       "embed": false,
-      "line": 73
+      "line": 77
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0009-monthly-rate-limit-pool.md",
       "anchor": null,
       "embed": false,
-      "line": 74
+      "line": 78
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 75
+      "line": 79
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 76
+      "line": 80
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 77
+      "line": 81
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 46
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
-      "line": 49
+      "line": 53
     },
     {
       "from": "architecture/invariants.md",
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 56
+      "line": 60
     },
     {
       "from": "architecture/invariants.md",
@@ -920,11 +935,18 @@
       "line": 38
     },
     {
+      "from": "architecture/invariants.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
       "from": "architecture/overview.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 190
+      "line": 194
     },
     {
       "from": "architecture/overview.md",
@@ -952,14 +974,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 193
+      "line": 197
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 175
+      "line": 179
     },
     {
       "from": "architecture/overview.md",
@@ -980,7 +1002,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 165
+      "line": 169
     },
     {
       "from": "architecture/overview.md",
@@ -1057,7 +1079,7 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 178
+      "line": 182
     },
     {
       "from": "architecture/overview.md",
@@ -1082,17 +1104,24 @@
     },
     {
       "from": "architecture/overview.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 133
+    },
+    {
+      "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 192
+      "line": 196
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 191
+      "line": 195
     },
     {
       "from": "architecture/overview.md",
@@ -1120,7 +1149,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 175
+      "line": 179
     },
     {
       "from": "architecture/overview.md",
@@ -1134,7 +1163,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 153
+      "line": 157
     },
     {
       "from": "architecture/overview.md",
@@ -1148,7 +1177,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 169
+      "line": 173
     },
     {
       "from": "architecture/overview.md",
@@ -1267,28 +1296,28 @@
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 63
+      "line": 64
     },
     {
       "from": "business/requirements.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 67
     },
     {
       "from": "business/requirements.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 48
+      "line": 49
     },
     {
       "from": "business/requirements.md",
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 67
+      "line": 68
     },
     {
       "from": "business/requirements.md",
@@ -1299,17 +1328,24 @@
     },
     {
       "from": "business/requirements.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 28
+    },
+    {
+      "from": "business/requirements.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 65
     },
     {
       "from": "business/requirements.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 66
     },
     {
       "from": "business/vision-and-goals.md",
@@ -2065,21 +2101,35 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 42
+    },
+    {
+      "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 27
+    },
+    {
+      "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
     },
     {
       "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 44
     },
     {
       "from": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "to": "research/vin-real-mileage.md",
       "anchor": null,
       "embed": false,
-      "line": 38
+      "line": 43
     },
     {
       "from": "decisions/0015-hybrid-executable-vault.md",
@@ -2614,25 +2664,81 @@
       "line": 125
     },
     {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 53
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 64
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "decisions/0020-graded-accident-risk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "research/profitability-definition.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 59
+    },
+    {
+      "from": "decisions/0023-one-sided-mileage-adjustment.md",
+      "to": "research/vin-real-mileage.md",
+      "anchor": null,
+      "embed": false,
+      "line": 66
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 52
+      "line": 54
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 48
+      "line": 50
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 48
+      "line": 50
     },
     {
       "from": "decisions/README.md",
@@ -2790,6 +2896,13 @@
     },
     {
       "from": "decisions/README.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 43
+    },
+    {
+      "from": "decisions/README.md",
       "to": "decisions/adr-template.md",
       "anchor": null,
       "embed": false,
@@ -2920,6 +3033,20 @@
       "anchor": null,
       "embed": false,
       "line": 64
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 16
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
     },
     {
       "from": "domain/glossary.md",
@@ -3823,6 +3950,7 @@
       "decisions/0020-graded-accident-risk.md",
       "decisions/0021-retrieval-discipline-by-default.md",
       "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "decisions/0023-one-sided-mileage-adjustment.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",

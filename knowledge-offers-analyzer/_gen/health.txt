@@ -1,5 +1,5 @@
 # vault graph health — generated, do not edit
 # For frontmatter, source-fact, retrieval, and freshness findings run `vault check`.
-notes=52 links=479 components=1
+notes=53 links=496 components=1
 dangling=0 ambiguous=0 case_mismatch=0
 orphans=0 unreachable=0

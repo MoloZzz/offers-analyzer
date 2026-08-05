@@ -281,21 +281,21 @@
           "level": 2,
           "text": "Scoring invariants",
           "line": 29,
-          "endLine": 60
+          "endLine": 64
         },
         {
           "n": 4,
           "level": 2,
           "text": "Evidence and explainability invariants",
-          "line": 61,
-          "endLine": 67
+          "line": 65,
+          "endLine": 71
         },
         {
           "n": 5,
           "level": 2,
           "text": "Authority",
-          "line": 68,
-          "endLine": 78
+          "line": 72,
+          "endLine": 82
         }
       ]
     },
@@ -334,35 +334,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 143
+          "endLine": 147
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 144,
-          "endLine": 172
+          "line": 148,
+          "endLine": 176
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 173,
-          "endLine": 181
+          "line": 177,
+          "endLine": 185
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 182,
-          "endLine": 183
+          "line": 186,
+          "endLine": 187
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 184,
-          "endLine": 194
+          "line": 188,
+          "endLine": 198
         }
       ]
     },
@@ -465,35 +465,35 @@
           "level": 2,
           "text": "Evaluation and alerts",
           "line": 21,
-          "endLine": 34
+          "endLine": 35
         },
         {
           "n": 3,
           "level": 2,
           "text": "Operator control and feedback",
-          "line": 35,
-          "endLine": 43
+          "line": 36,
+          "endLine": 44
         },
         {
           "n": 4,
           "level": 2,
           "text": "Release and evidence requirements",
-          "line": 44,
-          "endLine": 53
+          "line": 45,
+          "endLine": 54
         },
         {
           "n": 5,
           "level": 2,
           "text": "Non-requirements for v1",
-          "line": 54,
-          "endLine": 60
+          "line": 55,
+          "endLine": 61
         },
         {
           "n": 6,
           "level": 2,
           "text": "Related",
-          "line": 61,
-          "endLine": 68
+          "line": 62,
+          "endLine": 69
         }
       ]
     },
@@ -1205,21 +1205,21 @@
           "level": 2,
           "text": "Decision",
           "line": 20,
-          "endLine": 26
+          "endLine": 30
         },
         {
           "n": 3,
           "level": 2,
           "text": "Consequences",
-          "line": 27,
-          "endLine": 34
+          "line": 31,
+          "endLine": 38
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 35,
-          "endLine": 41
+          "line": 39,
+          "endLine": 46
         }
       ]
     },
@@ -1550,6 +1550,45 @@
       ]
     },
     {
+      "rel": "decisions/0023-one-sided-mileage-adjustment.md",
+      "path": "knowledge-offers-analyzer/decisions/0023-one-sided-mileage-adjustment.md",
+      "name": "0023-one-sided-mileage-adjustment",
+      "title": "ADR-0023 - One-sided mileage adjustment",
+      "type": "decision",
+      "summary": null,
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 13,
+          "endLine": 28
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 29,
+          "endLine": 44
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 45,
+          "endLine": 61
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 62,
+          "endLine": 67
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1563,21 +1602,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 42
+          "endLine": 44
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 43,
-          "endLine": 49
+          "line": 45,
+          "endLine": 51
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 50,
-          "endLine": 53
+          "line": 52,
+          "endLine": 55
         }
       ]
     },

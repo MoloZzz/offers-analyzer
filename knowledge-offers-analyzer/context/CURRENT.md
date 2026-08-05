@@ -11,6 +11,23 @@ updated: 2026-08-05
 
 ## Active work
 
+**One-sided mileage adjustment — implemented 2026-08-06 ([[0023-one-sided-mileage-adjustment|ADR-0023]]).**
+The analytic mileage correction may now only *lower* fair value. The ADR-0014 exception that let a
+below-expectation odometer add up to 5% when AUTO.RIA reported VIN evidence is removed, along with
+the `allowPositiveAdjustment` / `maxPositiveAdjPct` options that carried it — `mileageAdjustmentPct`
+returns `[−maxAdjPct, 0]` by construction, so no call site can reintroduce an uplift. Rationale: the
+AUTO.RIA VIN signals attest that a report exists, not that the displayed reading is real, so the
+uplift ran on a seller-typed number and turned understated odometers into high-scoring alerts.
+Scores can only move down or stay equal; no ParameterSet change, so this sits outside the ADR-0011
+gates. Decisions and what was deliberately *not* done:
+`context/log/2026-08-06-one-sided-mileage.md`.
+
+Verification (native Windows `npm.cmd`): `typecheck`, `lint`, Jest 1896/1897 — the single failure is
+a pre-existing timeout flake in the stale `.claude/worktrees/recursing-chandrasekhar-4293e8` copy,
+not in the real tree.
+
+## Previously (still current)
+
 **SPEC-016 — fully implemented 2026-08-05 (T001–T022, all four user stories).**
 
 **Phases 3–4 (T015–T019)** closed the spec. `/check` now renders the shared section layout instead
@@ -46,8 +63,6 @@ Verification (native Windows `npm.cmd`; RTK's wrapper is Linux/musl and does not
 `typecheck`, `lint`, Jest **526/526** (63 suites), `nest build` — all pass.
 
 Phases 3–4 of the same spec closed later the same day — see the active-work section above.
-
-## Previously (still current)
 
 **SPEC-006 US6.1, assessment confidence — implemented 2026-08-04 (T001–T013).** A separate,
 never-multiplied evidence-coverage output over already-fetched fields, rendered as one
