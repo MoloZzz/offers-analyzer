@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 50,
-    "links": 456,
+    "notes": 52,
+    "links": 477,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -17,7 +17,7 @@
       "title": "Offers Analyzer - Knowledge Base Index",
       "type": "moc",
       "inDeg": 17,
-      "outDeg": 22
+      "outDeg": 23
     },
     {
       "rel": "Roadmap & Status.md",
@@ -48,8 +48,8 @@
       "name": "vault-protocol",
       "title": "Vault Protocol - how agents use and maintain the knowledge base",
       "type": "meta",
-      "inDeg": 7,
-      "outDeg": 19
+      "inDeg": 9,
+      "outDeg": 22
     },
     {
       "rel": "architecture/invariants.md",
@@ -104,15 +104,23 @@
       "name": "coding-standards",
       "title": "Coding standards & conventions",
       "type": "convention",
-      "inDeg": 9,
+      "inDeg": 11,
       "outDeg": 8
+    },
+    {
+      "rel": "conventions/delegation.md",
+      "name": "delegation",
+      "title": "Delegation to subagents — when, which model, and what to hand over",
+      "type": "convention",
+      "inDeg": 3,
+      "outDeg": 7
     },
     {
       "rel": "decisions/0001-adopt-sdd-vault-rtk.md",
       "name": "0001-adopt-sdd-vault-rtk",
       "title": "ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK",
       "type": "decision",
-      "inDeg": 5,
+      "inDeg": 6,
       "outDeg": 4
     },
     {
@@ -192,7 +200,7 @@
       "name": "0011-evidence-gated-scoring-rollout",
       "title": "ADR-0011 — Evidence-gated scoring rollout",
       "type": "decision",
-      "inDeg": 21,
+      "inDeg": 23,
       "outDeg": 5
     },
     {
@@ -272,16 +280,24 @@
       "name": "0021-retrieval-discipline-by-default",
       "title": "ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation",
       "type": "decision",
-      "inDeg": 3,
+      "inDeg": 5,
       "outDeg": 6
+    },
+    {
+      "rel": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "name": "0022-delegate-independent-work-to-tiered-subagents",
+      "title": "ADR-0022 — Delegate independent work to named subagents with pinned model tiers",
+      "type": "decision",
+      "inDeg": 3,
+      "outDeg": 9
     },
     {
       "rel": "decisions/README.md",
       "name": "README",
       "title": "Decision log (ADRs)",
       "type": "moc",
-      "inDeg": 25,
-      "outDeg": 25
+      "inDeg": 26,
+      "outDeg": 26
     },
     {
       "rel": "decisions/adr-template.md",
@@ -304,7 +320,7 @@
       "name": "environment-setup",
       "title": "Environment setup & tooling",
       "type": "operations",
-      "inDeg": 9,
+      "inDeg": 10,
       "outDeg": 6
     },
     {
@@ -425,14 +441,14 @@
       "to": "Roadmap & Status.md",
       "anchor": null,
       "embed": false,
-      "line": 67
+      "line": 68
     },
     {
       "from": "00-INDEX.md",
       "to": "Welcome.md",
       "anchor": null,
       "embed": false,
-      "line": 52
+      "line": 53
     },
     {
       "from": "00-INDEX.md",
@@ -460,7 +476,7 @@
       "to": "business/how-it-works.md",
       "anchor": null,
       "embed": false,
-      "line": 39
+      "line": 40
     },
     {
       "from": "00-INDEX.md",
@@ -485,6 +501,13 @@
     },
     {
       "from": "00-INDEX.md",
+      "to": "conventions/delegation.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "00-INDEX.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
@@ -502,70 +525,70 @@
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 37
+      "line": 38
     },
     {
       "from": "00-INDEX.md",
       "to": "research/alternative-sources.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 43
     },
     {
       "from": "00-INDEX.md",
       "to": "research/explainability-gaps.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 43
     },
     {
       "from": "00-INDEX.md",
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 41
     },
     {
       "from": "00-INDEX.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 41
     },
     {
       "from": "00-INDEX.md",
       "to": "research/profitability-methods-coverage.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 42
     },
     {
       "from": "00-INDEX.md",
       "to": "research/vin-real-mileage.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 42
     },
     {
       "from": "00-INDEX.md",
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 42
+      "line": 43
     },
     {
       "from": "00-INDEX.md",
       "to": "research/why-no-opportunities.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 42
     },
     {
       "from": "00-INDEX.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 38
+      "line": 39
     },
     {
       "from": "Roadmap & Status.md",
@@ -677,7 +700,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 85
+      "line": 91
     },
     {
       "from": "_meta/vault-protocol.md",
@@ -705,7 +728,7 @@
       "to": "_meta/note-template.md",
       "anchor": null,
       "embed": false,
-      "line": 129
+      "line": 139
     },
     {
       "from": "_meta/vault-protocol.md",
@@ -758,10 +781,31 @@
     },
     {
       "from": "_meta/vault-protocol.md",
+      "to": "conventions/delegation.md",
+      "anchor": null,
+      "embed": false,
+      "line": 83
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "conventions/delegation.md",
+      "anchor": null,
+      "embed": false,
+      "line": 110
+    },
+    {
+      "from": "_meta/vault-protocol.md",
       "to": "decisions/0021-retrieval-discipline-by-default.md",
       "anchor": null,
       "embed": false,
-      "line": 118
+      "line": 128
+    },
+    {
+      "from": "_meta/vault-protocol.md",
+      "to": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
     },
     {
       "from": "_meta/vault-protocol.md",
@@ -1364,6 +1408,55 @@
       "anchor": null,
       "embed": false,
       "line": 82
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 110
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 110
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 59
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 109
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "anchor": null,
+      "embed": false,
+      "line": 11
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "anchor": null,
+      "embed": false,
+      "line": 108
+    },
+    {
+      "from": "conventions/delegation.md",
+      "to": "operations/environment-setup.md",
+      "anchor": null,
+      "embed": false,
+      "line": 111
     },
     {
       "from": "decisions/0001-adopt-sdd-vault-rtk.md",
@@ -2451,25 +2544,88 @@
       "line": 112
     },
     {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "_meta/vault-protocol.md",
+      "anchor": null,
+      "embed": false,
+      "line": 129
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "conventions/coding-standards.md",
+      "anchor": null,
+      "embed": false,
+      "line": 129
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "conventions/delegation.md",
+      "anchor": null,
+      "embed": false,
+      "line": 129
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/0001-adopt-sdd-vault-rtk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 128
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 81
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 127
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 37
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/0021-retrieval-discipline-by-default.md",
+      "anchor": null,
+      "embed": false,
+      "line": 125
+    },
+    {
+      "from": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "to": "decisions/README.md",
+      "anchor": null,
+      "embed": false,
+      "line": 125
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 52
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 46
+      "line": 48
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 46
+      "line": 48
     },
     {
       "from": "decisions/README.md",
@@ -2617,6 +2773,13 @@
       "anchor": null,
       "embed": false,
       "line": 39
+    },
+    {
+      "from": "decisions/README.md",
+      "to": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "anchor": null,
+      "embed": false,
+      "line": 41
     },
     {
       "from": "decisions/README.md",
@@ -3623,6 +3786,7 @@
       "business/requirements.md",
       "business/vision-and-goals.md",
       "conventions/coding-standards.md",
+      "conventions/delegation.md",
       "decisions/0001-adopt-sdd-vault-rtk.md",
       "decisions/0002-monitoring-via-official-api.md",
       "decisions/0003-decoupled-context-zone.md",
@@ -3644,6 +3808,7 @@
       "decisions/0019-advisory-only-ai-analysis.md",
       "decisions/0020-graded-accident-risk.md",
       "decisions/0021-retrieval-discipline-by-default.md",
+      "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",

@@ -1,7 +1,7 @@
 ---
 title: Vault Protocol - how agents use and maintain the knowledge base
 type: meta
-updated: 2026-08-02
+updated: 2026-08-05
 ---
 
 # Vault Protocol
@@ -77,6 +77,12 @@ configuration), run `npm run vault:build`, then `npm run vault:check:strict`. Th
 For every task, also record a concise dated note in context/log/. Update context/CURRENT.md only
 with the actual active handoff; it must never become a competing roadmap.
 
+**The write protocol is never delegated.** Subagents report durable facts in a `VAULT:` line and
+the orchestrator promotes each one to the owner above; a delegated vault edit produces a plausible
+note that quietly diverges from what was built. Record the delegation (agent, model, slice) in the
+context/log/ entry. See [[delegation]] and
+[[0022-delegate-independent-work-to-tiered-subagents|ADR-0022]].
+
 ## Context zone
 
 The vault has two distinct layers:
@@ -98,6 +104,10 @@ Whenever a decision changes, search the vault for the old fact and update every 
 same task. Common drift locations are vision/requirements, architecture overview, glossary,
 business explanation, roadmap, and context orientation. A note that contradicts an ADR is a defect,
 not harmless stale documentation.
+
+The sweep itself is mechanical retrieval and is the standing job of the `oa-vault-scribe` subagent
+(haiku, read-only): hand it the old fact and the new fact, and it returns the file:line hits that
+still contradict. It reports; the orchestrator edits ([[delegation]]).
 
 ## Enforcement baseline and ownership
 

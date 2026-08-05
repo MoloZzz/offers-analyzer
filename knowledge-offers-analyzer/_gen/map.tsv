@@ -11,6 +11,7 @@ business/how-it-works.md	Як працює система (для бізнесу
 business/requirements.md	Product requirements	business	Durable product obligations, safety guardrails, and rollout requirements.
 business/vision-and-goals.md	Product vision and goals	business	Operator-profit product vision, v1 scope, non-goals, and operator decision test.
 conventions/coding-standards.md	Coding standards & conventions	convention	
+conventions/delegation.md	Delegation to subagents — when, which model, and what to hand over	convention	Independent, fully-specified work is delegated to a named subagent with a pinned model tier so the orchestrator's context stays wide; reads fan out in parallel, writes are serialized, and the vault write protocol never delegates.
 decisions/0001-adopt-sdd-vault-rtk.md	ADR-0001 — Adopt Spec-Driven Development, a knowledge vault, and RTK	decision	
 decisions/0002-monitoring-via-official-api.md	ADR-0002 — Monitor AUTO.RIA via the official API, narrow niche on free tier	decision	
 decisions/0003-decoupled-context-zone.md	ADR-0003 — Decoupled context zone instead of a second knowledge base	decision	
@@ -32,6 +33,7 @@ decisions/0018-assessment-confidence-and-monetary-output.md	ADR-0018 — Assessm
 decisions/0019-advisory-only-ai-analysis.md	ADR-0019 — On-demand AI analysis is advisory-only, admin-triggered, and never a scoring input	decision	Admit a third-party LLM as a human-triggered second opinion behind a hard advisory-only boundary.
 decisions/0020-graded-accident-risk.md	ADR-0020 — Accident presence is graded risk, not a hard disqualifier	decision	Narrows ADR-0018 §5 — severity classification stays data-blocked, but the blanket accident clamp is removed behind a shadow-measured, operator-approved flip.
 decisions/0021-retrieval-discipline-by-default.md	ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation	decision	Planning questions are answered from maintained artifacts on a fixed path (`/status`) with a named escalation trigger; a proposed 350-word "Information Acquisition Policy" was rejected as redundant with rules that already existed and were violated.
+decisions/0022-delegate-independent-work-to-tiered-subagents.md	ADR-0022 — Delegate independent work to named subagents with pinned model tiers	decision	Independent, already-specified work is dispatched to four named agents in `.claude/agents/` whose model tier is pinned in frontmatter (haiku for retrieval, sonnet for build and verify); reads fan out in parallel, writes serialize on the shared tree, and the vault write protocol is never delegated.
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	

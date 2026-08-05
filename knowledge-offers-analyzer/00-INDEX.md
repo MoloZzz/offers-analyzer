@@ -1,7 +1,7 @@
 ---
 title: Offers Analyzer - Knowledge Base Index
 type: moc
-updated: 2026-08-02
+updated: 2026-08-05
 ---
 
 # Offers Analyzer Knowledge Base
@@ -33,7 +33,8 @@ conventions, and operations. Keep it current under [[vault-protocol]].
 - **Architecture** -> [[overview|Architecture overview]] - modules, data flow, entities, boundaries.
 - **Domain** -> [[glossary|Domain glossary]] - ubiquitous language and business rules.
 - **Decisions** -> [[decisions/README|Decision log (ADRs)]] - why things are the way they are.
-- **Conventions** -> [[coding-standards|Coding standards]] - NestJS patterns, testing, and style.
+- **Conventions** -> [[coding-standards|Coding standards]] - NestJS patterns, testing, and style;
+  [[delegation|Delegation to subagents]] - when to delegate, model tiers, and the brief contract.
 - **Operations** -> [[environment-setup|Environment setup]] - tooling, environment, and runbooks.
 - **Specs (SDD)** -> [[specs/README|Feature specs index]] - repo-root feature specs and Spec Kit workflow.
 - **Business explanation** -> [[how-it-works|How it works and how we score]] - non-technical narrative.

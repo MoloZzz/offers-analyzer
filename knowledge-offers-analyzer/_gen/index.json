@@ -31,35 +31,35 @@
           "level": 2,
           "text": "Maps of Content",
           "line": 31,
-          "endLine": 43
+          "endLine": 44
         },
         {
           "n": 4,
           "level": 2,
           "text": "Context zone",
-          "line": 44,
-          "endLine": 49
+          "line": 45,
+          "endLine": 50
         },
         {
           "n": 5,
           "level": 2,
           "text": "Project infrastructure",
-          "line": 50,
-          "endLine": 57
+          "line": 51,
+          "endLine": 58
         },
         {
           "n": 6,
           "level": 2,
           "text": "Project one-liner",
-          "line": 58,
-          "endLine": 63
+          "line": 59,
+          "endLine": 64
         },
         {
           "n": 7,
           "level": 2,
           "text": "Status",
-          "line": 64,
-          "endLine": 68
+          "line": 65,
+          "endLine": 69
         }
       ]
     },
@@ -214,42 +214,42 @@
           "level": 2,
           "text": "Write protocol",
           "line": 58,
-          "endLine": 79
+          "endLine": 85
         },
         {
           "n": 5,
           "level": 2,
           "text": "Context zone",
-          "line": 80,
-          "endLine": 94
+          "line": 86,
+          "endLine": 100
         },
         {
           "n": 6,
           "level": 2,
           "text": "Decision supersession sweep",
-          "line": 95,
-          "endLine": 101
+          "line": 101,
+          "endLine": 111
         },
         {
           "n": 7,
           "level": 2,
           "text": "Enforcement baseline and ownership",
-          "line": 102,
-          "endLine": 124
+          "line": 112,
+          "endLine": 134
         },
         {
           "n": 8,
           "level": 2,
           "text": "Note conventions",
-          "line": 125,
-          "endLine": 135
+          "line": 135,
+          "endLine": 145
         },
         {
           "n": 9,
           "level": 2,
           "text": "Note types",
-          "line": 136,
-          "endLine": 140
+          "line": 146,
+          "endLine": 150
         }
       ]
     },
@@ -600,6 +600,73 @@
           "text": "Related",
           "line": 80,
           "endLine": 83
+        }
+      ]
+    },
+    {
+      "rel": "conventions/delegation.md",
+      "path": "knowledge-offers-analyzer/conventions/delegation.md",
+      "name": "delegation",
+      "title": "Delegation to subagents — when, which model, and what to hand over",
+      "type": "convention",
+      "summary": "Independent, fully-specified work is delegated to a named subagent with a pinned model tier so the orchestrator's context stays wide; reads fan out in parallel, writes are serialized, and the vault write protocol never delegates.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Why",
+          "line": 13,
+          "endLine": 26
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "The four agents",
+          "line": 27,
+          "endLine": 42
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Delegate when — all four hold",
+          "line": 43,
+          "endLine": 54
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Never delegate",
+          "line": 55,
+          "endLine": 68
+        },
+        {
+          "n": 5,
+          "level": 2,
+          "text": "Parallelism: reads fan out, writes serialize",
+          "line": 69,
+          "endLine": 79
+        },
+        {
+          "n": 6,
+          "level": 2,
+          "text": "The brief — what to hand over",
+          "line": 80,
+          "endLine": 95
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "What the orchestrator does with the result",
+          "line": 96,
+          "endLine": 105
+        },
+        {
+          "n": 8,
+          "level": 2,
+          "text": "Related",
+          "line": 106,
+          "endLine": 113
         }
       ]
     },
@@ -1444,6 +1511,45 @@
       ]
     },
     {
+      "rel": "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "path": "knowledge-offers-analyzer/decisions/0022-delegate-independent-work-to-tiered-subagents.md",
+      "name": "0022-delegate-independent-work-to-tiered-subagents",
+      "title": "ADR-0022 — Delegate independent work to named subagents with pinned model tiers",
+      "type": "decision",
+      "summary": "Independent, already-specified work is dispatched to four named agents in `.claude/agents/` whose model tier is pinned in frontmatter (haiku for retrieval, sonnet for build and verify); reads fan out in parallel, writes serialize on the shared tree, and the vault write protocol is never delegated.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 14,
+          "endLine": 49
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 50,
+          "endLine": 85
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 86,
+          "endLine": 122
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 123,
+          "endLine": 134
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1457,21 +1563,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 40
+          "endLine": 42
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 41,
-          "endLine": 47
+          "line": 43,
+          "endLine": 49
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 48,
-          "endLine": 51
+          "line": 50,
+          "endLine": 53
         }
       ]
     },

@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.0 → 1.3.0
+- Version change: 1.3.0 → 1.4.0
 - Ratification: initial adoption
 - Principles defined: I Spec-Driven Development; II Knowledge Base is Source of Truth;
   III Clean, Simple Code; IV Ports & Adapters for External Systems;
   V Respect External Limits & Legality; VI Test What Matters (contract-test external APIs);
-  VII Token-Efficient Tooling (RTK); VIII Executable Knowledge Hygiene
+  VII Context Economy (RTK + delegation to tiered subagents); VIII Executable Knowledge Hygiene
 - Added sections: Technology & External Constraints; Development Workflow & Quality Gates; Governance
 - Templates reviewed: plan-template.md ✅ | spec-template.md ✅ | tasks-template.md ✅ (generic, no changes required)
 - Deferred TODOs: none
@@ -66,10 +66,22 @@ The external API MUST be contract-tested against recorded fixtures; tests MUST N
 live rate-limited endpoint. Rationale: protect the logic that defines the product and stay
 within the request budget.
 
-### VII. Token-Efficient Tooling (RTK)
+### VII. Context Economy — Token-Efficient Tooling and Delegation
 
 Noisy shell commands (tests, build, lint, git, grep) MUST be run through RTK to compact
-output before it reaches agent context. Rationale: preserve context budget for real work.
+output before it reaches agent context.
+
+Work that is **independent, already specified, and cheaply verifiable** MUST be delegated to a
+named subagent (`.claude/agents/`) rather than performed in the orchestrating context, so the
+material consulted to produce a result never enters the context that consumes it. Model tier is
+pinned per agent, not chosen per task. Read-only agents may run in parallel; write-capable agents
+run one at a time on a shared tree. Spec authorship, ADRs, prioritization, evidence-gated scoring
+changes, and the vault write protocol are NEVER delegated — subagents report durable facts, the
+orchestrator promotes them. Where a runtime provides no subagent mechanism, work in-context and
+state the fallback. See ADR-0022 and `conventions/delegation.md`.
+
+Rationale: preserve context budget for real work, and give each independent slice a context sized
+to its actual scope.
 
 ### VIII. Executable Knowledge Hygiene
 
@@ -117,6 +129,11 @@ must be precise, low-noise, reproducible, and safe in every agent runtime.
 6. For a change affecting curated notes, source facts, adapter logic, or generated output, run
    `npm run vault:build` and `npm run vault:check:strict`. The compatibility command
    `npm run vault:check` remains part of the same gate.
+7. **Delegated slices are verified independently and recorded.** Any slice built by an
+   `oa-implementer` subagent that changed behavior MUST pass `oa-verifier` before acceptance — an
+   implementer reporting its own success is not evidence. The delegation (agent, model, slice) is
+   recorded in the context log, and every `VAULT:` line a subagent returned MUST be promoted to
+   its owning note by the orchestrator (Principle VII, Principle II).
 
 ## Governance
 
@@ -127,9 +144,10 @@ MAJOR for incompatible principle removals/redefinitions, MINOR for a new princip
 materially expanded guidance, PATCH for clarifications. All work — human or agent — is
 expected to comply; `CLAUDE.md` is the runtime enforcement of these rules.
 
-**Version**: 1.3.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-08-03
+**Version**: 1.4.0 | **Ratified**: 2026-07-12 | **Last Amended**: 2026-08-05
 <!-- 1.0.1: PATCH — Technology stack refined to drop Redis/BullMQ from v1 (ADR-0004). -->
 <!-- 1.0.2: PATCH — Rate budget is now Postgres-backed (durable) instead of in-memory (ADR-0004, B13). -->
 <!-- 1.1.0: MINOR — Mission reframed to operator-profit ranking (composite Total Deal Score, price dominant) + operator-value workflow gate (ADR-0006). -->
 <!-- 1.3.0: MINOR — Admitted advisory AI services as a distinct external-system class under a hard advisory-only boundary (ADR-0019). -->
 <!-- 1.2.0: MINOR — Executable-vault retrieval, generated-artifact safety, and advisory evidence governance (ADR-0015). -->
+<!-- 1.4.0: MINOR — Principle VII broadened from RTK to Context Economy: independent, specified, verifiable work is delegated to named subagents with pinned model tiers; delegated slices are independently verified and recorded (ADR-0022). -->

@@ -151,10 +151,36 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
-   - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
+   - **Respect dependencies**: Run sequential tasks in order
+   - **`[P]` tasks are delegated, not done in this context** — see step 6a. They are independent
+     by construction, but they are dispatched **one at a time**, because concurrent writers on a
+     shared working tree corrupt each other and timestamp-named append-only migrations collide.
    - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
    - **File-based coordination**: Tasks affecting the same files must run sequentially
    - **Validation checkpoints**: Verify each phase completion before proceeding
+
+6a. **Delegation protocol** (`CLAUDE.md` §4; full rules in
+    `knowledge-offers-analyzer/conventions/delegation.md`):
+
+   **Delegate to `oa-implementer` (sonnet)** when the task is `[P]`-marked *and* its contract is
+   already decided. This is the default for `[P]` tasks — the point is that the orchestrator's
+   context stays wide and each slice gets a context matched to its actual scope.
+
+   **Keep in this context**: work whose hard part is deciding the contract, changes to scoring
+   weights / thresholds / `ParameterSet` activation / the alert set (evidence-gated, ADR-0011),
+   delicate cross-cutting files (`poll.service.ts` is the standing example), and every vault edit.
+
+   Each brief names: **Goal** (one sentence), **Task id** (T0NN), **Files** (the exact allowed
+   write set), **Contract** (signatures / entity fields / migration intent other slices depend on),
+   **Context refs** (`note#section`, spec path, ADR number — *references, never pasted bodies*),
+   **Acceptance** (the test that must exist and pass), **Known hazards**.
+
+   On return: read `SURPRISES` first — it is the part that changes the plan. A `BLOCKED` report or
+   a request to touch a file outside the write set is answered by you, not worked around by the
+   agent. Hold each `VAULT:` line for the write protocol in step 9a.
+
+   In a runtime with no subagent mechanism, implement in-context and state the fallback in the
+   completion report.
 
 7. Implementation execution rules:
    - **Setup first**: Initialize project structure, dependencies, configuration
@@ -165,6 +191,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
+   - For delegated tasks, report the agent and model used alongside the task id
    - Halt execution if any non-parallel task fails
    - For parallel tasks [P], continue with successful tasks, report failed ones
    - Provide clear error messages with context for debugging
@@ -176,6 +203,19 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check that implemented features match the original specification
    - Validate that tests pass and coverage meets requirements
    - Confirm the implementation follows the technical plan
+   - **Run `oa-verifier` (sonnet, read-only) on every slice that changed behavior.** An
+     implementer reporting its own success is not independent evidence. `oa-verifier` runs the
+     gates (`tsc`, `jest`, `lint`, `vault:check:strict`), reads the bounded diff, and checks the
+     project invariants — append-only migrations, no `any`, ports, ADR-0011/ADR-0019 boundaries,
+     and that files changed ⊆ files the brief named. Verifiers are read-only, so **several may
+     run in parallel**. Treat `FAIL` / `PASS WITH FINDINGS` as blocking until resolved.
+
+9a. **Promote returned `VAULT:` lines.** Every durable fact a subagent reported — new module,
+    new domain term, new convention, decision made — goes to its owning note under the `CLAUDE.md`
+    §1 write protocol, **by you, not by the subagent**. If any decision changed, dispatch
+    `oa-vault-scribe` (haiku, read-only) with the old fact and the new fact to run the supersession
+    sweep, then fix every `CONTRADICTS` hit it reports. An unpromoted `VAULT:` line means this
+    command is not done.
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 
@@ -222,6 +262,11 @@ Report final status with summary of completed work.
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
 - [ ] Implementation validated against specification, plan, and test coverage
+- [ ] **`[P]` tasks were delegated to `oa-implementer` subagents** (one write-capable agent at a
+      time) or the no-subagent fallback was stated — `CLAUDE.md` §4
+- [ ] **Every behavior-changing slice passed `oa-verifier`**; findings resolved, not waived
+- [ ] **Every returned `VAULT:` line promoted** to its owning note by the orchestrator; delegation
+      recorded in today's `context/log/` entry (agent, model, slice)
 - [ ] **Knowledge vault synced per `CLAUDE.md` §1 write protocol** — `architecture/overview.md`, `domain/glossary.md`, `conventions/coding-standards.md`, `operations/environment-setup.md`, and `specs/README.md` reflect what was built; durable context promoted out of `context/`.
 - [ ] **Supersession sweep run** — if this work changed, dropped, or narrowed any prior decision, every note that repeated the old fact (esp. `context/goals.md`, `overview.md`, `glossary.md`) was updated in this task; no note contradicts an ADR (`CLAUDE.md` §1).
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above

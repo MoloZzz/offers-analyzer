@@ -15,6 +15,12 @@ For every task:
    `CLAUDE.md`.
 5. When source or curated-vault changes affect generated facts, run `npm run vault:build`, then
    `npm run vault:check:strict`; `vault:check` remains the compatibility command.
+6. Delegate independent, already-specified work to the named subagents in `.claude/agents/`
+   rather than doing it in the main context — see `CLAUDE.md` §4 and
+   `knowledge-offers-analyzer/conventions/delegation.md`. Read-only agents may run in parallel;
+   write-capable agents run one at a time. Spec authorship, ADRs, prioritization, evidence-gated
+   scoring changes, and the vault write protocol are never delegated. In a runtime without a
+   subagent mechanism, work in-context and state the fallback.
 
 This file deliberately stays short so the policy has one owner. Do not copy or
 diverge from `CLAUDE.md`; update that file when the operating policy changes.

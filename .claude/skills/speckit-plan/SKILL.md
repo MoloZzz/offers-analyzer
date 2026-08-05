@@ -117,14 +117,26 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
    - For each dependency → best practices task
    - For each integration → patterns task
 
-2. **Generate and dispatch research agents**:
+2. **Dispatch research to `oa-researcher` subagents — do not research in the main context.**
+
+   `oa-researcher` (haiku, read-only, `.claude/agents/`) exists so the documents consulted during
+   research never enter this context; only the answers do. Per `CLAUDE.md` §4 these are read-only,
+   so **dispatch them in parallel** — one agent per unknown, one bounded question each.
+
+   Pass **note references and the question, never pasted note bodies**:
 
    ```text
    For each unknown in Technical Context:
-     Task: "Research {unknown} for {feature context}"
+     oa-researcher: "Does this project already decide <unknown>?
+                     Refs: <note#section>, ADR-NNNN, specs/<id>/spec.md"
    For each technology choice:
-     Task: "Find best practices for {tech} in {domain}"
+     oa-researcher: "What do the vault and codebase already establish about <tech> here?
+                     Refs: <note#section>, _gen/code-map.txt"
    ```
+
+   Consolidate the returned `ANSWER` / `SOURCES` lines yourself. A `CONFIDENCE: low` verdict or a
+   non-empty `OPEN` line means the unknown is **still** NEEDS CLARIFICATION — do not record it as
+   decided. In a runtime without a subagent mechanism, research in-context and state the fallback.
 
 3. **Consolidate findings** in `research.md` using format:
    - Decision: [what was chosen]
@@ -165,5 +177,7 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
 ## Done When
 
 - [ ] Plan workflow executed and design artifacts generated
+- [ ] Phase 0 research was delegated to parallel `oa-researcher` subagents (or the no-subagent
+      fallback was stated) per `CLAUDE.md` §4
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with branch, plan path, and generated artifacts

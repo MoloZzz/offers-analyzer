@@ -111,6 +111,25 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
   gate solely because the Linux/musl wrapper cannot run.
 - Full command reference and rules: **@.claude/RTK.md**.
 
+## 4. Delegate independent work to subagents — REQUIRED when the trigger holds
+
+**Trigger:** the work is independent of other in-flight slices, its contract (files, signatures,
+acceptance test) is already decided, and the result is cheaply verifiable. Every `[P]` task in
+`tasks.md` and every bounded lookup qualifies by construction.
+
+When it holds, dispatch a named agent from `.claude/agents/` instead of doing the work in the main
+context: `oa-researcher` / `oa-vault-scribe` (haiku, read-only), `oa-implementer` (sonnet, one
+slice), `oa-verifier` (sonnet, read-only). Pass **note references and a target question, never
+pasted note bodies**. Read-only agents may run in parallel; **write-capable agents run one at a
+time** on the shared tree.
+
+**Never delegate** spec authorship, ADRs, prioritization, evidence-gated scoring/threshold changes,
+or the §1 write protocol — subagents report durable facts in a `VAULT:` line and the orchestrator
+promotes them.
+
+Full rules, model tiers, and brief format: `knowledge-offers-analyzer/conventions/delegation.md`
+(ADR-0022). Where a runtime has no subagent mechanism, work in-context and state the fallback.
+
 ---
 
 ## Definition of done (every task)
@@ -123,3 +142,6 @@ tsc, lint, git, grep) before it reaches context — 60–90% token savings.
 4. Run `npm run vault:build` when source/vault inputs affect generated artifacts, then
    `npm run vault:check:strict`; `npm run vault:check` retains the legacy compatibility check.
 5. For features: the SDD artifacts under `.specify/` are consistent with the code.
+6. Any delegated slice is recorded in today's context log (agent, model, slice), and every
+   `VAULT:` line a subagent returned has been promoted to its owning note (§4). An unpromoted
+   `VAULT:` line means the task is not done.

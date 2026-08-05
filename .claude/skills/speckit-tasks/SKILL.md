@@ -157,6 +157,13 @@ Every task MUST strictly follow this format:
 1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
 2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
 3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
+   - **`[P]` is also the delegation marker.** Per `CLAUDE.md` §4, a `[P]` task asserts exactly the
+     independence condition for handing the slice to an `oa-implementer` subagent — so write every
+     `[P]` task to be *briefable*: exact file paths, the contract it must expose (signatures,
+     entity fields, migration intent), and its acceptance test. A `[P]` task that cannot be handed
+     over without a conversation is under-specified; split it or drop the marker.
+   - Do **not** mark `[P]` on tasks that change scoring weights, thresholds, `ParameterSet`
+     activation, or the alert set — those are evidence-gated (ADR-0011) and never delegated.
 4. **[Story] label**: REQUIRED for user story phase tasks only
    - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
    - Setup phase: NO story label
@@ -213,5 +220,7 @@ Every task MUST strictly follow this format:
 ## Done When
 
 - [ ] tasks.md generated with all phases, task IDs, and file paths
+- [ ] Every `[P]` task is briefable as-written (file paths, contract, acceptance test) and none
+      covers evidence-gated scoring changes — `CLAUDE.md` §4
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, story breakdown, and MVP scope
