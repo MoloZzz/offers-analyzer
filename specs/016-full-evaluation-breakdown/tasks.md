@@ -19,21 +19,27 @@ and `test/integration/`.
 **Nothing below starts until this phase is complete.** Building the button first would create the
 fifth divergent formatter this spec exists to eliminate.
 
-- [ ] T001 Define `BreakdownSection` and `Breakdown` value objects in
+- [X] T001 Define `BreakdownSection` and `Breakdown` value objects in
       `src/modules/notifications/format/breakdown.types.ts`. Each line carries `label`, `value`,
       `availability`, and an optional `reason`.
-- [ ] T002 [P] Unit tests in `test/unit/breakdown.spec.ts` over V1, V2, and V3 explanation fixtures:
+- [X] T002 [P] Unit tests in `test/unit/breakdown.spec.ts` over V1, V2, and V3 explanation fixtures:
       every emitted parameter traces to a record field; a version-missing field yields
       `unavailable` with the version reason; an empty `factors` array yields the
       "factors inactive" reason, not an empty section.
-- [ ] T003 Implement the pure builder `src/modules/notifications/format/breakdown.ts` —
+- [X] T003 Implement the pure builder `src/modules/notifications/format/breakdown.ts` —
       `EvaluationExplanation → Breakdown`. Sections in decision order: identity, price and
       benchmark, cohort, mileage, score decomposition, factors, flags by source, confidence,
       monetary, verdict. Switch on `schemaVersion`; never recompute a value.
-- [ ] T004 Refactor `formatWhy` and `formatStoredWhy` (`why-message.ts`) to consume the builder.
-- [ ] T005 Refactor `formatAssessment` (`opportunity-message.ts`) to consume the builder.
-- [ ] T006 Run the existing `/why`, alert-format, and integration suites unchanged. **Exit
+      *Added a `provider` section between mileage and score to hold the SPEC-015 stored evidence
+      `/why` already rendered — it had no home in the planned list.*
+- [X] T004 Refactor `formatWhy` and `formatStoredWhy` (`why-message.ts`) to consume the builder.
+      Both are now one-line adapters; `buildLiveBreakdown` is the live-computation entry point.
+- [X] T005 Refactor `formatAssessment` (`opportunity-message.ts`) to consume the builder. `/check`
+      keeps its compact shape (full section layout is T016) but takes its score total and risk line
+      from the builder, so flag grouping is no longer duplicated here.
+- [X] T006 Run the existing `/why`, alert-format, and integration suites unchanged. **Exit
       condition for the phase** — parameters previously rendered must be unchanged (SC-003).
+      *513/513 green after Phase 1; no existing assertion changed.*
 
 ---
 
@@ -41,25 +47,32 @@ fifth divergent formatter this spec exists to eliminate.
 
 ### Tests
 
-- [ ] T007 [P] [US16.2] Unit tests for the renderer: a breakdown exceeding the Telegram limit
+- [X] T007 [P] [US16.2] Unit tests for the renderer: a breakdown exceeding the Telegram limit
       splits at a section boundary with numbered parts, never mid-section (FR-007).
-- [ ] T008 [P] [US16.2] Integration test: alert delivered → button tapped → breakdown replied,
+      `test/unit/details-callback.spec.ts`.
+- [X] T008 [P] [US16.2] Integration test: alert delivered → button tapped → breakdown replied,
       with **zero** budget-ledger entries recorded (SC-002).
+      `test/integration/details-button.spec.ts` — a real `QueryService` with live jest mocks for the
+      source and the budget, asserted never called.
 
 ### Implementation
 
-- [ ] T009 [US16.2] Attach the `Деталі` inline button to opportunity and price-drop alerts in
-      `src/modules/notifications/telegram/telegram.notifier.ts`. Callback data `details:<listingId>`
-      — listing UUID only, no encoded state (64-byte limit).
-- [ ] T010 [US16.2] `src/modules/notifications/telegram/details-callback.ts`. Its module MUST NOT
-      inject `LISTING_SOURCE`, so a source call is impossible by construction (FR-002).
-- [ ] T011 [US16.2] Stored-read path in `src/modules/query/query.service.ts` returning the
-      persisted explanation for a listing id.
-- [ ] T012 [US16.2] Section-boundary message splitting with `(n/m)` part markers.
-- [ ] T013 [US16.2] Handle the three degenerate cases: no persisted explanation → say the
+- [X] T009 [US16.2] Attach the `Деталі` inline button to opportunity and price-drop alerts.
+      Callback data `details:<listingId>` — listing UUID only, no encoded state (64-byte limit).
+      *Implemented in `notifications.service.ts` (`alertButtons`), not `telegram.notifier.ts`: the
+      notifier is a channel-agnostic transport that renders whatever button rows it is handed, and
+      the alert keyboard has always been composed in the service.*
+- [X] T010 [US16.2] `src/modules/notifications/telegram/details-callback.ts`. Its module MUST NOT
+      inject `LISTING_SOURCE`, so a source call is impossible by construction (FR-002). Asserted by
+      a source-text test that strips comments and requires the module to have **no imports at all**.
+- [X] T011 [US16.2] Stored-read path in `src/modules/query/query.service.ts` returning the
+      persisted explanation for a listing id — `storedBreakdownById`, a discriminated union over
+      `ok` / `listing_missing` / `no_explanation`.
+- [X] T012 [US16.2] Section-boundary message splitting with `(n/m)` part markers.
+- [X] T013 [US16.2] Handle the three degenerate cases: no persisted explanation → say the
       evaluation predates persistence and offer `/check`; deleted listing → plain "no longer
       available"; repeat taps → identical reply, no charge.
-- [ ] T014 [US16.2] Assert the pushed alert body line count is unchanged (SC-001).
+- [X] T014 [US16.2] Assert the pushed alert body line count is unchanged (SC-001).
 
 **Checkpoint:** the operator's request is satisfied here. Phases 3–4 are consistency and
 future-proofing.
@@ -89,11 +102,15 @@ future-proofing.
 
 ## Phase 5: Polish & cross-cutting
 
-- [ ] T020 [P] Update `knowledge-offers-analyzer/architecture/overview.md` (notifications module)
-      and `domain/glossary.md` if any term changed during implementation.
-- [ ] T021 [P] `npm run vault:build` then `npm run vault:check:strict`.
-- [ ] T022 Verification gate: `typecheck`, `lint`, full Jest, contract Jest, Nest build — all via
-      RTK (`rtk npm test`), or the native equivalent with the fallback stated in the task record.
+- [X] T020 [P] Update `knowledge-offers-analyzer/architecture/overview.md` (notifications module)
+      and `domain/glossary.md` if any term changed during implementation. Also
+      `research/explainability-gaps.md` (the note that owns this problem), `Roadmap & Status.md`,
+      `specs/README.md`, `context/CURRENT.md`, and `context/log/2026-08-05-*`. New glossary terms:
+      **Evaluation breakdown**, **Availability (breakdown line)**.
+- [X] T021 [P] `npm run vault:build` then `npm run vault:check:strict` — 0 errors, 0 warnings.
+- [X] T022 Verification gate: `typecheck`, `lint`, full Jest (526/526, 63 suites incl. contract),
+      Nest build — all pass. **Fallback stated:** run natively with `npm.cmd`; the bundled RTK
+      wrapper is a Linux/musl binary and does not execute on this Windows runtime.
 
 ---
 

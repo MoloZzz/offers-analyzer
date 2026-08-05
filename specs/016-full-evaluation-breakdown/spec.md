@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-03
 
-**Status**: Draft
+**Status**: Phases 1–2 implemented 2026-08-05 (US16.1 + US16.2, T001–T014); US16.3 and US16.4 open
 
 **Input**: Operator request 2026-08-03 — "I also want to receive a full (separate parameters)
 description of the calculated listings in alerts." Delivery shape chosen by the operator: keep the

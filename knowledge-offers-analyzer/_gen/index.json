@@ -1633,15 +1633,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 59,
-          "endLine": 65
+          "line": 61,
+          "endLine": 67
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 66,
-          "endLine": 70
+          "line": 68,
+          "endLine": 72
         }
       ]
     },
@@ -1833,9 +1833,16 @@
         {
           "n": 6,
           "level": 2,
-          "text": "Related",
+          "text": "Implementation note (2026-08-05) — spec 016 phases 1–2: reach, and one renderer",
           "line": 91,
-          "endLine": 93
+          "endLine": 121
+        },
+        {
+          "n": 7,
+          "level": 2,
+          "text": "Related",
+          "line": 122,
+          "endLine": 124
         }
       ]
     },

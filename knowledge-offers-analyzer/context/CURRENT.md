@@ -1,7 +1,7 @@
 ---
 title: Current task handoff
 type: context
-updated: 2026-08-04
+updated: 2026-08-05
 ---
 
 # Current task handoff
@@ -10,6 +10,24 @@ updated: 2026-08-04
 > file as a second roadmap.
 
 ## Active work
+
+**SPEC-016 phases 1–2 — implemented 2026-08-05 (T001–T014).** One pure breakdown builder
+(`src/modules/notifications/format/breakdown.ts`) over the persisted `EvaluationExplanation`, with
+`formatWhy`, `formatStoredWhy` and `/check` refactored onto it, plus the 📋 **Деталі** inline button
+that replies with the full per-parameter breakdown from storage. The pushed alert body is unchanged
+at seven lines; the reply spends **zero** source requests and charges nothing to the budget —
+`details-callback.ts` has no imports at all, so the dependency is unreachable rather than merely
+unused. Presentation-only, so it sits outside the ADR-0011 gates. Decisions and the one deliberate
+`/check` copy change: `context/log/2026-08-05-full-evaluation-breakdown.md`.
+
+Verification (native Windows `npm.cmd`; RTK's wrapper is Linux/musl and does not run here):
+`typecheck`, `lint`, Jest **526/526** (63 suites), `nest build` — all pass.
+
+**Phases 3–4 of the same spec remain open and unblocked**: T015–T017 (`/check` adopts the full
+section layout; formatters reduced to thin adapters) and T018–T019 (test-only forward-compatibility
+proof that factors / `assessmentConfidence` / `monetary` render with no renderer change).
+
+## Previously (still current)
 
 **SPEC-006 US6.1, assessment confidence — implemented 2026-08-04 (T001–T013).** A separate,
 never-multiplied evidence-coverage output over already-fetched fields, rendered as one
@@ -29,8 +47,6 @@ The pre-existing `single-flights concurrent calls…` failure in
 `test/unit/valuation-evidence.service.spec.ts` is **fixed** — two defects in the test itself
 (a fixed-tick microtask drain, and an unpinned `now` whose fixture had since expired against the
 real clock). The suite is 492/492.
-
-## Previously (still current)
 
 SPEC-015, Defensible valuation evidence, is implemented at
 `specs/015-defensible-valuation-evidence/`. It adds an official AUTO.RIA AI provider-evidence path
@@ -90,10 +106,10 @@ flip should be presented alongside the combined rollout. See
 
 ## Next pickup
 
-With US6.1 shipped, the remaining **ungated** engineering work is `016-full-evaluation-breakdown`
-and `017-on-demand-ai-analysis` (the latter ships disabled behind operator gates). Everything else
-— the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence gates or the
-month-long accident shadow window, not on code.
+With SPEC-016 phases 1–2 shipped, the remaining **ungated** engineering work is SPEC-016 phases 3–4
+(T015–T019) and `017-on-demand-ai-analysis` (the latter ships disabled behind operator gates).
+Everything else — the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence
+gates or the month-long accident shadow window, not on code.
 
 If the pickup is instead SPEC-015, read this handoff and
 `specs/015-defensible-valuation-evidence/quickstart.md`.

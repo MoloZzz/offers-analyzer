@@ -88,5 +88,36 @@ B23 implemented X1 + X2 as the first persisted-provenance slice:
 X3 (matched phrases) and X4 (richer localized business argument) remain follow-up polish; live scoring
 behavior was deliberately unchanged.
 
+## Implementation note (2026-08-05) — spec 016 phases 1–2: reach, and one renderer
+
+B23 made a past decision *reproducible*; spec 016 made it *reachable* and stopped the four
+formatters that render it from drifting apart.
+
+- **One builder.** `src/modules/notifications/format/breakdown.ts` turns an `EvaluationExplanation`
+  into an ordered `Breakdown` of labelled sections (identity, price, cohort, mileage, provider
+  evidence, score, factors, flags, confidence, monetary, verdict). It **computes nothing** — every
+  emitted parameter is a field of the record it was handed. `formatWhy` and `formatStoredWhy` are
+  now one-line adapters over it; `/check` takes its score total and risk line from it.
+- **Availability is explicit.** Each line carries `availability: 'available' | 'unavailable'` with a
+  reason. A V1/V2 snapshot says the measure *did not exist yet*; a V3 carrying `null` says it *was
+  not measured*. Neither is ever rendered as `0` or a bare dash. This is the same discipline the
+  SPEC-015 `ValuationFact` shape established.
+- **Reach.** Opportunity and price-drop alerts carry a 📋 **Деталі** inline button
+  (`details:<listingId>`, 44 of Telegram's 64 callback bytes, no encoded state). The pushed alert
+  body is unchanged at seven lines — detail is pulled, never pushed.
+- **Zero budget by construction.** `details-callback.ts` has *no imports at all*, so it cannot reach
+  a source; the reply resolves through `QueryService.storedBreakdownById`, a pure storage read. A
+  source-text test and an integration test with live source/budget mocks assert both.
+- **Growth without edits.** `factors`, `assessmentConfidence` and `monetary` sections already exist
+  and populate the moment records start carrying them — no renderer change when the ADR-0010
+  rollout or SPEC-006's monetary slices land. Today all three render as stated gaps, which is the
+  honest picture of an inactive-factor, pre-`k` system.
+- **Not rendered:** the spec-018 `accidentSeverity` shadow verdict. It stays behind admin-only
+  `/accident_shadow` until phase 3 is approved ([[0020-graded-accident-risk|ADR-0020]]).
+
+Phases 3–4 (the `/check` full-section layout, and the test-only forward-compatibility proof) remain
+open. X3 and X4 above are still untouched: the breakdown surfaces the flag *codes*, not the matched
+phrases, and the `reason` string is still the terse English one.
+
 ## Related
 - [[profitability-definition]] · [[how-it-works]] · [[overview]] · [[Roadmap & Status]]

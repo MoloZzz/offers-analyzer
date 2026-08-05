@@ -15,6 +15,7 @@ import { formatReport } from '../../query/report';
 import { formatBudgetReport } from '../../scheduling/budget-report';
 import { SourceControlService } from '../../scheduling/source-control.service';
 import { formatAccidentShadow } from '../format/accident-shadow-message';
+import { buildBreakdown, renderBreakdownSections } from '../format/breakdown';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
 import { formatAssessment } from '../format/opportunity-message';
@@ -25,6 +26,7 @@ import { SubscribersService } from '../subscribers.service';
 
 import { parseDealArgs, splitDealCommand } from './deal-args';
 import { buildDeclineReasonCallback, parseDealCallback } from './deal-callback';
+import { parseDetailsCallback, splitIntoMessages } from './details-callback';
 import { parseOutcomeCallback } from './outcome-callback';
 
 /** Ukrainian labels for the decline-reason keyboard. */
@@ -392,6 +394,47 @@ export class TelegramBotUpdate {
     await ctx.reply(
       version != null ? `Активовано набір ваг v${version}.` : 'Немає кандидата для застосування.',
     );
+  }
+
+  /**
+   * The `Деталі` button (spec 016 US16.2): reply with the full breakdown for the alerted listing.
+   *
+   * Every value comes from the persisted explanation, so this handler spends **zero** source
+   * requests and charges nothing to the budget (FR-002, SC-002). It is idempotent by construction —
+   * it writes nothing, so repeat taps produce an identical reply (AS-4) — and it leaves the original
+   * alert untouched, replying with a separate message (AS-1).
+   */
+  @Action(/^details:/)
+  async onDetailsButton(@Ctx() ctx: Context): Promise<void> {
+    const cq = ctx.callbackQuery;
+    const data = cq && 'data' in cq ? cq.data : '';
+    const listingId = parseDetailsCallback(data);
+    if (!listingId) {
+      await ctx.answerCbQuery();
+      return;
+    }
+    const lookup = await this.query.storedBreakdownById(listingId);
+    await ctx.answerCbQuery();
+
+    if (lookup.status === 'listing_missing') {
+      await ctx.reply('Оголошення більше недоступне.');
+      return;
+    }
+    if (lookup.status === 'no_explanation') {
+      // Not an error: B23 persistence postdates some evaluations. Offering /check is the honest
+      // alternative — it is the one surface allowed to spend a request to rebuild the detail.
+      await ctx.reply(
+        'Ця оцінка зроблена до того, як бот почав зберігати повний розклад параметрів.\n' +
+          'Щоб порахувати наново: /check <посилання> (витратить запит до джерела).',
+      );
+      return;
+    }
+
+    for (const part of splitIntoMessages(
+      renderBreakdownSections(buildBreakdown(lookup.explanation, lookup.evidence)),
+    )) {
+      await ctx.reply(part);
+    }
   }
 
   @Action(/^oc:/)

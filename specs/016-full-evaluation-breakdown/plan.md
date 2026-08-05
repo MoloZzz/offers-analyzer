@@ -1,6 +1,7 @@
 # Implementation Plan: Full evaluation breakdown
 
-**Spec**: `spec.md` · **Created**: 2026-08-03 · **Status**: Draft
+**Spec**: `spec.md` · **Created**: 2026-08-03 · **Status**: Phases F and 1 implemented 2026-08-05;
+Phases 2–3 open
 
 ## Summary
 

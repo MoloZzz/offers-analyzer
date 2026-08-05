@@ -2,7 +2,7 @@
   "version": 1,
   "metrics": {
     "notes": 52,
-    "links": 477,
+    "links": 479,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -65,7 +65,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 17,
-      "outDeg": 33
+      "outDeg": 34
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -272,7 +272,7 @@
       "name": "0020-graded-accident-risk",
       "title": "ADR-0020 — Accident presence is graded risk, not a hard disqualifier",
       "type": "decision",
-      "inDeg": 10,
+      "inDeg": 11,
       "outDeg": 14
     },
     {
@@ -336,8 +336,8 @@
       "name": "explainability-gaps",
       "title": "Research — explainability gaps (arguing WHY an evaluation was made)",
       "type": "research",
-      "inDeg": 6,
-      "outDeg": 7
+      "inDeg": 7,
+      "outDeg": 8
     },
     {
       "rel": "research/monitoring-approaches.md",
@@ -1100,6 +1100,13 @@
       "anchor": null,
       "embed": false,
       "line": 18
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "research/explainability-gaps.md",
+      "anchor": null,
+      "embed": false,
+      "line": 48
     },
     {
       "from": "architecture/overview.md",
@@ -2800,14 +2807,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 68
+      "line": 70
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 69
+      "line": 71
     },
     {
       "from": "domain/glossary.md",
@@ -2863,7 +2870,7 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 48
+      "line": 50
     },
     {
       "from": "domain/glossary.md",
@@ -2884,21 +2891,21 @@
       "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
-      "line": 51
+      "line": 53
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
-      "line": 52
+      "line": 54
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 55
     },
     {
       "from": "domain/glossary.md",
@@ -2912,14 +2919,14 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 62
+      "line": 64
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 66
     },
     {
       "from": "domain/glossary.md",
@@ -2933,7 +2940,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 62
+      "line": 64
     },
     {
       "from": "operations/environment-setup.md",
@@ -3052,14 +3059,14 @@
       "to": "Roadmap & Status.md",
       "anchor": null,
       "embed": false,
-      "line": 92
+      "line": 123
     },
     {
       "from": "research/explainability-gaps.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 92
+      "line": 123
     },
     {
       "from": "research/explainability-gaps.md",
@@ -3073,7 +3080,7 @@
       "to": "business/how-it-works.md",
       "anchor": null,
       "embed": false,
-      "line": 92
+      "line": 123
     },
     {
       "from": "research/explainability-gaps.md",
@@ -3084,6 +3091,13 @@
     },
     {
       "from": "research/explainability-gaps.md",
+      "to": "decisions/0020-graded-accident-risk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 116
+    },
+    {
+      "from": "research/explainability-gaps.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
@@ -3094,7 +3108,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 92
+      "line": 123
     },
     {
       "from": "research/monitoring-approaches.md",

@@ -6,25 +6,12 @@ import { EvaluationExplanation, EvaluationExplanationV3 } from '../../valuation/
 import { ValuationResult } from '../../valuation/valuation.service';
 import { AssessmentConfidence } from '../../valuation/valuation.types';
 
+import { buildLiveBreakdown, findLine, LiveBreakdownContext, renderLine } from './breakdown';
+import { Breakdown, BreakdownSectionKey } from './breakdown.types';
 import { confidenceInputLabel } from './confidence-labels';
+import { FLAG_LABELS } from './flag-labels';
 
-/** Human-readable Ukrainian labels for red-flag codes. */
-export const FLAG_LABELS: Record<string, string> = {
-  suspicious_discount: 'підозріло дешево',
-  damaged: 'була в ДТП',
-  salvage: 'на запчастини',
-  confiscated: 'конфіскат',
-  under_credit: 'під кредитом',
-  unclear_customs: 'нерозмитнена',
-  abroad: 'за кордоном',
-  no_vin_report: 'немає VIN-звіту',
-  desc_after_accident: 'опис: після ДТП',
-  desc_not_running: 'опис: не на ходу / на запчастини',
-  desc_needs_repair: 'опис: потребує ремонту',
-  desc_mechanical_issue: 'опис: проблеми з двигуном/КПП',
-  suspicious_low_mileage: 'підозріло малий пробіг для віку',
-  unverified_bargain: 'завелика знижка без VIN-перевірки',
-};
+export { FLAG_LABELS };
 
 function risksLabel(redFlags: Record<string, boolean>): string {
   const fired = Object.entries(redFlags)
@@ -127,28 +114,53 @@ export function formatPriceDrop(op: Opportunity, listing: Listing, oldAmount: nu
   ].join('\n');
 }
 
-/** On-demand `/check` reply: assessment of a single listing the user asked about. */
+/**
+ * On-demand `/check` reply: assessment of a single listing the user asked about.
+ *
+ * The score total and the risk line come from the shared breakdown builder rather than being
+ * assembled here — `/check` is one of the four formatters spec 016 exists to stop from drifting, and
+ * a parameter added to the builder must not need a second edit in this file. The reply stays
+ * compact by design; the full section layout is `/check`'s Phase-3 adoption (T016), not this.
+ */
 export function formatAssessment(
   detail: ListingDetail,
   result: ValuationResult,
   fairValue: number,
   currency: Currency,
+  ctx?: Partial<LiveBreakdownContext>,
 ): string {
+  const breakdown = buildLiveBreakdown(detail, result, {
+    fairValue,
+    currency,
+    sampleSize: ctx?.sampleSize ?? 0,
+    benchmarkBase: ctx?.benchmarkBase ?? fairValue,
+    mileageAware: ctx?.mileageAware ?? true,
+  });
   const verdict = result.isOpportunity ? '✅ Вигідна пропозиція' : `ℹ️ ${result.reason}`;
   return [
     `${scoreEmoji(result.score)} ${detail.make} ${detail.model}, ${detail.year}, ${mileageLabel(detail.mileage)}`,
-    `📊 Загальний бал: ${result.total100}/100`,
+    breakdownLine(breakdown, 'score', '📊 Загальний бал'),
     `💰 Вигідність: ${signed(result.score)} (-1...+1)`,
     `Ціна: ${fmt(detail.price.amount)} ${currency}  ·  Ринкова: ${fmt(fairValue)} ${currency}  ·  -${result.discountPct}%`,
     `Впевненість: ${result.confidence}`,
     `Продавець: ${sellerLabel(detail.sellerType)}`,
-    `⚠️ Ризики: ${risksLabel(result.redFlags)}`,
+    breakdownLine(breakdown, 'flags', '⚠️ Ризики'),
     confidenceLine(result.assessmentConfidence),
     verdict,
     `🔗 ${detail.url}`,
   ]
     .filter((line): line is string => line !== null)
     .join('\n');
+}
+
+/** One rendered parameter from the shared builder, or `null` when this record does not carry it. */
+function breakdownLine(
+  breakdown: Breakdown,
+  key: BreakdownSectionKey,
+  label: string,
+): string | null {
+  const line = findLine(breakdown, key, label);
+  return line ? renderLine(line) : null;
 }
 
 function signed(n: number): string {

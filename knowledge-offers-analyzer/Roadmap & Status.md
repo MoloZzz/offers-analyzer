@@ -96,7 +96,7 @@ neither is blocked by the evidence gates above.
 
 | Spec | What it delivers | Gate |
 |---|---|---|
-| `016-full-evaluation-breakdown` | Compact alert keeps its shape; a **Деталі** button expands the full per-parameter breakdown, built once and shared with `/why` and `/check` | None — ungated. Its output is thin today and grows automatically as spec 003 activates and spec 006 lands |
+| `016-full-evaluation-breakdown` phases 1–2 | **Implemented 2026-08-05.** Compact alert keeps its shape (seven lines, asserted); a 📋 **Деталі** button expands the full per-parameter breakdown, built once by `format/breakdown.ts` and shared with `/why` and `/check`. Zero source requests by construction | None — ungated. Its output is thin today and grows automatically as spec 003 activates and spec 006 lands. Phases 3–4 (`/check` full layout, forward-compat proof) remain open |
 | `017-on-demand-ai-analysis` | Admin-only `/analyze_ai`: structured context to a language model, strict structured output, content-hash cache, separate budget, immutable records | Ships disabled. Provider credentials, approved terms, lawfulness of sending listing content, and an agreed monthly cap are operator gates ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
 | `018-graded-accident-risk` phases 1–2 | **Implemented 2026-08-03.** Severity classifier + shadow recording in `EvaluationExplanationV3` + admin-only `/accident_shadow` rollout report quantifying what the current clamp suppresses | None — shadow mode changes nothing observable, asserted bit-for-bit by `accident-shadow-equivalence.spec.ts`. The month-long shadow window (T011) is now the gate on phase 3 |
 

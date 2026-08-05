@@ -54,6 +54,16 @@ export interface WhyLookup {
   live?: Assessment;
 }
 
+/**
+ * Outcome of a stored-explanation read. Modelled as a discriminated union rather than a nullable
+ * record so the caller cannot accidentally collapse "listing gone" and "never explained" into one
+ * message — spec 016 requires a different reply for each (US16.2 AS-3, edge cases).
+ */
+export type StoredBreakdownLookup =
+  | { status: 'ok'; explanation: NonNullable<Listing['lastExplanation']>; evidence: ValuationEvidence | null }
+  | { status: 'listing_missing' }
+  | { status: 'no_explanation' };
+
 export interface RankedOpportunity {
   opportunity: Opportunity;
   listing?: Listing;
@@ -189,6 +199,28 @@ export class QueryService {
       return { stored: listing.lastExplanation, evidence };
     }
     return { live: await this.assessById(externalId) };
+  }
+
+  /**
+   * The persisted explanation behind one listing id, for the `Деталі` button (spec 016 US16.2).
+   *
+   * Storage only — no source call, no re-score, no cohort request, no budget charge (FR-002). The
+   * three outcomes are kept distinct because the operator-facing reply differs for each: a deleted
+   * listing is not the same as an evaluation that predates explanation persistence (AS-3).
+   */
+  async storedBreakdownById(listingId: string): Promise<StoredBreakdownLookup> {
+    const listing = await this.findListingById(listingId);
+    if (!listing) return { status: 'listing_missing' };
+    if (!listing.lastExplanation) return { status: 'no_explanation' };
+
+    const referencedEvidenceId = isEvaluationExplanationV2(listing.lastExplanation)
+      ? listing.lastExplanation.providerEvidence?.evidenceId
+      : undefined;
+    const evidence =
+      this.valuationEvidence && referencedEvidenceId
+        ? await this.valuationEvidence.findByIdForListing(referencedEvidenceId, listing.id)
+        : null;
+    return { status: 'ok', explanation: listing.lastExplanation, evidence };
   }
 
   /** The highest-scoring opportunities recorded so far. */
