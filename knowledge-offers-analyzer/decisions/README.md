@@ -42,6 +42,8 @@ updated: 2026-08-05
 
 - [[0023-one-sided-mileage-adjustment|ADR-0023]] — A claimed odometer may only lower fair value, never raise it; narrows the mileage clause of ADR-0014 (Accepted)
 
+- [[0024-drivetrain-banded-cohort-tiers|ADR-0024]] — Narrow the cohort with exact-year and gearbox+fuel proxies, because `/average_price` has no generation or modification filter; the real ones stay behind ADR-0017 (Accepted)
+
 ## How to add one
 
 1. Copy `adr-template.md` → `NNNN-short-title.md` (next number).

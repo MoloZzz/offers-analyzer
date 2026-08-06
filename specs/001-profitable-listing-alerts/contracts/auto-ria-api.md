@@ -42,7 +42,13 @@ Returns **ids only, no prices** → confirms N+1 (one `/info` per listing).
 - risk (→ red-flags): `autoInfoBar.{damage, onRepairParts, custom, confiscatedCar, underCredit, abroad}`.
 
 **`/average_price`**: `marka_id`/`model_id` must be numeric; returns HTTP **400
-`{message:"Not Enough Data"}`** for thin cohorts (treat as "no benchmark", not an error).
+`{message:"Not Enough Data"}`** for thin cohorts — the adapter raises `SourceNoDataError` and
+`averagePrice` converts it to a **zero-sample result**, so the 24h cache remembers the barren cohort
+instead of re-spending the request per listing (ADR-0024).
+Its filter set is `marka_id`, `model_id`, `yers[]`, `raceInt[]`, `gear_id[]`, `fuel_id[]`,
+`auto_options[]`, `city_id` — **no generation and no modification parameter** (those are catalog
+resources here; the real filters live on `POST /auto/ai-avarage-price/`). We send `gear_id`/`fuel_id`
+as a drivetrain band standing in for trim, and an exact `yers` range standing in for generation.
 Verified fields: `arithmeticMean` (last fallback), `interQuartileMean` (compatibility fallback),
 and `percentiles` (`"1.0"`…`"99.0"`, incl. `"50.0"` median, used as fair value), `total` (sample size),
 plus `prices[]` / `classifieds[]` (ignored). **Narrow the cohort** (year + `raceInt` band + city) or

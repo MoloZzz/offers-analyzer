@@ -79,6 +79,45 @@ describe('AutoRiaSource (contract)', () => {
     expect(result.value.amount).toBe(10584);
   });
 
+  it('sends the drivetrain band as gear_id and fuel_id', async () => {
+    let seen = '';
+    agent
+      .get('https://developers.ria.com')
+      .intercept({
+        path: (p) => {
+          if (p.startsWith('/auto/average_price')) seen = p;
+          return p.startsWith('/auto/average_price');
+        },
+        method: 'GET',
+      })
+      .reply(200, { percentiles: { '50.0': 10998 }, total: 42 });
+
+    await makeSource().averagePrice({
+      markId: 9,
+      modelId: 3219,
+      yearFrom: 2017,
+      yearTo: 2017,
+      gearboxId: 2,
+      fuelId: 1,
+    });
+
+    expect(seen).toContain('gear_id=2');
+    expect(seen).toContain('fuel_id=1');
+  });
+
+  it('turns "Not Enough Data" into a zero-sample result, not a failure', async () => {
+    // A thin cohort is an answer about the market, so the 24h cache may remember it; throwing
+    // would make every listing in that cohort re-spend the request.
+    agent
+      .get('https://developers.ria.com')
+      .intercept({ path: (p) => p.startsWith('/auto/average_price'), method: 'GET' })
+      .reply(400, { message: 'Not Enough Data' });
+
+    const result = await makeSource().averagePrice({ markId: 9, modelId: 3219 });
+    expect(result.sampleSize).toBe(0);
+    expect(result.value.amount).toBe(0);
+  });
+
   it('maps listing detail from info (real AUTO.RIA shape)', async () => {
     agent
       .get('https://developers.ria.com')

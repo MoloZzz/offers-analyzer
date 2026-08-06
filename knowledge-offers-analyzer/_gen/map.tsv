@@ -35,6 +35,7 @@ decisions/0020-graded-accident-risk.md	ADR-0020 — Accident presence is graded 
 decisions/0021-retrieval-discipline-by-default.md	ADR-0021 — Enforce retrieval discipline with defaults and triggers, not exhortation	decision	Planning questions are answered from maintained artifacts on a fixed path (`/status`) with a named escalation trigger; a proposed 350-word "Information Acquisition Policy" was rejected as redundant with rules that already existed and were violated.
 decisions/0022-delegate-independent-work-to-tiered-subagents.md	ADR-0022 — Delegate independent work to named subagents with pinned model tiers	decision	Independent, already-specified work is dispatched to four named agents in `.claude/agents/` whose model tier is pinned in frontmatter (haiku for retrieval, sonnet for build and verify); reads fan out in parallel, writes serialize on the shared tree, and the vault write protocol is never delegated.
 decisions/0023-one-sided-mileage-adjustment.md	ADR-0023 - One-sided mileage adjustment	decision	
+decisions/0024-drivetrain-banded-cohort-tiers.md	ADR-0024 — Narrow the cohort with drivetrain proxies, not generation and trim	decision	/average_price cannot filter by generation or modification, so the ladder gains exact-year and gearbox+fuel tiers as proxies; the real filters stay behind ADR-0017.
 decisions/README.md	Decision log (ADRs)	moc	
 decisions/adr-template.md	ADR-NNNN — <short title>	decision	
 domain/glossary.md	Domain glossary	domain	

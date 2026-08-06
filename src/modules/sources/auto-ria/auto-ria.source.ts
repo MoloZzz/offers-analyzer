@@ -6,6 +6,7 @@ import { request } from 'undici';
 import { AppConfig } from '../../../common/config/configuration';
 import {
   RateBudgetExhaustedError,
+  SourceNoDataError,
   SourceUnavailableError,
 } from '../../../common/errors/domain-error';
 import { Currency } from '../../../common/types/money';
@@ -155,8 +156,23 @@ export class AutoRiaSource implements ListingSource {
     if (cohort.yearTo != null) params.append('yers', String(cohort.yearTo));
     if (cohort.mileageFrom != null) params.append('raceInt', String(cohort.mileageFrom));
     if (cohort.mileageTo != null) params.append('raceInt', String(cohort.mileageTo));
+    // Drivetrain band. `/average_price` documents no generation or modification parameter — these
+    // two are the only trim-shaped filters it accepts (both OR-combined arrays; we send one value).
+    if (cohort.gearboxId != null) params.append('gear_id', String(cohort.gearboxId));
+    if (cohort.fuelId != null) params.append('fuel_id', String(cohort.fuelId));
 
-    const d = await this.get<AutoRiaAverage>('/average_price', params, tier, context);
+    let d: AutoRiaAverage;
+    try {
+      d = await this.get<AutoRiaAverage>('/average_price', params, tier, context);
+    } catch (err) {
+      // "Not Enough Data" is an answer about the cohort, not a source failure. Returning it as a
+      // zero-sample result lets BenchmarkCacheService remember the barren cohort for its TTL; the
+      // narrow tiers added for trim/generation would otherwise re-pay this call per listing.
+      if (err instanceof SourceNoDataError) {
+        return { value: { amount: 0, currency: Currency.USD }, sampleSize: 0 };
+      }
+      throw err;
+    }
     // Prefer the median: even an interquartile mean can be pulled by generations/trims in a
     // broad model cohort. Keep the other measures only as compatibility fallbacks (SPEC-011).
     const central = d.percentiles?.['50.0'] ?? d.interQuartileMean ?? d.arithmeticMean;
@@ -193,6 +209,11 @@ export class AutoRiaSource implements ListingSource {
         // The source's own rate limit is authoritative — stop spending until the window rolls over.
         await this.budget.markExhausted(this.key);
         throw new RateBudgetExhaustedError(`AUTO.RIA ${path} rate limited (HTTP 429)`);
+      }
+      if (statusCode === 400) {
+        // AUTO.RIA answers a query it understood but cannot satisfy with 400 {message:"Not Enough
+        // Data"} — see contracts/auto-ria-api.md. Callers that can use an empty answer catch this.
+        throw new SourceNoDataError(`AUTO.RIA ${path} has not enough data (HTTP 400)`);
       }
       if (statusCode >= 400) {
         throw new SourceUnavailableError(`AUTO.RIA ${path} returned HTTP ${statusCode}`);

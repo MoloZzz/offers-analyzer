@@ -48,6 +48,14 @@ doing its job; the cohort is starving it.**
   **make+model** only, dropping `city_id` and mileage; `resolveBenchmark` walks them until
   `sampleSize ≥ 10`, gracefully skipping thin cohorts ("Not Enough Data") instead of dropping the
   listing. Wired into both the poll and the on-demand `/check`.
+
+> **Partly re-narrowed 2026-08-06 ([[0024-drivetrain-banded-cohort-tiers|ADR-0024]]).** Widening
+> fixed the starvation but overshot: make+model+year±1 averages a base trim against a loaded one.
+> Two tiers now sit *above* it — exact year + gearbox + fuel, then year±1 + gearbox + fuel — as
+> proxies for generation and trim, which `/average_price` cannot filter on directly. The widening
+> ladder is unchanged underneath, so a thin proxy cohort still falls through to the broad one; the
+> starvation this note diagnosed cannot return. "Not Enough Data" is now cached as a zero-sample
+> result rather than silently re-fetched.
 - **(2) Surface candidates** — default `minDealScore` lowered **0.3 → 0.15**; new bot command
   **`/best`** (`QueryService.topCandidates` → `ListingsService.topByScore`) lists the best-scoring
   evaluated listings **even below** the alert bar. Silence is no longer the only output.

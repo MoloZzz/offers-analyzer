@@ -57,7 +57,9 @@ Implemented (spec 001). One NestJS module per concern:
 End-to-end path (v1): `scheduling` cron runs a poll per active `profile` → `sources` search (ids;
 market-wide profiles set `top` submission-period for "newest by market") → `listings` filters to new
 ids → `sources` fetch details (budgeted) → `valuation` resolves a benchmark via **`cohort.ts`
-widen-and-retry** (make+model+year±1 → make+model until `sampleSize ≥ 10`), computes
+widen-and-retry** (exact year+gearbox+fuel → year±1+gearbox+fuel → make+model+year±1 → make+model,
+until `sampleSize ≥ 10`; the drivetrain band proxies trim and the exact year proxies generation,
+because `/average_price` accepts neither — [[0024-drivetrain-banded-cohort-tiers|ADR-0024]]), computes
 discount/confidence/red-flags → every evaluated listing records its score plus a persisted
 **EvaluationExplanation** snapshot (`ParameterSet` version, profile threshold, cohort provenance,
 fair-value base/adjustment, score breakdown, fired flags; from `V3` also the shadow accident verdict

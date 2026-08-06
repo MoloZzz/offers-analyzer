@@ -48,7 +48,7 @@ factors, and re-validate thresholds. Operator approval remains mandatory
 | Outcome feedback and bounded calibration (SPEC-002) | Initial outcome, threshold-calibration, and bounded weight-learning slices are implemented; later optimization remains gated. |
 | Composite score foundation (SPEC-003) | Score presentation, liquidity, and repair-risk foundations exist but are intentionally inactive in production. Seller, positives, and segment-mileage factors remain later work. |
 | Budget stabilization (SPEC-010) | Implemented to protect fresh-listing discovery and make cohorts reusable. |
-| Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. Tightened 2026-08-06 — the mileage correction is now **one-sided** (downward only, no VIN-evidenced uplift), [[0023-one-sided-mileage-adjustment|ADR-0023]]. |
+| Valuation sanity guards (SPEC-011) | Implemented: median-first benchmark and conservative mileage treatment. Tightened 2026-08-06 — the mileage correction is now **one-sided** (downward only, no VIN-evidenced uplift), [[0023-one-sided-mileage-adjustment|ADR-0023]] — and the cohort ladder gained exact-year + gearbox+fuel tiers as proxies for generation and trim, [[0024-drivetrain-banded-cohort-tiers|ADR-0024]]. Real generation/modification cohorts stay behind [[0017-shadow-valuation-evidence|ADR-0017]]. |
 | Assessment confidence (SPEC-006 US6.1) | Implemented 2026-08-04: a separate, never-multiplied evidence-coverage output over zero-cost fields, rendered in the alert and `/why`. The non-multiplication property is asserted at both unit and alert-set level. The remaining SPEC-006 monetary slices stay gated. |
 | Executable hybrid vault (SPEC-012) | Implemented: generated L1 context, bounded retrieval, verified Offers source facts, strict CI validation, and advisory-only evidence. |
 | Portable AI infrastructure kit (SPEC-013) | Implemented: clean-room, copy-and-own second-brain/bootstrap kit with safe docs-only defaults and opt-in extensions. |
@@ -81,6 +81,12 @@ factors, and re-validate thresholds. Operator approval remains mandatory
   rather than adding more of them.
 - [ ] Then choose among: remaining composite factors, cohort drift, wider coverage, additional
   sources, or ML only when their stated triggers are met.
+- [ ] **True generation/trim cohorts.** `/average_price` cannot filter on them; `POST
+  /auto/ai-avarage-price/` can, and the adapter already sends `generationId`/`modificationId`.
+  Promoting it from shadow to the live benchmark is the real fix for cohort relevance and needs its
+  own decision plus operator gates (credentials, approved terms, per-request cost, budget
+  allocation) — [[0017-shadow-valuation-evidence|ADR-0017]] §5,
+  [[0024-drivetrain-banded-cohort-tiers|ADR-0024]] §6.
 
 Partly reopened the same day. ADR-0018 closed graded accident handling as data-blocked;
 [[0020-graded-accident-risk|ADR-0020]] narrowed that closure. **Structured** severity (damage

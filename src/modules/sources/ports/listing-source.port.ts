@@ -170,6 +170,13 @@ export interface CohortQuery {
   yearTo?: number;
   mileageFrom?: number;
   mileageTo?: number;
+  /**
+   * Drivetrain band (AUTO.RIA `gear_id` / `fuel_id`) — the closest thing `/average_price` offers to a
+   * trim filter. The endpoint has no generation or modification parameter; a tight year range is the
+   * only generation lever it exposes. See `cohortCandidates`.
+   */
+  gearboxId?: number;
+  fuelId?: number;
 }
 
 export interface AveragePriceResult {

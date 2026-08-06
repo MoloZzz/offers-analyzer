@@ -11,6 +11,21 @@ updated: 2026-08-05
 
 ## Active work
 
+**Drivetrain-banded cohort tiers — implemented 2026-08-06 ([[0024-drivetrain-banded-cohort-tiers|ADR-0024]]).**
+The cohort ladder gained two tiers above the year±1 cohort: exact year + gearbox + fuel, then year±1
++ gearbox + fuel. They are **proxies** — `/average_price` has no generation or modification
+parameter, and the endpoint that does (`POST /auto/ai-avarage-price/`) is paid and shadow-only under
+ADR-0017 §5, so promoting it is queued as a separate decision on [[Roadmap & Status]]. Supporting
+changes: `SourceNoDataError` turns HTTP 400 "Not Enough Data" into a cacheable zero-sample result;
+`cohortKey` appends the band so bandless keys stay byte-identical for the SPEC-004 join; two new
+coverage weights in `assessment-confidence.ts`. **Unlike ADR-0023 this can move a benchmark either
+way** and therefore changes the alert set — worth watching the tier strings in `/why` for the first
+production cycles. Decisions and what was deliberately *not* done:
+`context/log/2026-08-06-drivetrain-banded-cohorts.md`.
+
+Verification (native Windows `npm.cmd`): `typecheck`, `lint`, Jest **549/549** (65 suites),
+`nest build` — all pass.
+
 **One-sided mileage adjustment — implemented 2026-08-06 ([[0023-one-sided-mileage-adjustment|ADR-0023]]).**
 The analytic mileage correction may now only *lower* fair value. The ADR-0014 exception that let a
 below-expectation odometer add up to 5% when AUTO.RIA reported VIN evidence is removed, along with

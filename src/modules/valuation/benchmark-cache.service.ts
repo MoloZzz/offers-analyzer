@@ -70,8 +70,14 @@ export class BenchmarkCacheService {
     return loaded;
   }
 
+  /**
+   * Cache/snapshot identity for a cohort. The drivetrain band is **appended** rather than folded
+   * into the fixed seven fields, so a cohort that carries no band produces byte-identical keys to
+   * the ones already stored — `average_price_snapshots` and `listing_disappearances.cohortKey`
+   * (SPEC-004 calibration) join on this string across history.
+   */
   static cohortKey(c: CohortQuery): string {
-    return [
+    const base = [
       c.markId,
       c.modelId,
       c.cityId ?? '',
@@ -80,5 +86,10 @@ export class BenchmarkCacheService {
       c.mileageFrom ?? '',
       c.mileageTo ?? '',
     ].join(':');
+    const band = [
+      c.gearboxId != null ? `gear=${c.gearboxId}` : null,
+      c.fuelId != null ? `fuel=${c.fuelId}` : null,
+    ].filter(Boolean);
+    return band.length > 0 ? `${base}:${band.join(':')}` : base;
   }
 }

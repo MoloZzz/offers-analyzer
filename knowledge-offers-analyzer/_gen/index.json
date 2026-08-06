@@ -105,35 +105,35 @@
           "level": 2,
           "text": "Next",
           "line": 70,
-          "endLine": 109
+          "endLine": 115
         },
         {
           "n": 6,
           "level": 3,
           "text": "Operator-facing work admitted 2026-08-03",
-          "line": 92,
-          "endLine": 109
+          "line": 98,
+          "endLine": 115
         },
         {
           "n": 7,
           "level": 2,
           "text": "Work-entry rule",
-          "line": 110,
-          "endLine": 115
+          "line": 116,
+          "endLine": 121
         },
         {
           "n": 8,
           "level": 2,
           "text": "Legacy queue migration",
-          "line": 116,
-          "endLine": 125
+          "line": 122,
+          "endLine": 131
         },
         {
           "n": 9,
           "level": 2,
           "text": "Related",
-          "line": 126,
-          "endLine": 133
+          "line": 132,
+          "endLine": 139
         }
       ]
     },
@@ -334,35 +334,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 147
+          "endLine": 149
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 148,
-          "endLine": 176
+          "line": 150,
+          "endLine": 178
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 177,
-          "endLine": 185
+          "line": 179,
+          "endLine": 187
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 186,
-          "endLine": 187
+          "line": 188,
+          "endLine": 189
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 188,
-          "endLine": 198
+          "line": 190,
+          "endLine": 200
         }
       ]
     },
@@ -1589,6 +1589,45 @@
       ]
     },
     {
+      "rel": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "path": "knowledge-offers-analyzer/decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "name": "0024-drivetrain-banded-cohort-tiers",
+      "title": "ADR-0024 — Narrow the cohort with drivetrain proxies, not generation and trim",
+      "type": "decision",
+      "summary": "/average_price cannot filter by generation or modification, so the ladder gains exact-year and gearbox+fuel tiers as proxies; the real filters stay behind ADR-0017.",
+      "rev": null,
+      "headings": [
+        {
+          "n": 1,
+          "level": 2,
+          "text": "Context",
+          "line": 14,
+          "endLine": 37
+        },
+        {
+          "n": 2,
+          "level": 2,
+          "text": "Decision",
+          "line": 38,
+          "endLine": 69
+        },
+        {
+          "n": 3,
+          "level": 2,
+          "text": "Consequences",
+          "line": 70,
+          "endLine": 91
+        },
+        {
+          "n": 4,
+          "level": 2,
+          "text": "Related",
+          "line": 92,
+          "endLine": 100
+        }
+      ]
+    },
+    {
       "rel": "decisions/README.md",
       "path": "knowledge-offers-analyzer/decisions/README.md",
       "name": "README",
@@ -1602,21 +1641,21 @@
           "level": 2,
           "text": "Index",
           "line": 11,
-          "endLine": 44
+          "endLine": 46
         },
         {
           "n": 2,
           "level": 2,
           "text": "How to add one",
-          "line": 45,
-          "endLine": 51
+          "line": 47,
+          "endLine": 53
         },
         {
           "n": 3,
           "level": 2,
           "text": "Related",
-          "line": 52,
-          "endLine": 55
+          "line": 54,
+          "endLine": 57
         }
       ]
     },
@@ -1672,15 +1711,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 61,
-          "endLine": 67
+          "line": 62,
+          "endLine": 68
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 68,
-          "endLine": 72
+          "line": 69,
+          "endLine": 73
         }
       ]
     },
@@ -2269,21 +2308,21 @@
           "level": 2,
           "text": "What we implemented (2026-07-16)",
           "line": 45,
-          "endLine": 63
+          "endLine": 71
         },
         {
           "n": 4,
           "level": 2,
           "text": "Recommendation",
-          "line": 64,
-          "endLine": 68
+          "line": 72,
+          "endLine": 76
         },
         {
           "n": 5,
           "level": 2,
           "text": "Related",
-          "line": 69,
-          "endLine": 71
+          "line": 77,
+          "endLine": 79
         }
       ]
     },

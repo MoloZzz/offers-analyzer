@@ -72,6 +72,10 @@ export const CONFIDENCE_FLOOR = 10;
 /** How like-for-like each resolved cohort tier is. Keys mirror `cohortTier()` in `cohort.ts`. */
 const TIER_COVERAGE: Record<string, number> = {
   make_model_year_mileage: 1,
+  // Gearbox+fuel stand in for trim and an exact year for generation; neither is like-for-like on
+  // mileage, so both stay below the banded tier and above the bare year range.
+  make_model_year_exact_trim: 0.85,
+  make_model_year_trim: 0.75,
   make_model_year: 0.6,
   make_model: 0.3,
   make_model_fallback: 0.2,

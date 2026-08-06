@@ -1,8 +1,8 @@
 {
   "version": 1,
   "metrics": {
-    "notes": 53,
-    "links": 496,
+    "notes": 54,
+    "links": 516,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -25,7 +25,7 @@
       "title": "Roadmap & Status",
       "type": "roadmap",
       "inDeg": 14,
-      "outDeg": 12
+      "outDeg": 16
     },
     {
       "rel": "Welcome.md",
@@ -64,8 +64,8 @@
       "name": "overview",
       "title": "Architecture overview",
       "type": "architecture",
-      "inDeg": 17,
-      "outDeg": 35
+      "inDeg": 18,
+      "outDeg": 36
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -200,7 +200,7 @@
       "name": "0011-evidence-gated-scoring-rollout",
       "title": "ADR-0011 — Evidence-gated scoring rollout",
       "type": "decision",
-      "inDeg": 24,
+      "inDeg": 25,
       "outDeg": 5
     },
     {
@@ -216,7 +216,7 @@
       "name": "0013-budget-stabilization-before-lifecycle-rechecks",
       "title": "ADR-0013 — Stabilize budget demand before lifecycle rechecks",
       "type": "decision",
-      "inDeg": 6,
+      "inDeg": 7,
       "outDeg": 3
     },
     {
@@ -224,7 +224,7 @@
       "name": "0014-conservative-benchmark-and-mileage-guard",
       "title": "ADR-0014 - Conservative benchmark and claimed-mileage guard",
       "type": "decision",
-      "inDeg": 10,
+      "inDeg": 11,
       "outDeg": 5
     },
     {
@@ -248,7 +248,7 @@
       "name": "0017-shadow-valuation-evidence",
       "title": "ADR-0017 — Keep provider valuation evidence shadow-only",
       "type": "decision",
-      "inDeg": 6,
+      "inDeg": 9,
       "outDeg": 5
     },
     {
@@ -256,7 +256,7 @@
       "name": "0018-assessment-confidence-and-monetary-output",
       "title": "ADR-0018 — Assessment confidence as a separate output; monetary output before more factors",
       "type": "decision",
-      "inDeg": 9,
+      "inDeg": 10,
       "outDeg": 21
     },
     {
@@ -296,8 +296,16 @@
       "name": "0023-one-sided-mileage-adjustment",
       "title": "ADR-0023 - One-sided mileage adjustment",
       "type": "decision",
-      "inDeg": 7,
+      "inDeg": 8,
       "outDeg": 8
+    },
+    {
+      "rel": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "name": "0024-drivetrain-banded-cohort-tiers",
+      "title": "ADR-0024 — Narrow the cohort with drivetrain proxies, not generation and trim",
+      "type": "decision",
+      "inDeg": 5,
+      "outDeg": 11
     },
     {
       "rel": "decisions/README.md",
@@ -305,7 +313,7 @@
       "title": "Decision log (ADRs)",
       "type": "moc",
       "inDeg": 26,
-      "outDeg": 27
+      "outDeg": 28
     },
     {
       "rel": "decisions/adr-template.md",
@@ -321,7 +329,7 @@
       "title": "Domain glossary",
       "type": "domain",
       "inDeg": 12,
-      "outDeg": 22
+      "outDeg": 24
     },
     {
       "rel": "operations/environment-setup.md",
@@ -392,8 +400,8 @@
       "name": "why-no-opportunities",
       "title": "Research — why 0 opportunities, and how to reach business value",
       "type": "research",
-      "inDeg": 6,
-      "outDeg": 5
+      "inDeg": 7,
+      "outDeg": 6
     },
     {
       "rel": "specs/README.md",
@@ -603,21 +611,21 @@
       "to": "architecture/invariants.md",
       "anchor": null,
       "embed": false,
-      "line": 130
+      "line": 136
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/requirements.md",
       "anchor": null,
       "embed": false,
-      "line": 129
+      "line": 135
     },
     {
       "from": "Roadmap & Status.md",
       "to": "business/vision-and-goals.md",
       "anchor": null,
       "embed": false,
-      "line": 128
+      "line": 134
     },
     {
       "from": "Roadmap & Status.md",
@@ -635,17 +643,31 @@
     },
     {
       "from": "Roadmap & Status.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 88
+    },
+    {
+      "from": "Roadmap & Status.md",
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 100
+      "line": 106
     },
     {
       "from": "Roadmap & Status.md",
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 86
+      "line": 92
     },
     {
       "from": "Roadmap & Status.md",
@@ -656,17 +678,31 @@
     },
     {
       "from": "Roadmap & Status.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 51
+    },
+    {
+      "from": "Roadmap & Status.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 89
+    },
+    {
+      "from": "Roadmap & Status.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 132
+      "line": 138
     },
     {
       "from": "Roadmap & Status.md",
       "to": "specs/README.md",
       "anchor": null,
       "embed": false,
-      "line": 131
+      "line": 137
     },
     {
       "from": "Roadmap & Status.md",
@@ -946,7 +982,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 194
+      "line": 196
     },
     {
       "from": "architecture/overview.md",
@@ -974,14 +1010,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 197
+      "line": 199
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 179
+      "line": 181
     },
     {
       "from": "architecture/overview.md",
@@ -1002,7 +1038,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 169
+      "line": 171
     },
     {
       "from": "architecture/overview.md",
@@ -1037,21 +1073,21 @@
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 114
+      "line": 116
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 91
+      "line": 93
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 129
+      "line": 131
     },
     {
       "from": "architecture/overview.md",
@@ -1072,14 +1108,14 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 79
+      "line": 81
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 182
+      "line": 184
     },
     {
       "from": "architecture/overview.md",
@@ -1100,28 +1136,35 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 90
+      "line": 92
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0023-one-sided-mileage-adjustment.md",
       "anchor": null,
       "embed": false,
-      "line": 133
+      "line": 135
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 62
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 196
+      "line": 198
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 195
+      "line": 197
     },
     {
       "from": "architecture/overview.md",
@@ -1149,7 +1192,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 179
+      "line": 181
     },
     {
       "from": "architecture/overview.md",
@@ -1163,7 +1206,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 157
+      "line": 159
     },
     {
       "from": "architecture/overview.md",
@@ -1177,7 +1220,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 173
+      "line": 175
     },
     {
       "from": "architecture/overview.md",
@@ -2720,25 +2763,102 @@
       "line": 66
     },
     {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "architecture/overview.md",
+      "anchor": null,
+      "embed": false,
+      "line": 99
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0011-evidence-gated-scoring-rollout.md",
+      "anchor": null,
+      "embed": false,
+      "line": 86
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 33
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
+      "anchor": null,
+      "embed": false,
+      "line": 95
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
+      "anchor": null,
+      "embed": false,
+      "line": 96
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 29
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
+      "anchor": null,
+      "embed": false,
+      "line": 94
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "anchor": null,
+      "embed": false,
+      "line": 84
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 97
+    },
+    {
+      "from": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "to": "research/why-no-opportunities.md",
+      "anchor": null,
+      "embed": false,
+      "line": 98
+    },
+    {
       "from": "decisions/README.md",
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 54
+      "line": 56
     },
     {
       "from": "decisions/README.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 52
     },
     {
       "from": "decisions/README.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 52
     },
     {
       "from": "decisions/README.md",
@@ -2903,6 +3023,13 @@
     },
     {
       "from": "decisions/README.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 45
+    },
+    {
+      "from": "decisions/README.md",
       "to": "decisions/adr-template.md",
       "anchor": null,
       "embed": false,
@@ -2920,56 +3047,56 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 71
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 71
+      "line": 72
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 41
+      "line": 42
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0006-operator-profit-vision.md",
       "anchor": null,
       "embed": false,
-      "line": 22
+      "line": 23
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0010-defer-factor-activation-until-k.md",
       "anchor": null,
       "embed": false,
-      "line": 23
+      "line": 24
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 23
+      "line": 24
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 31
+      "line": 32
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0011-evidence-gated-scoring-rollout.md",
       "anchor": null,
       "embed": false,
-      "line": 40
+      "line": 41
     },
     {
       "from": "domain/glossary.md",
@@ -2983,28 +3110,28 @@
       "to": "decisions/0013-budget-stabilization-before-lifecycle-rechecks.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 51
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 16
+      "line": 17
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0014-conservative-benchmark-and-mileage-guard.md",
       "anchor": null,
       "embed": false,
-      "line": 29
+      "line": 30
     },
     {
       "from": "domain/glossary.md",
-      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
+      "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 53
+      "line": 15
     },
     {
       "from": "domain/glossary.md",
@@ -3015,59 +3142,73 @@
     },
     {
       "from": "domain/glossary.md",
-      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "to": "decisions/0018-assessment-confidence-and-monetary-output.md",
       "anchor": null,
       "embed": false,
       "line": 55
     },
     {
       "from": "domain/glossary.md",
-      "to": "decisions/0020-graded-accident-risk.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 28
+      "line": 56
     },
     {
       "from": "domain/glossary.md",
       "to": "decisions/0020-graded-accident-risk.md",
-      "anchor": null,
-      "embed": false,
-      "line": 64
-    },
-    {
-      "from": "domain/glossary.md",
-      "to": "decisions/0023-one-sided-mileage-adjustment.md",
-      "anchor": null,
-      "embed": false,
-      "line": 16
-    },
-    {
-      "from": "domain/glossary.md",
-      "to": "decisions/0023-one-sided-mileage-adjustment.md",
       "anchor": null,
       "embed": false,
       "line": 29
     },
     {
       "from": "domain/glossary.md",
+      "to": "decisions/0020-graded-accident-risk.md",
+      "anchor": null,
+      "embed": false,
+      "line": 65
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 17
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0023-one-sided-mileage-adjustment.md",
+      "anchor": null,
+      "embed": false,
+      "line": 30
+    },
+    {
+      "from": "domain/glossary.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 15
+    },
+    {
+      "from": "domain/glossary.md",
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 66
+      "line": 67
     },
     {
       "from": "domain/glossary.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 16
+      "line": 17
     },
     {
       "from": "domain/glossary.md",
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 64
+      "line": 65
     },
     {
       "from": "operations/environment-setup.md",
@@ -3627,14 +3768,21 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 78
     },
     {
       "from": "research/why-no-opportunities.md",
       "to": "Roadmap & Status.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 78
+    },
+    {
+      "from": "research/why-no-opportunities.md",
+      "to": "decisions/0024-drivetrain-banded-cohort-tiers.md",
+      "anchor": null,
+      "embed": false,
+      "line": 52
     },
     {
       "from": "research/why-no-opportunities.md",
@@ -3655,7 +3803,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 70
+      "line": 78
     },
     {
       "from": "specs/README.md",
@@ -3951,6 +4099,7 @@
       "decisions/0021-retrieval-discipline-by-default.md",
       "decisions/0022-delegate-independent-work-to-tiered-subagents.md",
       "decisions/0023-one-sided-mileage-adjustment.md",
+      "decisions/0024-drivetrain-banded-cohort-tiers.md",
       "decisions/README.md",
       "decisions/adr-template.md",
       "domain/glossary.md",
