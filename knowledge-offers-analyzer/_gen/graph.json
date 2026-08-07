@@ -2,7 +2,7 @@
   "version": 1,
   "metrics": {
     "notes": 54,
-    "links": 516,
+    "links": 517,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -65,7 +65,7 @@
       "title": "Architecture overview",
       "type": "architecture",
       "inDeg": 18,
-      "outDeg": 36
+      "outDeg": 37
     },
     {
       "rel": "architecture/persistence-surface.md",
@@ -982,7 +982,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 196
+      "line": 220
     },
     {
       "from": "architecture/overview.md",
@@ -1010,14 +1010,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 199
+      "line": 223
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 181
+      "line": 205
     },
     {
       "from": "architecture/overview.md",
@@ -1038,7 +1038,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 171
+      "line": 195
     },
     {
       "from": "architecture/overview.md",
@@ -1115,7 +1115,7 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 184
+      "line": 208
     },
     {
       "from": "architecture/overview.md",
@@ -1130,6 +1130,13 @@
       "anchor": null,
       "embed": false,
       "line": 49
+    },
+    {
+      "from": "architecture/overview.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 166
     },
     {
       "from": "architecture/overview.md",
@@ -1157,14 +1164,14 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 198
+      "line": 222
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 197
+      "line": 221
     },
     {
       "from": "architecture/overview.md",
@@ -1192,7 +1199,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 181
+      "line": 205
     },
     {
       "from": "architecture/overview.md",
@@ -1206,7 +1213,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 159
+      "line": 177
     },
     {
       "from": "architecture/overview.md",
@@ -1220,7 +1227,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 175
+      "line": 199
     },
     {
       "from": "architecture/overview.md",
@@ -1234,28 +1241,28 @@
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 49
+      "line": 55
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 50
+      "line": 56
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "decisions/0015-hybrid-executable-vault.md",
       "anchor": null,
       "embed": false,
-      "line": 51
+      "line": 57
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 52
+      "line": 58
     },
     {
       "from": "business/how-it-works.md",
@@ -3215,14 +3222,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 131
+      "line": 158
     },
     {
       "from": "operations/environment-setup.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 132
+      "line": 159
     },
     {
       "from": "operations/environment-setup.md",
@@ -3236,7 +3243,7 @@
       "to": "decisions/0001-adopt-sdd-vault-rtk.md",
       "anchor": null,
       "embed": false,
-      "line": 133
+      "line": 160
     },
     {
       "from": "operations/environment-setup.md",

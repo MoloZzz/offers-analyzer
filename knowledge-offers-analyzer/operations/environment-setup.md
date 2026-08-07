@@ -118,6 +118,33 @@ The provider output is labelled `active_listing_ask` evidence, never a resale or
 price, and it cannot change fair value, scoring, ranking, alerts, thresholds, ParameterSets,
 factors, or `k`.
 
+## SPEC-017 advisory AI analysis (`/analyze_ai`)
+
+Also inert in a fresh environment, and for a stronger reason than SPEC-015: it sends listing
+content to a third-party model, so lawfulness is an operator question, not a configuration one.
+
+```dotenv
+AI_ANALYSIS_ENABLED=false
+AI_ANALYSIS_MODEL_ID=claude-opus-5
+AI_ANALYSIS_MONTHLY_ALLOCATION=0
+AI_ANALYSIS_PER_ADMIN_LIMIT=10
+AI_ANALYSIS_PER_ADMIN_WINDOW_HOURS=24
+AI_ANALYSIS_TIMEOUT_MS=60000
+```
+
+`AI_ANALYSIS_API_KEY` belongs only in the ignored environment file and is redacted in logs.
+Startup validation rejects `AI_ANALYSIS_ENABLED=true` without a key and a positive integer
+`AI_ANALYSIS_MONTHLY_ALLOCATION`; **a zero allocation disables the feature even when enabled**, and
+that is the revert path — no migration is needed to turn it off. The allocation lives under the
+separate `ai-analysis` source key, so AI spend can never decrement the AUTO.RIA request pool, and
+`/budget` reports it on its own line.
+
+Four operator gates before enabling (spec 017 T037): approved provider credentials, approved
+provider terms, confirmation that listing content may lawfully be sent to that provider, and an
+agreed monthly cap. The additive `1785400000000-spec-017-ai-analysis.ts` migration is in the
+repository but was **not applied** as part of implementation — apply it only to an
+operator-approved database, then verify TypeORM generation produces no follow-up schema churn.
+
 ## Related
 
 ## Telegram monitoring administration

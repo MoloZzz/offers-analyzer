@@ -233,6 +233,13 @@ function buildFakeOperationStateRepo(): {
   const repo = {
     query,
     find: jest.fn().mockResolvedValue(rows),
+    // Spec 017: `report()` reads the AI allocation row directly, under its own source key.
+    findOne: ({ where }: { where: Record<string, unknown> }) =>
+      Promise.resolve(
+        rows.find((row) =>
+          Object.entries(where).every(([key, value]) => (row as never)[key] === value),
+        ) ?? null,
+      ),
   } as unknown as Repository<OperationBudgetState>;
   return { repo, rows, query };
 }
@@ -251,6 +258,13 @@ function buildFakeConfig(overrides?: Partial<AppConfig>) {
     autoRiaAiSampleRate: 0,
     autoRiaAiMonthlyAllocation: 0,
     autoRiaAiTimeoutMs: 5000,
+    aiAnalysisEnabled: false,
+    aiAnalysisApiKey: '',
+    aiAnalysisModelId: 'claude-opus-5',
+    aiAnalysisMonthlyAllocation: 0,
+    aiAnalysisPerAdminLimit: 10,
+    aiAnalysisPerAdminWindowHours: 24,
+    aiAnalysisTimeoutMs: 60000,
     telegramBotToken: 'token',
     telegramAdminChatIds: [],
     nbuRateUrl: 'url',

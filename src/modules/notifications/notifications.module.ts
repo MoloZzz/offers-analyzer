@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelegrafModule } from 'nestjs-telegraf';
 
 import { AppConfig } from '../../common/config/configuration';
+import { AnalysisModule } from '../analysis/analysis.module';
 import { CalibrationModule } from '../calibration/calibration.module';
 import { HealthModule } from '../health/health.module';
 import { ListingsModule } from '../listings/listings.module';
@@ -33,6 +34,7 @@ import { TelegramNotifier } from './telegram/telegram.notifier';
     HealthModule,
     ListingsModule,
     SchedulingModule,
+    AnalysisModule,
     TypeOrmModule.forFeature([Subscriber, Notification, AlertedCar]),
     TelegrafModule.forRootAsync({
       inject: [ConfigService],

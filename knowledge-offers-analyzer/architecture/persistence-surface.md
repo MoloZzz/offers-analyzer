@@ -1,13 +1,13 @@
 ---
 title: Persistence surface
 type: architecture
-updated: 2026-08-04
+updated: 2026-08-06
 summary: Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.
 code:
   - src/common/database/data-source.ts
   - src/common/database/migrations/*.ts
   - src/modules/**/entities/*.ts
-rev: caea24b768ba
+rev: d076e142f797
 ---
 
 # Persistence surface
@@ -26,6 +26,12 @@ rev: caea24b768ba
   `operation_budget_states` for atomic `valuation_ai` allocation. Its migration also adds only
   nullable Listing/Opportunity evidence pointers and immutable `BudgetActivity` audit fields; it
   is additive and has not been applied by the implementation task.
+- SPEC-017 (2026-08-06) adds the append-only `ai_analyses` table — one immutable row per advisory
+  analysis attempt, indexed on `(listingId, inputFactHash, promptVersion, modelId)` (the future
+  cache key) and on `capturedAt` — plus one nullable `actorId` column on `budget_activities` so a
+  human-triggered admission records who triggered it. Additive and append-only; the migration
+  `1785400000000-spec-017-ai-analysis.ts` was **not applied** by the implementation task. Nothing in
+  it touches a scoring, benchmark, threshold, or alert column.
 - SPEC-006 US6.1 (2026-08-04) added **no table and no column**. `ParameterSet` gained six optional
   fields *inside its existing JSON `params`* and the explanation gained fields inside the existing
   JSON explanation column, so both are typing changes over data the schema already holds — no

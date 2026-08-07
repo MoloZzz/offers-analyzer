@@ -17,6 +17,16 @@ export interface AppConfig {
   autoRiaAiMonthlyAllocation: number;
   /** Bounded per-request source timeout for the AI adapter. */
   autoRiaAiTimeoutMs: number;
+  /** SPEC-017: admin-only advisory AI analysis. Disabled by default; a zero cap also disables it. */
+  aiAnalysisEnabled: boolean;
+  aiAnalysisApiKey: string;
+  aiAnalysisModelId: string;
+  /** Dedicated monthly cap, in requests. Never drawn from the AUTO.RIA pool (FR-006). */
+  aiAnalysisMonthlyAllocation: number;
+  /** Per-admin admissions allowed inside the rolling window below. */
+  aiAnalysisPerAdminLimit: number;
+  aiAnalysisPerAdminWindowHours: number;
+  aiAnalysisTimeoutMs: number;
   telegramBotToken: string;
   telegramAdminChatIds: string[];
   nbuRateUrl: string;
@@ -66,6 +76,23 @@ export default (): AppConfig => ({
     1_000_000,
   ),
   autoRiaAiTimeoutMs: boundedInteger(process.env.AUTO_RIA_AI_TIMEOUT_MS, 5_000, 1_000, 60_000),
+  aiAnalysisEnabled: process.env.AI_ANALYSIS_ENABLED === 'true',
+  aiAnalysisApiKey: process.env.AI_ANALYSIS_API_KEY ?? '',
+  aiAnalysisModelId: process.env.AI_ANALYSIS_MODEL_ID?.trim() || 'claude-opus-5',
+  aiAnalysisMonthlyAllocation: boundedInteger(
+    process.env.AI_ANALYSIS_MONTHLY_ALLOCATION,
+    0,
+    0,
+    100_000,
+  ),
+  aiAnalysisPerAdminLimit: boundedInteger(process.env.AI_ANALYSIS_PER_ADMIN_LIMIT, 10, 0, 1_000),
+  aiAnalysisPerAdminWindowHours: boundedInteger(
+    process.env.AI_ANALYSIS_PER_ADMIN_WINDOW_HOURS,
+    24,
+    1,
+    720,
+  ),
+  aiAnalysisTimeoutMs: boundedInteger(process.env.AI_ANALYSIS_TIMEOUT_MS, 60_000, 1_000, 300_000),
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
   telegramAdminChatIds: (process.env.TELEGRAM_ADMIN_CHAT_IDS ?? '')
     .split(',')

@@ -39,6 +39,7 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
               'config.autoRiaApiKey',
               'config.autoRiaAiApiKey',
               'config.autoRiaAiUserId',
+              'config.aiAnalysisApiKey',
               'config.telegramBotToken',
             ],
           },

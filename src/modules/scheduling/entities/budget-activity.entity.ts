@@ -7,7 +7,9 @@ export type BudgetOperation =
   | 'sweep'
   | 'cohort_average'
   | 'on_demand'
-  | 'valuation_ai';
+  | 'valuation_ai'
+  /** SPEC-017 advisory analysis. Its own allocation under its own source key — never the AUTO.RIA pool. */
+  | 'ai_analysis';
 
 export type BudgetActivityOutcome = 'allowed' | 'denied';
 /** Provider billing state at admission time; reconciled spend remains immutable audit evidence. */
@@ -20,6 +22,7 @@ export type BudgetDenialReason =
   | 'admission_contention'
   | 'operation_allocation_exhausted'
   | 'operation_allocation_unavailable'
+  | 'per_admin_rate_limited'
   | 'cooldown'
   | 'paused';
 
@@ -58,6 +61,13 @@ export class BudgetActivity {
 
   @Column({ type: 'varchar' })
   reason!: BudgetDenialReason;
+
+  /**
+   * Who triggered a human-triggered operation (SPEC-017): the admin's Telegram chat id. Null for
+   * every automatic operation, which is exactly what makes the per-admin rate limit countable.
+   */
+  @Column({ type: 'varchar', nullable: true })
+  actorId?: string | null;
 
   /** Redacted canonical provider-request identifier; absent for legacy source operations. */
   @Column({ type: 'varchar', nullable: true })

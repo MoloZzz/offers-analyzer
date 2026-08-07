@@ -2,6 +2,7 @@ import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
+import { AiAnalysis } from '../../modules/analysis/entities/ai-analysis.entity';
 import { CalibrationRun } from '../../modules/calibration/entities/calibration-run.entity';
 import { DealOutcome } from '../../modules/calibration/entities/deal-outcome.entity';
 import { Outcome } from '../../modules/calibration/entities/outcome.entity';
@@ -47,6 +48,7 @@ export const ENTITIES = [
   Outcome,
   CalibrationRun,
   DealOutcome,
+  AiAnalysis,
 ];
 
 export function buildDataSourceOptions(url: string, synchronize: boolean): DataSourceOptions {

@@ -113,6 +113,7 @@ function buildBot(query: QueryService): { update: TelegramBotUpdate; ctx: Contex
     {} as never,
     {} as never,
     { get: () => [] } as never,
+    {} as never,
   );
   const ctx = {
     chat: { id: 77 },

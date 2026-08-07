@@ -1,0 +1,48 @@
+{
+  "id": "msg_01Redacted",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-opus-5",
+  "stop_reason": "tool_use",
+  "content": [
+    {
+      "type": "text",
+      "text": "Аналізую надані факти."
+    },
+    {
+      "type": "tool_use",
+      "id": "toolu_01Redacted",
+      "name": "submit_analysis",
+      "input": {
+        "warnings": [
+          {
+            "code": "dsg_mechatronics",
+            "severity": "high",
+            "rationale": "DQ250 на цьому пробігу часто потребує ремонту мехатроніка.",
+            "estimatedCostUsd": 900
+          },
+          {
+            "code": "description_vague_service_history",
+            "severity": "medium",
+            "rationale": "Опис не називає жодного сервісу, лише загальні слова."
+          }
+        ],
+        "inspectionChecklist": [
+          "Перевірити роботу DSG на холодну та в режимі повзання",
+          "Компресія та витрата масла",
+          "Товщиномір по всьому кузову"
+        ],
+        "sellerQuestions": [
+          "Коли востаннє обслуговували коробку і чи є чек?",
+          "Чи є сервісна книжка з відмітками?"
+        ],
+        "advisoryScore": 5.5,
+        "advisoryScoreRationale": "Ціна нижча за ринок, але ризик по коробці з'їдає перевагу.",
+        "reliabilityNotes": [
+          "Мехатронік DQ250 — відома слабка ланка на пробігах понад 150 тис. км."
+        ]
+      }
+    }
+  ],
+  "usage": { "input_tokens": 1200, "output_tokens": 420 }
+}

@@ -334,35 +334,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 149
+          "endLine": 167
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 150,
-          "endLine": 178
+          "line": 168,
+          "endLine": 202
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 179,
-          "endLine": 187
+          "line": 203,
+          "endLine": 211
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 188,
-          "endLine": 189
+          "line": 212,
+          "endLine": 213
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 190,
-          "endLine": 200
+          "line": 214,
+          "endLine": 224
         }
       ]
     },
@@ -373,35 +373,35 @@
       "title": "Persistence surface",
       "type": "architecture",
       "summary": "Narrow owner for the TypeORM entity registry, migrations, and schema-review boundary.",
-      "rev": "caea24b768ba",
+      "rev": "d076e142f797",
       "headings": [
         {
           "n": 1,
           "level": 2,
           "text": "Source of truth",
           "line": 18,
-          "endLine": 34
+          "endLine": 40
         },
         {
           "n": 2,
           "level": 2,
           "text": "Review boundary",
-          "line": 35,
-          "endLine": 40
+          "line": 41,
+          "endLine": 46
         },
         {
           "n": 3,
           "level": 2,
           "text": "Generated evidence",
-          "line": 41,
-          "endLine": 46
+          "line": 47,
+          "endLine": 52
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 47,
-          "endLine": 53
+          "line": 53,
+          "endLine": 59
         }
       ]
     },
@@ -1777,16 +1777,23 @@
         {
           "n": 7,
           "level": 2,
-          "text": "Related",
+          "text": "SPEC-017 advisory AI analysis (`/analyze_ai`)",
           "line": 121,
-          "endLine": 122
+          "endLine": 147
         },
         {
           "n": 8,
           "level": 2,
+          "text": "Related",
+          "line": 148,
+          "endLine": 149
+        },
+        {
+          "n": 9,
+          "level": 2,
           "text": "Telegram monitoring administration",
-          "line": 123,
-          "endLine": 134
+          "line": 150,
+          "endLine": 161
         }
       ]
     },

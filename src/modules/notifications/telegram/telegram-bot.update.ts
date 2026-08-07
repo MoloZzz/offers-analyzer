@@ -3,6 +3,8 @@ import { Action, Command, Ctx, Help, Start, Update } from 'nestjs-telegraf';
 import { Context, Markup } from 'telegraf';
 
 import { AppConfig } from '../../../common/config/configuration';
+import { AnalysisAttempt, AnalysisService } from '../../analysis/analysis.service';
+import { AnalysisOutput } from '../../analysis/analysis.types';
 import { CalibrationService } from '../../calibration/calibration.service';
 import { realizedMargin } from '../../calibration/deal-margin';
 import { DealsService } from '../../calibration/deals.service';
@@ -15,6 +17,7 @@ import { formatReport } from '../../query/report';
 import { formatBudgetReport } from '../../scheduling/budget-report';
 import { SourceControlService } from '../../scheduling/source-control.service';
 import { formatAccidentShadow } from '../format/accident-shadow-message';
+import { formatAiAnalysis } from '../format/ai-analysis-message';
 import { buildBreakdown, renderBreakdownSections } from '../format/breakdown';
 import { formatCalibration } from '../format/calibration-message';
 import { formatDeals } from '../format/deals-message';
@@ -45,6 +48,7 @@ const HELP =
   '/check <посилання> — оцінити конкретне авто\n' +
   '/why <посилання> — пояснити, чому такий бал\n' +
   '/valuation_audit — admin: аудит shadow-оцінок AUTO.RIA\n' +
+  '/analyze_ai <посилання> — admin: дорадчий AI-аналіз (не впливає на бал)\n' +
   '/accident_shadow [днів] — admin: тіньовий звіт по градації ДТП\n' +
   '/top [N] — знайдені вигідні пропозиції (за замовчуванням 5)\n' +
   '/best [N] — найкращі оцінені авто (навіть нижче порогу, за замовчуванням 5)\n' +
@@ -81,6 +85,7 @@ export class TelegramBotUpdate {
     private readonly deals: DealsService,
     private readonly sourceControl: SourceControlService,
     private readonly config: ConfigService<AppConfig, true>,
+    private readonly analysis: AnalysisService,
   ) {}
 
   @Command('daily_limit')
@@ -105,6 +110,83 @@ export class TelegramBotUpdate {
   async onValuationAudit(@Ctx() ctx: Context): Promise<void> {
     if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
     await ctx.reply(formatValuationAudit(await this.query.valuationAudit()));
+  }
+
+  /**
+   * Spec 017 US17.2 — admin-only advisory AI analysis.
+   *
+   * The reply is a model opinion and changes nothing: no score, threshold, ParameterSet, or alert
+   * decision is touched on any path through this handler (FR-002). It is also the only invocation
+   * point that exists — there is no scheduled or per-listing caller (FR-001).
+   */
+  @Command('analyze_ai')
+  async onAnalyzeAi(@Ctx() ctx: Context): Promise<void> {
+    if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
+    const externalId = extractAutoId(commandArg(ctx));
+    if (!externalId) {
+      await ctx.reply(`Надішліть посилання на оголошення, напр.:\n/analyze_ai ${URL_EXAMPLE}`);
+      return;
+    }
+    const chatId = ctx.chat?.id;
+    if (chatId == null) return;
+
+    const attempt = await this.analysis.analyze({ externalId, actorId: String(chatId) });
+    for (const part of splitIntoMessages([this.renderAnalysis(attempt)])) {
+      await ctx.reply(part);
+    }
+  }
+
+  /** Every terminal state gets an explicit reply; nothing from a failed attempt is rendered. */
+  private renderAnalysis(attempt: AnalysisAttempt): string {
+    switch (attempt.status) {
+      case 'listing_missing':
+        return (
+          'Оголошення ще не в базі — оцініть його спершу через /check або дочекайтеся поллінгу.\n' +
+          'AI-аналіз працює лише над збереженими фактами і сам джерело не запитує.'
+        );
+      case 'refused':
+        return this.renderRefusal(attempt);
+      case 'failed':
+        return (
+          `AI-аналіз не вдався (${attempt.reason}). Нічого з відповіді не показано.\n` +
+          'Спробу записано в журнал. Оцінка авто, поріг і сповіщення не змінилися.'
+        );
+      case 'available':
+      case 'cached':
+        // A cache hit renders the same stored answer, marked, with its **original** capture time —
+        // so a month-old opinion can never be read as a fresh one (FR-005, US17.3 AS-2).
+        return formatAiAnalysis({
+          make: attempt.listing.make,
+          model: attempt.listing.model,
+          year: attempt.listing.year,
+          url: attempt.listing.url,
+          modelId: attempt.record.modelId,
+          promptVersion: attempt.record.promptVersion,
+          capturedAt: attempt.record.capturedAt,
+          output: attempt.record.output as AnalysisOutput,
+          cached: attempt.status === 'cached',
+        });
+    }
+  }
+
+  private renderRefusal(attempt: Extract<AnalysisAttempt, { status: 'refused' }>): string {
+    if (attempt.reason === 'rate_limited') {
+      const limit = attempt.admission?.perAdminLimit ?? 0;
+      const hours = attempt.admission?.perAdminWindowHours ?? 24;
+      return `Ліміт AI-аналізів на адміністратора вичерпано: ${limit} за ${hours} год. Спробуйте пізніше.`;
+    }
+    if (attempt.reason === 'budget_exhausted') {
+      const allocation = attempt.admission?.allocation ?? 0;
+      const resets = attempt.admission?.resetsAt?.toLocaleDateString('uk-UA') ?? 'початку місяця';
+      return (
+        `Місячний ліміт AI-аналізу вичерпано (${allocation} за місяць). Оновиться ${resets}.\n` +
+        'Це окрема алокація — пошук і оцінка авто через AUTO.RIA не постраждали.'
+      );
+    }
+    return (
+      'AI-аналіз вимкнено. Це навмисне: він потребує схвалених умов провайдера, ключа та ' +
+      'узгодженого місячного ліміту.'
+    );
   }
 
   /** Spec 018 US18.2. Read-only over persisted evaluations — no source traffic, no state change. */

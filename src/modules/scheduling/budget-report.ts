@@ -36,6 +36,19 @@ export interface BudgetReportDigest {
   }>;
   rolloutReady: boolean;
   rolloutReason: string;
+  /**
+   * SPEC-017 SC-007. AI-analysis spend is reported as its **own allocation**, never folded into the
+   * AUTO.RIA pool: it is ledgered under a separate source key, so it contributes nothing to
+   * `poolUsed`, `ledgerAllowed`, or the reconciliation above. Null when nothing has been attempted.
+   */
+  aiAnalysis: AiAnalysisBudgetLine | null;
+}
+
+export interface AiAnalysisBudgetLine {
+  allocation: number;
+  used: number;
+  attempts: number;
+  refused: number;
 }
 
 const ALLOCATIONS: Record<BudgetOperation, number> = {
@@ -46,6 +59,9 @@ const ALLOCATIONS: Record<BudgetOperation, number> = {
   cohort_average: 1500,
   on_demand: 0,
   valuation_ai: 0,
+  // Not an AUTO.RIA request line at all: its capacity lives under its own source key and is
+  // reported separately. A non-zero value here would imply it draws on the source pool.
+  ai_analysis: 0,
 };
 
 export function buildBudgetReport(
@@ -53,6 +69,7 @@ export function buildBudgetReport(
   activities: BudgetActivity[],
   now = new Date(),
   operationStates: OperationBudgetState[] = [],
+  aiAnalysis?: { state: OperationBudgetState | null; activities: BudgetActivity[] },
 ): BudgetReportDigest {
   const allowed = activities.filter((a) => a.outcome === 'allowed');
   const ledgerAllowed = allowed.reduce((sum, a) => sum + a.cost, 0);
@@ -149,6 +166,20 @@ export function buildBudgetReport(
     deferred: [...groups.values()],
     rolloutReady,
     rolloutReason,
+    aiAnalysis: buildAiAnalysisLine(aiAnalysis),
+  };
+}
+
+function buildAiAnalysisLine(
+  input?: { state: OperationBudgetState | null; activities: BudgetActivity[] },
+): AiAnalysisBudgetLine | null {
+  if (!input || (!input.state && input.activities.length === 0)) return null;
+  const attempts = input.activities.filter((a) => a.outcome === 'allowed').length;
+  return {
+    allocation: input.state?.capacity ?? 0,
+    used: input.state?.used ?? attempts,
+    attempts,
+    refused: input.activities.length - attempts,
   };
 }
 
@@ -178,6 +209,11 @@ export function formatBudgetReport(d: BudgetReportDigest): string {
         (x) =>
           `• ${x.operation}${x.profileName ? ` (${x.profileName})` : ''}, tier ${x.tier}: ${x.count} — ${x.reason}`,
       ),
+    );
+  if (d.aiAnalysis)
+    lines.push(
+      '🤖 AI-аналіз (окрема алокація, не з пулу AUTO.RIA):',
+      `• ${d.aiAnalysis.used}/${d.aiAnalysis.allocation || '—'} · виконано ${d.aiAnalysis.attempts} · відмов ${d.aiAnalysis.refused}`,
     );
   lines.push(
     `Rollout SPEC-005/новий профіль: ${d.rolloutReady ? 'evidence ready (потрібне ручне схвалення)' : 'НЕ готово'} — ${d.rolloutReason}`,

@@ -30,6 +30,20 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     }
   }
 
+  // SPEC-017: the same discipline for the advisory analysis provider. Enabling it without a key or
+  // with an unbounded cap would put paid, operator-triggered traffic behind a flag alone.
+  if (config.AI_ANALYSIS_ENABLED === 'true') {
+    if (!config.AI_ANALYSIS_API_KEY) missing.push('AI_ANALYSIS_API_KEY');
+    const allocation = Number(config.AI_ANALYSIS_MONTHLY_ALLOCATION);
+    if (!Number.isInteger(allocation) || allocation <= 0) {
+      invalid.push('AI_ANALYSIS_MONTHLY_ALLOCATION (positive integer required when enabled)');
+    }
+    const perAdmin = Number(config.AI_ANALYSIS_PER_ADMIN_LIMIT);
+    if (config.AI_ANALYSIS_PER_ADMIN_LIMIT !== undefined && (!Number.isInteger(perAdmin) || perAdmin <= 0)) {
+      invalid.push('AI_ANALYSIS_PER_ADMIN_LIMIT (positive integer required when enabled)');
+    }
+  }
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }

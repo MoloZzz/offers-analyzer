@@ -1,0 +1,11 @@
+{
+  "id": "msg_02Redacted",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-opus-5",
+  "stop_reason": "end_turn",
+  "content": [
+    { "type": "text", "text": "Ось мій аналіз у вільній формі, без структурованої відповіді." }
+  ],
+  "usage": { "input_tokens": 1200, "output_tokens": 60 }
+}

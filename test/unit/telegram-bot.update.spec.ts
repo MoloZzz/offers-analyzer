@@ -98,9 +98,11 @@ function buildUpdate(): {
     isDailyLimitEnabled: jest.fn().mockResolvedValue(true),
   } as unknown as SourceControlService;
   const config = { get: jest.fn().mockReturnValue(['77']) } as never;
+  // Spec 017: the bot holds an AnalysisService, but these cases never reach /analyze_ai.
+  const analysis = { analyze: jest.fn() } as never;
 
   return {
-    update: new TelegramBotUpdate(subscribers, profiles, query, outcomes, calibration, deals, sourceControl, config),
+    update: new TelegramBotUpdate(subscribers, profiles, query, outcomes, calibration, deals, sourceControl, config, analysis),
     subscribers: subscriberMocks,
     profiles: profileMocks,
     sourceControl: sourceControl as unknown as {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 
@@ -22,10 +22,21 @@ import { SourceControlService } from './source-control.service';
 // retrying. Keeps us from hammering an upstream that just told us to back off.
 const EXHAUSTED_COOLDOWN_MS = 5 * 60_000; // 5 minutes
 
+/**
+ * SPEC-017: advisory analysis is ledgered under its own source key, so its spend can never
+ * decrement the 20,000-request AUTO.RIA pool (FR-006, SC-002) even by accident.
+ */
+export const AI_ANALYSIS_SOURCE_KEY = 'ai-analysis';
+
+/** Operations admitted through an atomic per-operation allocation rather than the source pool. */
+const ALLOCATED_OPERATIONS: readonly BudgetOperation[] = ['valuation_ai', 'ai_analysis'];
+
 export interface BudgetRequestContext {
   operation: BudgetOperation;
   profileId?: string;
   profileName?: string;
+  /** Telegram chat id of the admin who triggered a human-triggered operation. */
+  actorId?: string;
   /** Canonical redacted provider input identity; used only by provider-backed operations. */
   requestFingerprint?: string;
   /** Billing observation supplied by a provider-backed caller before an outbound request. */
@@ -45,6 +56,27 @@ export interface ValuationAiBudgetRequestContext extends BudgetRequestContext {
   operation: 'valuation_ai';
   requestFingerprint: string;
   operationMonthlyAllocation: number;
+}
+
+/** Admin-triggered advisory analysis. The actor is required — the rate limit is counted from it. */
+export interface AiAnalysisBudgetRequestContext extends BudgetRequestContext {
+  operation: 'ai_analysis';
+  actorId: string;
+  operationMonthlyAllocation: number;
+  /** Max admissions for one admin inside `perAdminWindowHours`; zero disables the operation. */
+  perAdminLimit: number;
+  perAdminWindowHours: number;
+}
+
+export interface AiAnalysisAdmission {
+  admitted: boolean;
+  reason: BudgetDenialReason;
+  /** Populated on a per-admin denial so the refusal can name the limit (US17.4 AS-4). */
+  perAdminLimit?: number;
+  perAdminWindowHours?: number;
+  /** Populated on an allocation denial so the refusal can name the cap and its reset (AS-2). */
+  allocation?: number;
+  resetsAt?: Date;
 }
 
 /**
@@ -192,6 +224,124 @@ export class RateBudgetService {
     }
   }
 
+  /**
+   * SPEC-017 T011/T012 — admission for one admin-triggered advisory analysis.
+   *
+   * Deliberately **not** routed through `tryConsume`: that method admits against the shared AUTO.RIA
+   * monthly pool and daily sub-budget, and charging an AI call there would decrement discovery
+   * capacity (the thing FR-006 and SC-002 forbid). This path touches only the dedicated allocation
+   * under `AI_ANALYSIS_SOURCE_KEY`, and every outcome — admitted or refused — is ledgered so
+   * `/budget` and `/ai_audit` see the same evidence.
+   *
+   * Order matters: the per-admin limit is checked before the allocation is reserved, so a rate-
+   * limited tap cannot consume monthly capacity it was never going to be allowed to use.
+   */
+  async tryConsumeAiAnalysis(
+    context: AiAnalysisBudgetRequestContext,
+    now = new Date(),
+  ): Promise<AiAnalysisAdmission> {
+    const cost = 1;
+    if (!isPositiveInteger(context.operationMonthlyAllocation)) {
+      // A zero (or absent) allocation is the kill switch, not an error state (FR-007).
+      await this.recordActivity(
+        AI_ANALYSIS_SOURCE_KEY,
+        cost,
+        1,
+        context,
+        'denied',
+        'operation_allocation_exhausted',
+        now,
+      );
+      return {
+        admitted: false,
+        reason: 'operation_allocation_exhausted',
+        allocation: 0,
+        resetsAt: RateBudgetService.nextMonthStart(now),
+      };
+    }
+
+    const perAdminDenial = await this.perAdminLimitReached(context, now);
+    if (perAdminDenial) {
+      await this.recordActivity(
+        AI_ANALYSIS_SOURCE_KEY,
+        cost,
+        1,
+        context,
+        'denied',
+        'per_admin_rate_limited',
+        now,
+      );
+      return {
+        admitted: false,
+        reason: 'per_admin_rate_limited',
+        perAdminLimit: context.perAdminLimit,
+        perAdminWindowHours: context.perAdminWindowHours,
+      };
+    }
+
+    const denial = await this.reserveOperationAllocation(AI_ANALYSIS_SOURCE_KEY, cost, context, now);
+    if (denial) {
+      this.logger.warn(
+        { operation: context.operation, allocation: context.operationMonthlyAllocation },
+        'AI analysis allocation denied consumption',
+      );
+      await this.recordActivity(AI_ANALYSIS_SOURCE_KEY, cost, 1, context, 'denied', denial, now);
+      return {
+        admitted: false,
+        reason: denial,
+        allocation: context.operationMonthlyAllocation,
+        resetsAt: RateBudgetService.nextMonthStart(now),
+      };
+    }
+
+    await this.recordActivity(AI_ANALYSIS_SOURCE_KEY, cost, 1, context, 'allowed', 'allowed', now);
+    return { admitted: true, reason: 'allowed' };
+  }
+
+  /**
+   * Returns the dedicated AI allocation and what has been drawn against it. Read-only; it is the
+   * input to `/budget`'s separate AI line (SC-007) and never folds into the AUTO.RIA reconciliation.
+   */
+  async aiAnalysisAllocation(
+    now = new Date(),
+  ): Promise<{ allocation: number; used: number } | null> {
+    if (!this.operationStateRepo) return null;
+    const state = await this.operationStateRepo.findOne({
+      where: {
+        sourceKey: AI_ANALYSIS_SOURCE_KEY,
+        monthKey: RateBudgetService.monthKey(now),
+        operation: 'ai_analysis',
+      },
+    });
+    return state ? { allocation: state.capacity, used: state.used } : null;
+  }
+
+  /** Compensates a reserved AI admission when the attempt never reached the provider. */
+  async releaseAiAnalysis(now = new Date()): Promise<void> {
+    await this.releaseOperationAllocation(AI_ANALYSIS_SOURCE_KEY, 1, 'ai_analysis', now);
+  }
+
+  private async perAdminLimitReached(
+    context: AiAnalysisBudgetRequestContext,
+    now: Date,
+  ): Promise<boolean> {
+    if (!this.activityRepo) return false;
+    if (!isPositiveInteger(context.perAdminLimit)) return true;
+    const windowStart = new Date(
+      now.getTime() - Math.max(1, context.perAdminWindowHours) * 60 * 60 * 1000,
+    );
+    const used = await this.activityRepo.count({
+      where: {
+        sourceKey: AI_ANALYSIS_SOURCE_KEY,
+        operation: 'ai_analysis',
+        outcome: 'allowed',
+        actorId: context.actorId,
+        createdAt: MoreThanOrEqual(windowStart),
+      },
+    });
+    return used >= context.perAdminLimit;
+  }
+
   /** Read-only SPEC-009 report; it does not touch a listing source or consume budget. */
   async report(sourceKey = 'auto-ria', now = new Date()): Promise<BudgetReportDigest | null> {
     const monthKey = RateBudgetService.monthKey(now);
@@ -203,7 +353,21 @@ export class RateBudgetService {
     const operationStates = this.operationStateRepo
       ? await this.operationStateRepo.find({ where: { sourceKey, monthKey } })
       : [];
-    return buildBudgetReport(state, activities, now, operationStates);
+    // Read from the AI source key separately and keep it out of the reconciliation inputs: folding
+    // those rows into `activities` would make `ledgerAllowed` disagree with the AUTO.RIA counter and
+    // report a phantom drift (SC-007).
+    const aiState = this.operationStateRepo
+      ? ((await this.operationStateRepo.findOne({
+          where: { sourceKey: AI_ANALYSIS_SOURCE_KEY, monthKey, operation: 'ai_analysis' },
+        })) ?? null)
+      : null;
+    const aiActivities = this.activityRepo
+      ? await this.activityRepo.find({ where: { sourceKey: AI_ANALYSIS_SOURCE_KEY, monthKey } })
+      : [];
+    return buildBudgetReport(state, activities, now, operationStates, {
+      state: aiState,
+      activities: aiActivities,
+    });
   }
 
   /** Remaining calls in the current hour window (legacy hourly mode). */
@@ -412,7 +576,7 @@ export class RateBudgetService {
     context: BudgetRequestContext,
     now: Date,
   ): Promise<BudgetDenialReason | null> {
-    if (context.operation !== 'valuation_ai') return null;
+    if (!ALLOCATED_OPERATIONS.includes(context.operation)) return null;
 
     const capacity = context.operationMonthlyAllocation;
     if (!isPositiveInteger(capacity) || !isPositiveInteger(cost)) {
@@ -453,7 +617,7 @@ export class RateBudgetService {
     operation: BudgetOperation,
     now: Date,
   ): Promise<void> {
-    if (operation !== 'valuation_ai' || !this.operationStateRepo) return;
+    if (!ALLOCATED_OPERATIONS.includes(operation) || !this.operationStateRepo) return;
     try {
       await this.operationStateRepo.query(
         `UPDATE operation_budget_states
@@ -487,15 +651,16 @@ export class RateBudgetService {
         priorityTier,
         profileId: context.profileId ?? null,
         profileName: context.profileName ?? null,
+        actorId: context.actorId ?? null,
         cost,
         outcome,
         reason,
         requestFingerprint: context.requestFingerprint ?? null,
         chargeStatus:
-          context.operation === 'valuation_ai' && outcome === 'denied'
+          isPaidOperation(context.operation) && outcome === 'denied'
             ? 'not_charged'
             : (context.chargeStatus ??
-              (context.operation === 'valuation_ai' ? 'unknown' : 'not_applicable')),
+              (isPaidOperation(context.operation) ? 'unknown' : 'not_applicable')),
       }),
     );
   }
@@ -523,6 +688,16 @@ export class RateBudgetService {
   private static monthStart(now: Date): Date {
     return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
   }
+
+  /** When a monthly allocation resets — named in an exhaustion refusal (US17.4 AS-2). */
+  private static nextMonthStart(now: Date): Date {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0));
+  }
+}
+
+/** Operations that spend real money with an external provider rather than source-pool requests. */
+function isPaidOperation(operation: BudgetOperation): boolean {
+  return operation === 'valuation_ai' || operation === 'ai_analysis';
 }
 
 function pad(n: number): string {

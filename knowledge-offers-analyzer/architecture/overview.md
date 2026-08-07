@@ -46,9 +46,9 @@ Implemented (spec 001). One NestJS module per concern:
 | `profiles` | SearchProfile config (niche + tuning; empty make/model = market-wide) | user-controlled params |
 | `query` | read-mostly on-demand queries for the bot (`assessById`, `topOpportunities`, `topCandidates`, `report`, `dealsOverview`, valuation audit, accident shadow report, `storedBreakdownById`) | powers `/check`, `/top`, `/best`, `/report`, `/why`, `/valuation_audit`, `/accident_shadow`, `/outcome`, `/deal`, `/deals`, the **Деталі** button; the audit, the accident report and `storedBreakdownById` read stored data only. |
 | `notifications` | Telegram bot, Subscriber, Notification, formatting, weekly report + calibration schedulers, **health monitor** (dead-man's-switch); **deal-outcome buttons** (🛒/❌) + `/deal`/`/deals` + `DealReminderService` (daily nudge to close bought-but-unsold deals, spec 007); **one breakdown builder** (`format/breakdown.ts`, spec 016) that every operator-facing surface renders from, reached from the alert by the 📋 **Деталі** button. Since spec 016 closed (2026-08-05) all three breakdown surfaces — the button, `/why`, `/check` — are thin adapters over it emitting the same sections in the same order, and `/check` is the only one that may spend a source request. The **alert body is deliberately not** one of them: it keeps its own compact seven-line vocabulary, frozen by SC-001 — see [[explainability-gaps]] | `Notifier` port |
-| `analysis` | **Planned (spec 017)** — `AnalysisProvider` port + adapter, pure context assembly (seller description quarantined in a delimited untrusted block), strict output validation, immutable `AiAnalysis` records, content-hash cache, dedicated budget allocation. Admin-only `/analyze_ai`, disabled by default | **`valuation` MUST NOT import `analysis`** — that separation is how the advisory-only boundary is enforced ([[0019-advisory-only-ai-analysis|ADR-0019]]) |
+| `analysis` | **Implemented, disabled by default (spec 017 phases 1–4, 2026-08-06/07)** — `AnalysisProvider` port + Anthropic adapter (`providers/anthropic-analysis.provider.ts`, forced tool call, no SDK dependency), pure context assembly (`analysis-context.ts`: seller description quarantined in a hash-derived delimited block), strict range-checked validation that discards a bad payload whole (`analysis-output.ts`), versioned `AnalysisPolicy`, immutable `AiAnalysis` records, a dedicated budget allocation under its own source key, and the **content-hash cache** on `(listingId, inputFactHash, promptVersion, modelId)` — consulted before admission, so a hit makes no request and charges nothing, with in-process single-flighting for simultaneous taps. Admin-only `/analyze_ai`. **Not yet built:** `/ai_audit`, the inline button, and the contradiction display (phase 5) | **`valuation` MUST NOT import `analysis`** — that separation is how the advisory-only boundary is enforced ([[0019-advisory-only-ai-analysis|ADR-0019]]), and `test/unit/analysis-module-boundary.spec.ts` fails CI if either `valuation` or `polling` ever imports it (the second guards FR-001: human-triggered only) |
 | `health` | `HealthService` (shared liveness singleton) + pure `decideHealthAlert`; poll marks success/failure, monitor alerts the operator | dead-man's-switch |
-| `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, operation allocations, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `valuation_ai` is a separate low-priority allocation inside that cap; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
+| `scheduling` | Postgres-backed monthly pool, daily sub-budget calculator, priority queue, operation allocations, and immutable `BudgetActivity` audit ledger | enforces the monthly cap with tiered spending; `valuation_ai` is a separate low-priority allocation inside that cap; `ai_analysis` (spec 017) is admitted by a **separate method under its own source key** (`tryConsumeAiAnalysis`, `AI_ANALYSIS_SOURCE_KEY`) so it can never decrement the AUTO.RIA pool, and reports as its own `/budget` line; `/budget` reconciles actual and deferred work by operation/profile/tier without source calls (SPEC-009) |
 | `polling` | cron pipeline: search profiles → fresh-listing value work plus bounded recovery of never-scored listings; **`SweepService`** (spec 004 US4.1b): daily 03:30 paged ids-only crawl of `filters.sweep` profiles → complete-sweep disappearance detection (30h grace) | scored-listing lifecycle rechecks are paused (SPEC-005); monthly pool + daily sub-budget; sweep ≈5,400 req/mo |
 | `fx` | `ExchangeRate` port + NBU adapter | UAH/USD normalization |
 
@@ -147,6 +147,24 @@ fully once daily by `SweepService` (paged, ids-only, budget-gated, ~5,400 req/mo
 ~17.9k-listing Kyiv ≤$15k niche); only a *complete* crawl runs detection, with a 30h grace so a
 single missed sweep never fabricates an event.
 
+**Advisory AI analysis** (SPEC-017 phases 1–3, 2026-08-06): admin-only `/analyze_ai <link>` in
+`notifications/telegram` calls `AnalysisService`, which runs a fixed gate order — **admission →
+assemble → call → validate → persist**. It reads only stored facts (`Listing` + its
+`lastExplanation`) and spends **zero AUTO.RIA requests** by construction. The advisory answer is
+rendered by its own formatter (`format/ai-analysis-message.ts`), deliberately *not* the spec-016
+breakdown builder, because ADR-0019 §8 requires the model's score to stay visually subordinate and
+separately labelled. Every terminal path — refusal, provider failure, invalid output, success —
+writes exactly one immutable `AiAnalysis` row, so a refusal is auditable evidence rather than
+silence. A **cache hit writes no row** — the record it serves is the record of that analysis — and
+is rendered marked, carrying its original capture time so a month-old opinion cannot read as fresh.
+The cache is consulted before the kill switch as well as before admission, which is what lets a
+stored analysis render in full with the provider disabled and no network (SC-005). Failed attempts
+are never cached: a timeout says nothing about the listing, and re-serving one would turn a
+transient provider fault into a permanent verdict. The non-influence property is asserted, not assumed: `test/unit/analysis-non-influence.spec.ts`
+scores the corpus in two isolated module registries, one where `analysis` was loaded and exercised
+and one where it was never required, and compares the score chain and alert set bit-for-bit. Ships
+disabled ([[0019-advisory-only-ai-analysis|ADR-0019]]); the cache and audit surfaces are unbuilt.
+
 ## Entities / data model
 
 - **SearchProfile** — a configured niche to watch (region + make/models + price band + `minDealScore`).
@@ -163,8 +181,14 @@ single missed sweep never fabricates an event.
 - **Subscriber / Notification** — Telegram users and what's been sent (idempotent).
 - **FairValueBenchmark / AveragePriceSnapshot** — cached cohort average (latest) + its time-series.
 - **RateBudgetWindow** — durable request-budget ledger used by the monthly pool / daily sub-budget accounting.
+- **AiAnalysis** — immutable, insert-only record of one advisory-analysis attempt (spec 017): model
+  id, prompt version, sampling parameters, input fact snapshot + hash, validated output (or null),
+  terminal status/reason, triggering admin, capture time. Indexed on
+  `(listingId, inputFactHash, promptVersion, modelId)` — the future cache key — and on `capturedAt`.
+  A re-analysis inserts a new row; nothing ever updates one.
 - **OperationBudgetState** — atomic per-operation allocation state; `valuation_ai` cannot exceed its
-  configured monthly allowance even when the shared AUTO.RIA pool has headroom.
+  configured monthly allowance even when the shared AUTO.RIA pool has headroom. `ai_analysis` uses
+  the same mechanism under the separate `ai-analysis` source key (spec 017).
 - **BudgetActivity** — immutable allowed/denied monthly-pool admission attempt with operation,
   profile (when applicable), priority tier, cost, and reason; the audit input to `/budget` and
   SPEC-005's rollout guardrail (SPEC-009).

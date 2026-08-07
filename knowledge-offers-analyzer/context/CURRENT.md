@@ -1,7 +1,7 @@
 ---
 title: Current task handoff
 type: context
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # Current task handoff
@@ -10,6 +10,44 @@ updated: 2026-08-05
 > file as a second roadmap.
 
 ## Active work
+
+**SPEC-017 phase 4 — content-hash cache implemented 2026-08-07 (T026–T029).** `/analyze_ai` now
+looks up `ai_analyses` on `(listingId, inputFactHash, promptVersion, modelId)` **before** budget
+admission *and before the kill switch* — a hit makes no provider request, charges nothing, and
+renders the stored answer marked as cached with its **original** capture time. Simultaneous taps on
+one listing are single-flighted in process, so two admins produce one provider request. A changed
+price, description, or source fact moves the hash and misses; a `promptVersion` or `modelId` change
+misses too. Failed attempts are never cached, and **a hit writes no new row** — which leaves phase
+5's `/ai_audit` cache-hit rate needing an invocation counter (flagged in `tasks.md` and the log).
+Decisions: `context/log/2026-08-07-ai-analysis-cache.md`.
+
+Verification: `typecheck`, `lint`, unit Jest **652/652** (74 suites), contract Jest **108/108**,
+`nest build` — all pass; T008 re-run as the phase exit condition.
+
+**SPEC-017 on-demand AI analysis — MVP implemented 2026-08-06 (phases 1–3, T001–T025).**
+Admin-only `/analyze_ai <link>`: a new `src/modules/analysis/` module with a pure context builder
+(seller text quarantined inside a **hash-derived** delimiter it cannot close), strict range-checked
+validation that discards a bad payload whole, a versioned `AnalysisPolicy`, an `AnalysisProvider`
+port with an **Anthropic** adapter (forced tool call, one `undici` POST, no new dependency), an
+immutable insert-only `AiAnalysis` record, and a dedicated `ai_analysis` allocation admitted under
+its **own source key** so it can never decrement the AUTO.RIA pool. Every terminal path — refusal,
+provider failure, invalid output, success — writes exactly one row.
+
+**It ships disabled** (`AI_ANALYSIS_ENABLED=false`, zero allocation) and the additive migration
+`1785400000000-spec-017-ai-analysis.ts` was **not applied**. T037's four operator gates are
+untouched: provider credentials, approved terms, lawfulness of sending listing content, an agreed
+monthly cap. Phase 4 landed the next day (see the active-work section above); **phase 5**
+(`/ai_audit`, inline button, contradiction display) remains open.
+
+One vault contradiction was found and **fixed in code, not in the note**: the advisory score is
+0–10 per `domain/glossary.md`, not 0–100 — a second 0–100 number beside the Total Deal Score would
+read as a competing verdict, which is the anchoring ADR-0019 §8 forbids. Decisions and what was
+deliberately not done: `context/log/2026-08-06-on-demand-ai-analysis.md`.
+
+Verification (native Windows `npm.cmd`): `typecheck`, `lint`, unit Jest **637/637** (73 suites),
+contract Jest **108/108**, `nest build` — all pass.
+
+## Previously (still current)
 
 **Drivetrain-banded cohort tiers — implemented 2026-08-06 ([[0024-drivetrain-banded-cohort-tiers|ADR-0024]]).**
 The cohort ladder gained two tiers above the year±1 cohort: exact year + gearbox + fuel, then year±1
@@ -40,8 +78,6 @@ gates. Decisions and what was deliberately *not* done:
 Verification (native Windows `npm.cmd`): `typecheck`, `lint`, Jest 1896/1897 — the single failure is
 a pre-existing timeout flake in the stale `.claude/worktrees/recursing-chandrasekhar-4293e8` copy,
 not in the real tree.
-
-## Previously (still current)
 
 **SPEC-016 — fully implemented 2026-08-05 (T001–T022, all four user stories).**
 
@@ -156,12 +192,16 @@ flip should be presented alongside the combined rollout. See
 
 ## Next pickup
 
-With SPEC-016 closed, the only remaining **ungated** engineering work is
-`017-on-demand-ai-analysis`, and even that ships disabled behind operator gates (provider
-credentials, approved terms, lawfulness of sending listing content, an agreed monthly cap —
-[[0019-advisory-only-ai-analysis|ADR-0019]]). Everything else — the `k` rollout, SPEC-006's monetary
-slices, SPEC-018 phase 3 — waits on evidence gates or the month-long accident shadow window, not on
-code. **The next material step is operator/evidence work, not engineering.**
+With phases 1–4 in, the remaining **ungated** engineering work on SPEC-017 is **phase 5** —
+`/ai_audit`, the inline-button shortcut, and the contradiction display (T030–T033). Start T031 by
+deciding where a cache hit is counted: it deliberately writes no `ai_analyses` row, so the specified
+cache-hit rate has no source yet. None of it can be exercised end-to-end until an operator enables
+the provider, but it is all pure code.
+
+Everything else — the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence
+gates or the month-long accident shadow window (which opened on the first production poll after the
+2026-08-03 phase-2 deploy), not on code. **The next material product step is still operator/evidence
+work, not engineering.**
 
 If the pickup is instead SPEC-015, read this handoff and
 `specs/015-defensible-valuation-evidence/quickstart.md`.
