@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { AppConfig } from '../../common/config/configuration';
 import { Listing } from '../listings/entities/listing.entity';
 import { Opportunity } from '../valuation/entities/opportunity.entity';
 
@@ -10,6 +12,7 @@ import { Subscriber } from './entities/subscriber.entity';
 import { formatOpportunity, formatPriceDrop } from './format/opportunity-message';
 import { Notifier, NOTIFIER, OutboundButton } from './ports/notifier.port';
 import { SubscribersService } from './subscribers.service';
+import { buildAnalyzeCallback } from './telegram/analyze-callback';
 import { buildDealCallback } from './telegram/deal-callback';
 import { buildDetailsCallback } from './telegram/details-callback';
 import { buildOutcomeCallback } from './telegram/outcome-callback';
@@ -22,8 +25,12 @@ import { buildOutcomeCallback } from './telegram/outcome-callback';
  * Buttons are the whole delivery mechanism for spec 016: the pushed **body** keeps its current line
  * count (SC-001), because detail the operator did not ask for is spam on a phone screen.
  */
-function alertButtons(opportunityId: string, listingId: string): OutboundButton[][] {
-  return [
+function alertButtons(
+  opportunityId: string,
+  listingId: string,
+  isAdmin = false,
+): OutboundButton[][] {
+  const rows: OutboundButton[][] = [
     [
       { text: '👍 Вдала', data: buildOutcomeCallback('good', opportunityId) },
       { text: '👎 Невдала', data: buildOutcomeCallback('bad', opportunityId) },
@@ -34,6 +41,12 @@ function alertButtons(opportunityId: string, listingId: string): OutboundButton[
     ],
     [{ text: '📋 Деталі', data: buildDetailsCallback(listingId) }],
   ];
+  // Spec 017 T032. Only admins get the row: the handler gates on `isAdmin` anyway, but offering a
+  // button that answers "this command is for administrators only" to everyone else is a worse
+  // interface than not offering it. Its own row, below `Деталі`, because it is a different kind of
+  // action — it spends money and returns an opinion, not a stored breakdown.
+  if (isAdmin) rows.push([{ text: '🤖 AI-аналіз', data: buildAnalyzeCallback(listingId) }]);
+  return rows;
 }
 
 /** Sends opportunity alerts to active subscribers, idempotently (unique dedupKey — FR-008). */
@@ -43,7 +56,12 @@ export class NotificationsService {
     private readonly subscribers: SubscribersService,
     @InjectRepository(Notification) private readonly notifications: Repository<Notification>,
     @Inject(NOTIFIER) private readonly notifier: Notifier,
+    private readonly config: ConfigService<AppConfig, true>,
   ) {}
+
+  private isAdminChat(chatId: string): boolean {
+    return this.config.get('telegramAdminChatIds', { infer: true }).includes(chatId);
+  }
 
   async notifyOpportunity(opportunity: Opportunity, listing: Listing): Promise<void> {
     const recipients = await this.activeRecipientsForProfile(opportunity.profileId);
@@ -59,7 +77,7 @@ export class NotificationsService {
       await this.notifier.send({
         chatId: sub.telegramChatId,
         text,
-        buttons: alertButtons(opportunity.id, listing.id),
+        buttons: alertButtons(opportunity.id, listing.id, this.isAdminChat(sub.telegramChatId)),
       });
       await this.notifications.save(
         this.notifications.create({
@@ -90,7 +108,7 @@ export class NotificationsService {
       await this.notifier.send({
         chatId: sub.telegramChatId,
         text,
-        buttons: alertButtons(opportunity.id, listing.id),
+        buttons: alertButtons(opportunity.id, listing.id, this.isAdminChat(sub.telegramChatId)),
       });
       await this.notifications.save(
         this.notifications.create({

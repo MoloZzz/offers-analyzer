@@ -96,10 +96,17 @@ function buildHarness(options: {
     findOne: () => Promise.resolve(null),
   } as unknown as Repository<AiAnalysis>;
 
-  const service = new AnalysisService(config, listings, analyses, budget, provider, {
-    warn: jest.fn(),
-    error: jest.fn(),
-  } as never);
+  const service = new AnalysisService(
+    config,
+    listings,
+    analyses,
+    budget,
+    provider,
+    { warn: jest.fn(), error: jest.fn() } as never,
+    // No curated repair-risk table loaded: the contradiction display is
+    // `analysis-contradiction.spec.ts`'s subject, not this file's.
+    { get: () => ({}) } as never,
+  );
   return { service, rows, analyze, tryConsumeAiAnalysis, release };
 }
 

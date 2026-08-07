@@ -60,8 +60,20 @@ export interface AnalysisOutput {
   reliabilityNotes: string[];
 }
 
-/** Terminal state of one attempt. Every one of these is persisted (FR-008). */
-export type AnalysisStatus = 'available' | 'refused' | 'unavailable' | 'invalid_output';
+/**
+ * Terminal state of one invocation. Every one of these is persisted (FR-008).
+ *
+ * `cached` is a **marker**: an invocation served from a stored answer, carrying no `output` of its
+ * own (the record it served already holds it). It exists so `/ai_audit` can report a cache-hit rate
+ * (T031) — without it, the cheapest invocations would be the only invisible ones. Cache lookups
+ * filter on `available`, so a marker can never satisfy one.
+ */
+export type AnalysisStatus =
+  | 'available'
+  | 'cached'
+  | 'refused'
+  | 'unavailable'
+  | 'invalid_output';
 
 export type AnalysisTerminalReason =
   | 'ok'

@@ -2,7 +2,7 @@
   "version": 1,
   "metrics": {
     "notes": 54,
-    "links": 517,
+    "links": 518,
     "dangling": 0,
     "ambiguous": 0,
     "caseMismatch": 0,
@@ -329,7 +329,7 @@
       "title": "Domain glossary",
       "type": "domain",
       "inDeg": 12,
-      "outDeg": 24
+      "outDeg": 25
     },
     {
       "rel": "operations/environment-setup.md",
@@ -982,7 +982,7 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 220
+      "line": 231
     },
     {
       "from": "architecture/overview.md",
@@ -1010,14 +1010,14 @@
       "to": "architecture/persistence-surface.md",
       "anchor": null,
       "embed": false,
-      "line": 223
+      "line": 234
     },
     {
       "from": "architecture/overview.md",
       "to": "decisions/0002-monitoring-via-official-api.md",
       "anchor": null,
       "embed": false,
-      "line": 205
+      "line": 216
     },
     {
       "from": "architecture/overview.md",
@@ -1038,7 +1038,7 @@
       "to": "decisions/0005-versioned-parameter-sets.md",
       "anchor": null,
       "embed": false,
-      "line": 195
+      "line": 206
     },
     {
       "from": "architecture/overview.md",
@@ -1115,7 +1115,7 @@
       "to": "decisions/0017-shadow-valuation-evidence.md",
       "anchor": null,
       "embed": false,
-      "line": 208
+      "line": 219
     },
     {
       "from": "architecture/overview.md",
@@ -1136,7 +1136,7 @@
       "to": "decisions/0019-advisory-only-ai-analysis.md",
       "anchor": null,
       "embed": false,
-      "line": 166
+      "line": 177
     },
     {
       "from": "architecture/overview.md",
@@ -1164,14 +1164,14 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 222
+      "line": 233
     },
     {
       "from": "architecture/overview.md",
       "to": "domain/glossary.md",
       "anchor": null,
       "embed": false,
-      "line": 221
+      "line": 232
     },
     {
       "from": "architecture/overview.md",
@@ -1199,7 +1199,7 @@
       "to": "research/monitoring-approaches.md",
       "anchor": null,
       "embed": false,
-      "line": 205
+      "line": 216
     },
     {
       "from": "architecture/overview.md",
@@ -1213,7 +1213,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 177
+      "line": 188
     },
     {
       "from": "architecture/overview.md",
@@ -1227,7 +1227,7 @@
       "to": "research/when-to-alert.md",
       "anchor": null,
       "embed": false,
-      "line": 199
+      "line": 210
     },
     {
       "from": "architecture/overview.md",
@@ -1241,28 +1241,28 @@
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 55
+      "line": 57
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "conventions/coding-standards.md",
       "anchor": null,
       "embed": false,
-      "line": 56
+      "line": 58
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "decisions/0015-hybrid-executable-vault.md",
       "anchor": null,
       "embed": false,
-      "line": 57
+      "line": 59
     },
     {
       "from": "architecture/persistence-surface.md",
       "to": "operations/environment-setup.md",
       "anchor": null,
       "embed": false,
-      "line": 58
+      "line": 60
     },
     {
       "from": "business/how-it-works.md",
@@ -3054,14 +3054,14 @@
       "to": "00-INDEX.md",
       "anchor": null,
       "embed": false,
-      "line": 71
+      "line": 72
     },
     {
       "from": "domain/glossary.md",
       "to": "architecture/overview.md",
       "anchor": null,
       "embed": false,
-      "line": 72
+      "line": 73
     },
     {
       "from": "domain/glossary.md",
@@ -3163,6 +3163,13 @@
     },
     {
       "from": "domain/glossary.md",
+      "to": "decisions/0019-advisory-only-ai-analysis.md",
+      "anchor": null,
+      "embed": false,
+      "line": 58
+    },
+    {
+      "from": "domain/glossary.md",
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
@@ -3173,7 +3180,7 @@
       "to": "decisions/0020-graded-accident-risk.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 66
     },
     {
       "from": "domain/glossary.md",
@@ -3201,7 +3208,7 @@
       "to": "decisions/README.md",
       "anchor": null,
       "embed": false,
-      "line": 67
+      "line": 68
     },
     {
       "from": "domain/glossary.md",
@@ -3215,7 +3222,7 @@
       "to": "research/profitability-definition.md",
       "anchor": null,
       "embed": false,
-      "line": 65
+      "line": 66
     },
     {
       "from": "operations/environment-setup.md",

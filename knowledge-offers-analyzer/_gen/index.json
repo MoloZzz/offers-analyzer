@@ -334,35 +334,35 @@
           "level": 2,
           "text": "Data flow",
           "line": 55,
-          "endLine": 167
+          "endLine": 178
         },
         {
           "n": 5,
           "level": 2,
           "text": "Entities / data model",
-          "line": 168,
-          "endLine": 202
+          "line": 179,
+          "endLine": 213
         },
         {
           "n": 6,
           "level": 2,
           "text": "Boundaries & integrations",
-          "line": 203,
-          "endLine": 211
+          "line": 214,
+          "endLine": 222
         },
         {
           "n": 7,
           "level": 2,
           "text": "Related",
-          "line": 212,
-          "endLine": 213
+          "line": 223,
+          "endLine": 224
         },
         {
           "n": 8,
           "level": 2,
           "text": "Runtime monitoring control",
-          "line": 214,
-          "endLine": 224
+          "line": 225,
+          "endLine": 235
         }
       ]
     },
@@ -380,28 +380,28 @@
           "level": 2,
           "text": "Source of truth",
           "line": 18,
-          "endLine": 40
+          "endLine": 42
         },
         {
           "n": 2,
           "level": 2,
           "text": "Review boundary",
-          "line": 41,
-          "endLine": 46
+          "line": 43,
+          "endLine": 48
         },
         {
           "n": 3,
           "level": 2,
           "text": "Generated evidence",
-          "line": 47,
-          "endLine": 52
+          "line": 49,
+          "endLine": 54
         },
         {
           "n": 4,
           "level": 2,
           "text": "Related",
-          "line": 53,
-          "endLine": 59
+          "line": 55,
+          "endLine": 61
         }
       ]
     },
@@ -1711,15 +1711,15 @@
           "n": 1,
           "level": 2,
           "text": "Business rules",
-          "line": 62,
-          "endLine": 68
+          "line": 63,
+          "endLine": 69
         },
         {
           "n": 2,
           "level": 2,
           "text": "Related",
-          "line": 69,
-          "endLine": 73
+          "line": 70,
+          "endLine": 74
         }
       ]
     },

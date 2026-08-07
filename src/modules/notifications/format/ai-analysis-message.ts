@@ -1,3 +1,4 @@
+import { RepairRiskContradiction } from '../../analysis/analysis-contradiction';
 import { AnalysisOutput, AnalysisWarningSeverity } from '../../analysis/analysis.types';
 
 /**
@@ -23,7 +24,21 @@ export interface AiAnalysisView {
   output: AnalysisOutput;
   /** Set when the answer is served from a stored record rather than a fresh call (FR-005). */
   cached?: boolean;
+  /** A disagreement with a curated repair-risk entry, shown side by side and never resolved. */
+  contradiction?: RepairRiskContradiction | null;
 }
+
+const TIER_LABELS: Record<RepairRiskContradiction['curatedTier'], string> = {
+  LOW: 'низький ризик ремонту',
+  MEDIUM: 'середній ризик ремонту',
+  HIGH: 'високий ризик ремонту',
+};
+
+const VIA_LABELS: Record<RepairRiskContradiction['curatedVia'], string> = {
+  model: 'моделлю авто',
+  make: 'маркою',
+  pattern: 'патерном',
+};
 
 const SEVERITY_LABELS: Record<AnalysisWarningSeverity, string> = {
   high: '🔴 висока',
@@ -67,6 +82,8 @@ export function formatAiAnalysis(view: AiAnalysisView): string {
     lines.push(...output.reliabilityNotes.map((item) => `• ${item}`));
   }
 
+  if (view.contradiction) lines.push('', ...contradictionLines(view.contradiction));
+
   lines.push(
     '',
     '— — —',
@@ -83,6 +100,32 @@ export function formatAiAnalysis(view: AiAnalysisView): string {
   );
 
   return lines.join('\n');
+}
+
+/**
+ * T033 — both sides, side by side, with the conflict named and nothing reconciled (FR-011).
+ *
+ * The operator is the only party with standing to judge here: the curated table is a human-edited,
+ * versioned artefact, and the model's claim is unverified opinion. So this renders the disagreement
+ * and stops. No automatic path writes the model's claim into the curated table, and none exists.
+ */
+function contradictionLines(c: RepairRiskContradiction): string[] {
+  const curated =
+    `• Наша таблиця (${c.tableVersion}, за ${VIA_LABELS[c.curatedVia]}): ` +
+    `${TIER_LABELS[c.curatedTier]} — ${c.curatedReason}`;
+  const model =
+    c.modelWarnings.length > 0
+      ? c.modelWarnings.map((w) => `• Модель: ${w.code} (${SEVERITY_LABELS[w.severity]}) — ${w.rationale}`)
+      : ['• Модель: жодного ризику не назвала'];
+
+  return [
+    c.kind === 'model_more_severe'
+      ? '⚡ Розбіжність: модель бачить серйозніший ризик, ніж наша таблиця'
+      : '⚡ Розбіжність: наша таблиця бачить серйозніший ризик, ніж модель',
+    curated,
+    ...model,
+    'Нічого не звірено автоматично: таблицю змінює тільки людина, а твердження моделі не перевірене.',
+  ];
 }
 
 /** 0–10, at most one decimal — a scale that cannot be mistaken for the 0–100 Total Deal Score. */

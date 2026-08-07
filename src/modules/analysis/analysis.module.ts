@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Listing } from '../listings/entities/listing.entity';
 import { SchedulingModule } from '../scheduling/scheduling.module';
+import { HeuristicTablesService } from '../valuation/factors/tables';
 
 import { AnalysisService } from './analysis.service';
 import { AiAnalysis } from './entities/ai-analysis.entity';
@@ -25,6 +26,12 @@ import { AnthropicAnalysisProvider } from './providers/anthropic-analysis.provid
     AnalysisService,
     AnthropicAnalysisProvider,
     { provide: ANALYSIS_PROVIDER, useExisting: AnthropicAnalysisProvider },
+    // Provided here rather than imported from `ValuationModule` on purpose. The contradiction
+    // display (T033) needs to *read* the curated repair-risk table, but importing ValuationModule
+    // would drag `SourcesModule` — and therefore `LISTING_SOURCE` — into this injector, making a
+    // source request reachable from a feature that must never make one. Same reasoning as the
+    // spec-016 callback module. The service only reads versioned config files from disk.
+    HeuristicTablesService,
   ],
   exports: [AnalysisService],
 })

@@ -17,6 +17,7 @@ import { formatReport } from '../../query/report';
 import { formatBudgetReport } from '../../scheduling/budget-report';
 import { SourceControlService } from '../../scheduling/source-control.service';
 import { formatAccidentShadow } from '../format/accident-shadow-message';
+import { formatAiAnalysisAudit } from '../format/ai-analysis-audit-message';
 import { formatAiAnalysis } from '../format/ai-analysis-message';
 import { buildBreakdown, renderBreakdownSections } from '../format/breakdown';
 import { formatCalibration } from '../format/calibration-message';
@@ -27,6 +28,7 @@ import { formatWeights } from '../format/weights-message';
 import { formatStoredWhy, formatWhy } from '../format/why-message';
 import { SubscribersService } from '../subscribers.service';
 
+import { parseAnalyzeCallback } from './analyze-callback';
 import { parseDealArgs, splitDealCommand } from './deal-args';
 import { buildDeclineReasonCallback, parseDealCallback } from './deal-callback';
 import { parseDetailsCallback, splitIntoMessages } from './details-callback';
@@ -136,6 +138,48 @@ export class TelegramBotUpdate {
     }
   }
 
+  /**
+   * Spec 017 T032 — the `🤖 AI-аналіз` button under an alert, routing to the same path as the
+   * command. Deliberately **not** merged with spec 016's `Деталі` handler: that one is free and
+   * open to every subscriber, this one is admin-only and spends money.
+   */
+  @Action(/^ai:/)
+  async onAnalyzeButton(@Ctx() ctx: Context): Promise<void> {
+    const cq = ctx.callbackQuery;
+    const data = cq && 'data' in cq ? cq.data : '';
+    const listingId = parseAnalyzeCallback(data);
+    if (!listingId) {
+      await ctx.answerCbQuery();
+      return;
+    }
+    if (!this.isAdmin(ctx)) {
+      // The button is only attached for admin recipients; this is the second gate, for a forwarded
+      // message or a shared chat.
+      await ctx.answerCbQuery('Тільки для адміністраторів');
+      return;
+    }
+    const chatId = ctx.chat?.id;
+    if (chatId == null) {
+      await ctx.answerCbQuery();
+      return;
+    }
+
+    await ctx.answerCbQuery('Запитую AI-аналіз…');
+    const attempt = await this.analysis.analyze({ listingId, actorId: String(chatId) });
+    for (const part of splitIntoMessages([this.renderAnalysis(attempt)])) {
+      await ctx.reply(part);
+    }
+  }
+
+  /** Spec 017 US17.5. Read-only over persisted attempts — no provider request, no state change. */
+  @Command('ai_audit')
+  async onAiAudit(@Ctx() ctx: Context): Promise<void> {
+    if (!this.isAdmin(ctx)) return this.replyAdminOnly(ctx);
+    const days = Number.parseInt(commandArg(ctx).trim(), 10);
+    const windowDays = Number.isFinite(days) && days > 0 ? Math.min(days, 365) : 30;
+    await ctx.reply(formatAiAnalysisAudit(await this.analysis.audit(windowDays)));
+  }
+
   /** Every terminal state gets an explicit reply; nothing from a failed attempt is rendered. */
   private renderAnalysis(attempt: AnalysisAttempt): string {
     switch (attempt.status) {
@@ -165,6 +209,7 @@ export class TelegramBotUpdate {
           capturedAt: attempt.record.capturedAt,
           output: attempt.record.output as AnalysisOutput,
           cached: attempt.status === 'cached',
+          contradiction: attempt.contradiction,
         });
     }
   }

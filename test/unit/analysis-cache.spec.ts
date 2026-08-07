@@ -114,10 +114,17 @@ function buildHarness(options: { modelId?: string; outcome?: AnalysisProviderOut
       ),
   } as unknown as Repository<AiAnalysis>;
 
-  const service = new AnalysisService(config, listings, analyses, budget, provider, {
-    warn: jest.fn(),
-    error: jest.fn(),
-  } as never);
+  const service = new AnalysisService(
+    config,
+    listings,
+    analyses,
+    budget,
+    provider,
+    { warn: jest.fn(), error: jest.fn() } as never,
+    // No curated repair-risk table loaded: the contradiction display is
+    // `analysis-contradiction.spec.ts`'s subject, not this file's.
+    { get: () => ({}) } as never,
+  );
 
   return {
     service,
@@ -193,14 +200,18 @@ describe('SPEC-017 cache — a repeat request costs nothing (SC-004, AS-1)', () 
     expect(second.record.capturedAt).toEqual(first.record.capturedAt);
   });
 
-  it('writes no second row — the served record is the record of that analysis (SC-006)', async () => {
+  it('records each hit as a marker, never as a second copy of the answer (T031)', async () => {
     const h = buildHarness();
 
     await h.run();
     await h.run();
     await h.run();
 
-    expect(h.rows).toHaveLength(1);
+    // One provider attempt carrying the output, two markers carrying none. The markers are what
+    // make `/ai_audit`'s cache-hit rate computable; duplicating the output would be the waste.
+    expect(h.rows.map((r) => r.status)).toEqual(['available', 'cached', 'cached']);
+    expect(h.rows.filter((r) => r.output).length).toBe(1);
+    expect(h.rows.every((r) => r.actorId === '77')).toBe(true);
   });
 
   it('serves a different admin from the same cache', async () => {
@@ -228,7 +239,7 @@ describe('SPEC-017 cache — a changed listing misses (AS-3)', () => {
 
     expect(second.status).toBe('available');
     expect(h.analyze).toHaveBeenCalledTimes(2);
-    expect(h.rows).toHaveLength(2);
+    expect(h.rows.map((r) => r.status)).toEqual(['available', 'available']);
   });
 });
 
@@ -299,7 +310,8 @@ describe('SPEC-017 cache — concurrent taps single-flight (T029)', () => {
     expect(h.tryConsumeAiAnalysis).toHaveBeenCalledTimes(1);
     expect(a.status).toBe('available');
     expect(b.status).toBe('cached');
-    expect(h.rows).toHaveLength(1);
+    // The joined caller is a cache hit too, and is marked as one.
+    expect(h.rows.map((r) => r.status)).toEqual(['available', 'cached']);
   });
 
   it('releases the key afterwards, so a later request is served from the stored cache', async () => {

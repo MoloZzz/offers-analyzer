@@ -83,5 +83,5 @@ vault:show	node tools/vault/v.mjs show
 vault:test	node --test tools/vault/test/core.test.mjs tools/vault/test/evidence.test.mjs tools/vault/test/offers-adapter.test.mjs
 
 ## TEST COUNTS
-unit	cases=484 files=66
+unit	cases=520 files=69
 integration	cases=23 files=4

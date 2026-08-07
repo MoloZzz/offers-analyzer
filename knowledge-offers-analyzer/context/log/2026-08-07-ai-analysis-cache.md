@@ -27,7 +27,11 @@ own table, so there is no cost or legal exposure to gate. Worth knowing the trad
 flips the kill switch still sees previously-produced answers on request. That is the intended
 reading of "rendering always reads the record" (FR-009), not an oversight.
 
-**A cache hit writes no new row.** The record it serves *is* the record of that analysis; inserting
+**A cache hit writes no new row.** *(Superseded the same day by phase 5 — a hit now writes a
+`cached` marker row, because `/ai_audit`'s cache-hit rate had no other source. See
+`2026-08-07-ai-analysis-audit-and-contradictions.md`. The reasoning below is retained as the record
+of what was decided and why it did not survive contact with T031.)* The record it serves *is* the
+record of that analysis; inserting
 a copy per tap would inflate `/ai_audit`, duplicate the stored `output` jsonb, and make "one
 immutable record per attempt" (SC-006) mean something weaker. **Consequence for phase 5:**
 `/ai_audit` is specified to report a cache-hit *rate*, and hits are currently uncounted. T031 has to

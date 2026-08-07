@@ -37,19 +37,41 @@ export function repairRiskFactor(
   const model = input.model?.trim().toLowerCase();
   if (!make || !model) return null; // no data → neutral (omitted)
 
-  // 1) Explicit model tier
+  const resolved = resolveRepairRiskTier(input, table);
+  if (resolved) return buildResult(resolved.tier, bounds, resolved.reason);
+
+  // Unknown → neutral with reason
+  return { factor: 'repair-risk', modifier: 1, subScore100: toSubScore100(1), reasons: ['ризик ремонтності невідомий'] };
+}
+
+/** What the curated table says about a listing, and why. `null` = the table has no opinion. */
+export interface ResolvedRepairRisk {
+  tier: RepairRiskTier;
+  reason: string;
+  /** How the tier was reached — a model entry, a make entry, or a pattern rule. */
+  via: 'model' | 'make' | 'pattern';
+}
+
+/**
+ * The curated table's verdict, split out of `repairRiskFactor` so a reader can consult the table
+ * **without** taking a scoring modifier with it (spec 017 T033 shows the curated tier beside a
+ * model's claim). Resolution order is unchanged: explicit model, explicit make, then pattern rules,
+ * preferring HIGH > MEDIUM > LOW. Nothing here writes; the curated table is edited only by a human.
+ */
+export function resolveRepairRiskTier(
+  input: RepairRiskInput,
+  table: RepairRiskTable,
+): ResolvedRepairRisk | null {
+  const make = input.make?.trim().toLowerCase();
+  const model = input.model?.trim().toLowerCase();
+  if (!make || !model) return null;
+
   const modelTier = table.models[`${make}|${model}`];
-  if (modelTier) {
-    return buildResult(modelTier, bounds, TIER_REASON[modelTier]);
-  }
+  if (modelTier) return { tier: modelTier, reason: TIER_REASON[modelTier], via: 'model' };
 
-  // 2) Explicit make tier
   const makeTier = table.makes[make];
-  if (makeTier) {
-    return buildResult(makeTier, bounds, TIER_REASON[makeTier]);
-  }
+  if (makeTier) return { tier: makeTier, reason: TIER_REASON[makeTier], via: 'make' };
 
-  // 3) Pattern matching (gearbox/engine/fuel/age) — prefer HIGH > MEDIUM > LOW
   const currentYear = new Date().getFullYear();
   const age = input.year ? currentYear - input.year : undefined;
 
@@ -57,7 +79,6 @@ export function repairRiskFactor(
   let bestReason = '';
   for (const pattern of table.patterns) {
     if (!matchesPattern(pattern, input, age)) continue;
-    // Prefer HIGH > MEDIUM > LOW
     if (
       pattern.tier === 'HIGH' ||
       (pattern.tier === 'MEDIUM' && bestTier !== 'HIGH') ||
@@ -68,12 +89,7 @@ export function repairRiskFactor(
     }
   }
 
-  if (bestTier) {
-    return buildResult(bestTier, bounds, bestReason);
-  }
-
-  // 4) Unknown → neutral with reason
-  return { factor: 'repair-risk', modifier: 1, subScore100: toSubScore100(1), reasons: ['ризик ремонтності невідомий'] };
+  return bestTier ? { tier: bestTier, reason: bestReason, via: 'pattern' } : null;
 }
 
 function matchesPattern(

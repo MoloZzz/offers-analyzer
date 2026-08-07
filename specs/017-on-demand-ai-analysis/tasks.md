@@ -2,16 +2,17 @@
 
 **Spec**: `spec.md` · **Plan**: `plan.md` · **Created**: 2026-08-03
 
-**Status 2026-08-07: phases 1–4 (T001–T029) implemented, plus the phase-6 vault and verification
-tasks.** The feature ships **disabled** — `AI_ANALYSIS_ENABLED=false` with a zero allocation — and
-T037's four operator gates are untouched. Still open: **phase 5** (`/ai_audit`, inline button,
-contradiction display, T030–T033). Vendor for the first adapter: **Anthropic** (operator decision,
-2026-08-06).
+**Status 2026-08-07: complete (T001–T036). Only T037's operator gates remain.** The feature ships
+**disabled** — `AI_ANALYSIS_ENABLED=false` with a zero allocation — and the additive migration
+`1785400000000-spec-017-ai-analysis.ts` has not been applied. Vendor for the first adapter:
+**Anthropic** (operator decision, 2026-08-06).
 
-Note for phase 5: `/ai_audit` reports a **cache-hit rate**, and a cache hit deliberately writes no
-`ai_analyses` row (the record it serves is the record of that analysis). So T031 must first decide
-where invocations are counted — a zero-cost ledger entry, a counter, or a `servedFromCache` marker
-row. That decision is not made here.
+Phase 5 settled the question phase 4 left open. `/ai_audit` reports a **cache-hit rate**, and phase 4
+wrote no row for a hit, leaving that number without a source. A hit now writes a `cached` **marker**
+row (no `output` of its own), which keeps FR-008 literally true — every invocation has exactly one
+immutable record — and needs no schema change. A zero-cost ledger entry was rejected (it would put a
+non-spend event in the spend ledger); a separate counter was rejected (a second source of truth about
+invocations, reconcilable with nothing).
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -119,12 +120,12 @@ New module `src/modules/analysis/` (pure logic + port + adapters), entity under
 
 ## Phase 5: User Story 17.5 — Immutable record and audit (P2)
 
-- [ ] T030 [P] [US17.5] Test: an analysis stored last month renders identically today with the
+- [x] T030 [P] [US17.5] Test: an analysis stored last month renders identically today with the
       provider disabled and no network (SC-005); records are never mutated (SC-006).
-- [ ] T031 [US17.5] Admin-only `/ai_audit` — recent attempts with status, cache-hit rate, spend.
-- [ ] T032 [US17.5] Inline-button shortcut under alerts routing to the same `/analyze_ai` path.
+- [x] T031 [US17.5] Admin-only `/ai_audit` — recent attempts with status, cache-hit rate, spend.
+- [x] T032 [US17.5] Inline-button shortcut under alerts routing to the same `/analyze_ai` path.
       Distinct from SPEC-016's `Деталі` button; the two must not be merged.
-- [ ] T033 [US17.5] Contradiction display: when a model reliability claim conflicts with a curated
+- [x] T033 [US17.5] Contradiction display: when a model reliability claim conflicts with a curated
       repair-risk table entry, show both and flag the conflict. **Never auto-reconcile, never write
       to the curated table** (FR-011).
 

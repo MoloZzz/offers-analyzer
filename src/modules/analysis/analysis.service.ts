@@ -2,13 +2,23 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { AppConfig } from '../../common/config/configuration';
 import { Listing } from '../listings/entities/listing.entity';
 import { AiAnalysisAdmission, RateBudgetService } from '../scheduling/rate-budget.service';
+import { HeuristicTablesService } from '../valuation/factors/tables';
 
+import {
+  AiAnalysisAuditDigest,
+  buildAiAnalysisAudit,
+  toAuditRecord,
+} from './ai-analysis-audit';
 import { buildAnalysisContext } from './analysis-context';
+import {
+  detectRepairRiskContradiction,
+  RepairRiskContradiction,
+} from './analysis-contradiction';
 import { validateAnalysisOutput } from './analysis-output';
 import { ANALYSIS_V1_POLICY } from './analysis-policy';
 import { AnalysisStatus, AnalysisTerminalReason } from './analysis.types';
@@ -39,9 +49,19 @@ export type AnalysisAttempt =
       admission?: AiAnalysisAdmission;
     }
   | { status: 'failed'; reason: AnalysisTerminalReason; record: AiAnalysis; listing: Listing }
-  | { status: 'available'; record: AiAnalysis; listing: Listing }
+  | {
+      status: 'available';
+      record: AiAnalysis;
+      listing: Listing;
+      contradiction: RepairRiskContradiction | null;
+    }
   /** Served from a stored record: no provider request, no budget charged (FR-005). */
-  | { status: 'cached'; record: AiAnalysis; listing: Listing };
+  | {
+      status: 'cached';
+      record: AiAnalysis;
+      listing: Listing;
+      contradiction: RepairRiskContradiction | null;
+    };
 
 @Injectable()
 export class AnalysisService {
@@ -65,6 +85,7 @@ export class AnalysisService {
     private readonly budget: RateBudgetService,
     @Inject(ANALYSIS_PROVIDER) private readonly provider: AnalysisProvider,
     @InjectPinoLogger(AnalysisService.name) private readonly logger: PinoLogger,
+    private readonly tables: HeuristicTablesService,
   ) {
     this.enabled = config.get('aiAnalysisEnabled', { infer: true });
     this.monthlyAllocation = config.get('aiAnalysisMonthlyAllocation', { infer: true });
@@ -72,8 +93,22 @@ export class AnalysisService {
     this.perAdminWindowHours = config.get('aiAnalysisPerAdminWindowHours', { infer: true });
   }
 
-  async analyze(input: { externalId: string; actorId: string }): Promise<AnalysisAttempt> {
-    const listing = await this.listings.findOne({ where: { externalId: input.externalId } });
+  /**
+   * One admin-triggered analysis. The listing may be named by its source id (a pasted link, the
+   * `/analyze_ai` path) or by its local id (the inline button under an alert, T032) — both resolve
+   * to the same stored listing and the same cache key, so the two entry points cannot diverge.
+   */
+  async analyze(input: {
+    externalId?: string;
+    listingId?: string;
+    actorId: string;
+  }): Promise<AnalysisAttempt> {
+    const where = input.listingId
+      ? { id: input.listingId }
+      : input.externalId
+        ? { externalId: input.externalId }
+        : null;
+    const listing = where ? await this.listings.findOne({ where }) : null;
     if (!listing) return { status: 'listing_missing' };
 
     const context = buildAnalysisContext({
@@ -121,10 +156,22 @@ export class AnalysisService {
     // nothing but our own table. That ordering is what lets a stored analysis render in full with
     // the provider disabled and no network (SC-005) — the same contract `/why` has with SPEC-015.
     //
-    // A hit writes no new row. The record it serves *is* the record of that analysis; inserting a
-    // copy per tap would inflate `/ai_audit` and duplicate the stored output for no gain.
+    // A hit writes a **marker** row: `status: 'cached'`, no `output` of its own (the record it
+    // serves already holds it). Phase 4 wrote nothing here, which was cheaper but left the cheapest
+    // invocations as the only invisible ones — and `/ai_audit` is specified to report a cache-hit
+    // rate (T031). The marker is what makes that number exist, and it keeps FR-008 literally true:
+    // every invocation has exactly one immutable record. Markers never satisfy a lookup, which
+    // filters on `available`.
     const cached = await this.findCached(listing.id, context.inputFactHash);
-    if (cached) return { status: 'cached', record: cached, listing };
+    if (cached) {
+      await persist('cached', 'ok');
+      return {
+        status: 'cached',
+        record: cached,
+        listing,
+        contradiction: this.contradiction(listing, cached),
+      };
+    }
 
     // The key must carry everything the cache key carries. Coalescing two attempts that would
     // produce differently-keyed records would let one listing's answer satisfy another's request.
@@ -132,10 +179,16 @@ export class AnalysisService {
     const joined = this.inFlight.get(key);
     if (joined) {
       const shared = await joined;
-      // The follower made no request and was charged nothing, so a success reaches it as a hit.
-      return shared.status === 'available'
-        ? { status: 'cached', record: shared.record, listing }
-        : shared;
+      // The follower made no request and was charged nothing, so a success reaches it as a hit —
+      // and is marked as one, for the same audit reason as a stored hit.
+      if (shared.status !== 'available') return shared;
+      await persist('cached', 'ok');
+      return {
+        status: 'cached',
+        record: shared.record,
+        listing,
+        contradiction: shared.contradiction,
+      };
     }
 
     const run = this.attempt(input, listing, context, persist).finally(() => {
@@ -166,9 +219,41 @@ export class AnalysisService {
     });
   }
 
+  /**
+   * SPEC-017 T033. Computed at **reply time**, not stored: the curated table is versioned config a
+   * human edits, so the honest question is always "does this answer disagree with the table as it
+   * stands now", not "as it stood when the answer was produced". A stored analysis whose claim the
+   * table has since caught up with should stop being flagged.
+   */
+  private contradiction(listing: Listing, record: AiAnalysis): RepairRiskContradiction | null {
+    if (!record.output) return null;
+    return detectRepairRiskContradiction({
+      make: listing.make,
+      model: listing.model,
+      year: listing.year,
+      output: record.output,
+      table: this.tables.get().repairRisk,
+    });
+  }
+
+  /**
+   * SPEC-017 T031 — admin-only audit over persisted attempts. Read-only, aggregate-only, and it
+   * makes no provider request: `/ai_audit` is an accounting surface, not a second way to read an
+   * analysis. The budget line comes from the dedicated `ai_analysis` allocation, never the
+   * AUTO.RIA pool.
+   */
+  async audit(windowDays = 30): Promise<AiAnalysisAuditDigest> {
+    const since = new Date(Date.now() - Math.max(1, windowDays) * 24 * 60 * 60 * 1000);
+    const [rows, budget] = await Promise.all([
+      this.analyses.find({ where: { capturedAt: MoreThanOrEqual(since) }, order: { capturedAt: 'DESC' } }),
+      this.budget.aiAnalysisAllocation(),
+    ]);
+    return buildAiAnalysisAudit(rows.map(toAuditRecord), { windowDays, budget });
+  }
+
   /** Admission → call → validate → persist. Reached only on a cache miss. */
   private async attempt(
-    input: { externalId: string; actorId: string },
+    input: { actorId: string },
     listing: Listing,
     context: ReturnType<typeof buildAnalysisContext>,
     persist: (
@@ -236,13 +321,15 @@ export class AnalysisService {
       };
     }
 
+    const record = await persist('available', 'ok', {
+      samplingParams: outcome.samplingParams,
+      output: validated.value,
+    });
     return {
       status: 'available',
       listing,
-      record: await persist('available', 'ok', {
-        samplingParams: outcome.samplingParams,
-        output: validated.value,
-      }),
+      record,
+      contradiction: this.contradiction(listing, record),
     };
   }
 }

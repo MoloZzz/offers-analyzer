@@ -11,15 +11,32 @@ updated: 2026-08-07
 
 ## Active work
 
+**SPEC-017 phase 5 — audit, inline button, contradictions implemented 2026-08-07 (T030–T033).
+The spec is now complete.** Admin-only `/ai_audit [days]` reports attempts by status, reason, model,
+prompt version and admin, plus the **cache-hit rate** and the dedicated `ai_analysis` allocation —
+read-only, aggregate-only, and it never renders stored model text. An admin-only 🤖 inline button
+under alerts routes to the same path as the command (its own `ai:` plumbing, deliberately not merged
+with spec 016's `details:`, and attached per recipient). A curated-table **contradiction display**
+shows both sides when the model and the repair-risk table disagree and reconciles nothing.
+
+**This reversed one phase-4 decision.** A cache hit now writes a `cached` **marker** row (no output
+of its own) — `/ai_audit`'s cache-hit rate had no other source, and the marker keeps FR-008 literally
+true without a schema change. Decisions, and why the alternatives were rejected:
+`context/log/2026-08-07-ai-analysis-audit-and-contradictions.md`.
+
+Verification: `typecheck`, `lint`, unit Jest **688/688** (77 suites), contract Jest **108/108**,
+`nest build` — all pass; T008 re-run as the phase exit condition.
+
 **SPEC-017 phase 4 — content-hash cache implemented 2026-08-07 (T026–T029).** `/analyze_ai` now
 looks up `ai_analyses` on `(listingId, inputFactHash, promptVersion, modelId)` **before** budget
 admission *and before the kill switch* — a hit makes no provider request, charges nothing, and
 renders the stored answer marked as cached with its **original** capture time. Simultaneous taps on
 one listing are single-flighted in process, so two admins produce one provider request. A changed
 price, description, or source fact moves the hash and misses; a `promptVersion` or `modelId` change
-misses too. Failed attempts are never cached, and **a hit writes no new row** — which leaves phase
-5's `/ai_audit` cache-hit rate needing an invocation counter (flagged in `tasks.md` and the log).
-Decisions: `context/log/2026-08-07-ai-analysis-cache.md`.
+misses too. Failed attempts are never cached. **Revised the same day by phase 5:** a hit now writes
+a `cached` **marker row** (no output of its own), because `/ai_audit`'s cache-hit rate has no other
+source — see the active-work section above. Decisions:
+`context/log/2026-08-07-ai-analysis-cache.md`.
 
 Verification: `typecheck`, `lint`, unit Jest **652/652** (74 suites), contract Jest **108/108**,
 `nest build` — all pass; T008 re-run as the phase exit condition.
@@ -192,11 +209,15 @@ flip should be presented alongside the combined rollout. See
 
 ## Next pickup
 
-With phases 1–4 in, the remaining **ungated** engineering work on SPEC-017 is **phase 5** —
-`/ai_audit`, the inline-button shortcut, and the contradiction display (T030–T033). Start T031 by
-deciding where a cache hit is counted: it deliberately writes no `ai_analyses` row, so the specified
-cache-hit rate has no source yet. None of it can be exercised end-to-end until an operator enables
-the provider, but it is all pure code.
+**SPEC-017 is complete in code, so there is no remaining ungated engineering work.** What is left on
+it is entirely operator-side (T037): approved provider credentials, approved provider terms,
+confirmation that listing content may lawfully be sent to that provider, and an agreed monthly cap —
+then applying the additive migration on an approved database and setting a non-zero allocation.
+
+Everything else — the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence
+gates or the month-long accident shadow window (opened on the first production poll after the
+2026-08-03 phase-2 deploy, so closing ~2026-09-03), not on code. **The next material step is
+operator/evidence work.**
 
 Everything else — the `k` rollout, SPEC-006's monetary slices, SPEC-018 phase 3 — waits on evidence
 gates or the month-long accident shadow window (which opened on the first production poll after the

@@ -28,6 +28,22 @@ const output = {
 
 function buildBot(analyzeResult: unknown, adminIds: string[] = ['77']) {
   const analyze = jest.fn().mockResolvedValue(analyzeResult);
+  const audit = jest.fn().mockResolvedValue({
+    hasData: true,
+    windowDays: 30,
+    total: 2,
+    providerAttempts: 1,
+    cacheHits: 1,
+    cacheHitRate: 0.5,
+    refusals: 0,
+    statusCounts: { available: 1, cached: 1 },
+    reasonCounts: { ok: 2 },
+    modelCounts: { 'claude-opus-5': 2 },
+    promptVersionCounts: { 'analysis-v1': 2 },
+    actorCounts: { '77': 2 },
+    budget: { allocation: 25, used: 1 },
+    lastCapturedAt: new Date('2026-08-06T10:00:00Z'),
+  });
   const update = new TelegramBotUpdate(
     {} as never,
     {} as never,
@@ -37,7 +53,7 @@ function buildBot(analyzeResult: unknown, adminIds: string[] = ['77']) {
     {} as never,
     {} as never,
     { get: () => adminIds } as never,
-    { analyze } as unknown as AnalysisService,
+    { analyze, audit } as unknown as AnalysisService,
   );
   const reply = jest.fn().mockResolvedValue(undefined);
   const ctx = {
@@ -45,7 +61,23 @@ function buildBot(analyzeResult: unknown, adminIds: string[] = ['77']) {
     message: { text: `/analyze_ai ${URL}` },
     reply,
   } as unknown as Context;
-  return { update, ctx, reply, analyze };
+  return { update, ctx, reply, analyze, audit };
+}
+
+/** A callback-query context, as the inline button under an alert delivers it. */
+function buttonCtx(listingId: string, chatId = 77) {
+  const reply = jest.fn().mockResolvedValue(undefined);
+  const answerCbQuery = jest.fn().mockResolvedValue(undefined);
+  return {
+    ctx: {
+      chat: { id: chatId },
+      callbackQuery: { data: `ai:${listingId}` },
+      reply,
+      answerCbQuery,
+    } as unknown as Context,
+    reply,
+    answerCbQuery,
+  };
 }
 
 const replied = (reply: jest.Mock): string => reply.mock.calls.map((c) => c[0]).join('\n');
@@ -213,5 +245,68 @@ describe('SPEC-017 rendering — the advisory score is subordinate (FR-010, ADR-
 
     expect(cached).toContain('Збережена відповідь');
     expect(cached).toContain('без нового запиту');
+  });
+});
+
+describe('/ai_audit — admin-only accounting surface (T031)', () => {
+  it('refuses a non-admin without reading anything', async () => {
+    const { update, ctx, reply, audit } = buildBot(null, ['999']);
+
+    await update.onAiAudit(ctx);
+
+    expect(audit).not.toHaveBeenCalled();
+    expect(replied(reply)).toContain('administrators only');
+  });
+
+  it('defaults to a 30-day window and renders the digest', async () => {
+    const { update, ctx, reply, audit } = buildBot(null);
+    (ctx as unknown as { message: { text: string } }).message.text = '/ai_audit';
+
+    await update.onAiAudit(ctx);
+
+    expect(audit).toHaveBeenCalledWith(30);
+    expect(replied(reply)).toContain('Влучань у кеш: 50%');
+  });
+
+  it('accepts a window argument, clamped to a year', async () => {
+    const { update, ctx, audit } = buildBot(null);
+    (ctx as unknown as { message: { text: string } }).message.text = '/ai_audit 9999';
+
+    await update.onAiAudit(ctx);
+
+    expect(audit).toHaveBeenCalledWith(365);
+  });
+});
+
+describe('🤖 AI-аналіз button — the same path, gated again (T032)', () => {
+  it('routes an admin tap to the analysis service by listing id', async () => {
+    const { update, analyze } = buildBot({ status: 'refused', reason: 'disabled', record: null });
+    const { ctx, answerCbQuery } = buttonCtx('listing-1');
+
+    await update.onAnalyzeButton(ctx);
+
+    expect(analyze).toHaveBeenCalledWith({ listingId: 'listing-1', actorId: '77' });
+    expect(answerCbQuery).toHaveBeenCalled();
+  });
+
+  it('refuses a non-admin tap without calling the service', async () => {
+    const { update, analyze } = buildBot(null, ['999']);
+    const { ctx, answerCbQuery, reply } = buttonCtx('listing-1');
+
+    await update.onAnalyzeButton(ctx);
+
+    expect(analyze).not.toHaveBeenCalled();
+    expect(answerCbQuery).toHaveBeenCalledWith('Тільки для адміністраторів');
+    expect(reply).not.toHaveBeenCalled();
+  });
+
+  it('ignores a malformed callback', async () => {
+    const { update, analyze } = buildBot(null);
+    const { ctx } = buttonCtx('listing-1');
+    (ctx as unknown as { callbackQuery: { data: string } }).callbackQuery.data = 'details:listing-1';
+
+    await update.onAnalyzeButton(ctx);
+
+    expect(analyze).not.toHaveBeenCalled();
   });
 });

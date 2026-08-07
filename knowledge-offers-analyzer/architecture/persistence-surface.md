@@ -31,7 +31,9 @@ rev: d076e142f797
   cache key) and on `capturedAt` — plus one nullable `actorId` column on `budget_activities` so a
   human-triggered admission records who triggered it. Additive and append-only; the migration
   `1785400000000-spec-017-ai-analysis.ts` was **not applied** by the implementation task. Nothing in
-  it touches a scoring, benchmark, threshold, or alert column.
+  it touches a scoring, benchmark, threshold, or alert column. Phase 5 (2026-08-07) added **no
+  schema change**: cache hits are recorded as ordinary rows with `status: 'cached'` and no `output`,
+  using columns the table already had.
 - SPEC-006 US6.1 (2026-08-04) added **no table and no column**. `ParameterSet` gained six optional
   fields *inside its existing JSON `params`* and the explanation gained fields inside the existing
   JSON explanation column, so both are typing changes over data the schema already holds — no

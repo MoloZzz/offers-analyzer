@@ -134,6 +134,8 @@ async function deliverAlert(): Promise<{ text: string; buttons: Array<Array<{ te
       save: jest.fn().mockResolvedValue(undefined),
     } as unknown as Repository<Notification>,
     notifier as never,
+    // Spec 017: this alert goes to a non-admin subscriber, so no AI button is attached.
+    { get: () => [] } as never,
   );
 
   await service.notifyOpportunity(opportunity, listing);
